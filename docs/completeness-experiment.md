@@ -1,5 +1,12 @@
 # Completeness-contract experiment
 
+Status update (2026-09-11): this remains a partial proof of concept. The custom
+translation profile and machine-ID extraction problems have been fixed; the
+translation and structure audits now pass. Actual bilingual HTML/PDF/DOCX have
+been rendered. Full acceptance is still blocked by unsupported Markdown pipe
+tables and unreviewed content outside the pilot. See the new Chinese repository's
+`docs/pilot-results.md` for evidence and the remaining limits.
+
 ## Decision being tested
 
 Keep one maintained English Jinja template as the executable source, improve
@@ -54,16 +61,15 @@ The three selected questions exercise different Jinja failure modes:
   unanswered reply as “no instrument dataset.” Re-use and provenance could
   also disappear.
 - **SE-3a / Question 5:** an unanswered top-level choice previously yielded an
-  empty answer block. The Science Europe audit also exposes two KM coverage
-  gaps: storage/backup locations and backup frequency are not directly
-  collected by the mapped replies.
+  empty answer block. The selected mappings do not yet cover storage/backup
+  locations and backup frequency. This is not proof that the entire KM lacks
+  suitable questions; a full-KM audit is still required.
 - **SE-6b / Question 15:** expertise, hardware/software, project costs, amounts,
   allocation, and cost coverage could disappear independently.
 
-The coverage gaps are intentional experimental results. Jinja must not invent
-answers that the knowledge model did not collect. If the gaps are unacceptable,
-the next change belongs in the questionnaire/KM as well as the document
-template.
+The mapping gaps are experimental results. Jinja must not invent answers.
+First audit the complete KM, then bind existing suitable questions or propose
+KM additions; do not infer missing questionnaire coverage from one template file.
 
 ## Acceptance criteria
 
@@ -96,8 +102,8 @@ bindings. `dsw-tdk verify` validates the complete package structure.
 - Questions other than SE-1a, SE-3a, and SE-6b are recorded but still marked
   `upstream-unreviewed`.
 - This branch has not changed the knowledge model. Consequently, an unmapped
-  Science Europe topic remains visible as missing even when all existing DSW
-  fields are answered.
+  Science Europe topic remains visible as missing in this slice even when its
+  mapped fields are answered. These markers must not be used to judge the full KM.
 - Runtime LLM generation and JSON-to-prose generation are outside this
   experiment. They can be evaluated later without becoming a workaround for
   missing source data.

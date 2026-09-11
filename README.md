@@ -3,22 +3,34 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `myorg:science-europe-completeness-experiment:0.1.0`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.1.0`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
-answers are rendered. An unanswered branch is displayed as **Information not
-provided**; it is never silently omitted and never treated as an explicit
-negative answer. Stable `data-requirement-id`, `data-fact-id`, and
+answers are rendered in the Q1/Q5/Q15 pilot. Covered unanswered branches display
+**Information not provided** instead of being omitted or treated as negative.
+This is not yet implemented or audited for every branch or all 15 questions.
+Stable `data-requirement-id`, `data-fact-id`, and
 `data-status` attributes also give the English and translated outputs a
 deterministic alignment key.
 
-This is the DMP template recommended by [Science Europe](https://www.scienceeurope.org) in their [Science Europe Guidance Document](https://scienceeurope.org/media/4brkxxe5/se_rdm_practical_guide_extended_final.pdf) designed for use in [Data Stewardship Wizard](https://ds-wizard.org) with [*Common Data Stewardship knowledge model*](https://registry.ds-wizard.org/knowledge-models/dsw:root:latest) and [*Life Sciences DSW Knowledge Model*](https://registry.ds-wizard.org/knowledge-models/dsw:lifesciences:latest). It applies various rules and synthesizes the text answers from questionnaire replies to relevant questions.
+This is a customized derivative of the official DSW Science Europe template,
+not an officially endorsed Science Europe template. Its content contract refers
+to the [Science Europe Guidance Document](https://scienceeurope.org/media/4brkxxe5/se_rdm_practical_guide_extended_final.pdf).
+It uses questionnaire replies in [Data Stewardship Wizard](https://ds-wizard.org);
+no runtime LLM generates or invents the answers.
 
 
 ## Usage
 
-This template is available through [DSW Registry](https://registry.ds-wizard.org/templates).
+This experimental custom template is not published in the DSW Registry.
+The official upstream template is available through the
+[DSW Registry](https://registry.ds-wizard.org/templates).
+
+Build reviewed bilingual candidates with
+[`ThreeMonth03/science-europe-template-zhtw`](https://github.com/ThreeMonth03/science-europe-template-zhtw).
+That build prepares embedded PDF fonts and language-specific Word reference
+styles before packaging; a raw `make package` is not the reviewed bilingual build.
 
 
 ## Local experiment and development
@@ -40,7 +52,7 @@ Before adopting a new release, follow
 [`docs/upstream-upgrades.md`](docs/upstream-upgrades.md) and run:
 
 ```bash
-git fetch upstream --tags
+git fetch --no-tags upstream '+refs/heads/main:refs/remotes/upstream/main' 'refs/tags/*:refs/tags/upstream/*'
 python scripts/audit_upstream.py --target upstream/main
 ```
 

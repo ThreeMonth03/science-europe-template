@@ -18,7 +18,7 @@ jobs:
       - name: Fetch official template
         run: |
           git remote add upstream https://github.com/ds-wizard/science-europe-template.git
-          git fetch upstream main --tags
+          git fetch --no-tags upstream '+refs/heads/main:refs/remotes/upstream/main' 'refs/tags/*:refs/tags/upstream/*'
       - name: Classify changes since the recorded base
         shell: bash
         run: |

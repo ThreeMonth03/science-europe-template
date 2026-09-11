@@ -1,1 +1,2 @@
-dsw-tdk>=4,<5
+dsw-tdk==4.30.2
+python-docx==1.2.0

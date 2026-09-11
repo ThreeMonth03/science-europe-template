@@ -5,3 +5,4 @@ template*.zip
 .DS_Store
 __pycache__/
 *.py[cod]
+fixtures/knowledge-models/*.km

@@ -15,15 +15,15 @@
       <ul>
         {%- for datasetItem in measuredDataItems -%}
           {%- set pathPrefix = [measuredDataPath, datasetItem]|reply_path -%}
-          <li>
+          <li data-item-id="{{ pathPrefix }}">
             {%- set measuredDataNamePath = [pathPrefix, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataName = repliesMap[measuredDataNamePath]|reply_str_value -%}
-            <strong>{{ measuredDataName if measuredDataName else "(no name given)" }}</strong>
+            <h5>{{ measuredDataName if measuredDataName else "(no name given)" }}</h5>
             {# Instruments #}
             {%- set measuredDataInstrPath = [pathPrefix, uuids.measuredDataInstrQUuid]|reply_path -%}
             {%- set measuredDataInstrItems = repliesMap[measuredDataInstrPath]|reply_items -%}
             {%- if measuredDataInstrItems|length > 0 -%}
-              <p>For this dataset, we are using the following instruments:
+              <p>For this dataset, we are using the following instruments:</p>
               <ul>
                 {%- for instrItem in measuredDataInstrItems -%}
                   {%- set instrPathPrefix = [measuredDataInstrPath, instrItem]|reply_path -%}
@@ -38,7 +38,6 @@
                   </li>
                 {%- endfor -%}
               </ul>
-              </p>
             {%- else -%}
               <p>No instruments for this dataset have been specified.</p>
             {%- endif -%}
@@ -120,7 +119,7 @@
                 </ul>
                 </p>
               {%- else -%}
-                <p>We will be using quality processes.<p>
+                <p class="data-gap" data-fact-id="quality-methods" data-status="missing"><strong>Information not provided:</strong> the quality control methods to be used.</p>
               {%- endif -%}
               {# Other quality processes #}
               {%- set mdQualityOtherPath = [mdqPrefix, uuids.mdQualityOtherQUuid]|reply_path -%}
@@ -129,7 +128,7 @@
                 {%- set mdQualityOtherYesPath = [mdQualityOtherPath, uuids.mdQualityOtherYesAUuid, uuids.mdQualityOtherWhatQUuid]|reply_path -%}
                 {%- set mdQualityOther = repliesMap[mdQualityOtherYesPath]|reply_str_value -%}
                 {%- if mdQualityOther -%}
-                  <p>{{ "Additional" if qualityCount > 0 else "Our" }} quality processes are: {{ mdQualityOther|markdown }}</p>
+                  <div class="answer-detail"><p><strong>Other quality control methods</strong></p>{{ mdQualityOther|markdown }}</div>
                 {%- endif -%}
               {%- endif -%}
             {%- endif -%}
@@ -137,12 +136,12 @@
         {%- endfor -%}
       </ul>
     {%- else -%}
-      {{ macros.missing("SE-1a", "collection-methods", "the datasets to be collected or produced and the methods, instruments, or software that will be used") }}
+      <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="collection-methods" data-status="missing"><strong>Information not provided:</strong> the datasets to be collected or produced and the methods, instruments, or software that will be used.</p>
     {%- endif -%}
   {%- elif measuredAUuid == uuids.measuredNoAUuid -%}
     <p data-requirement-id="SE-1a" data-fact-id="new-data" data-status="explicit-no">No new instrument datasets will be produced in this project.</p>
   {%- else -%}
-    {{ macros.missing("SE-1a", "new-data", "whether the project will collect or produce new instrument data") }}
+    <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="new-data" data-status="missing"><strong>Information not provided:</strong> whether the project will collect or produce new instrument data.</p>
   {%- endif -%}
 
  {# Existing datasets #}
@@ -160,7 +159,7 @@
       <ul>
       {# Reference Data #}
         {%- for refDataItem in refDataItems -%}
-          <li>
+          <li data-item-id="{{ refDataItem }}">
           {%- set refDataPrefix = [refDataPath, refDataItem]|reply_path -%}
           {%- set refDataUse = [refDataPrefix, uuids.refDataUseQUuid]|reply_path -%}
           {%- set refDataUseReply = repliesMap[refDataUse]|reply_str_value -%}
@@ -170,7 +169,7 @@
           {%- set refDataWhere = repliesMap[[refDataPrefix, uuids.refDataWhereQUuid]|reply_path]|reply_str_value -%}
 
           {%- if refDataNameReply -%}
-            <strong>{{ refDataNameReply }}</strong>
+            <h5>{{ refDataNameReply }}</h5>
           {%- else -%}
             <strong>(no name given)</strong>
           {%- endif -%}
@@ -179,25 +178,27 @@
           {%- if refDataUseReply == uuids.refDataUseYesAUuid  %}
 
             {# identification #}
-            <p>We will re-use this standard reference data
-            {%- if refDataWhere -%}
-              {{" "}}available via:{{" "}}
-              {%- if refDataWhere.startswith("http://") or refDataWhere.startswith("https://") or refDataWhere.startswith("ftp://") -%}
-                <a href="{{ refDataWhere }}" target="_blank">{{ refDataWhere }} </a>.
-              {%- else -%}
-                {{ refDataWhere }}
-             {%- endif -%}
-            {%- endif -%}
-    
-            {# usage #}
-            {%- set refDataUsageQ = [ refDataUsedPrefix, uuids.refDataUsageQUuid]|reply_path -%}
-            {%- set refDataUsageReply = repliesMap[refDataUsageQ]|reply_str_value  -%}
-            {%- if refDataUsageReply -%}
-                {{+" "}}in order to {{ refDataUsageReply|markdown }}
-            {%- else -%}.
-            {%- endif -%}
-            </p>
-    
+            <p data-fact-id="reuse-decision" data-status="complete">This reference dataset will be re-used.</p>
+            {% if refDataWhere %}
+              {% if refDataWhere.startswith("https://") or refDataWhere.startswith("http://") or refDataWhere.startswith("ftp://") %}
+              <p data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ refDataWhere }}">{{ refDataWhere }}</a></p>
+            {% else %}
+              <p data-fact-id="dataset-source" data-status="complete">Source: {{ refDataWhere }}</p>
+            {% endif %}
+            {% else %}
+              <p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>
+            {% endif %}
+            {%- set refDataUsageQ = [refDataUsedPrefix, uuids.refDataUsageQUuid]|reply_path -%}
+            {%- set refDataUsageReply = repliesMap[refDataUsageQ]|reply_str_value -%}
+            {% if refDataUsageReply %}
+              <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
+                <p><strong>Purpose of re-use</strong></p>
+                {{ refDataUsageReply|markdown }}
+              </div>
+            {% else %}
+              <p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>
+            {% endif %}
+
             {# version #}
             {%- set refDataVersionedPath = [refDataUsedPrefix, uuids.refDataVersionedQUuid]|reply_path -%}
             {%- set refDataVersionedAUuid = repliesMap[refDataVersionedPath]|reply_str_value -%}
@@ -206,20 +207,23 @@
               {%- set refDataVersionedWhich = repliesMap[refDataVersionedWhichPath]|reply_str_value -%}
               {%- set refDataVersionedChangePath = [refDataVersionedPath, uuids.refDataVersionedYesAUuid, uuids.refDataVersionedChangeQUuid]|reply_path -%}
               {%- set refDataVersionedChangeAUuid = repliesMap[refDataVersionedChangePath]|reply_str_value -%}
-              {%- if refDataVersionedWhich or refDataVersionedChangeAUuid  %}
-                <p>
-                {% if refDataVersionedWhich -%}
-                  We will use the following version of this dataset: {{ refDataVersionedWhich|markdown }}
-                {%- endif -%}
-                {%- if refDataVersionedChangeAUuid == uuids.refDataVersionedChangeStayAUuid %}
-                  If a new version becomes available during the project, we will stay with the old version.
-                {%- elif refDataVersionedChangeAUuid == uuids.refDataVersionedChangeNewAUuid %}
-                  If a new version becomes available during the project, new analyses will be done with the new version.
-                {%- elif refDataVersionedChangeAUuid == uuids.refDataVersionedChangeAllAUuid %}
-                  If a new version becomes available during the project, all analyses will be redone with the new version.
-                {%- endif -%}
-                </p>
-              {%- endif -%}
+              {% if refDataVersionedWhich %}
+                <div class="answer-detail" data-fact-id="dataset-version" data-status="complete">
+                  <p><strong>Dataset version to be used</strong></p>
+                  {{ refDataVersionedWhich|markdown }}
+                </div>
+              {% else %}
+                <p class="data-gap" data-fact-id="dataset-version" data-status="missing"><strong>Information not provided:</strong> which version of this dataset will be used.</p>
+              {% endif %}
+              {% if refDataVersionedChangeAUuid == uuids.refDataVersionedChangeStayAUuid %}
+                <p>If a new version becomes available during the project, the current version will continue to be used.</p>
+              {% elif refDataVersionedChangeAUuid == uuids.refDataVersionedChangeNewAUuid %}
+                <p>If a new version becomes available during the project, it will be used for new analyses.</p>
+              {% elif refDataVersionedChangeAUuid == uuids.refDataVersionedChangeAllAUuid %}
+                <p>If a new version becomes available during the project, all analyses will be repeated using it.</p>
+              {% else %}
+                <p class="data-gap" data-fact-id="dataset-version-policy" data-status="missing"><strong>Information not provided:</strong> how new dataset versions will be handled.</p>
+              {% endif %}
             {%- endif -%}
 
             {# availability of the standard reference data for future results reproduction #}
@@ -313,7 +317,7 @@
       {# Non-reference Data #}
       <ul>
       {%- for nrefDataItem in nrefDataItems -%}
-      <li>
+      <li data-item-id="{{ nrefDataItem }}">
         {%- set nrefDataPrefix = [nrefDataPath, nrefDataItem]|reply_path  -%}
         {%- set nrefDataUse = [nrefDataPrefix, uuids.nrefDataUseQUuid]|reply_path -%}
         {%- set nrefDataUseReply = repliesMap[nrefDataUse]|reply_str_value -%}
@@ -322,7 +326,7 @@
         {%- set nrefDataWhere = repliesMap[[nrefDataPrefix, uuids.nrefDataWhereQUuid]|reply_path]|reply_str_value -%}
 
         {%- if nrefDataNameReply -%}
-          <strong>{{ nrefDataNameReply }}</strong>
+          <h5>{{ nrefDataNameReply }}</h5>
         {%- else -%}
           <strong>(no name given)</strong>
         {%- endif -%}
@@ -331,23 +335,26 @@
         {%- if nrefDataUseReply == uuids.nrefDataUseYesAUuid %}
 
           {# identification #}
-          <p>We will re-use this non-referece data 
-          {%- if nrefDataWhere -%}
-         {{" "}} available via:{{" "}}
-            {%- if nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("ftp://") -%}
-              <a href="{{ nrefDataWhere }}" target="_blank">{{ nrefDataWhere }} </a>.
-            {%- else -%}
-              {{ nrefDataWhere }}
-            {%- endif -%}
-          {%- endif -%}
-    
-          {# usage #}
-          {%- set nrefDataUsageQ = [nrefDataUsedPrefix, uuids.nrefDataUsageQUuid]|reply_path  -%}
+          <p data-fact-id="reuse-decision" data-status="complete">This dataset will be re-used.</p>
+          {% if nrefDataWhere %}
+            {% if nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("ftp://") %}
+              <p data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ nrefDataWhere }}">{{ nrefDataWhere }}</a></p>
+            {% else %}
+              <p data-fact-id="dataset-source" data-status="complete">Source: {{ nrefDataWhere }}</p>
+            {% endif %}
+          {% else %}
+            <p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>
+          {% endif %}
+          {%- set nrefDataUsageQ = [nrefDataUsedPrefix, uuids.nrefDataUsageQUuid]|reply_path -%}
           {%- set nrefDataUsageReply = repliesMap[nrefDataUsageQ]|reply_str_value -%}
-          {%- if nrefDataUsageReply -%}
-            {{+" "}}in order to {{ nrefDataUsageReply|markdown }}
-          {%- endif -%}
-          .</p>
+          {% if nrefDataUsageReply %}
+            <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
+              <p><strong>Purpose of re-use</strong></p>
+              {{ nrefDataUsageReply|markdown }}
+            </div>
+          {% else %}
+            <p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>
+          {% endif %}
 
           {# Which part of the non-reference data we will use #}
           {%- set nrefDataComplete = [nrefDataUsedPrefix, uuids.nrefDataCompleteQUuid]|reply_path  -%}
@@ -470,46 +477,36 @@
           {%- set nrefDataUseNoOtherReasonReply = repliesMap[nrefDataUseNoOtherReason]|reply_str_value %}
           
           {# identification #}
-          <p>We considered reusing this non-reference data 
-          {%- if nrefDataWhere -%}
-          {{+" "}}available via:{{" "}}
-            {%- if nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("ftp://") -%}
-              <a href="{{ rnefDataWhere }}" target="_blank">{{ nrefDataWhere }} </a>.
-            {%- else -%}
-              {{ nrefDataWhere }}
-            {%- endif -%}
-          {%- endif -%}
-
-          {# no usage reason #}
-          {%- if nrefDataUseNoReply -%}
-            , but decided not to reuse it
-            {%- if nrefDataUseNoReply == uuids.nrefDataUseNoDataAUuid -%}
-              {{" "}}because it misses data we need
-            {%- elif nrefDataUseNoReply == uuids.nrefDataUseNoAspectAUuid -%}
-              {{" "}}becauseit misses required aspects
-            {%- elif nrefDataUseNoReply == uuids.nrefDataUseNoQualityAUuid -%}
-              {{" "}}becauseit is not sufficient quality
-            {%- elif nrefDataUseNoReply == uuids.nrefDataUseNoCondAUuid -%}
-              {{" "}}because its conditions of use do not allow us to use it
-            {%- elif nrefDataUseNoReply == uuids.nrefDataUseNoReasonAUuid and nrefDataUseNoOtherReasonReply -%}
-              {{" "}}because: {{nrefDataUseNoOtherReasonReply|markdown}}
-            {%- else -%}
-             .
-            {%- endif -%}
-
-          {%- else -%}
-          .</p>
-          {%- endif -%}
-
+          <p data-fact-id="reuse-decision" data-status="explicit-no">This dataset was considered but will not be re-used.</p>
+          {% if nrefDataWhere %}
+            {% if nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("ftp://") %}
+              <p>Source: <a href="{{ nrefDataWhere }}">{{ nrefDataWhere }}</a></p>
+            {% else %}
+              <p>Source: {{ nrefDataWhere }}</p>
+            {% endif %}
+          {% endif %}
+          {% if nrefDataUseNoReply == uuids.nrefDataUseNoDataAUuid %}
+            <p>It does not contain the data required for this project.</p>
+          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoAspectAUuid %}
+            <p>It does not cover the aspects required for this project.</p>
+          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoQualityAUuid %}
+            <p>Its quality is insufficient for this project.</p>
+          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoCondAUuid %}
+            <p>Its conditions of use do not permit the intended re-use.</p>
+          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoReasonAUuid and nrefDataUseNoOtherReasonReply %}
+            <div class="answer-detail"><p><strong>Reason for not re-using this dataset</strong></p>{{ nrefDataUseNoOtherReasonReply|markdown }}</div>
+          {% else %}
+            <p class="data-gap" data-fact-id="nonreuse-reason" data-status="missing"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>
+          {% endif %}
+        {% else %}
+          <p class="data-gap" data-fact-id="reuse-decision" data-status="missing"><strong>Information not provided:</strong> whether this dataset will be re-used.</p>
         {%- endif -%}
-
-      </p>
       </li>
       {%- endfor -%}
       </ul>
       </div>
     {%- else -%}
-      {{ macros.missing("SE-1a", "reuse-sources", "the existing datasets considered for re-use, including any sources that were considered but discarded") }}
+      <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> the existing datasets considered for re-use, including any sources that were considered but discarded.</p>
     {%- endif -%}
 
     {# Constrains - Data Harmonization #}
@@ -572,9 +569,9 @@
       </p>
     {%- endif -%}
   {%- elif preexistingAUuid == uuids.preexistingNoAUuid -%}
-    <p data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="explicit-no">No relevant pre-existing datasets were identified for re-use.</p>
+    <p data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="explicit-no">No existing datasets will be re-used.</p>
   {%- else -%}
-    {{ macros.missing("SE-1a", "reuse-sources", "whether existing data will be re-used, including constraints or reasons for discarding candidate sources") }}
+    <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> whether existing data will be re-used, including constraints or reasons for discarding candidate sources.</p>
   {%- endif -%}
 
   {# Provenance (lab notebooks)#}
@@ -595,16 +592,19 @@
           {%- set provenanceOtherPath = [provenancePath, uuids.provenanceOtherAUuid, uuids.provenanceOtherQUuid]|reply_path -%}
           {%- set provenanceOther = repliesMap[provenanceOtherPath]|reply_str_value -%}
           {%- if provenanceOther -%}
-            <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We will use the following arrangement to document the provenance of the data analysis: {{ provenanceOther|markdown }}</p>
+            <div class="answer-detail" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">
+              <p><strong>How data provenance will be documented</strong></p>
+              {{ provenanceOther|markdown }}
+            </div>
           {%- else -%}
-            {{ macros.missing("SE-1a", "provenance-detail", "the other arrangement that will document data provenance") }}
+            <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance-detail" data-status="missing"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>
           {%- endif -%}
         {%- endif -%}
       {%- else -%}
-        {{ macros.missing("SE-1a", "provenance", "how data provenance will be documented") }}
+        <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>
       {%- endif -%}
     {%- else -%}
-      {{ macros.missing("SE-1a", "provenance", "how data provenance will be documented") }}
+      <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>
     {%- endif -%}
   </div>
 </div>

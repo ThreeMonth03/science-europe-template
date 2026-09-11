@@ -44,7 +44,7 @@
           "id": "collection-methods",
           "dswBindings": ["measuredQUuid", "measuredDataQUuid", "measuredDataInstrQUuid"],
           "coverage": "partial",
-          "gap": "The KM captures instrument datasets and instruments but has no general field for methodology or software."
+          "gap": "This slice maps instrument datasets and instruments, not general methodology or software. Full-KM coverage has not yet been audited."
         },
         {
           "id": "reuse-sources",

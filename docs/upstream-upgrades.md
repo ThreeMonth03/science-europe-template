@@ -1,5 +1,12 @@
 # Upstream upgrade policy
 
+Review update (2026-09-11): the procedure below describes the initial small-patch
+experiment. For substantial sentence/layout customization, use the selective
+integration and provenance recommendations in the
+[pipeline reassessment](pipeline-reassessment-2026-09.md). In particular, do not
+automatically replace customized Word styles or advance the upstream baseline
+after selectively importing only some changes.
+
 ## Repository model
 
 - `origin` is the project repository:
@@ -37,28 +44,30 @@ and a small Jinja fix can touch many translated strings.
 1. Fetch without changing the working branch:
 
    ```bash
-   git fetch upstream --tags --prune
+   git fetch --no-tags upstream '+refs/heads/main:refs/remotes/upstream/main' 'refs/tags/*:refs/tags/upstream/*'
    python scripts/audit_upstream.py --target upstream/main
    ```
 
 2. Choose a released tag, then create a review branch from the current custom
-   branch:
+   branch. Classify its changes before selecting a merge strategy:
 
    ```bash
    git switch -c upgrade/upstream-vX.Y.Z
-   git merge --no-commit --no-ff vX.Y.Z
    ```
 
-3. Stop and review every `critical` and `high` group in the audit report before
-   resolving the merge. Never resolve `src/uuids.j2` or question-template
+3. Review every `critical` and `high` group. Still-inherited files can be merged
+   normally; independently rewritten questions and Word styles need selective
+   semantic porting. Only after deciding a full merge is appropriate, use
+   `git merge --no-commit --no-ff upstream/vX.Y.Z`. Never resolve UUID or question
    conflicts by choosing an entire side.
 
 4. Update the Science Europe contract when a binding or output behaviour has
    changed. If the official standard changes, record that as a separate source
    revision; do not silently edit the 2021 contract.
 
-5. Update `.upstream/base.json` only after the merge has been semantically
-   reviewed. Record the new tag and its full commit hash.
+5. Update `.upstream/base.json` only after a full integration has been reviewed.
+   Selective porting must instead record accepted/rejected/pending changes in an
+   upgrade ledger, retaining the original base. Record full commit hashes.
 
 6. Run structural and contract checks:
 
@@ -72,8 +81,9 @@ and a small Jinja fix can touch many translated strings.
    and fact IDs.
 
 8. Merge the upgrade branch only after the visual review. Tag the local release
-   separately from the official version, for example
-   `local-v0.2.0-upstream-v1.31.0`.
+   separately from official namespaced tags: custom `v0.2.0` versus official
+   `upstream/v1.31.0`. The manifest records their relationship. Never use
+   `git push --tags`; push only an explicitly approved custom release tag.
 
 ## Automation boundary
 
@@ -82,8 +92,7 @@ fails when a change is detected so that the repository receives a visible
 signal; it does not merge, rewrite Jinja, update UUIDs, or alter the Word
 reference file automatically. Those steps require semantic and visual review.
 
-If the local changes eventually overlap most upstream question files, stop
-merging feature by feature and reassess the architecture. At that point a
-versioned upstream source plus deterministic overlay/generation step may be
-cheaper. The current three-question patch is intentionally below that
-threshold.
+The pilot already owns substantial Q1/Q15 prose and output styling. Treat those
+as selectively maintained derivatives now, not as a promise of conflict-free
+full merges. The 1.30.0 → 1.30.1 replay and its translation review queue are
+recorded in the new Chinese repository's `docs/pilot-results.md`.
