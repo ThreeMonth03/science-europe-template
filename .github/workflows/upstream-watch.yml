@@ -1,0 +1,31 @@
+name: Watch upstream template
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 2 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Fetch official template
+        run: |
+          git remote add upstream https://github.com/ds-wizard/science-europe-template.git
+          git fetch upstream main --tags
+      - name: Classify changes since the recorded base
+        shell: bash
+        run: |
+          set -o pipefail
+          set +e
+          python scripts/audit_upstream.py --target upstream/main --fail-on-change | tee upstream-audit.md
+          audit_status=${PIPESTATUS[0]}
+          set -e
+          cat upstream-audit.md >> "$GITHUB_STEP_SUMMARY"
+          exit "$audit_status"

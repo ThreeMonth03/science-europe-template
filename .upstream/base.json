@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/ds-wizard/science-europe-template.git",
+  "baselineRef": "v1.30.1",
+  "baselineCommit": "22d60aae4b63ee677477ac0c73097807284aaf9f",
+  "riskGroups": [
+    {
+      "name": "runtime-contract",
+      "severity": "critical",
+      "patterns": ["template.json"]
+    },
+    {
+      "name": "knowledge-model-bindings",
+      "severity": "critical",
+      "patterns": ["src/uuids.j2"]
+    },
+    {
+      "name": "experiment-overlap",
+      "severity": "critical",
+      "patterns": [
+        "src/macros.html.j2",
+        "src/questions/01-how-data.html.j2",
+        "src/questions/05-store-backup.html.j2",
+        "src/questions/15-required-resources.html.j2",
+        "src/style.css"
+      ]
+    },
+    {
+      "name": "question-logic",
+      "severity": "high",
+      "patterns": ["src/questions/*.html.j2"]
+    },
+    {
+      "name": "word-layout",
+      "severity": "high",
+      "patterns": ["src/word/*", "src/word/**/*"]
+    },
+    {
+      "name": "document-layout",
+      "severity": "medium",
+      "patterns": ["src/index.html.j2", "src/content.html.j2", "src/header.html.j2", "src/*.css"]
+    }
+  ]
+}
