@@ -94,6 +94,7 @@
               {%- elif qualityCount > 1 -%}
                 <p>
                 We will be using the following quality processes:
+                </p>
                 <ul>
                   {%- if calibrating -%}
                     <li>calibrating measurements</li>
@@ -117,7 +118,6 @@
                     <li>measuring samples with known outcome (to monitor consistency)</li>
                   {%- endif %}
                 </ul>
-                </p>
               {%- else -%}
                 <p class="data-gap" data-fact-id="quality-methods" data-status="missing"><strong>Information not provided:</strong> the quality control methods to be used.</p>
               {%- endif -%}

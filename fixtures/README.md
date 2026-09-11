@@ -1,5 +1,10 @@
 # Synthetic pilot inputs
 
+`populated` means the original **partially populated three-question test**, not a
+completed DMP. See `scripts/generate_retention_fixtures.py` for the broader
+`representative` and `retention-partial` cases; those exercise all 15 output
+questions but still do not prove complete Science Europe topic coverage.
+
 No real project answers or credentials are included. `pilot/en` and
 `pilot/zh-Hant` contain reviewed bilingual synthetic answers with identical item
 IDs. Runtime event UUIDs are regenerated per test because DSW requires them to

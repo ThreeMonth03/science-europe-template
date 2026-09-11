@@ -69,6 +69,7 @@
                     {%- elif qualityCount > 1 -%}
                         <p>
                         We will be using the following quality processes for this dataset:
+                        </p>
                         <ul>
                         {%- if calibrating -%}
                             <li>calibrating measurements</li>
@@ -92,9 +93,8 @@
                             <li>measuring samples with known outcome (to monitor consistency)</li>
                         {%- endif %}
                         </ul>
-                        </p>
                     {%- else -%}
-                        <p>We will be using quality processes.<p>
+                        <p>We will be using quality processes.</p>
                     {%- endif -%}
                     {# Other quality processes #}
                     {%- set mdQualityOtherPath = [mdqPrefix, uuids.mdQualityOtherQUuid]|reply_path -%}

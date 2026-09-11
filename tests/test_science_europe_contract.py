@@ -50,6 +50,7 @@ def render_question(path: str, replies: dict[str, object]) -> str:
         reply_str_value=reply_str_value,
         reply_items=reply_items,
         markdown=lambda value: value,
+        any=any,
         dot=lambda value: f"{value}." if value and not str(value).endswith(".") else value,
     )
     env.tests["true"] = lambda value: value is True

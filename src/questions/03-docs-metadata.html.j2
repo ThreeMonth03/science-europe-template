@@ -73,7 +73,7 @@
       {%- set metadataOpenInstrAUuid = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenInstrQUuid]|reply_path]|reply_str_value -%}
       {%- set metadataOpenFormAUuid = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenFormQUuid]|reply_path]|reply_str_value -%}
       <p>
-      {%- if metadataOpenInstrAUuid == uuids.metadataOpenInstrNoAUuid %}
+      {%- if metadataOpenInstrAUuid == uuids.metadataOpenInstrYesAUuid %}
         Metadata will be openly available including instructions how to get access to the data.
       {%- elif metadataOpenInstrAUuid == uuids.metadataOpenInstrNoAUuid %}
         Metadata will be openly available without instructions how to get access to the data.
@@ -103,7 +103,8 @@
     {%- set storageConvObjStoreAUuid = repliesMap[storageConvObjStorePath]|reply_str_value -%}
     {%- set storageConvRelDbPath = [stConvPrefix, uuids.storageConvRelDbQUuid]|reply_path -%}
     {%- set storageConvRelDbAUuid = repliesMap[storageConvRelDbPath]|reply_str_value -%}
-    {%- if storageConvFSysAUuid or storageConvObjStoreAUuid or storageConvRelDbAUuid -%}
+    {# Capacity is an independent answer, not conditional on a storage technology. #}
+    {%- if storageSpaceAUuid or storageConvFSysAUuid or storageConvObjStoreAUuid or storageConvRelDbAUuid -%}
       <h4>Data storage and file conventions</h4>
       {# Storage space #}
       {%- if storageSpaceAUuid == uuids.storageSpaceLittleAUuid -%}
@@ -115,7 +116,7 @@
         {%- endif -%}
       {%- endif -%}
       {# File System #}
-      <p>
+      <div class="answer-detail">
       {%- if storageConvFSysAUuid == uuids.storageConvFSysNoAUuid -%}
         We will not use a filesystem with files and folders.
       {%- elif storageConvFSysAUuid == uuids.storageConvFSysYesAUuid -%}
@@ -175,10 +176,10 @@
         {%- set scFSysAppointmentsPath = [scFSysPrefix, uuids.scFSysAppointmentsQUuid]|reply_path -%}
         {%- set scFSysAppointments = repliesMap[scFSysAppointmentsPath]|reply_str_value -%}
         {%- if scFSysAppointments %}
-          {{ "Moreover, we" if folders|any else "We" }} have made appointments about naming the files. {{ scFSysAppointments|capitalize|markdown }}
+          {{ "Moreover, we" if folders|any else "We" }} have made appointments about naming the files. {{ scFSysAppointments|markdown }}
         {%- endif -%}
       {%- endif -%}
-      </p>
+      </div>
       {# Object and Document Store #}
       <p>
       {%- if storageConvObjStoreAUuid == uuids.storageConvObjStoreNoAUuid -%}
