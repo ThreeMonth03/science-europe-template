@@ -46,7 +46,7 @@
                             {# Will this data be assigned persistent identifier? #}
                             {%- if publishedDataIdentifierAUuid == uuids.publishedDataIdentifierYesAUuid -%}
                             <p>Within this repository, unique and persistent identifiers will be applied as follows:</p>
-                            <ul>
+                            <div class="identifier-arrangement">
                                 {# Who assigns #}
                                 {%- set publishedDataIdentifierAssignsQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierAssignsQUuid]|reply_path -%}
                                 {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}
@@ -54,7 +54,7 @@
                                 {%- if publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
                                     <p>A project data steward or principle investigator will assign the persistent identifier.</p>
 
-                                {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsInstitDataStewardAUui -%}
+                                {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid -%}
                                     <p>An institutional data steward will assign the persistent identifier.</p>
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsRepositoryAUuid -%}
@@ -72,14 +72,8 @@
                                     <p>The repository will not make sure the persistent identifier can be resolved to a digital object.</p>
                                 {%- endif -%}
 
-                                {# Specification #}
-                                {%- set publishedDataIdentifierSpecifyQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierSpecifyQUuid]|reply_path -%}
-                                {%- set publishedDataIdentifierSpecifyReply = repliesMap[publishedDataIdentifierSpecifyQUuid]|reply_str_value -%}
-
-                                {%- if publishedDataIdentifierSpecifyReply -%}
-                                    <p>The assigned persistent identifier is specified as follows: {{publishedDataIdentifierSpecifyReply|dot}}</p>
-                                {%- endif -%}
-                            </ul>
+                                {# The old identifier-specification question is absent from KM 2.7.0. #}
+                            </div>
                             {%- elif publishedDataIdentifierAUuid == uuids.publishedDataIdentifierNoAUuid -%}
                               <p>Within this repository, unique and persistent identifiers will not be applied.</p>
                             {%- else -%}
@@ -89,8 +83,8 @@
                         {%- endfor -%}
                     </ul>
                     {%- endif -%}
-            {%- endif -%}
             </li>
+            {%- endif -%}
         {%- endfor -%}
         </ul>
     {%- else -%}
@@ -126,14 +120,15 @@
                 {%- set measuredDataReuseOtherFieldHowQUuid = [measuredDataReuseQUuid, uuids.measuredDataReuseOtherFieldAUuid, uuids.measuredDataReuseOtherFieldHowQUuid]|reply_path -%}
                 {%- set measuredDataReuseOtherFieldHowReply = repliesMap[measuredDataReuseOtherFieldHowQUuid]|reply_str_value -%}
 
-                <p>Researchers working in other fields will be interested in re-using this data
+                <div class="answer-detail">Researchers working in other fields will be interested in re-using this data
                 
                 {%- if measuredDataReuseOtherFieldHowReply -%}
                 
-                 {{" "}}because: {{measuredDataReuseOtherFieldHowReply|markdown}}</p>
+                 {{" "}}because: {{measuredDataReuseOtherFieldHowReply|markdown}}
                 {%- else -%}
                 .
                 {%- endif -%}
+                </div>
 
             {%- endif -%}
             </li>

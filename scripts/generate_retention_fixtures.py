@@ -119,7 +119,17 @@ def retention_cases(language):
         for key in list(partial):
             if key == prefix or key.startswith(prefix + '.'):
                 del partial[key]
-    return {'representative': replies, 'retention-partial': partial}
+    cases = {'representative': replies, 'retention-partial': partial}
+    # Keep the legacy inputs unchanged: their unitless duration and potentially
+    # inconsistent payment selections remain negative review probes.
+    for source, target in [('representative', 'structured'), ('retention-partial', 'structured-partial')]:
+        corrected = copy.deepcopy(cases[source])
+        corrected[path(duration, 'publishedDataHowLongFixedAUuid', 'publishedDataHowLongFixedQUuid')]['value'] = text('10 years', '10 年')
+        charges = path('preservingCUuid', 'repoChargesQUuid')
+        corrected[charges] = {'type': 'AnswerReply', 'value': IDS['repoChargesYesAUuid']}
+        corrected[path(charges, 'repoChargesYesAUuid', 'repoChargesHowPayQUuid')] = {'type': 'AnswerReply', 'value': IDS['repoChargesHowPayBudgetedAUuid']}
+        cases[target] = corrected
+    return cases
 
 
 if __name__ == '__main__':

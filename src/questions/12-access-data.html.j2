@@ -32,7 +32,7 @@
                                 {%- set swPIDReply = repliesMap[swPIDUuid]|reply_str_value -%}
                                 <li><strong>{{ swNameReply if swNameReply else "(no name given)" }}</strong>
                                 {%- if swPIDReply -%}
-                                , available at {{swPIDReply|dot}}
+                                <div>Available at: {{swPIDReply|e}}</div>
                                 {%- else -%}
                                 .
                                 {%- endif -%}

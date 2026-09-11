@@ -23,6 +23,11 @@
         "src/questions/05-store-backup.html.j2",
         "src/questions/03-docs-metadata.html.j2",
         "src/questions/12-access-data.html.j2",
+        "src/questions/07-personal-data.html.j2",
+        "src/questions/08-copyright-ipr.html.j2",
+        "src/questions/09-ethical-issues.html.j2",
+        "src/questions/11-data-preservation.html.j2",
+        "src/questions/13-persistent-identifier.html.j2",
         "src/questions/15-required-resources.html.j2",
         "src/style.css"
       ]

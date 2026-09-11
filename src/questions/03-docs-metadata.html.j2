@@ -23,8 +23,6 @@
         {%- set metadataStandardsKeywordsPath = [metadataStandardsPath, uuids.metadataStandardsExploreAUuid, uuids.metadataStandardsKeywordsQUuid]|reply_path -%}
         {%- set metadataStandardsKeywordsAUuid = repliesMap[metadataStandardsKeywordsPath]|reply_str_value -%}
 
-        {%- set documentDataW3CPath = [metadataStandardsPath, uuids.metadataStandardsExploreAUuid, uuids.documentDataW3CQUuid]|reply_path -%}
-        {%- set documentDataW3CAUuid = repliesMap[documentDataW3CPath]|reply_str_value -%}
 
         {%- set metadataStandards = [] -%}
         {%- if metadataStandardsDCAUuid == uuids.metadataStandardsDCYesAUuid -%}
@@ -176,7 +174,8 @@
         {%- set scFSysAppointmentsPath = [scFSysPrefix, uuids.scFSysAppointmentsQUuid]|reply_path -%}
         {%- set scFSysAppointments = repliesMap[scFSysAppointmentsPath]|reply_str_value -%}
         {%- if scFSysAppointments %}
-          {{ "Moreover, we" if folders|any else "We" }} have made appointments about naming the files. {{ scFSysAppointments|markdown }}
+          <p>File naming conventions:</p>
+          <div class="answer-detail">{{ scFSysAppointments|markdown }}</div>
         {%- endif -%}
       {%- endif -%}
       </div>

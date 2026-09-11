@@ -3,7 +3,7 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.2.1`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.2.2`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
@@ -22,6 +22,10 @@ The 0.2.1 [answer-retention experiment](docs/answer-retention-experiment.md)
 fixes selected Q3/Q12 omissions and misleading negatives, preserves case-sensitive
 file names, and adds a broader synthetic scenario plus KM-binding diagnostics.
 All fifteen output questions are exercised, not all their branches or SE topics.
+
+The 0.2.2 [structure and binding experiment](docs/structure-and-bindings.md)
+repairs selected Q8/Q9/Q11/Q13 HTML blocks and answer-loss conditions. It is
+still experimental and does not claim complete SE coverage or runtime table support.
 
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers

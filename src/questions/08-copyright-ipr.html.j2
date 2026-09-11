@@ -37,7 +37,7 @@
       {%- set nReasons = reasons|select("true")|list|length -%}
 
       {%- if nReasons > 0 -%}
-        <p>
+        <div class="answer-detail">
         The data cannot become completely open because 
         {%- if nReasons == 1 -%}
           {%- if legalReasons %}
@@ -69,6 +69,7 @@
             {%- endif -%}
           </ul>
         {%- endif -%}
+        </div>
       {%- else -%}
         <p>The data cannot become completely open.</p>
       {%- endif -%}
@@ -90,7 +91,7 @@
             {%- set legalReasonsAuthenticatedCommitteeReply = repliesMap[legalReasonsAuthenticatedCommitteeQUuid]|reply_str_value -%}
             
             {%- if legalReasonsAuthenticatedCommitteeReply -%}
-              <p>We will make use of an existing data committee: {{legalReasonsAuthenticatedCommitteeReply|markdown}}</p>
+              <div class="answer-detail">We will make use of an existing data committee: {{legalReasonsAuthenticatedCommitteeReply|markdown}}</div>
             {%- else -%}
               <p>We will make use of an existing data committee.</p>
             {%- endif -%}
@@ -100,7 +101,7 @@
             {%- set legalReasonsAuthenticatedOtherReply = repliesMap[legalReasonsAuthenticatedOtherQUuid]|reply_str_value -%}
 
             {%- if legalReasonsAuthenticatedOtherReply  -%}
-              <p>We will have following arrangements: {{legalReasonsAuthenticatedOtherReply|markdown}}</p>
+              <div class="answer-detail">We will have following arrangements: {{legalReasonsAuthenticatedOtherReply|markdown}}</div>
             {%- else -%}
               <p>We will have not decided yet.</p>
             {%- endif -%}
@@ -110,15 +111,7 @@
 
       {%- endif -%}
 
-      {%- set notOpenLimitedEmbargoPath = [openImmediatelyPath, uuids.openImmediatelyNoAUuid, uuids.notOpenLimitedEmbargoQUuid]|reply_path -%}
-      {%- set notOpenLimitedEmbargoAUuid = repliesMap[notOpenLimitedEmbargoPath]|reply_str_value -%}
-      {%- if notOpenLimitedEmbargoAUuid == uuids.notOpenLimitedEmbargoIndefinitelyAUuid -%}
-        <p>Limited embargo cannot be used because some restricted data will be embargoed indefinitely.</p>
-      {%- elif notOpenLimitedEmbargoAUuid == uuids.notOpenLimitedEmbargoReleasedSoonAUuid -%}
-        <p>Data will be released only as soon as restrictions are falling away.</p>
-      {%- elif notOpenLimitedEmbargoAUuid == uuids.notOpenLimitedEmbargoYesAUuid -%}
-        <p>Data that is not legally restrained will be released after a fixed time period, unconditionally.</p>
-      {%- endif -%}
+      {# KM 2.7.0 stores embargo at the access chapter root, handled below. #}
     {%- endif -%}
 
     {# Embargo #}
@@ -155,7 +148,7 @@
       {%- set ownershipOtherPath = [ownershipPath, uuids.ownershipOtherAUuid, uuids.ownershipOtherQUuid]|reply_path -%}
       {%- set ownershipOther = repliesMap[ownershipOtherPath]|reply_str_value -%}
       {%- if ownershipOther -%}
-        <p>We have made the following arrangements regarding the data ownership: {{ ownershipOther|markdown }}</p>
+        <div class="answer-detail">We have made the following arrangements regarding the data ownership: {{ ownershipOther|markdown }}</div>
       {%- endif -%}
     {%- endif -%}
 
@@ -184,7 +177,7 @@
         {%- endif -%}
       {%- endfor -%}
       {%- if (answeredRefData|length + answeredNRefData|length) > 0 -%}
-        <p>For the reference and non-reference data sets that we reuse, conditions are as follows:
+        <p>For the reference and non-reference data sets that we reuse, conditions are as follows:</p>
         <ul>
           {%- for i in answeredRefData -%}
             {%- set refDataPrefix = [refDataPath, i]|reply_path -%}
