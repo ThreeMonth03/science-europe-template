@@ -86,7 +86,7 @@
         <li>
           <strong>{{ producedDataName if producedDataName else "(no name given)" }}</strong>
           {%- if containPersonal or containSensitive -%}
-            <ul>
+            <ul class="ethical-data-flags">
             {%- if containPersonal == uuids.containPersonalNoAUuid -%}
               <li>It does not contain personal data.</li>
             {%- elif containPersonal == uuids.containPersonalYesAUuid -%}

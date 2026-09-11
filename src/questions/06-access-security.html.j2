@@ -136,38 +136,8 @@
     {%- endif -%}
     
 
-    {# Shared Workspace #}
-    {%- set sharedWorkspaceQUuid = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid]|reply_path -%}
-    {%- set sharedWorkspaceReply = repliesMap[sharedWorkspaceQUuid]|reply_str_value  -%}
+    {# Access controls remain here; archival/backup facts are owned by Q5. #}
     {%- set sharedWorkspacePrefix = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid, uuids.sharedWorkspaceYesAUuid]|reply_path -%}
-    {%- set sharedWorkspaceReliableAUuid = [sharedWorkspacePrefix, uuids.sharedReliableQUuid, uuids.sharedReliableExploreAUuid ]|reply_path  -%}
-    {%- set sharedWorkspaceReliablePreventLossQUuid = [sharedWorkspaceReliableAUuid, uuids.sharedReliablePreventLossQUuid]|reply_path  -%}
-    {%- set sharedWorkspaceReliablePreventLossReply = repliesMap[sharedWorkspaceReliablePreventLossQUuid]|reply_str_value -%}
-    {# Storage/backup facts are rendered once in Q5; they do not answer access security. #}
-
-    {# Long term preservation and recovery #}
-    {%- set preservingArchivedDuringQUuid = [uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path -%}
-    {%- set preservingArchivedDuringReply = repliesMap[preservingArchivedDuringQUuid]|reply_str_value -%}
-    {%- if preservingArchivedDuringReply == uuids.archivedDuringYesAUuid -%}
-      <p> We will be archiving data for long-term preservation already during our project.
-      {%- set preservingArchivedDuringReQUuid = [preservingArchivedDuringQUuid, uuids.archivedDuringYesAUuid, uuids.archivedDuringReQUuid]|reply_path  -%}
-      {%- set preservingArchivedDuringReReply = repliesMap[preservingArchivedDuringReQUuid]|reply_str_value -%}
-
-      {%- if preservingArchivedDuringReReply == uuids.archivedDuringReYesAUuid -%}
-        {{" "}}The archived data will be changing over time and needs re-archival.
-        {%- set preservingArchivedDuringRelyQUuid = [preservingArchivedDuringReQUuid, uuids.archivedDuringReYesAUuid, uuids.archivedDuringRelyQUuid]|reply_path -%}
-        {%- set preservingArchivedDuringRelyReply = repliesMap[preservingArchivedDuringRelyQUuid]|reply_str_value -%}
-        {%- set archivedDuringReFrequentBackupsQUuid = [preservingArchivedDuringReQUuid, uuids.archivedDuringReYesAUuid, uuids.archivedDuringReFrequentBackupsQUuid]|reply_path-%}
-        {%- set preservingArchivedDuringReFrequentBackupsReply = repliesMap[archivedDuringReFrequentBackupsQUuid]|reply_str_value -%}
-          
-        {%- if (preservingArchivedDuringReFrequentBackupsReply == uuids.archivedDuringReFrequentBackupsYesAUuid ) and (preservingArchivedDuringRelyReply == uuids.archivedDuringRelyYesAUuid) -%}
-          {{" "}}This data needs frequent backups and we will rely on these backups in case of recovery from human errors.</p>
-        {%- elif (preservingArchivedDuringReFrequentBackupsReply == uuids.archivedDuringReFrequentBackupsNoAUuid ) and (preservingArchivedDuringRelyReply == uuids.archivedDuringRelyYesAUuid )-%}
-          {{" "}}This data will be infrequently backed up and we will rely on these backups in case of recovery from human errors.</p>
-        {%- endif -%}
-
-      {%- endif -%}
-    {%- endif -%}
 
     {# Access control in shared workspace #}
     {%- set sharedAccessControlPath = [sharedWorkspacePrefix, uuids.sharedAccessControlQUuid]|reply_path -%}
@@ -220,6 +190,10 @@
     {{ answerContent }}
   {% else %}
     <p class="data-gap" data-requirement-id="SE-3b" data-status="missing-output">This document does not yet contain an answer about data security and protection of sensitive data.</p>
+  {% endif %}
+  {# A cross-reference is not an answer to Q6; do not let it hide the gap above. #}
+  {% if repliesMap[[uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path]|reply_str_value == uuids.archivedDuringYesAUuid %}
+    <p class="answer-reference"><a href="#q-store-backup">See question 5 for archival and backup arrangements.</a></p>
   {% endif %}
   </div>
 </div>

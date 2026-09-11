@@ -119,7 +119,7 @@
                                 {%- set licenseStartPath = [licensePrefix, uuids.publishedDataLicenseStartQUuid]|reply_path -%}
                                 {%- set licenseStart = repliesMap[licenseStartPath]|reply_str_value -%}
                                 {% if licenseStart %}
-                                    <p class="answer-lead">Licence start date: {{ licenseStart|e }}.</p>
+                                    <div class="answer-lead"><p>Licence start date: {{ licenseStart|e }}.</p></div>
                                 {% endif %}
                                 
                                 {%- set publishedDataLicensePath = [licensePrefix, uuids.publishedDataLicenseQUuid]|reply_path -%}
@@ -138,7 +138,12 @@
                                     {%- set licenseRestrictMetadataPath = [publishedDataLicensePath, uuids.publishedDataLicenseRestrictAUuid, uuids.licenseRestrictMetadataQUuid]|reply_path -%}
                                     {%- set licenseRestrictMetadataAUuid = repliesMap[licenseRestrictMetadataPath]|reply_str_value %}
                                     
-                                    Available under some restrictions, which we will follow in our project{{ ": " ~ licenseRestrictConditions|markdown if licenseRestrictConditions else "." }}
+                                    <div class="answer-lead"><p>Access to this distribution is subject to restrictions.</p></div>
+                                    {% if licenseRestrictConditions %}
+                                      <div class="answer-detail">{{ licenseRestrictConditions|markdown }}</div>
+                                    {% else %}
+                                      <p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">The conditions of restricted access have not been provided.</p>
+                                    {% endif %}
                                     {%- if licenseRestrictAccessAUuid == uuids.licenseRestrictAccessRequestAUuid %}
                                     Re-users will be able to get access by request to the contact person.
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessCommitteeAUuid %}

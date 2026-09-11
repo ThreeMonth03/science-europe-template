@@ -2,7 +2,7 @@
   <h3>14. Who (for example role, position, and institution) will be responsible for data management (i.e. the data steward)?</h3>
 
   <div class="answer">
-
+    {% set responsibilitiesContent %}
     {%- set contributorsPath = [uuids.adminDetailsCUuid, uuids.contributorsQUuid]|reply_path -%}
     {%- set contributorsItems = repliesMap[contributorsPath]|reply_items -%}
     {%- if contributorsItems|length > 0 -%}
@@ -43,5 +43,9 @@
       {# Data protection officers #}
       {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleCreatorOfDMPAUuid, "responsible for implementing the DMP, and ensuring it is reviewed and revised.") }}
     {%- endif -%}
+    {% endset %}
+    {% if responsibilitiesContent|striptags|trim %}
+      <div class="responsibilities-block{{ ' short-reading-unit' if responsibilitiesContent|striptags|length <= 500 else '' }}">{{ responsibilitiesContent }}</div>
+    {% endif %}
   </div>
 </div>

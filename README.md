@@ -3,7 +3,7 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.0`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.3.1`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
@@ -30,6 +30,10 @@ still experimental and does not claim complete SE coverage or runtime table supp
 The 0.3.0 [storage and sharing experiment](docs/storage-sharing.md) maps selected
 during-project archival facts, preserves partially specified publication
 arrangements, and replaces Q10–Q13 outer list scaffolding with reading blocks.
+
+The 0.3.1 [narrative and pagination experiment](docs/narrative-pagination.md)
+consolidates archival facts in Q5, preserves the independent Q6 security gap,
+and tests bounded reading units and long free answers in PDF and Word.
 
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers

@@ -37,6 +37,19 @@ end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
+  if div.classes:includes("short-reading-unit") and #div.content > 1 and utf8.len(pandoc.utils.stringify(div)) <= 500 then
+    -- Only bounded, template-owned responsibility paragraphs; never long answers.
+    local simple = true
+    for _, block in ipairs(div.content) do
+      if block.t ~= "Para" then simple = false end
+    end
+    if simple then
+      for index = 1, #div.content - 1 do
+        div.content[index] = pandoc.Div({div.content[index]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+      end
+    end
+    return div
+  end
   if div.classes:includes("answer-lead") then
     div.attributes["custom-style"] = "Pilot Lead"
     return div

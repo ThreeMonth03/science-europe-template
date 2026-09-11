@@ -78,4 +78,9 @@ html body .distribution-section + .distribution-section { border-top: 1px solid 
 html body .license-entry { margin: .25em 0 .5em; }
 html body .license-entry + .license-entry { border-top: 1px dotted #cbd2d5; padding-top: .4em; }
 html body .storage-detail-limits li { margin-bottom: .25em; }
+/* Narrow reading units, not whole-question keep-together rules. */
+html body .short-reading-unit, html body .ethical-data-flags { break-inside: avoid; }
+html body .reading-gap { margin: .5em 0; }
+html body .reading-gap > p { margin-bottom: 0; }
+html body .answer-reference { font-size: 9.5pt; color: #526169; margin-top: .7em; }
 html body .data-gap[data-status="missing-output"] { border: none; border-left: 2px solid #b5bec1; background: #f5f6f6; color: #526169; font-size: 10pt; padding: .4em .65em; }

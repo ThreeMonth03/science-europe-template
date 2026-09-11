@@ -5,6 +5,7 @@
     {# Data stored by members (no shared workspace) #}
     {%- set sharedWorkspacePath = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid]|reply_path -%}
     {%- set sharedWorkspaceAUuid = repliesMap[sharedWorkspacePath]|reply_str_value -%}
+    <div class="workspace-policy dataset-policy">
     {%- if sharedWorkspaceAUuid == uuids.sharedWorkspaceNoAUuid -%}
       <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">There is no shared workspace used during the project for working with data.</p>
       {%- set notSharedBackupPath = [sharedWorkspacePath, uuids.sharedWorkspaceNoAUuid, uuids.notSharedBackupQUuid]|reply_path -%}
@@ -14,7 +15,7 @@
       {%- elif notSharedBackupAUuid == uuids.notSharedBackupNoAUuid -%}
         <p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="explicit-no">Data stored by individual project members are not yet adequately backed up and traceable.</p>
       {%- else -%}
-        <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="missing"><strong>Information not provided:</strong> whether data stored by individual project members are adequately backed up and traceable.</p>
+        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="missing"><strong>Information not provided:</strong> whether data stored by individual project members are adequately backed up and traceable.</p></div>
       {%- endif -%}
     {%- elif sharedWorkspaceAUuid == uuids.sharedWorkspaceYesAUuid -%}
       <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">There is a shared workspace used during the project for working with data.</p>
@@ -38,10 +39,10 @@
         {%- elif sharedHowChangeAUuid == uuids.sharedHowChangeMiddleAUuid -%}
           <p data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="complete">Storage needs are largest in the middle of the project.</p>
         {%- else -%}
-          <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p>
+          <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p></div>
         {%- endif -%}
       {%- else -%}
-        <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p>
+        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p></div>
       {%- endif -%}
       {%- set sharedReliablePath = [sharedWorkspacePath, uuids.sharedWorkspaceYesAUuid, uuids.sharedReliableQUuid]|reply_path -%}
       {%- set sharedReliableAUuid = repliesMap[sharedReliablePath]|reply_str_value -%}
@@ -55,7 +56,7 @@
         {%- elif sharedReliablePreventLossAUuid == uuids.sharedReliablePreventLossStoredAUuid %}
           <p data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="complete">All essential data will also be stored elsewhere to prevent a total loss of data.</p>
         {%- else -%}
-          <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p>
+          <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p></div>
         {%- endif -%}
         {%- if sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyLeftAUuid %}
           <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">Project participants are responsible for backing up project data stored outside the workspace.</p>
@@ -66,16 +67,17 @@
         {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyBackupsAUuid %}
           <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">We will make automated backups of all data stored outside the workspace.</p>
         {%- else -%}
-          <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p>
+          <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p></div>
         {%- endif -%}
       {%- else -%}
-        <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p>
-        <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p>
+        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p></div>
+        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p></div>
       {%- endif -%}
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="missing"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p>
-      <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p>
+      <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="missing"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p></div>
+      <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p></div>
     {%- endif -%}
+    </div>
     {# Cold archival DURING research is independent of the shared workspace. #}
     {% set archivePath = [uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path %}
     {% set archive = repliesMap[archivePath]|reply_str_value %}
@@ -83,6 +85,7 @@
     {% set frequencyKnown = false %}
     {% if archive == uuids.archivedDuringYesAUuid %}
       <h4>Archival during the project</h4>
+      <div class="archive-location-policy dataset-policy">
       <p data-fact-id="during-project-archive" data-status="complete">Data will be archived in cold storage during the project.</p>
       {% set archivePrefix = [archivePath, uuids.archivedDuringYesAUuid]|reply_path %}
       {% set medium = repliesMap[[archivePrefix, uuids.archiveMediumQUuid]|reply_path]|reply_str_value %}
@@ -100,11 +103,13 @@
       {% elif remote == uuids.archiveRemoteNoAUuid %}
         <p data-fact-id="archive-remote-location" data-status="explicit-no">The archive will not be stored at a remote location.</p>
       {% endif %}
+      </div>
       {% set changesPath = [archivePrefix, uuids.archivedDuringReQUuid]|reply_path %}
       {% set changes = repliesMap[changesPath]|reply_str_value %}
       {% if changes == uuids.archivedDuringReNoAUuid %}
         <p data-fact-id="archive-changes" data-status="explicit-no">The archived data is not expected to change over time.</p>
       {% elif changes == uuids.archivedDuringReYesAUuid %}
+        <div class="archive-recovery-policy dataset-policy">
         <p data-fact-id="archive-changes" data-status="complete">Changes to archived data will require re-archival.</p>
         {% set changingPrefix = [changesPath, uuids.archivedDuringReYesAUuid]|reply_path %}
         {% set frequent = repliesMap[[changingPrefix, uuids.archivedDuringReFrequentBackupsQUuid]|reply_path]|reply_str_value %}
@@ -120,6 +125,7 @@
         {% elif recovery == uuids.archivedDuringRelyNoAUuid %}
           <p data-fact-id="archive-human-error-recovery" data-status="explicit-no">These backups will not be relied on to recover from accidental changes or deletions.</p>
         {% endif %}
+        </div>
       {% endif %}
     {% elif archive == uuids.archivedDuringNoAUuid %}
       <p data-fact-id="during-project-archive" data-status="explicit-no">Data will not be archived in cold storage during the project.</p>
