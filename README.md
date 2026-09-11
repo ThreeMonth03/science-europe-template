@@ -3,7 +3,7 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.2.0`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.2.1`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
@@ -17,6 +17,11 @@ deterministic alignment key.
 The next experimental iteration improves whole-document readability. See
 [the owned changes and upgrade boundaries](docs/readability-pass.md). This is
 not a release or a claim that all fifteen questions have been fully audited.
+
+The 0.2.1 [answer-retention experiment](docs/answer-retention-experiment.md)
+fixes selected Q3/Q12 omissions and misleading negatives, preserves case-sensitive
+file names, and adds a broader synthetic scenario plus KM-binding diagnostics.
+All fifteen output questions are exercised, not all their branches or SE topics.
 
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers
