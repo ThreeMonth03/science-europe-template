@@ -2,7 +2,7 @@
   <h3>3. What metadata and documentation (for example the methodology of data collection and way of organising data) will accompany the data?</h3>
 
   <div class="answer">
-    <p>List of data to be published is given in Section 5, Question 10 and 11. This also includes information about catalogs where the data can be found. Information about data types used is given in Section 1, Question 2.</p>
+  {% set answerContent %}
 
     {# Metadata #}
     {%- set metadataPath = [uuids.creatingCUuid, uuids.metadataQUuid]|reply_path -%}
@@ -213,5 +213,11 @@
     {%- endif -%}
   {%- endif -%}
 
+  {% endset %}
+  {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
+    {{ answerContent }}
+  {% else %}
+    <p class="data-gap" data-requirement-id="SE-2a" data-status="missing-output">This document does not yet contain an answer about metadata and documentation.</p>
+  {% endif %}
   </div>
 </div>

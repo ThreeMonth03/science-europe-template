@@ -1,0 +1,15 @@
+<header class="document-heading">
+  <p class="document-kind">Data Management Plan</p>
+  {%- set overviewPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
+  {%- set overviewItems = repliesMap[overviewPath]|reply_items -%}
+  {%- set overviewName = repliesMap[[overviewPath, overviewItems[0], uuids.projectNameQUuid]|reply_path]|reply_str_value if overviewItems|length == 1 else '' -%}
+  <h1>{{ overviewName if overviewName else dc.project.name }}</h1>
+  {% if overviewName and overviewName != dc.project.name %}<p class="document-meta">Document: {{ dc.project.name }}</p>{% endif %}
+  <p class="document-meta">Generated on {{ dc.document.created_at|datetime_format("%Y-%m-%d") }}</p>
+  {% if ctx.phaseUuid %}
+  <p class="document-meta">Project phase: {{ km.entities.phases[ctx.phaseUuid].title }}</p>
+  {% endif %}
+  {% for version in dc.project.versions if version.uuid == ctx.project.versionUuid %}
+  <p class="document-meta">Version: {{ version.name }} ({{ version.created_at|datetime_format("%Y-%m-%d") }})</p>
+  {% endfor %}
+</header>

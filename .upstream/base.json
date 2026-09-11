@@ -38,7 +38,7 @@
     {
       "name": "document-layout",
       "severity": "medium",
-      "patterns": ["src/index.html.j2", "src/content.html.j2", "src/header.html.j2", "src/*.css"]
+      "patterns": ["src/index.html.j2", "src/content.html.j2", "src/header.html.j2", "src/frontmatter.html.j2", "src/document-provenance.html.j2", "src/projects.html.j2", "src/contributors.html.j2", "src/*.css", "scripts/prepare_layout.py"]
     }
   ]
 }

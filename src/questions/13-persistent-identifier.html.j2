@@ -3,10 +3,10 @@
 
     <div class="answer">
     {# identifiers #}
-    <h4>Ensuring PIDs for published data</h4>
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
     {%- if producedDataItems|length > 0 -%}
+        <h4>Persistent identifiers for shared data</h4>
         <ul>
         {%- for i in producedDataItems -%}
             {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
@@ -80,21 +80,24 @@
                                     <p>The assigned persistent identifier is specified as follows: {{publishedDataIdentifierSpecifyReply|dot}}</p>
                                 {%- endif -%}
                             </ul>
+                            {%- elif publishedDataIdentifierAUuid == uuids.publishedDataIdentifierNoAUuid -%}
+                              <p>Within this repository, unique and persistent identifiers will not be applied.</p>
+                            {%- else -%}
+                              <p class="data-gap" data-status="missing-output">The persistent identifier arrangement is not yet described.</p>
                             {%- endif -%}
                             </li>
                         {%- endfor -%}
-                        <p>Within this repository, unique and persistent identifiers will not be applied.</p>
                     </ul>
                     {%- endif -%}
             {%- endif -%}
             </li>
         {%- endfor -%}
         </ul>
+    {%- else -%}
+      <p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.</p>
     {%- endif -%}
 
     {# Explain how the data might be re-used in other contexts. #}
-    <h4>Possible re-use of created data in other contexts</h4>
-    Explanation of how the collected or created data might be re-used in other contexts:
 
     {%- set dataMeasuredQUuid = [uuids.creatingCUuid, uuids.measuredQUuid]|reply_path  -%}
     {%- set dataMeasuredAUuid = repliesMap[dataMeasuredQUuid]|reply_str_value -%}
@@ -103,6 +106,7 @@
 
         {%- set dataMeasuredPath = [dataMeasuredQUuid, uuids.measuredYesAUuid, uuids.measuredDataQUuid]|reply_path -%}
         {%- set dataMeasuredItems = repliesMap[dataMeasuredPath]|reply_items -%}
+        {% if dataMeasuredItems %}<h4>Possible re-use of created data in other contexts</h4>{% endif %}
         <ul>
         {%- for k in dataMeasuredItems -%}
             {%- set measuredDataItem = [dataMeasuredPath, k]|reply_path -%}

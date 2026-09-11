@@ -70,8 +70,13 @@
       <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="missing"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p>
       <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p>
     {%- endif -%}
-    <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-location" data-status="missing"><strong>Information not provided:</strong> the locations where data and metadata will be stored and backed up.</p>
-    <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-frequency" data-status="missing"><strong>Information not provided:</strong> how often backups will be performed.</p>
+    <div class="data-gap template-gap">
+      <p><strong>Template mapping pending:</strong> the following details are not yet connected to questionnaire answers. This is not a finding that the user left them blank.</p>
+      <ul>
+        <li data-requirement-id="SE-3a" data-fact-id="storage-location" data-status="unmapped">Storage and backup locations.</li>
+        <li data-requirement-id="SE-3a" data-fact-id="backup-frequency" data-status="unmapped">Backup frequency.</li>
+      </ul>
+    </div>
   </div>
 
 </div>

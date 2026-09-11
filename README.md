@@ -3,7 +3,7 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.1.0`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.2.0`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
@@ -13,6 +13,10 @@ This is not yet implemented or audited for every branch or all 15 questions.
 Stable `data-requirement-id`, `data-fact-id`, and
 `data-status` attributes also give the English and translated outputs a
 deterministic alignment key.
+
+The next experimental iteration improves whole-document readability. See
+[the owned changes and upgrade boundaries](docs/readability-pass.md). This is
+not a release or a claim that all fifteen questions have been fully audited.
 
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers

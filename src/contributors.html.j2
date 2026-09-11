@@ -1,9 +1,7 @@
 {%- set contributorsPath = [uuids.adminDetailsCUuid, uuids.contributorsQUuid]|join(".") -%}
 {%- set contributorsItems = repliesMap[contributorsPath]|reply_items -%}
 <div id="dmp-contributors">
-  <h2>Contributors</h2>
-
-  <p>The following contributors are related to the {{globals.projects}} of this DMP:</p>
+  <h2>People and responsibilities</h2>
 
   {% set contributors = [] %}
   {%- for contributor in contributorsItems -%}
@@ -13,7 +11,7 @@
     {%- set contributorOrcid = repliesMap[pathPrefix ~ uuids.contributorOrcidQUuid] -%}
     {%- set contributorRoles = repliesMap[pathPrefix ~ uuids.contributorRoleQUuid]|reply_items -%}
     {%- set contributorAffiliationReply = repliesMap[pathPrefix ~ uuids.contributorAffiliationQUuid] -%}
-    {%- if contributorName -%}
+    {%- if contributorName or contributorEmail or contributorOrcid or contributorRoles or contributorAffiliationReply -%}
       {%- set roles = [] -%}
       {%- for role in contributorRoles -%}
         {%- if role in dc.e.choices.keys() -%}
@@ -34,7 +32,7 @@
   <ul>
   {% for contributor in contributors %}
     <li class="contributor">
-      <span class="name"><strong>{{ contributor.name }}</strong></span>
+      <span class="name"><strong>{{ contributor.name if contributor.name else "(name not given)" }}</strong></span>
       {%- if contributor.email and contributor.orcid %}
         <br>{{ macros.formatEmail(contributor.email) }}, {{ macros.formatOrcid(contributor.orcid) }}
       {%- elif contributor.email %}

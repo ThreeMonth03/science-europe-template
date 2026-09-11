@@ -1,8 +1,8 @@
-<div id="q-access-security" class="question">
+<div id="q-personal-data" class="question">
     <h3>7. If personal data are processed, how will compliance with legislation on personal data and on security be ensured?</h3>
 
     <div class="answer">
-        <p>Data security protection is described in Section 3, Question 6.</p>
+    {% set answerContent %}
         {%- set personalDataQUuid = [uuids.creatingCUuid,uuids.collectPersonalQUuid ]|reply_path -%}
         {%- set personalDataReply = repliesMap[personalDataQUuid]|reply_str_value -%}
         {%- if personalDataReply == uuids.collectPersonalYesAUuid -%}
@@ -94,5 +94,11 @@
             {%- endif -%}
         {%- endif -%}
 
+    {% endset %}
+    {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
+      {{ answerContent }}
+    {% else %}
+      <p class="data-gap" data-requirement-id="SE-4a" data-status="missing-output">This document does not yet contain an answer about personal-data protection and compliance.</p>
+    {% endif %}
     </div>
 </div>

@@ -62,6 +62,55 @@ def render_question(path: str, replies: dict[str, object]) -> str:
 
 
 class ScienceEuropeContractTests(unittest.TestCase):
+    def test_shared_reference_rules_keep_individual_purposes_and_versions(self):
+        events = json.loads((ROOT / "fixtures/pilot/en/populated.events.json").read_text())
+        replies = {event["path"]: event["value"]["value"] for event in events}
+        source = (ROOT / "src/uuids.j2").read_text()
+        def uuid(name):
+            return re.search(rf'set {name} = "([^"]+)"', source)[1]
+        output = render_question("src/questions/01-how-data.html.j2", replies)
+        self.assertEqual(1, output.count('class="shared-reference-policy"'))
+        self.assertEqual(1, output.count("We will retain a copy"))
+        self.assertEqual(2, output.count('data-fact-id="reuse-purpose"'))
+        self.assertEqual(2, output.count('data-fact-id="dataset-version"'))
+        conditions = [path for path in replies if path.endswith(uuid("refDataConditionsQUuid"))]
+        self.assertEqual(2, len(conditions))
+        replies[conditions[1]] = uuid("refDataConditionsCC0AUuid")
+        distinct = render_question("src/questions/01-how-data.html.j2", replies)
+        self.assertNotIn('class="shared-reference-policy"', distinct)
+        self.assertEqual(2, distinct.count("We will retain a copy"))
+        self.assertIn("freely available for any use", distinct)
+        self.assertIn("obligation to cite the source", distinct)
+        del replies[conditions[1]]
+        unknown = render_question("src/questions/01-how-data.html.j2", replies)
+        self.assertNotIn('class="shared-reference-policy"', unknown)
+
+    def test_empty_answers_do_not_leave_empty_titles_or_promise_other_answers(self):
+        for filename in (
+            "03-docs-metadata", "06-access-security", "07-personal-data",
+            "09-ethical-issues", "10-share-restrictions", "11-data-preservation",
+            "12-access-data", "13-persistent-identifier",
+        ):
+            with self.subTest(question=filename):
+                result = render_question(f"src/questions/{filename}.html.j2", {})
+                self.assertIn('data-status="missing-output"', result)
+                self.assertNotIn("described in Section", result)
+                self.assertNotIn("are documented under Section", result)
+                self.assertNotIn("There are no published data", result)
+                self.assertNotIn("<h4>", result)
+
+    def test_question_ids_are_unique(self):
+        ids = []
+        for requirement in CONTRACT["requirements"]:
+            text = (ROOT / requirement["template"]).read_text()
+            ids.append(re.search(r'<div id="([^"]+)" class="question"', text)[1])
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_empty_funding_is_not_a_negative_answer(self):
+        source = (ROOT / "src/projects.html.j2").read_text()
+        self.assertNotIn("Did not apply", source)
+        self.assertIn("Funding information has not been provided.", source)
+
     def test_all_six_sections_and_fifteen_questions_are_tracked(self):
         requirements = CONTRACT["requirements"]
         self.assertEqual(15, len(requirements))
@@ -120,8 +169,10 @@ class ScienceEuropeContractTests(unittest.TestCase):
 
     def test_unanswered_se_3a_keeps_the_whole_requirement_visible(self):
         output = render_question("src/questions/05-store-backup.html.j2", {})
-        for fact_id in ("working-storage-arrangement", "backup-arrangement", "storage-location", "backup-frequency"):
+        for fact_id in ("working-storage-arrangement", "backup-arrangement"):
             self.assertIn(f'data-fact-id="{fact_id}" data-status="missing"', output)
+        for fact_id in ("storage-location", "backup-frequency"):
+            self.assertIn(f'data-fact-id="{fact_id}" data-status="unmapped"', output)
 
     def test_explicit_backup_problem_is_not_reported_as_unanswered(self):
         replies = {
@@ -170,8 +221,10 @@ class ScienceEuropeContractTests(unittest.TestCase):
         }
         output = render_question("src/questions/15-required-resources.html.j2", replies)
         self.assertIn("Data curator time", output)
-        self.assertIn("The amount is 5000 EUR.", output)
-        self.assertNotIn('data-status="missing"', output)
+        self.assertIn("5000 EUR", output)
+        self.assertIn('class="resource-table"', output)
+        self.assertNotIn('data-fact-id="resource-amount" data-status="missing"', output)
+        self.assertNotIn('data-fact-id="cost-coverage" data-status="missing"', output)
 
 
 if __name__ == "__main__":

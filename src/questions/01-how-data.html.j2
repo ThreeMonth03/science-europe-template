@@ -153,10 +153,29 @@
     {%- set nrefDataPath = [preexistingPath, uuids.preexistingYesAUuid, uuids.nrefDataQUuid]|reply_path -%}
     {%- set nrefDataItems = repliesMap[nrefDataPath]|reply_items -%}
 
+    {# Share only identical, fully specified rules for selected reference data.
+       Free answers, unknown conditions and non-reference scopes stay separate. #}
+    {% set referencePolicies = namespace(signatures=[], names=[], content='') %}
+    {% for item in refDataItems %}
+      {% set itemPath = [refDataPath, item]|reply_path %}
+      {% set usePath = [itemPath, uuids.refDataUseQUuid]|reply_path %}
+      {% if repliesMap[usePath]|reply_str_value == uuids.refDataUseYesAUuid %}
+        {% set usedPath = [usePath, uuids.refDataUseYesAUuid]|reply_path %}
+        {% set reproduction = repliesMap[[usedPath, uuids.refDataReproduceQUuid]|reply_path]|reply_str_value %}
+        {% set conditions = repliesMap[[usedPath, uuids.refDataConditionsQUuid]|reply_path]|reply_str_value %}
+        {% set format = repliesMap[[usedPath, uuids.refDataFormatQUuid]|reply_path]|reply_str_value %}
+        {% set name = repliesMap[[itemPath, uuids.refDataNameQUuid]|reply_path]|reply_str_value %}
+        {% set known = name and reproduction in [uuids.refDataReproduceProviderAUuid, uuids.refDataReproduceCopyAUuid, uuids.refDataReproduceBothAUuid] and conditions in [uuids.refDataConditionsCC0AUuid, uuids.refDataConditionsCCBYAUuid] and format in [uuids.refDataFormatConvertAUuid, uuids.refDataFormatUseAUuid] %}
+        {% do referencePolicies.signatures.append([reproduction, conditions, format] if known else [item]) %}
+        {% do referencePolicies.names.append(name) %}
+      {% endif %}
+    {% endfor %}
+    {% set sharedReferencePolicy = referencePolicies.signatures|length > 1 and referencePolicies.signatures|select('equalto', referencePolicies.signatures[0])|list|length == referencePolicies.signatures|length %}
+
     {%- if (refDataItems|length > 0) or (nrefDataItems|length > 0) -%}
       <div>
       <h4>Re-used datasets</h4>
-      <ul>
+      <ul class="dataset-list">
       {# Reference Data #}
         {%- for refDataItem in refDataItems -%}
           <li data-item-id="{{ refDataItem }}">
@@ -178,10 +197,10 @@
           {%- if refDataUseReply == uuids.refDataUseYesAUuid  %}
 
             {# identification #}
-            <p data-fact-id="reuse-decision" data-status="complete">This reference dataset will be re-used.</p>
+            <div data-fact-id="reuse-decision" data-status="complete">
             {% if refDataWhere %}
               {% if refDataWhere.startswith("https://") or refDataWhere.startswith("http://") or refDataWhere.startswith("ftp://") %}
-              <p data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ refDataWhere }}">{{ refDataWhere }}</a></p>
+              <p class="dataset-source" data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ refDataWhere }}">{{ refDataWhere }}</a></p>
             {% else %}
               <p data-fact-id="dataset-source" data-status="complete">Source: {{ refDataWhere }}</p>
             {% endif %}
@@ -192,7 +211,6 @@
             {%- set refDataUsageReply = repliesMap[refDataUsageQ]|reply_str_value -%}
             {% if refDataUsageReply %}
               <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
-                <p><strong>Purpose of re-use</strong></p>
                 {{ refDataUsageReply|markdown }}
               </div>
             {% else %}
@@ -208,10 +226,9 @@
               {%- set refDataVersionedChangePath = [refDataVersionedPath, uuids.refDataVersionedYesAUuid, uuids.refDataVersionedChangeQUuid]|reply_path -%}
               {%- set refDataVersionedChangeAUuid = repliesMap[refDataVersionedChangePath]|reply_str_value -%}
               {% if refDataVersionedWhich %}
-                <div class="answer-detail" data-fact-id="dataset-version" data-status="complete">
-                  <p><strong>Dataset version to be used</strong></p>
-                  {{ refDataVersionedWhich|markdown }}
-                </div>
+                <table class="dataset-version" data-fact-id="dataset-version" data-status="complete">
+                  <tbody><tr><th scope="row">Version</th><td>{{ refDataVersionedWhich|markdown }}</td></tr></tbody>
+                </table>
               {% else %}
                 <p class="data-gap" data-fact-id="dataset-version" data-status="missing"><strong>Information not provided:</strong> which version of this dataset will be used.</p>
               {% endif %}
@@ -226,16 +243,18 @@
               {% endif %}
             {%- endif -%}
 
+            {% set referencePolicy %}
             {# availability of the standard reference data for future results reproduction #}
             {%- set refDataReproduce = [refDataUsedPrefix, uuids.refDataReproduceQUuid]|reply_path -%}
             {%- set refDataReproduceReply = repliesMap[refDataReproduce]|reply_str_value -%}
+            <div class="dataset-policy">
             <p>
             {%- if refDataReproduceReply == uuids.refDataReproduceProviderAUuid -%}
-              This standard reference data will be available for long-term by the provider.
+              The provider will keep this dataset available in the long term.
             {%- elif refDataReproduceReply == uuids.refDataReproduceCopyAUuid  -%}
-              We will keep the copy of this standard reference data and make it available with our results. 
+              We will retain a copy of this dataset and provide it alongside the research results.
             {%- elif refDataReproduceReply == uuids.refDataReproduceBothAUuid -%}
-              This standard reference data will be available for long-term by the provider as well as we will keep the copy of this dataset and make it available with our results.
+              The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results.
             {%- endif -%}
             </p>
 
@@ -245,20 +264,17 @@
             {%- set refDataConditionsOther = [refDataConditions, uuids.refDataConditionsOtherAUuid, uuids.refDataConditionsOtherQUuid]|reply_path -%}
             {%- set refDataConditionsOtherReply = repliesMap[refDataConditionsOther]|reply_str_value -%}
             {%- if refDataConditionsReply %}
-             <p>This standard reference data are{{+" "}}
               {%- if refDataConditionsReply == uuids.refDataConditionsCC0AUuid -%}
-                freely available for any use.
+                <p>This dataset is freely available for any use.</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsCCBYAUuid -%}
-                freely available with obligation to quote the source.
+                <p>This dataset is freely available with an obligation to cite the source.</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsOtherAUuid -%}
-                available with {{" "}}
                   {%- if refDataConditionsOtherReply -%}
-                    following restrictions: {{refDataConditionsOtherReply|markdown}}
+                    <div class="answer-detail"><p><strong>Conditions of use</strong></p>{{refDataConditionsOtherReply|markdown}}</div>
                   {%- else -%}
-                    {{" "}}restrictions, that will be specified.
+                    <p class="data-gap" data-status="missing-output">Restrictions apply, but the conditions of use are not yet described.</p>
                   {%- endif -%}
               {%- endif -%}
-             </p>
             {%- endif -%}
 
             {# format #}
@@ -266,13 +282,21 @@
             {%- set refDataFormatReply = repliesMap[refDataFormat]|reply_str_value -%}
             <p>
             {%- if refDataFormatReply == uuids.refDataFormatConvertAUuid -%}
-              The standard reference data are in the format that has to be transformed before using.
+              The data format must be converted before use.
             {%- elif refDataFormatReply == uuids.refDataFormatUseAUuid -%}
-              The standard reference data are in the format that does not have to be transformed and we can use it directly.
+              The data can be used directly without format conversion.
             {% endif %}
             </p>
+            </div>
 
           {# Reference data set that will NOT be used #}
+            {% endset %}
+            {% if sharedReferencePolicy %}
+              {% set referencePolicies.content = referencePolicy %}
+            {% else %}
+              {{ referencePolicy }}
+            {% endif %}
+            </div>
           {%- elif refDataUseReply == uuids.refDataUseNoAUuid -%}
             {%- set refDataUsedNoPrefix = [refDataUse, uuids.refDataUseNoAUuid, uuids.refDataUseNoWhyQUuid]|reply_path -%}
             {%- set refDataUseNoReply = repliesMap[refDataUsedNoPrefix]|reply_str_value -%}
@@ -315,6 +339,13 @@
       </ul>
 
       {# Non-reference Data #}
+      {% if sharedReferencePolicy %}
+        <div class="shared-reference-policy">
+          <p><strong>Shared arrangements</strong></p>
+          <p>These arrangements apply to the following selected reference datasets: {{ referencePolicies.names|join('; ') }}.</p>
+          {{ referencePolicies.content }}
+        </div>
+      {% endif %}
       <ul>
       {%- for nrefDataItem in nrefDataItems -%}
       <li data-item-id="{{ nrefDataItem }}">
@@ -593,7 +624,6 @@
           {%- set provenanceOther = repliesMap[provenanceOtherPath]|reply_str_value -%}
           {%- if provenanceOther -%}
             <div class="answer-detail" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">
-              <p><strong>How data provenance will be documented</strong></p>
               {{ provenanceOther|markdown }}
             </div>
           {%- else -%}

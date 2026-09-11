@@ -2,12 +2,13 @@
   <h3>10. How and when will data be shared? Are there possible restrictions to data sharing or embargo reasons?</h3>
 
   <div class="answer">
+    {% set answerContent %}
     {# How data will be shared #}
     {# Produced datasets #}
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
-    <h4>How the data will be shared</h4>
     {%- if producedDataItems|length > 0 -%}
+        <h4>How the data will be shared</h4>
         <ul>
         {%- for i in producedDataItems -%}
             {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
@@ -217,8 +218,6 @@
 
     {# Restrictions #}
 
-    <h4>Restrictions on data sharing</h4>
-    <p>Ethical and legal restrictions are documented under Section 4. We have used the {{ dc.config.service_name }}, which made us aware of options to minimize the restrictions.</p>
 
     {%- set openImmediatelyPath = [uuids.accessCUuid, uuids.openImmediatelyQUuid]|reply_path -%}
     {%- set openImmediatelyAUuid = repliesMap[openImmediatelyPath]|reply_str_value -%}
@@ -280,5 +279,11 @@
         <p>We are running the project in a collaboration between different groups and institutes. A collaboration agreement that describes who can have access to what data in the project is set.</p>
       {%- endif -%}
     {%- endif -%}
+    {% endset %}
+    {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
+      {{ answerContent }}
+    {% else %}
+      <p class="data-gap" data-requirement-id="SE-5a" data-status="missing-output">This document does not yet describe how and when data will be shared, or any restrictions.</p>
+    {% endif %}
   </div>
 </div>

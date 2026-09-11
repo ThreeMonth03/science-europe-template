@@ -124,16 +124,16 @@
     {%- set nrefDataPath = [preexistingPath, uuids.preexistingYesAUuid, uuids.nrefDataQUuid]|reply_path -%}
     {%- set nrefDataItems = repliesMap[nrefDataPath]|reply_items -%}
     {%- if (refDataItems|length + nrefDataItems|length) > 0 -%}
-      <div>
-        <h4>Re-used datasets</h4>
-        <p>Datasets considered for reuse and actually reused are described in Question 1.</p>
-      </div>
+      {# Re-use decisions and source links are already in Q1, not an answer about formats/volume. #}
     {%- endif -%}
   {%- endif -%}
 
   {# Format/Type with volume #}
   {%- set formatsPath = [uuids.creatingCUuid, uuids.formatsQUuid]|reply_path -%}
   {%- set formatsItems = repliesMap[formatsPath]|reply_items -%}
+  {% if not formatsItems %}
+    <p class="data-gap" data-requirement-id="SE-1b" data-status="missing-output">This document does not yet list the data types, formats and estimated volumes.</p>
+  {% endif %}
   {%- if formatsItems|length > 0 -%}
     <h4>Data formats and types</h4>
     <div>We will be using the following data formats and types:

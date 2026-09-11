@@ -17,11 +17,12 @@
   </head>
   <body>
     <article class="dmp">
-      {% include "src/header.html.j2" with context %}
+      {% include "src/frontmatter.html.j2" with context %}
       {% if dc.project.versions|length > 0 %}{% include "src/versions.html.j2" with context %}{% endif %}
-      {% include "src/contributors.html.j2" with context %}
       {% include "src/projects.html.j2" with context %}
+      {% include "src/contributors.html.j2" with context %}
       {% include "src/content.html.j2" with context %}
+      {% include "src/document-provenance.html.j2" with context %}
     </article>
   </body>
 </html>

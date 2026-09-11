@@ -2,6 +2,7 @@
   <h3>11. How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?</h3>
 
   <div class="answer">
+  {% set answerContent %}
     {# Produced datasets #}
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
@@ -151,5 +152,11 @@
       <p>We have a reserved budget for the time and effort it will take to prepare the data for publication.</p>
     {%- endif -%}
   {%- endif -%}
+  {% endset %}
+  {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
+    {{ answerContent }}
+  {% else %}
+    <p class="data-gap" data-requirement-id="SE-5b" data-status="missing-output">This document does not yet contain an answer about data selection and long-term preservation.</p>
+  {% endif %}
   </div>
 </div>

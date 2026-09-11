@@ -8,6 +8,7 @@ from pathlib import Path
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Mm, Pt, RGBColor
@@ -31,6 +32,8 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     # Keep the upstream binary in Git for provenance; remove drawings in the build.
     for section in document.sections:
         for container in (section.header, section.first_page_header, section.even_page_header):
+            for paragraph in container.paragraphs:
+                paragraph.clear()
             for element in list(container._element.iter()):
                 if element.tag in {qn("w:drawing"), qn("w:pict")}:
                     element.getparent().remove(element)
@@ -65,11 +68,15 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item.paragraph_format.space_before = Pt(0)
             item.paragraph_format.space_after = Pt(6)
             item.paragraph_format.widow_control = True
-    for level, size in enumerate((22, 16, 12.5, 11.5, 10.5), 1):
+    for level, size in enumerate((21, 15, 11, 11, 10.5), 1):
         if f"Heading {level}" in document.styles:
             item = document.styles[f"Heading {level}"]
             item.font.size, item.font.bold = Pt(size), True
+            if level == 3:
+                item.font.bold = False
+                item.font.color.rgb = RGBColor.from_string("47565C")
             item.paragraph_format.keep_with_next = True
+            item.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
             item.paragraph_format.keep_together = True
             item.paragraph_format.page_break_before = False
             item.paragraph_format.space_before = Pt(12)

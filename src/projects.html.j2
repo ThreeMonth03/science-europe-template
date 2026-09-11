@@ -1,17 +1,15 @@
 {%- set projectsPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
 {%- set projectsItems = repliesMap[projectsPath]|reply_items -%}
 <div id="dmp-projects">
-  <h2>Projects</h2>
-
-  <p>We will be working on the following projects and for those are the data and work described in this DMP.</p>
+  <h2>Research overview</h2>
 
   {% for projectsItem in projectsItems %}
     <div class="project">
     {%- set projectNamePath = [projectsPath, projectsItem, uuids.projectNameQUuid]|reply_path -%}
     {%- set projectName = repliesMap[projectNamePath]|reply_str_value -%}
-    {%- if projectName -%}
+    {%- if projectName and projectsItems|length > 1 -%}
       <h3>{{ projectName }}</h3>
-    {%- else -%}
+    {%- elif not projectName -%}
       <h3 class="empty-value">(project name not given)</h3>
     {%- endif -%}
 
@@ -23,15 +21,11 @@
     {%- set projectEnd = repliesMap[projectEndPath]|reply_str_value -%}
     {%- set fundersPath = [projectsPath, projectsItem, uuids.fundersQUuid]|reply_path -%}
     {%- set fundersItems = repliesMap[fundersPath]|reply_items -%}
-      <dl>
-        <dt>Project Number</dt>
-        <dd>{{ projectNumber if projectNumber else "N/A" }}</dd>
-        <dt>Start date</dt>
-        <dd>{{ projectStart if projectStart else "N/A" }}</dd>
-        <dt>End date</dt>
-        <dd>{{ projectEnd if projectEnd else "N/A" }}</dd>
-        <dt>Funding</dt>
-        <dd>
+      <table class="project-details"><tbody>
+        <tr><th scope="row">Project Number</th><td>{{ projectNumber if projectNumber else "N/A" }}</td></tr>
+        <tr><th scope="row">Start date</th><td>{{ projectStart if projectStart else "N/A" }}</td></tr>
+        <tr><th scope="row">End date</th><td>{{ projectEnd if projectEnd else "N/A" }}</td></tr>
+        <tr><th scope="row">Funding</th><td>
           {%- if fundersItems|length > 0 %}
             <ul>
             {%- for fundersItem in fundersItems %}
@@ -45,10 +39,10 @@
             {%- endfor %}
             </ul>
           {%- else -%}
-            Did not apply for any funding yet.
+            Funding information has not been provided.
           {%- endif -%}
-        </dd>
-      </dl>
+        </td></tr>
+      </tbody></table>
 
     {%- set projectAbstractPath = [projectsPath, projectsItem, uuids.projectAbstractQUuid]|reply_path -%}
     {%- set projectAbstract = repliesMap[projectAbstractPath]|reply_str_value -%}

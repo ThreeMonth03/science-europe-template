@@ -2,6 +2,7 @@
   <h3>6. How will data security and protection of sensitive data be taken care of during the research?</h3>
 
   <div class="answer">
+  {% set answerContent %}
     {%- set risksPathPrefix = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid]|reply_path -%}
     {# Basic risks #}
     {%- set risksStoreLabPath = [risksPathPrefix, uuids.risksStoreLabQUuid]|reply_path -%}
@@ -142,24 +143,7 @@
     {%- set sharedWorkspaceReliableAUuid = [sharedWorkspacePrefix, uuids.sharedReliableQUuid, uuids.sharedReliableExploreAUuid ]|reply_path  -%}
     {%- set sharedWorkspaceReliablePreventLossQUuid = [sharedWorkspaceReliableAUuid, uuids.sharedReliablePreventLossQUuid]|reply_path  -%}
     {%- set sharedWorkspaceReliablePreventLossReply = repliesMap[sharedWorkspaceReliablePreventLossQUuid]|reply_str_value -%}
-    {%- if sharedWorkspaceReply == uuids.sharedWorkspaceYesAUuid and sharedWorkspaceReliablePreventLossReply -%}
-     <p>During the project we will use shared working space to work with our data{{+" "}}
-      {%- if sharedWorkspaceReliablePreventLossReply == uuids.sharedReliablePreventLossSufficientAUuid  -%}
-        that ensures the prevention of complete data loss.
-      {%- elif sharedWorkspaceReliablePreventLossReply == uuids.sharedReliablePreventLossStoredAUuid -%}
-        but we will store all essential data elsewhere.
-      {%- endif -%}
-
-      {%- set sharedWorkspaceReliableBackupQUuid = [sharedWorkspaceReliableAUuid, uuids.sharedReliableBackupQUuid]|reply_path -%}
-      {%- set sharedWorkspaceReliableBackupReply = repliesMap[sharedWorkspaceReliableBackupQUuid]|reply_str_value  -%}
-      {%- if sharedWorkspaceReliableBackupReply == uuids.sharedReliableBackupCopyAllSomewhereAUuid -%}
-        {{+" "}}And all the data that are stores elsewhere is adequately backed up.
-      {%- elif sharedWorkspaceReliableBackupReply == uuids.sharedReliableBackupCopyBackupsAUuid -%}
-        {{+" "}}We make (automated) backups of all data stored outside of the working area.
-      {%- endif -%}
-     </p>
-
-    {%- endif -%}
+    {# Storage/backup facts are rendered once in Q5; they do not answer access security. #}
 
     {# Long term preservation and recovery #}
     {%- set preservingArchivedDuringQUuid = [uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path -%}
@@ -231,5 +215,11 @@
         {%- endfor -%}
       </ul>
     {%- endif -%}
+  {% endset %}
+  {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
+    {{ answerContent }}
+  {% else %}
+    <p class="data-gap" data-requirement-id="SE-3b" data-status="missing-output">This document does not yet contain an answer about data security and protection of sensitive data.</p>
+  {% endif %}
   </div>
 </div>

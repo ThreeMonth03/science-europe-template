@@ -5,9 +5,9 @@
   @bottom-center { margin-top: 4mm; padding-top: 2mm; border-top: 1px solid #8c999e; }
 }
 html body { font-size: 10.5pt; line-height: 1.5; color: #222; }
-html body h1 { font-size: 23pt; line-height: 1.25; }
-html body h2 { font-size: 16pt; line-height: 1.35; margin: 1.2em 0 .6em; }
-html body h3 { font-size: 12.5pt; line-height: 1.4; margin: 1em 0 .65em; }
+html body h1 { font-size: 21pt; line-height: 1.25; }
+html body h2 { font-size: 15pt; line-height: 1.35; margin: 1.3em 0 .65em; }
+html body h3 { font-size: 11pt; font-weight: normal; line-height: 1.5; margin: .9em 0 .6em; color: #47565c; }
 html body h4 { font-size: 11.5pt; margin: .85em 0 .4em; }
 html body h5 { font-size: 10.5pt; margin: .75em 0 .3em; }
 html body h1, html body h2, html body h3, html body h4, html body h5 { break-after: avoid; break-inside: avoid; }
@@ -37,3 +37,36 @@ html body .abstract p { text-align: left; }
 html body section { margin-bottom: 1.4em; }
 html body .dmp-section .question + .question { margin-top: 1.3em; }
 html body .data-gap { padding: .45em .65em; border-left: 3px solid #95651b; background: #fff8e8; }
+
+/* Reading units, not arbitrary fixed-height pages. */
+html body #dmp-content { break-before: page; }
+html body #dmp-projects h3 { font-size: 14pt; font-weight: bold; color: #222; }
+html body .document-meta { font-size: 9pt; color: #526169; }
+html body .document-kind { font-size: 14pt; color: #526169; }
+html body .document-provenance { border-top: 1px solid #bcc6cc; margin-top: 2em; padding-top: .7em; font-size: 8.5pt; color: #526169; }
+html body .dataset-list { list-style: none; padding-left: 0; }
+html body .dataset-list > li { margin: 0 0 1em; }
+html body .dataset-list h5 { font-size: 11pt; margin: .8em 0 .35em; }
+html body .dataset-source { font-size: 9pt; }
+html body .dataset-version { margin: .4em 0; }
+html body .dataset-version th { width: 15%; font-weight: normal; }
+html body .dataset-version p { margin-bottom: .2em; }
+html body .dataset-policy > p { display: inline; margin: 0; }
+html body .dataset-policy > p::after { content: ' '; }
+html body .dataset-policy { margin: .4em 0 .6em; }
+html body .answer-detail ul { margin-top: .2em; }
+html body .answer-detail li { margin-bottom: .2em; }
+html body .answer-detail ul:has(> li:last-child:nth-child(-n+3)) { break-inside: avoid; }
+html body li > p:first-child { break-after: avoid; }
+html body .resource-table { font-size: 10pt; table-layout: fixed; }
+html body .resource-table th:nth-child(1) { width: 57%; }
+html body .resource-table th:nth-child(2) { width: 17%; }
+html body .resource-table th:nth-child(3) { width: 26%; }
+html body .resource-table tr { break-inside: auto; }
+html body .resource-table:has(tbody > tr:last-child:nth-child(-n+3)) { break-inside: avoid; }
+html body .resource-table p { margin-bottom: .3em; }
+html body .resource-table ul { padding-left: 1.2em; }
+html body .resource-table .answer-detail { margin: .25em 0; }
+html body .resource-table .data-gap { padding: .2em .35em; }
+html body .template-gap { font-size: 9.5pt; color: #526169; border-left-color: #8c999e; background: #f3f5f5; }
+html body .data-gap[data-status="missing-output"] { border: none; border-left: 2px solid #b5bec1; background: #f5f6f6; color: #526169; font-size: 10pt; padding: .4em .65em; }

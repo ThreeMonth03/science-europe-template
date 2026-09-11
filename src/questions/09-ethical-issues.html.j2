@@ -2,6 +2,7 @@
   <h3>9. What ethical issues and codes of conduct are there, and how will they be taken into account?</h3>
 
   <div class="answer">
+  {% set answerContent %}
 
     {# Research Projects - ethical approval #}
     {%- set projectsPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
@@ -225,5 +226,11 @@
         </p>
       {% endif %}
     {%- endif -%}
+  {% endset %}
+  {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
+    {{ answerContent }}
+  {% else %}
+    <p class="data-gap" data-requirement-id="SE-4c" data-status="missing-output">This document does not yet contain an answer about ethical issues and codes of conduct.</p>
+  {% endif %}
   </div>
 </div>
