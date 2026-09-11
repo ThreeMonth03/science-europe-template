@@ -6,23 +6,19 @@
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
     {%- if producedDataItems|length > 0 -%}
-        <h4>Persistent identifiers for shared data</h4>
-        <ul>
         {%- for i in producedDataItems -%}
             {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
             {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
             {# If will be published #}
             {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
             {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
+            <div class="dataset-section" data-item-id="{{ i }}">
+                <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
             {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
-            <li>
-                <strong>{{ producedDataName if producedDataName else "(no name given)" }}</strong>
                 {# Where the data will be distributed #}
                 {%- set publishedDistrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
                 {%- set publishedDistrosItems = repliesMap[publishedDistrosPath]|reply_items -%}
                     {%- if publishedDistrosItems|length > 0  -%}
-                    <p>This data will be distributed in following {{ "repositories" if publishedDistrosItems|length > 1 else "repository" }}:</p>
-                    <ul>
                         {%- for j in publishedDistrosItems -%}
                             {%- set publishedDistrosItem = [publishedDistrosPath, j]|reply_path -%}
                             {%- set publishedDataIdentifierQUuid = [publishedDistrosItem, uuids.publishedDataIdentifierQUuid]|reply_path -%}
@@ -30,7 +26,9 @@
 
                             {%- set repositoryKindQUuid = [publishedDistrosItem, uuids.publishedDataRepositoryKindQUuid]|reply_path -%}
                             {%- set repositoryKindAUuid = repliesMap[repositoryKindQUuid]|reply_str_value -%}
-                            <li>
+                            <div class="distribution-section" data-item-id="{{ j }}">
+                            {% if publishedDistrosItems|length > 1 %}<p class="answer-lead"><strong>Distribution {{ loop.index }}</strong></p>{% endif %}
+                            <p class="answer-lead">
                             {%- if repositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid -%}
                                 <strong>Domain-specific repository</strong>
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid -%}
@@ -42,17 +40,18 @@
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid -%}
                                 <strong>Special-purpose repository</strong>
                             {%- endif -%}
+                            </p>
 
                             {# Will this data be assigned persistent identifier? #}
                             {%- if publishedDataIdentifierAUuid == uuids.publishedDataIdentifierYesAUuid -%}
-                            <p>Within this repository, unique and persistent identifiers will be applied as follows:</p>
-                            <div class="identifier-arrangement">
+                            <p data-fact-id="persistent-identifier" data-status="complete">Persistent identifiers will be assigned.</p>
+                            <div class="identifier-arrangement dataset-policy">
                                 {# Who assigns #}
                                 {%- set publishedDataIdentifierAssignsQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierAssignsQUuid]|reply_path -%}
                                 {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}
 
                                 {%- if publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
-                                    <p>A project data steward or principle investigator will assign the persistent identifier.</p>
+                                    <p>A project data steward or principal investigator will assign the persistent identifier.</p>
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid -%}
                                     <p>An institutional data steward will assign the persistent identifier.</p>
@@ -79,14 +78,18 @@
                             {%- else -%}
                               <p class="data-gap" data-status="missing-output">The persistent identifier arrangement is not yet described.</p>
                             {%- endif -%}
-                            </li>
+                            </div>
                         {%- endfor -%}
-                    </ul>
+                    {% else %}
+                        <p class="data-gap" data-fact-id="identifier-distributions" data-status="missing">The publication locations have not been listed.</p>
                     {%- endif -%}
-            </li>
+            {% elif isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
+                <p>This dataset will not be published.</p>
+            {% else %}
+                <p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>
             {%- endif -%}
+            </div>
         {%- endfor -%}
-        </ul>
     {%- else -%}
       <p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.</p>
     {%- endif -%}

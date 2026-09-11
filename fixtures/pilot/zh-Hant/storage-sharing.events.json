@@ -1,0 +1,1290 @@
+[
+  {
+    "type": "SetReplyEvent",
+    "uuid": "40f6f2dd-61c2-52c2-a333-fc8e8392c68f",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.614ab69d-55a6-4214-b384-00ba21ce92a1",
+    "value": {
+      "type": "AnswerReply",
+      "value": "b2f76c0a-847a-403c-9ed6-09cad10e625e"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "1602e33c-6f22-5539-97d5-e7445ff3ca29",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.72099c46-16e7-47a2-a320-cc768b7085fe",
+    "value": {
+      "type": "AnswerReply",
+      "value": "e7324e1a-bfcb-4f2b-855a-35701dfb1ad5"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "da43b4a2-b11b-5f32-a321-b6dd23539b25",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.bc5e3dbf-2923-4025-a49a-f204b01d4018",
+    "value": {
+      "type": "AnswerReply",
+      "value": "f7f2ff16-eee0-42a7-a89a-bd7291cef5fc"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "68b1ad74-f930-581a-aa42-1972effe3d6b",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.09c7c989-6461-417f-b09e-228491c051c6",
+    "value": {
+      "type": "AnswerReply",
+      "value": "f4da7f1d-f3c6-42e2-a7b5-41c4845ba352"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "590472cf-bd03-5513-bc2e-61f97d71f3b0",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.73d686bd-7939-412e-8631-502ee6d9ea7b",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "0d10f3d5-6033-5c6b-8886-0487bef50d90"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "0ff0eb15-30a1-566b-84be-eb1d4c4143ac",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.83c0d09d-e74c-4c81-a52c-aaa2e18415ac",
+    "value": {
+      "type": "AnswerReply",
+      "value": "d4b4c6e3-e5c6-4938-a08a-e51cb7cdebeb"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "29dd84cf-0ed7-54f9-a201-8595e3c7e514",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "2ff7d9fd-9153-58b2-8566-e73e80e281a6"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "14962150-d7cd-59e4-8b14-0b5ea41e9d12",
+    "path": "6be88f7c-f868-460f-bba7-91e1c659adfd.12baa8af-db59-43a5-8ec7-0941c58ff89a",
+    "value": {
+      "type": "AnswerReply",
+      "value": "cb148cc8-f15f-494f-a197-f01e3111ec60"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "99d614a0-5629-5e80-aeac-3bcdac63ecd2",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1",
+    "value": {
+      "type": "AnswerReply",
+      "value": "2663b978-5125-4224-9930-0a50dbe895c9"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "76bb53d5-daa6-5000-9e77-8dade492d884",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.49c009cb-a38c-4836-9780-8a8b3dd1cbac",
+    "value": {
+      "type": "AnswerReply",
+      "value": "4bdc319d-282a-4a80-9cdd-78d2081e812b"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "efcce924-0c07-5ff7-80b2-aba51b979d73",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.8c962e6f-17ee-4b22-8ebb-9f06f779e3b3",
+    "value": {
+      "type": "AnswerReply",
+      "value": "6d18bfff-0f53-469b-934e-9806dda9d4fb"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "a8ca52a9-549d-5cbe-8039-b9ba7b8b8b5f",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.b08fe063-33f8-4380-b3a9-ba1e586dedf2",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "eb0dd269-bbc6-5675-b516-f128d0edfc75"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "44c8b20a-bcd5-5a46-8f79-2edd4f7495c2",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.ebcbf4c6-ce25-4a0b-9e82-039a88498203",
+    "value": {
+      "type": "AnswerReply",
+      "value": "579c0a9a-29f0-4ab8-991d-bc4f55f2e4b8"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "7aa86bc9-d609-52a7-a97a-a560f5807d2d",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab",
+    "value": {
+      "type": "AnswerReply",
+      "value": "e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "a6d9808e-65ce-52ee-8542-61f61fcaa100",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.13a7eeae-09f5-42bf-8e62-b2c1fe1b86f7",
+    "value": {
+      "type": "AnswerReply",
+      "value": "db44d6ca-efc2-413e-8abc-d92f92ed1d1d"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "8cb9f177-fb2c-58fd-8b98-35dd0a272e04",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "37fb9b85-922d-51d5-9936-722cbb9bc74a"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "13a0bbf3-9175-5b38-9e2b-8b0f5092444b",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.d5784d24-0e66-4821-bd62-a711fb6d7a40",
+    "value": {
+      "type": "AnswerReply",
+      "value": "e81599af-4519-4987-b74e-9545428ed0e3"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "25e96d52-f17a-5a12-ae1f-2d82a5f1b188",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.de23bb94-b727-4907-9a5d-6f8c78c3e432",
+    "value": {
+      "type": "AnswerReply",
+      "value": "fe8ed36b-40e8-483b-ab31-061f6168d7ad"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "0182fbce-ac40-59ba-8e08-f0c27121f707",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.614ab69d-55a6-4214-b384-00ba21ce92a1.b2f76c0a-847a-403c-9ed6-09cad10e625e.39d8dad9-7666-405c-b35c-9e430c9691ed",
+    "value": {
+      "type": "AnswerReply",
+      "value": "bb176104-3bf1-4bc8-b8e8-a4b09e14b88c"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "dedd6f2c-9000-5e50-891d-130603fd0a03",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.614ab69d-55a6-4214-b384-00ba21ce92a1.b2f76c0a-847a-403c-9ed6-09cad10e625e.abaf4a70-17d4-449c-9b95-5b3bcfed7e9b",
+    "value": {
+      "type": "AnswerReply",
+      "value": "3c8f999d-c962-42a4-a7c3-05b21a4029ab"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "212ab9ae-d4a3-5080-a00e-46a150bf4436",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.614ab69d-55a6-4214-b384-00ba21ce92a1.b2f76c0a-847a-403c-9ed6-09cad10e625e.dc327e53-cf4f-44e7-8e66-40ddf1b4ae0a",
+    "value": {
+      "type": "AnswerReply",
+      "value": "4f86bb87-06f6-4d52-a9c0-52fc97bb441c"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "7bbe36fc-71b0-507e-b42e-61ed301da943",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.72099c46-16e7-47a2-a320-cc768b7085fe.e7324e1a-bfcb-4f2b-855a-35701dfb1ad5.5607d0bb-6b9e-4211-821c-785acc3aa25e",
+    "value": {
+      "type": "AnswerReply",
+      "value": "35b32d04-fec6-465e-976d-466aafcb385d"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "9ca40a23-550a-5b6b-9c96-aadc92f6d873",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.72099c46-16e7-47a2-a320-cc768b7085fe.e7324e1a-bfcb-4f2b-855a-35701dfb1ad5.b171ec17-d7b5-4726-ae22-0d892b106cf8",
+    "value": {
+      "type": "AnswerReply",
+      "value": "0d64d3c6-4312-47a9-92ad-0bc9440d6e45"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "80c019fb-1788-576b-a09a-d496b6e6dd93",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.72099c46-16e7-47a2-a320-cc768b7085fe.e7324e1a-bfcb-4f2b-855a-35701dfb1ad5.df36fb68-131c-4f31-a42b-684abf523bbc",
+    "value": {
+      "type": "AnswerReply",
+      "value": "5af813b7-cb41-4eb9-afe7-ca364771b74e"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "1bbbd602-62a4-5084-8155-3cb774031279",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.bc5e3dbf-2923-4025-a49a-f204b01d4018.f7f2ff16-eee0-42a7-a89a-bd7291cef5fc.38ebf5d0-f7a3-4cf5-93eb-6ee3143c8a69",
+    "value": {
+      "type": "AnswerReply",
+      "value": "ec502175-376d-4bf3-a055-c4f7d7639103"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "27c408e0-9f46-5d8a-bc27-78003f33b8d5",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.bc5e3dbf-2923-4025-a49a-f204b01d4018.f7f2ff16-eee0-42a7-a89a-bd7291cef5fc.a12aa967-28a5-4a9b-8df8-f7c533205ea4",
+    "value": {
+      "type": "AnswerReply",
+      "value": "00ed33b9-ef1c-4de0-932b-bc6a29023e76"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "260ba2eb-29fa-56a0-918b-9c81c0a79ab8",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.73d686bd-7939-412e-8631-502ee6d9ea7b.0d10f3d5-6033-5c6b-8886-0487bef50d90.3a2ffc13-6a0e-4976-bb34-14ab6d938348",
+    "value": {
+      "type": "StringReply",
+      "value": "research@example.org"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "70bfedb7-37e8-54ae-92e8-dfe7b5870b11",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.73d686bd-7939-412e-8631-502ee6d9ea7b.0d10f3d5-6033-5c6b-8886-0487bef50d90.6155ad47-3d1e-4488-9f2a-742de1e56580",
+    "value": {
+      "type": "StringReply",
+      "value": "範例研究團隊"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "5b09ab5e-8447-58fe-aac1-ce4f9f5388e1",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.73d686bd-7939-412e-8631-502ee6d9ea7b.0d10f3d5-6033-5c6b-8886-0487bef50d90.829dcda6-db8a-40ac-819a-92b9b52490f5",
+    "value": {
+      "type": "MultiChoiceReply",
+      "value": [
+        "2c6ee59d-4dc9-4dcb-ac13-d969c317a117",
+        "21047dec-71ee-40e4-868a-3ed75a027ff6",
+        "3022098b-0e2c-4fad-9f28-cf2e1325521d"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "9b1858d9-f686-5334-a693-e70f22195166",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.83c0d09d-e74c-4c81-a52c-aaa2e18415ac.d4b4c6e3-e5c6-4938-a08a-e51cb7cdebeb.13dcbcd7-73d8-4480-8739-0a58702ced75",
+    "value": {
+      "type": "StringReply",
+      "value": "工作人員將於資料發布前完成培訓。\n\n- 後設資料品質檢核\n- 版本控制與資料溯源"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "c17ef236-1459-5b11-b1e8-8fcab4744337",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.22583d74-3c98-4e0a-b363-26d767c88212",
+    "value": {
+      "type": "StringReply",
+      "value": "本合成案例用於測試十五題的文件輸出。計畫將蒐集新的沿岸水溫觀測資料，並與兩筆開放參考資料集比較。本文件並非已核定或已完成的資料管理方案。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "e310472b-d7d8-5f9f-810f-73537f5aa6b0",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "83d5916b-e86c-59cd-8d87-bf9d5d0a802e",
+        "d61cc9fa-7412-51ea-9b69-64ecd5e15390"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "ca8af67e-0c25-5d83-a7ec-d6f3ca2fc75a",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.56163eb0-0101-40b4-b1c1-580875196b5c",
+    "value": {
+      "type": "StringReply",
+      "value": "COAST-2026"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "b5b9c319-7d56-5d87-939c-ac70c281d014",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.cabc6f07-6015-454e-b97a-c34db4ec0c60",
+    "value": {
+      "type": "StringReply",
+      "value": "2027-12-31"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "332e95f2-b50e-5f67-9709-803b13a3a3be",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.dbb99f35-bdd9-4637-890e-23ba5bc19d6a",
+    "value": {
+      "type": "AnswerReply",
+      "value": "2eb83683-86bc-4615-86b7-1d9bf0e414cc"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "2d773176-c08c-56de-b1f1-beaa327a051e",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.de84b9b5-bcd0-4954-8370-72ea83916b8c",
+    "value": {
+      "type": "StringReply",
+      "value": "2026-01-01"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "1d183c2e-aec0-5396-a58f-c5f343bede7a",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.f0ef08fd-d733-465c-bc66-5de0b826c41b",
+    "value": {
+      "type": "StringReply",
+      "value": "海岸觀測：可重現的資料管理"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "ba0b3779-b105-5609-b094-88d5ee69dece",
+    "path": "6be88f7c-f868-460f-bba7-91e1c659adfd.12baa8af-db59-43a5-8ec7-0941c58ff89a.cb148cc8-f15f-494f-a197-f01e3111ec60.1270ea5a-92a2-46ce-b658-9bf2862b9b57",
+    "value": {
+      "type": "AnswerReply",
+      "value": "6833a1fa-62fe-46b1-bb81-a3e42ff9626d"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "b6d7fb44-ac99-5696-9f12-4f8df45f1de5",
+    "path": "6be88f7c-f868-460f-bba7-91e1c659adfd.12baa8af-db59-43a5-8ec7-0941c58ff89a.cb148cc8-f15f-494f-a197-f01e3111ec60.26b2afa6-99e8-4337-b380-5642bc807ad8",
+    "value": {
+      "type": "AnswerReply",
+      "value": "a7aaba0a-2e27-4051-b3a2-03474efa0cd9"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "f7e9ac57-ef92-5828-b0d6-9ba6d969e7ba",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "1f41fb97-54f7-53d1-9ae6-367f1a82d9b5",
+        "f3cb958d-101d-5605-b2ca-920fad70dd90"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "ac7d1dda-016c-576e-9a38-9747b7ff16ec",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.8c962e6f-17ee-4b22-8ebb-9f06f779e3b3.6d18bfff-0f53-469b-934e-9806dda9d4fb.1440afd6-d516-44f6-9c02-6abb13900b66",
+    "value": {
+      "type": "AnswerReply",
+      "value": "aec37b0d-490d-4d75-8814-8ed78ea5b8dd"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "c2607e94-728b-5f7a-8ae7-dc8e9c8ee509",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.8c962e6f-17ee-4b22-8ebb-9f06f779e3b3.6d18bfff-0f53-469b-934e-9806dda9d4fb.948b5fd8-c1bd-457d-8f81-ea2fd093f541",
+    "value": {
+      "type": "AnswerReply",
+      "value": "ccdb5296-919c-44ac-89df-351fd2e564ae"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "909674b2-715e-5f2d-b955-52eeee45cd5a",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.b08fe063-33f8-4380-b3a9-ba1e586dedf2.eb0dd269-bbc6-5675-b516-f128d0edfc75.ba9e42fc-2bf5-413f-85de-003f981aaf81",
+    "value": {
+      "type": "AnswerReply",
+      "value": "c2bc3d0b-a11b-4831-bd2c-5235dbf868b7"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "3288faa8-0272-5c08-b331-ccf0bb541c3d",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.b08fe063-33f8-4380-b3a9-ba1e586dedf2.eb0dd269-bbc6-5675-b516-f128d0edfc75.ced5a7c2-4034-4763-a1d5-3cb815cdfddb",
+    "value": {
+      "type": "AnswerReply",
+      "value": "985e488d-257f-479d-8113-5dcbe105a08e"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "a4b7b32d-5f98-5262-8020-3b585ab1baa4",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.b08fe063-33f8-4380-b3a9-ba1e586dedf2.eb0dd269-bbc6-5675-b516-f128d0edfc75.ecff019a-d4e6-44c6-a8fe-c84eb15ed8b7",
+    "value": {
+      "type": "AnswerReply",
+      "value": "d4ce2c56-b3df-4013-9220-289b28f922de"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "8179c9ad-ff38-5816-ba4c-b5c8cd2dd963",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.b08fe063-33f8-4380-b3a9-ba1e586dedf2.eb0dd269-bbc6-5675-b516-f128d0edfc75.f00cf643-5368-458a-97d4-b463c2000c66",
+    "value": {
+      "type": "IntegrationReply",
+      "value": {
+        "type": "PlainType",
+        "value": "CSV (UTF-8)"
+      }
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "72832b4d-b071-599e-a2a5-dc1c2fcde8ea",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "cef98e0d-2780-5780-b4d1-b32fc5830517"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "19f3f537-6a7d-58c9-8bbf-9d85aceb67fa",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.3b3fbcc6-c405-4151-8dce-e11dbd46b1bd",
+    "value": {
+      "type": "AnswerReply",
+      "value": "d21c32f1-c150-4c89-8472-2918d60dd547"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "f45b52f0-b393-5ea3-8728-dd55bb64ab26",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292",
+    "value": {
+      "type": "AnswerReply",
+      "value": "8d1b07a7-f177-41f5-9532-05536223a8d6"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "277659ca-dde8-5d48-8802-223ba7c56375",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a1d76760-053c-4706-80a2-cfb6c6a061f3",
+    "value": {
+      "type": "AnswerReply",
+      "value": "4b2a08c7-4942-41fc-8114-d3868c882624"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "5fe233bf-9143-55be-b392-6979881f9d0e",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.b0949d09-d179-4491-9fb4-14b0deb9f862",
+    "value": {
+      "type": "StringReply",
+      "value": "完成品質檢查的沿岸觀測資料"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "f78d7d87-0104-592a-88be-907b2fab6a3e",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.cc95b399-7d8d-4232-bccf-686f78c91bff",
+    "value": {
+      "type": "AnswerReply",
+      "value": "60de66a3-d303-4784-8931-bc58f8a3e747"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "6128cd33-eeaa-5dba-9a49-42ced5700190",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.d4e6a244-07fb-4573-b93f-c20a9409ac7c",
+    "value": {
+      "type": "AnswerReply",
+      "value": "7b5f059a-ae7e-4f7f-92e8-119911e568b2"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "d9272b79-8393-5a51-9a5c-d6f04217a978",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.d5784d24-0e66-4821-bd62-a711fb6d7a40.e81599af-4519-4987-b74e-9545428ed0e3.41a8d19b-2468-4c60-9f5e-7a8fee26eedb",
+    "value": {
+      "type": "AnswerReply",
+      "value": "4bc5017e-2808-4fc1-95b9-77bd2e755bb6"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "aae7f843-9ee3-538c-9048-9a71b0465753",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.d5784d24-0e66-4821-bd62-a711fb6d7a40.e81599af-4519-4987-b74e-9545428ed0e3.c2a38110-f7a3-432f-ae98-4e448e496b44",
+    "value": {
+      "type": "AnswerReply",
+      "value": "ebbe4ef1-ec2a-44b8-bbc9-f15a743c438f"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "d741620f-9614-50f9-bebb-6e7c9bab0751",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.d5784d24-0e66-4821-bd62-a711fb6d7a40.e81599af-4519-4987-b74e-9545428ed0e3.c659c36f-d142-4453-8d8b-db7c05f31371",
+    "value": {
+      "type": "AnswerReply",
+      "value": "48d7128a-a237-4d32-8fc6-464089b46892"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "4b3965c5-872f-54f3-ad88-e4231250df42",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.de23bb94-b727-4907-9a5d-6f8c78c3e432.fe8ed36b-40e8-483b-ab31-061f6168d7ad.edc9b6d9-c121-4e00-ba83-710330c2e18d",
+    "value": {
+      "type": "AnswerReply",
+      "value": "f613d751-f6dd-406e-863c-cdce486a5fc0"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "60ac7266-c849-5d96-9451-d27ad659d1ba",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.72099c46-16e7-47a2-a320-cc768b7085fe.e7324e1a-bfcb-4f2b-855a-35701dfb1ad5.b171ec17-d7b5-4726-ae22-0d892b106cf8.0d64d3c6-4312-47a9-92ad-0bc9440d6e45.25e06912-08a2-40e4-af76-cfbc5ada9925",
+    "value": {
+      "type": "AnswerReply",
+      "value": "766e16e4-21c7-4030-9eda-1973f51061d4"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "7a68e680-7cc9-5dfa-a34d-dd0b955b1363",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.72099c46-16e7-47a2-a320-cc768b7085fe.e7324e1a-bfcb-4f2b-855a-35701dfb1ad5.b171ec17-d7b5-4726-ae22-0d892b106cf8.0d64d3c6-4312-47a9-92ad-0bc9440d6e45.98d9789b-32fc-4e2f-876a-47760ad7c7ec",
+    "value": {
+      "type": "AnswerReply",
+      "value": "0884ac19-9bde-4bf1-afdd-0794c2c69092"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "923407b2-cf32-50f4-8206-0197d5bbaa99",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.72099c46-16e7-47a2-a320-cc768b7085fe.e7324e1a-bfcb-4f2b-855a-35701dfb1ad5.df36fb68-131c-4f31-a42b-684abf523bbc.5af813b7-cb41-4eb9-afe7-ca364771b74e.4ee4d67d-62c5-47f0-a741-f2629b65cf8a",
+    "value": {
+      "type": "AnswerReply",
+      "value": "eef277cb-1032-401e-b242-e74afde575dc"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "315c7f09-f65b-556e-bf91-1764b4711277",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.bc5e3dbf-2923-4025-a49a-f204b01d4018.f7f2ff16-eee0-42a7-a89a-bd7291cef5fc.38ebf5d0-f7a3-4cf5-93eb-6ee3143c8a69.ec502175-376d-4bf3-a055-c4f7d7639103.974f3ad3-90b3-4e00-b751-8c5a5629b2cf",
+    "value": {
+      "type": "StringReply",
+      "value": "2048"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "587a0303-ed67-556e-8075-43f9d3bfcb21",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.bc5e3dbf-2923-4025-a49a-f204b01d4018.f7f2ff16-eee0-42a7-a89a-bd7291cef5fc.a12aa967-28a5-4a9b-8df8-f7c533205ea4.00ed33b9-ef1c-4de0-932b-bc6a29023e76.3d0e0a6e-24c0-421c-8656-fc7c1e6f79be",
+    "value": {
+      "type": "StringReply",
+      "value": "檔名採 station_YYYYMMDD.csv，並在 CHANGELOG.md 記錄修正。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "ee3fc734-973c-523c-87f3-bab09fc17b1c",
+    "path": "10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5.bc5e3dbf-2923-4025-a49a-f204b01d4018.f7f2ff16-eee0-42a7-a89a-bd7291cef5fc.a12aa967-28a5-4a9b-8df8-f7c533205ea4.00ed33b9-ef1c-4de0-932b-bc6a29023e76.a2e22a59-4747-4c29-84c0-3a9cbd859249",
+    "value": {
+      "type": "AnswerReply",
+      "value": "7df4eaa1-6779-473e-ab7d-44421d4e5f49"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "ac419579-8520-5935-a6b6-c03475f3bce1",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.83d5916b-e86c-59cd-8d87-bf9d5d0a802e.028909e8-7392-4385-96a3-467d79c43a42",
+    "value": {
+      "type": "MultiChoiceReply",
+      "value": [
+        "d84664d4-9bb6-40ff-bde5-3c1ed58ce522",
+        "d2a9d717-c0b2-44ee-8a6d-8476831b6225"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "11a1c9d9-76a2-53d4-94e9-d959348df40c",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.83d5916b-e86c-59cd-8d87-bf9d5d0a802e.46cd176a-138a-4f6c-8cd5-dfcb1f23f04a",
+    "value": {
+      "type": "AnswerReply",
+      "value": "2e37f71b-b7aa-4182-888a-8b7a5156b53c"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "05de0f40-2194-5e18-9017-e6ad9390ed4f",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.83d5916b-e86c-59cd-8d87-bf9d5d0a802e.7098b454-bc5e-4f83-a95d-970aa42e1479",
+    "value": {
+      "type": "StringReply",
+      "value": "資料整理資源 1"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "077ca3bc-36d9-5ff2-9dc9-8b641d8ebfcf",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.83d5916b-e86c-59cd-8d87-bf9d5d0a802e.ac1f8f04-17a2-49e9-b2ad-2a9f8e44efb3",
+    "value": {
+      "type": "IntegrationReply",
+      "value": {
+        "type": "PlainType",
+        "value": "TWD"
+      }
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "b08e5c13-f07d-53b6-9411-ff5944ba6449",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.83d5916b-e86c-59cd-8d87-bf9d5d0a802e.b3d9b6ca-bd24-4fa3-a3bd-d15005b9ae8b",
+    "value": {
+      "type": "StringReply",
+      "value": "整理後設資料並檢查寄存檔案。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "92fe478f-106f-55fb-b02d-36499121d4b0",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.83d5916b-e86c-59cd-8d87-bf9d5d0a802e.e53fdad9-7799-4eb4-8b4d-fa9aa05f9d2d",
+    "value": {
+      "type": "StringReply",
+      "value": "5000"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "25351ff4-fee9-5adf-a05b-78986dc0a811",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.d61cc9fa-7412-51ea-9b69-64ecd5e15390.028909e8-7392-4385-96a3-467d79c43a42",
+    "value": {
+      "type": "MultiChoiceReply",
+      "value": [
+        "d84664d4-9bb6-40ff-bde5-3c1ed58ce522",
+        "d2a9d717-c0b2-44ee-8a6d-8476831b6225"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "d8994440-fcd9-582d-a832-5323ec16d000",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.d61cc9fa-7412-51ea-9b69-64ecd5e15390.46cd176a-138a-4f6c-8cd5-dfcb1f23f04a",
+    "value": {
+      "type": "AnswerReply",
+      "value": "2e37f71b-b7aa-4182-888a-8b7a5156b53c"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "53fad2bf-ddb3-59da-8eca-72d2c2babd6b",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.d61cc9fa-7412-51ea-9b69-64ecd5e15390.7098b454-bc5e-4f83-a95d-970aa42e1479",
+    "value": {
+      "type": "StringReply",
+      "value": "資料整理資源 2"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "8cbf01c1-26fb-5e5b-8c1b-a09fc5c86d74",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.d61cc9fa-7412-51ea-9b69-64ecd5e15390.ac1f8f04-17a2-49e9-b2ad-2a9f8e44efb3",
+    "value": {
+      "type": "IntegrationReply",
+      "value": {
+        "type": "PlainType",
+        "value": "TWD"
+      }
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "cb303c6e-8767-57dc-9dda-e5c0142c08cf",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.d61cc9fa-7412-51ea-9b69-64ecd5e15390.b3d9b6ca-bd24-4fa3-a3bd-d15005b9ae8b",
+    "value": {
+      "type": "StringReply",
+      "value": "整理後設資料並檢查寄存檔案。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "fee9bf6e-56a3-569d-8ff1-81c4a61fb128",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.d61cc9fa-7412-51ea-9b69-64ecd5e15390.e53fdad9-7799-4eb4-8b4d-fa9aa05f9d2d",
+    "value": {
+      "type": "StringReply",
+      "value": "0"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "86e23f82-aef3-5914-a605-fc634f7df90e",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.3b769dce-a88f-4339-a0f3-641d0ba22932",
+    "value": {
+      "type": "StringReply",
+      "value": "開放海岸觀測資料——測站 1"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "fc1e185c-41da-520b-a201-ae91dd4d836c",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e",
+    "value": {
+      "type": "AnswerReply",
+      "value": "8a1937d8-39dc-4efd-a3f6-b62e789f225b"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "fb503ffd-5e15-5a63-8da0-36516fd6930b",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.7801fe70-a2ac-432b-9470-e326646c249f",
+    "value": {
+      "type": "StringReply",
+      "value": "https://example.org/datasets/coastal-observations/station-1/version-2026"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "94570961-2dce-5d05-87fe-6a87f9a072f1",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.3b769dce-a88f-4339-a0f3-641d0ba22932",
+    "value": {
+      "type": "StringReply",
+      "value": "開放海岸觀測資料——測站 2"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "df0b14c9-5b33-5916-95c2-c868e782a2c1",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e",
+    "value": {
+      "type": "AnswerReply",
+      "value": "8a1937d8-39dc-4efd-a3f6-b62e789f225b"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "c89d997b-a6f5-5183-af00-c143b61672e0",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.7801fe70-a2ac-432b-9470-e326646c249f",
+    "value": {
+      "type": "StringReply",
+      "value": "https://example.org/datasets/coastal-observations/station-2/version-2026"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "1613c0e8-7dec-59d9-b3b2-ec3d80247035",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.8c962e6f-17ee-4b22-8ebb-9f06f779e3b3.6d18bfff-0f53-469b-934e-9806dda9d4fb.1440afd6-d516-44f6-9c02-6abb13900b66.aec37b0d-490d-4d75-8814-8ed78ea5b8dd.8d3b85e0-1683-48a5-a650-9f0d9bf8a1a4",
+    "value": {
+      "type": "AnswerReply",
+      "value": "d29ca8b4-0cb6-4678-90fa-e8c72de9073f"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "1f051791-4530-5cd2-94d0-19fc492a3eae",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.8c962e6f-17ee-4b22-8ebb-9f06f779e3b3.6d18bfff-0f53-469b-934e-9806dda9d4fb.948b5fd8-c1bd-457d-8f81-ea2fd093f541.ccdb5296-919c-44ac-89df-351fd2e564ae.b73b8310-3b4f-49c8-a5c0-4208883754ac",
+    "value": {
+      "type": "StringReply",
+      "value": "在計畫的版本控制儲存庫記錄來源版本與處理程式。\n\n| 紀錄 | 保存期間 |\n|---|---|\n| 處理紀錄 | 10 年 |\n| 來源校驗碼 | 10 年 |"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "7d3ccc24-8779-5adf-9ff6-2fd06650c957",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.b08fe063-33f8-4380-b3a9-ba1e586dedf2.eb0dd269-bbc6-5675-b516-f128d0edfc75.ba9e42fc-2bf5-413f-85de-003f981aaf81.c2bc3d0b-a11b-4831-bd2c-5235dbf868b7.4ae6452a-4ca6-434c-8453-7e3872e41847",
+    "value": {
+      "type": "StringReply",
+      "value": "120"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "a3ebc26b-66ad-572e-a289-4d0b0f26f555",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.135aa977-ecc2-4bb8-aa55-2def9d9d6040",
+    "value": {
+      "type": "AnswerReply",
+      "value": "515cac06-d101-4af1-95ef-33fd6a2da8b0"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "2818176a-112a-5168-ac75-5483b03c3fbf",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.a077aec4-83d2-45c2-8d9f-75a391bdee20",
+    "value": {
+      "type": "StringReply",
+      "value": "沿岸水溫觀測資料"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "2a9ae3ee-71e6-5241-b777-4455c539e6be",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.ba38b16d-2154-4372-b445-7854a6e90443",
+    "value": {
+      "type": "AnswerReply",
+      "value": "9a8dbe23-8fb2-4501-adde-3b6261dc1653"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "9c411a29-ae86-58d3-9c63-6f38f02e4b3c",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.bce52f7f-2256-4afc-9801-2e4da8111470",
+    "value": {
+      "type": "AnswerReply",
+      "value": "cba473be-2489-4387-8877-ce49cf95a304"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "0b4d2678-a3b9-5073-944c-6ddac5b10b49",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.e33ae210-62fe-4665-b836-e71660325a06",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "2bf77e3f-3b49-50f5-8635-e183718645ca"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "9a3c12b1-52ae-5c48-adb4-fb91f23e5f16",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.ee59664e-4026-4796-a42a-e8003df6dadf",
+    "value": {
+      "type": "AnswerReply",
+      "value": "44ef09a4-5a78-439d-9fb4-940d3d84bfab"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "23f935b4-2475-5d61-b11d-d6279c0495bf",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.1302cb21-6a98-490e-b64d-acf4744a8b1a",
+    "value": {
+      "type": "AnswerReply",
+      "value": "371461b3-3758-443d-b06a-fa37514be4da"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "f69d80e6-c260-5c94-b6ba-5295c9f3d94b",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "7daa1605-0d04-5c7a-891f-75627a81b7c8",
+        "344f105d-428d-563e-a587-e185d3445cd2"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "38ad59b3-985d-5301-ad0b-912e9ba6b5ac",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.d4e6a244-07fb-4573-b93f-c20a9409ac7c.7b5f059a-ae7e-4f7f-92e8-119911e568b2.346118ee-265f-4104-8409-161ea9a57f75",
+    "value": {
+      "type": "StringReply",
+      "value": "10 年"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "7d415b40-468a-59fb-bf05-e8bea0ed9b42",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.d5784d24-0e66-4821-bd62-a711fb6d7a40.e81599af-4519-4987-b74e-9545428ed0e3.c659c36f-d142-4453-8d8b-db7c05f31371.48d7128a-a237-4d32-8fc6-464089b46892.1147485f-b9a9-486c-8341-27e05718c508",
+    "value": {
+      "type": "AnswerReply",
+      "value": "67d52405-a902-4661-8158-91ab1d268832"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "b1e3bc4f-b50b-5fab-922f-ea912fb8d02c",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.d5784d24-0e66-4821-bd62-a711fb6d7a40.e81599af-4519-4987-b74e-9545428ed0e3.c659c36f-d142-4453-8d8b-db7c05f31371.48d7128a-a237-4d32-8fc6-464089b46892.f6476ea3-1ec5-447b-a776-4f0bfca38f8f",
+    "value": {
+      "type": "AnswerReply",
+      "value": "899b6dc9-59fa-4246-b152-915d4864f771"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "e0b1a3fe-18c0-53f8-a97a-1c6789cb2a03",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.83d5916b-e86c-59cd-8d87-bf9d5d0a802e.46cd176a-138a-4f6c-8cd5-dfcb1f23f04a.2e37f71b-b7aa-4182-888a-8b7a5156b53c.2964c7f7-d9be-42ac-8cfe-dbcf4d62f8a2",
+    "value": {
+      "type": "StringReply",
+      "value": "機構研究經費"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "03e9f963-3547-5104-877e-a250b9361640",
+    "path": "1e85da40-bbfc-4180-903e-6c569ed2da38.c3dabaaf-c946-4a0d-889c-ede966f97667.2ff7d9fd-9153-58b2-8566-e73e80e281a6.353eeaca-45fa-4958-a33c-ec6de3075701.d61cc9fa-7412-51ea-9b69-64ecd5e15390.46cd176a-138a-4f6c-8cd5-dfcb1f23f04a.2e37f71b-b7aa-4182-888a-8b7a5156b53c.2964c7f7-d9be-42ac-8cfe-dbcf4d62f8a2",
+    "value": {
+      "type": "StringReply",
+      "value": "機構研究經費"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "85988599-fe3a-56b8-943f-e4e5a0518985",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.10b6548c-21cd-44c8-a8de-47415e7b012e",
+    "value": {
+      "type": "AnswerReply",
+      "value": "842007ce-0951-4655-8acc-b0f582e82ea1"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "67348229-33d6-5294-8789-45c5818f819c",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.12762d00-f02a-40f7-b175-c7e4c92f5f54",
+    "value": {
+      "type": "AnswerReply",
+      "value": "9832a3a5-e24d-4db1-b48f-4d171c1402ae"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "61c5a55a-d908-542d-bba2-aea99bcabdcf",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.7b8c75c0-8d5c-4fde-9898-ded8b91f7f1f",
+    "value": {
+      "type": "AnswerReply",
+      "value": "2c2a9b84-b140-4e17-8026-56d5372064d0"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "e8f3e55b-34e7-5262-941f-9dde3c90b1b9",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.aee03da5-b399-4274-8db4-fac82c6210d3",
+    "value": {
+      "type": "AnswerReply",
+      "value": "180bb426-9ebe-4210-b307-eaeb1be12c0e"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "84d7fd3f-e2c9-5b9b-b4fd-35c968c37202",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.bf02f456-0a60-4b50-ae86-5cd56d430b2e",
+    "value": {
+      "type": "StringReply",
+      "value": "比較水溫的季節變化。\n\n- 保留原始時間戳記。\n- 記錄排除觀測值的原因。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "e7905c4c-412a-54fa-b78e-410c6b77c635",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.10b6548c-21cd-44c8-a8de-47415e7b012e",
+    "value": {
+      "type": "AnswerReply",
+      "value": "842007ce-0951-4655-8acc-b0f582e82ea1"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "dc865c5d-12b7-5727-bb5c-b414a3cc9800",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.12762d00-f02a-40f7-b175-c7e4c92f5f54",
+    "value": {
+      "type": "AnswerReply",
+      "value": "9832a3a5-e24d-4db1-b48f-4d171c1402ae"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "42d524c6-7a23-5389-8578-e9c6009e19d0",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.7b8c75c0-8d5c-4fde-9898-ded8b91f7f1f",
+    "value": {
+      "type": "AnswerReply",
+      "value": "2c2a9b84-b140-4e17-8026-56d5372064d0"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "9d5d1ae3-2250-5f1a-b1d0-72b0e084f415",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.aee03da5-b399-4274-8db4-fac82c6210d3",
+    "value": {
+      "type": "AnswerReply",
+      "value": "180bb426-9ebe-4210-b307-eaeb1be12c0e"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "c1b9cc2f-7be0-5e34-b028-1e350c00980c",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.bf02f456-0a60-4b50-ae86-5cd56d430b2e",
+    "value": {
+      "type": "StringReply",
+      "value": "比較水溫的季節變化。\n\n- 保留原始時間戳記。\n- 記錄排除觀測值的原因。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "fbafe046-a7aa-57ea-bf16-dc92b9dfb0bd",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.ba38b16d-2154-4372-b445-7854a6e90443.9a8dbe23-8fb2-4501-adde-3b6261dc1653.01b70401-021b-4fe7-9073-570ecb3b320c",
+    "value": {
+      "type": "AnswerReply",
+      "value": "394d1836-cfdd-4113-8c8a-9b4884f3ae70"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "be3e232d-62c3-535d-8172-470769e14c2d",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.ba38b16d-2154-4372-b445-7854a6e90443.9a8dbe23-8fb2-4501-adde-3b6261dc1653.e458d2eb-ba1e-4c4c-8619-5f8f431715b4",
+    "value": {
+      "type": "AnswerReply",
+      "value": "7cd93213-e3da-45bc-be98-69304abbfaee"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "8b0e02d0-f6b1-55ae-a4ca-e4bfafe16c4e",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.e33ae210-62fe-4665-b836-e71660325a06.2bf77e3f-3b49-50f5-8635-e183718645ca.2426addd-293b-4829-b87b-f3dd6b594516",
+    "value": {
+      "type": "StringReply",
+      "value": "水溫紀錄器"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "23ca4d7d-79e0-5725-abb5-ddae3401d675",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.f87c331d-794a-42c8-a910-61a2a9110dab.e4ca2d31-137a-46d3-96cd-3e9e8c5e9a76.f5fef09d-ade5-4019-b089-f05bd89c34bc.cef98e0d-2780-5780-b4d1-b32fc5830517.e33ae210-62fe-4665-b836-e71660325a06.2bf77e3f-3b49-50f5-8635-e183718645ca.45b61cd4-057a-40ff-873f-5558acf3568c",
+    "value": {
+      "type": "StringReply",
+      "value": "每十分鐘記錄水溫，保留 UTC 時間戳記與校正紀錄。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "589fbef4-acf9-5c4f-b9fa-599a390d06e8",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.1302cb21-6a98-490e-b64d-acf4744a8b1a.371461b3-3758-443d-b06a-fa37514be4da.b8543a67-2a6b-4f45-a0b0-d245227f9818",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "2bbfac38-0f7b-565c-981d-dc57eb3ad5ad"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "0d216c6e-3e9c-5e60-978a-a038a76d0ca9",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.3d89e23d-ff5c-45da-97a8-169ad8c39be6",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "47ddfe09-c0aa-5607-99d8-b2f6e1f9e837"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "4389e245-9124-565a-a165-8deca44cfb7d",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.80a682bd-8a5c-4a52-935d-680509838a4e",
+    "value": {
+      "type": "AnswerReply",
+      "value": "afd9f4d5-20e0-4fa0-a42a-376c132ff5b0"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "a56c708d-cdf8-576b-804d-e807b6bc6e60",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.82fc0a41-8be0-407c-b2f8-95bf5b366187",
+    "value": {
+      "type": "AnswerReply",
+      "value": "985366e7-7504-4f67-a8ee-90c340ff977a"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "07fe9f1d-53ef-5e63-b87f-2aa39352023c",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.d21fdb06-22bf-418e-aa40-dc5ef1485f56",
+    "value": {
+      "type": "AnswerReply",
+      "value": "1072923b-8330-4da1-9b5f-9880afa053a9"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "7372cef7-69e8-5c29-88a8-6bea58248e0a",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.3d89e23d-ff5c-45da-97a8-169ad8c39be6",
+    "value": {
+      "type": "ItemListReply",
+      "value": [
+        "70358daa-103f-5039-8da3-9401efb3f397"
+      ]
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "9f42a74f-8d07-5906-aa0c-73ee7b5010a4",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.80a682bd-8a5c-4a52-935d-680509838a4e",
+    "value": {
+      "type": "AnswerReply",
+      "value": "df0b2ee3-8e4d-42a1-9bb2-c69228074406"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "4060bb49-01f7-5746-9fde-75a7c2cea1d6",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.82fc0a41-8be0-407c-b2f8-95bf5b366187",
+    "value": {
+      "type": "AnswerReply",
+      "value": "1fd3e838-f92a-4086-8308-de17f6fa9d73"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "b73a604a-64ed-5a8e-bdf2-62d1f819d7f6",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.d21fdb06-22bf-418e-aa40-dc5ef1485f56",
+    "value": {
+      "type": "AnswerReply",
+      "value": "1072923b-8330-4da1-9b5f-9880afa053a9"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "f5f87d12-33dd-508b-86b6-01461333dbed",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.10b6548c-21cd-44c8-a8de-47415e7b012e.842007ce-0951-4655-8acc-b0f582e82ea1.481d0157-6d89-4f68-9f3b-cf1b05f8f15d",
+    "value": {
+      "type": "AnswerReply",
+      "value": "a4f6a1da-536b-43fa-9637-71e33327fa08"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "63f6d8ac-7102-5e6b-a7c4-7aea19a43e32",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.1f41fb97-54f7-53d1-9ae6-367f1a82d9b5.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.10b6548c-21cd-44c8-a8de-47415e7b012e.842007ce-0951-4655-8acc-b0f582e82ea1.f00a28fb-ac77-4110-b285-c73c8bc62630",
+    "value": {
+      "type": "StringReply",
+      "value": "2026.1"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "6fe54827-2f94-526c-9112-2d278c60d5cd",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.10b6548c-21cd-44c8-a8de-47415e7b012e.842007ce-0951-4655-8acc-b0f582e82ea1.481d0157-6d89-4f68-9f3b-cf1b05f8f15d",
+    "value": {
+      "type": "AnswerReply",
+      "value": "a4f6a1da-536b-43fa-9637-71e33327fa08"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "36733e02-b60b-5dc5-8623-78cf06121084",
+    "path": "82fd0cce-2b41-423f-92ad-636d0872045c.efc80cc8-8318-4f8c-acb7-dc1c60e491c1.2663b978-5125-4224-9930-0a50dbe895c9.fcc51962-08df-4f4c-85ad-6bb932107010.f3cb958d-101d-5605-b2ca-920fad70dd90.58401091-2d48-4231-983a-c972d11d9f6e.8a1937d8-39dc-4efd-a3f6-b62e789f225b.10b6548c-21cd-44c8-a8de-47415e7b012e.842007ce-0951-4655-8acc-b0f582e82ea1.f00a28fb-ac77-4110-b285-c73c8bc62630",
+    "value": {
+      "type": "StringReply",
+      "value": "2026.1"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "525f74cd-889c-5b40-9312-edad9491d091",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.1302cb21-6a98-490e-b64d-acf4744a8b1a.371461b3-3758-443d-b06a-fa37514be4da.b8543a67-2a6b-4f45-a0b0-d245227f9818.2bbfac38-0f7b-565c-981d-dc57eb3ad5ad.235b36a8-3df7-44b7-9d0f-2ced3e4281a3",
+    "value": {
+      "type": "StringReply",
+      "value": "CoastView 1.0 (synthetic test tool)"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "021b05f0-af13-5a08-987a-6ec3a954c06d",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.1302cb21-6a98-490e-b64d-acf4744a8b1a.371461b3-3758-443d-b06a-fa37514be4da.b8543a67-2a6b-4f45-a0b0-d245227f9818.2bbfac38-0f7b-565c-981d-dc57eb3ad5ad.f29e2dbd-8edc-4ac3-92ba-96a6d507789b",
+    "value": {
+      "type": "StringReply",
+      "value": "https://example.org/coastview/1.0"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "d6923a6b-054a-5e88-a5fb-b9be01b1aaaf",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.3d89e23d-ff5c-45da-97a8-169ad8c39be6.47ddfe09-c0aa-5607-99d8-b2f6e1f9e837.28d494ef-26c0-4632-956e-5cafcc498a32",
+    "value": {
+      "type": "StringReply",
+      "value": "2027-06-01"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "5fcd65c3-ffcf-5d50-ac5a-8a8482598df3",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.3d89e23d-ff5c-45da-97a8-169ad8c39be6.47ddfe09-c0aa-5607-99d8-b2f6e1f9e837.ca0f9465-3116-4824-8651-b592151c5368",
+    "value": {
+      "type": "AnswerReply",
+      "value": "734d5f4e-91c0-4019-8164-8c70c2e0c8f2"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "d0c095f4-fc19-5582-886d-5b3345c138a9",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.d21fdb06-22bf-418e-aa40-dc5ef1485f56.1072923b-8330-4da1-9b5f-9880afa053a9.7f55274c-a5f5-4f6a-94d8-531ea0077462",
+    "value": {
+      "type": "AnswerReply",
+      "value": "862e3a05-e5d7-4004-b6d9-79fc20192311"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "82139610-43b5-580d-99a8-a09947103943",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.d21fdb06-22bf-418e-aa40-dc5ef1485f56.1072923b-8330-4da1-9b5f-9880afa053a9.c928d464-4ae7-447c-82f6-bc525d2596a9",
+    "value": {
+      "type": "AnswerReply",
+      "value": "290d7b18-f851-41eb-8024-e23bba79592e"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "be660002-d468-564e-a9a3-8325bb3c52f5",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.3d89e23d-ff5c-45da-97a8-169ad8c39be6.70358daa-103f-5039-8da3-9401efb3f397.28d494ef-26c0-4632-956e-5cafcc498a32",
+    "value": {
+      "type": "StringReply",
+      "value": "2027-12-31"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "b87cb207-65aa-5c0f-a6d2-250e69aa9900",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.3d89e23d-ff5c-45da-97a8-169ad8c39be6.70358daa-103f-5039-8da3-9401efb3f397.ca0f9465-3116-4824-8651-b592151c5368",
+    "value": {
+      "type": "AnswerReply",
+      "value": "9186e183-e328-41f9-b012-149d0bbad9ea"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "36119eca-5a15-5d39-9d38-10c372e12eac",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.d21fdb06-22bf-418e-aa40-dc5ef1485f56.1072923b-8330-4da1-9b5f-9880afa053a9.7f55274c-a5f5-4f6a-94d8-531ea0077462",
+    "value": {
+      "type": "AnswerReply",
+      "value": "862e3a05-e5d7-4004-b6d9-79fc20192311"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "a3277bc4-7c20-5e27-814b-f24010245de4",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.7daa1605-0d04-5c7a-891f-75627a81b7c8.d21fdb06-22bf-418e-aa40-dc5ef1485f56.1072923b-8330-4da1-9b5f-9880afa053a9.c928d464-4ae7-447c-82f6-bc525d2596a9",
+    "value": {
+      "type": "AnswerReply",
+      "value": "a31e0fc2-4bde-4482-8747-d250042a1589"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "7ad1364c-7ac0-5a1c-9d39-63a009de7869",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.3d89e23d-ff5c-45da-97a8-169ad8c39be6.47ddfe09-c0aa-5607-99d8-b2f6e1f9e837.ca0f9465-3116-4824-8651-b592151c5368.734d5f4e-91c0-4019-8164-8c70c2e0c8f2.30426255-b153-4f3e-bf20-f13573160a64",
+    "value": {
+      "type": "StringReply",
+      "value": "此初步發布版本僅提供計畫審閱小組使用。\n\n- 不得轉散布初步檔案。\n- 審閱紀錄須註明發布版本的識別碼。"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "cb4c0fe5-23b2-5b05-8f98-0b5db3d268fb",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.3d89e23d-ff5c-45da-97a8-169ad8c39be6.47ddfe09-c0aa-5607-99d8-b2f6e1f9e837.ca0f9465-3116-4824-8651-b592151c5368.734d5f4e-91c0-4019-8164-8c70c2e0c8f2.375792f1-d7c3-4c8d-bf9e-f15ffa38e2fb",
+    "value": {
+      "type": "StringReply",
+      "value": "https://example.org/coast/review-terms"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "305e2ce8-f4cc-5371-a2a9-e18563dc012c",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.3d89e23d-ff5c-45da-97a8-169ad8c39be6.47ddfe09-c0aa-5607-99d8-b2f6e1f9e837.ca0f9465-3116-4824-8651-b592151c5368.734d5f4e-91c0-4019-8164-8c70c2e0c8f2.a572c436-5d57-4385-ac9a-d6f117881444",
+    "value": {
+      "type": "AnswerReply",
+      "value": "438aa606-da1d-49f7-8de0-e5fbe64feaa8"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "4c0ccbe6-4217-519e-a964-6d253ab8dab8",
+    "path": "d5b27482-b598-4b8c-b534-417d4ad27394.4e0c1edf-660c-4ebf-81f5-9fa959dead30.37fb9b85-922d-51d5-9936-722cbb9bc74a.a063da1c-aaea-4e18-85ec-f560d833f292.8d1b07a7-f177-41f5-9532-05536223a8d6.81d3095e-a530-40a4-878e-ced42fabc4cd.344f105d-428d-563e-a587-e185d3445cd2.3d89e23d-ff5c-45da-97a8-169ad8c39be6.47ddfe09-c0aa-5607-99d8-b2f6e1f9e837.ca0f9465-3116-4824-8651-b592151c5368.734d5f4e-91c0-4019-8164-8c70c2e0c8f2.f78fb7e9-2f26-493c-a19b-04e153c17274",
+    "value": {
+      "type": "AnswerReply",
+      "value": "15e7beff-1d71-4515-9517-26e222e672e5"
+    }
+  }
+]

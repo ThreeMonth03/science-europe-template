@@ -7,22 +7,18 @@
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
     {%- if producedDataItems|length > 0 -%}
-      <p>
-      We plan to produce the following datasets:
-      </p>
-      <ul>
       {%- for i in producedDataItems -%}
         {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
-        <li>
-          <strong>{{ producedDataName if producedDataName else "(no name given)" }}</strong>
+        <div class="dataset-section" data-item-id="{{ i }}">
+          <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
           {# If will be published #}
           {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
           {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
           {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
-            (not published)
+            <p>This dataset will not be published.</p>
           {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
-            (will be published)
+            <p>This dataset will be published.</p>
           {% endif -%}
           {# How long will be stored + Metadata FAIRness #}
           {%- set publishedDataHowLongPath = [pathPrefix, uuids.publishedDataHowLongQUuid]|reply_path -%}
@@ -132,9 +128,8 @@
           {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
             <br>We will be adding a reference to the published data to at least one data catalogue.
           {%- endif -%}
-        </li>
+        </div>
       {%- endfor -%}
-      </ul>
     {%- endif -%}
     {# Repository charges #}
     {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}

@@ -66,7 +66,7 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item.font.size = Pt(10.5)
             item.paragraph_format.line_spacing = 1.4
             item.paragraph_format.space_before = Pt(0)
-            item.paragraph_format.space_after = Pt(6)
+            item.paragraph_format.space_after = Pt(4)
             item.paragraph_format.widow_control = True
     for level, size in enumerate((21, 15, 11, 11, 10.5), 1):
         if f"Heading {level}" in document.styles:

@@ -18,6 +18,12 @@
       {%- endif -%}
     {%- elif sharedWorkspaceAUuid == uuids.sharedWorkspaceYesAUuid -%}
       <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">There is a shared workspace used during the project for working with data.</p>
+      {% set specialists = repliesMap[[sharedWorkspacePath, uuids.sharedWorkspaceYesAUuid, uuids.sharedSpecialistsQUuid]|reply_path]|reply_str_value %}
+      {% if specialists == uuids.sharedSpecialistsYesAUuid %}
+        <p data-fact-id="workspace-management" data-status="complete">Dedicated specialists will operate the shared workspace.</p>
+      {% elif specialists == uuids.sharedSpecialistsNoAUuid %}
+        <p data-fact-id="workspace-management" data-status="explicit-no">The shared workspace will not be operated by dedicated specialists.</p>
+      {% endif %}
       {%- set sharedHowPath = [sharedWorkspacePath, uuids.sharedWorkspaceYesAUuid, uuids.sharedHowQUuid]|reply_path -%}
       {%- set sharedHowAUuid = repliesMap[sharedHowPath]|reply_str_value -%}
       {%- if sharedHowAUuid == uuids.sharedHowExploreAUuid -%}
@@ -70,11 +76,59 @@
       <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="missing"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p>
       <p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p>
     {%- endif -%}
-    <div class="data-gap template-gap">
-      <p><strong>Template mapping pending:</strong> the following details are not yet connected to questionnaire answers. This is not a finding that the user left them blank.</p>
+    {# Cold archival DURING research is independent of the shared workspace. #}
+    {% set archivePath = [uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path %}
+    {% set archive = repliesMap[archivePath]|reply_str_value %}
+    {% set remoteKnown = false %}
+    {% set frequencyKnown = false %}
+    {% if archive == uuids.archivedDuringYesAUuid %}
+      <h4>Archival during the project</h4>
+      <p data-fact-id="during-project-archive" data-status="complete">Data will be archived in cold storage during the project.</p>
+      {% set archivePrefix = [archivePath, uuids.archivedDuringYesAUuid]|reply_path %}
+      {% set medium = repliesMap[[archivePrefix, uuids.archiveMediumQUuid]|reply_path]|reply_str_value %}
+      {% if medium == uuids.archiveMediumDiskAUuid %}
+        <p data-fact-id="archive-medium" data-status="complete">The archive will be stored on disk.</p>
+      {% elif medium == uuids.archiveMediumTapeAUuid %}
+        <p data-fact-id="archive-medium" data-status="complete">The archive will be stored on tape.</p>
+      {% elif medium == uuids.archiveMediumOtherAUuid %}
+        <p data-fact-id="archive-medium" data-status="partial">The archive will use a medium other than disk or tape.</p>
+      {% endif %}
+      {% set remote = repliesMap[[archivePrefix, uuids.archiveRemoteQUuid]|reply_path]|reply_str_value %}
+      {% set remoteKnown = remote in [uuids.archiveRemoteYesAUuid, uuids.archiveRemoteNoAUuid] %}
+      {% if remote == uuids.archiveRemoteYesAUuid %}
+        <p data-fact-id="archive-remote-location" data-status="complete">The archive will be stored at a remote location.</p>
+      {% elif remote == uuids.archiveRemoteNoAUuid %}
+        <p data-fact-id="archive-remote-location" data-status="explicit-no">The archive will not be stored at a remote location.</p>
+      {% endif %}
+      {% set changesPath = [archivePrefix, uuids.archivedDuringReQUuid]|reply_path %}
+      {% set changes = repliesMap[changesPath]|reply_str_value %}
+      {% if changes == uuids.archivedDuringReNoAUuid %}
+        <p data-fact-id="archive-changes" data-status="explicit-no">The archived data is not expected to change over time.</p>
+      {% elif changes == uuids.archivedDuringReYesAUuid %}
+        <p data-fact-id="archive-changes" data-status="complete">Changes to archived data will require re-archival.</p>
+        {% set changingPrefix = [changesPath, uuids.archivedDuringReYesAUuid]|reply_path %}
+        {% set frequent = repliesMap[[changingPrefix, uuids.archivedDuringReFrequentBackupsQUuid]|reply_path]|reply_str_value %}
+        {% set frequencyKnown = frequent in [uuids.archivedDuringReFrequentBackupsYesAUuid, uuids.archivedDuringReFrequentBackupsNoAUuid] %}
+        {% if frequent == uuids.archivedDuringReFrequentBackupsYesAUuid %}
+          <p data-fact-id="archive-frequent-backup-need" data-status="complete">Frequent backups are required because the archived data changes frequently.</p>
+        {% elif frequent == uuids.archivedDuringReFrequentBackupsNoAUuid %}
+          <p data-fact-id="archive-frequent-backup-need" data-status="explicit-no">Frequent backups are not required because the archived data changes infrequently.</p>
+        {% endif %}
+        {% set recovery = repliesMap[[changingPrefix, uuids.archivedDuringRelyQUuid]|reply_path]|reply_str_value %}
+        {% if recovery == uuids.archivedDuringRelyYesAUuid %}
+          <p data-fact-id="archive-human-error-recovery" data-status="complete">These backups will be used to recover from accidental changes or deletions.</p>
+        {% elif recovery == uuids.archivedDuringRelyNoAUuid %}
+          <p data-fact-id="archive-human-error-recovery" data-status="explicit-no">These backups will not be relied on to recover from accidental changes or deletions.</p>
+        {% endif %}
+      {% endif %}
+    {% elif archive == uuids.archivedDuringNoAUuid %}
+      <p data-fact-id="during-project-archive" data-status="explicit-no">Data will not be archived in cold storage during the project.</p>
+    {% endif %}
+    <div class="data-gap template-gap storage-detail-limits">
+      <p>The mapped answers describe storage arrangements and backup needs, but do not establish all operational details:</p>
       <ul>
-        <li data-requirement-id="SE-3a" data-fact-id="storage-location" data-status="unmapped">Storage and backup locations.</li>
-        <li data-requirement-id="SE-3a" data-fact-id="backup-frequency" data-status="unmapped">Backup frequency.</li>
+        <li data-requirement-id="SE-3a" data-fact-id="storage-location" data-status="{{ 'partial' if remoteKnown else 'unmapped' }}">Exact working-storage and backup locations are not established by these mapped answers.</li>
+        <li data-requirement-id="SE-3a" data-fact-id="backup-frequency" data-status="{{ 'partial' if frequencyKnown else 'unmapped' }}">An actual backup schedule is not established by these mapped answers; a need for frequent backups is not a schedule.</li>
       </ul>
     </div>
   </div>

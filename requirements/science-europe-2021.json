@@ -117,15 +117,15 @@
         },
         {
           "id": "storage-location",
-          "dswBindings": [],
-          "coverage": "unmapped",
-          "gap": "No directly mapped answer states the primary and backup locations."
+          "dswBindings": ["archiveRemoteQUuid", "archiveMediumQUuid"],
+          "coverage": "partial",
+          "gap": "During-project archival medium and remote-location decision are mapped. They do not specify named working-storage and backup locations; publication repository choices are not substitutes."
         },
         {
           "id": "backup-frequency",
-          "dswBindings": [],
-          "coverage": "unmapped",
-          "gap": "No directly mapped answer states backup frequency."
+          "dswBindings": ["archivedDuringReFrequentBackupsQUuid"],
+          "coverage": "partial",
+          "gap": "The during-project archive branch captures a qualitative need for frequent backups, not an implemented cadence. An actual schedule remains unspecified by these mapped answers."
         }
       ]
     },

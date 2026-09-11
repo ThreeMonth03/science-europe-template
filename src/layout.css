@@ -70,4 +70,12 @@ html body .resource-table ul { padding-left: 1.2em; }
 html body .resource-table .answer-detail { margin: .25em 0; }
 html body .resource-table .data-gap { padding: .2em .35em; }
 html body .template-gap { font-size: 9.5pt; color: #526169; border-left-color: #8c999e; background: #f3f5f5; }
+/* Owned publication reading blocks: structure, not hidden list markers. */
+html body .dataset-section { margin: .6em 0 1em; }
+html body .dataset-section > h5 { font-size: 11pt; margin: .5em 0 .35em; }
+html body .distribution-section { margin: .35em 0 .65em; }
+html body .distribution-section + .distribution-section { border-top: 1px solid #cbd2d5; padding-top: .6em; }
+html body .license-entry { margin: .25em 0 .5em; }
+html body .license-entry + .license-entry { border-top: 1px dotted #cbd2d5; padding-top: .4em; }
+html body .storage-detail-limits li { margin-bottom: .25em; }
 html body .data-gap[data-status="missing-output"] { border: none; border-left: 2px solid #b5bec1; background: #f5f6f6; color: #526169; font-size: 10pt; padding: .4em .65em; }

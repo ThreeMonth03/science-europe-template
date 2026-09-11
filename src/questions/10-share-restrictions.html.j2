@@ -8,25 +8,23 @@
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
     {%- if producedDataItems|length > 0 -%}
-        <h4>How the data will be shared</h4>
-        <ul>
         {%- for i in producedDataItems -%}
             {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
             {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
-            <li>
-            <strong>{{ producedDataName if producedDataName else "(no name given)" }}</strong>
+            <div class="dataset-section" data-item-id="{{ i }}">
+            <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
             {# If will be published #}
             {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
             {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
             {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
-                (not published)
+                <p>This dataset will not be published.</p>
             {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
-                (will be published)
+                <p>This dataset will be published.</p>
                 {# Identifiers #}
                 {% set identifiersPath = [pathPrefix, uuids.producedDataIdentifiersQUuid]|reply_path -%}
                 {%- set identifiersItems = repliesMap[identifiersPath]|reply_items -%}
                 {%- if identifiersItems|length > 0 -%}
-                    <br>The dataset has the following identifiers:
+                    <p>The dataset has the following identifiers:</p>
                     <ul>
                     {%- for j in identifiersItems -%}
                         {%- set identifierPrefix = [identifiersPath, j]|reply_path -%}
@@ -53,25 +51,26 @@
                 {% set distrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
                 {%- set distrosItems = repliesMap[distrosPath]|reply_items -%}
                 {%- if distrosItems|length > 0 -%}
-                    <br>The distributions will be available as follows:
-                    <ul>
                     {%- for j in distrosItems -%}
                         {%- set distroPrefix = [distrosPath, j]|reply_path -%}
                         {%- set distroRepositoryKindPath = [distroPrefix, uuids.publishedDataRepositoryKindQUuid]|reply_path -%}
                         {%- set distroRepositoryKindAUuid = repliesMap[distroRepositoryKindPath]|reply_str_value -%}
                         {%- set distroSharePath = [distroPrefix, uuids.publishedDistroShareQUuid]|reply_path -%}
                         {%- set distroShareAUuid = repliesMap[distroSharePath]|reply_str_value -%}
-                        {%- if distroRepositoryKindAUuid and distroShareAUuid -%}
-                        <li>
+                        <div class="distribution-section" data-item-id="{{ j }}">
+                            {% if distrosItems|length > 1 %}<p class="answer-lead"><strong>Distribution {{ loop.index }}</strong></p>{% endif %}
                             {%- if distroShareAUuid == uuids.publishedDistroShareOpenAUuid %}
-                                Open (shared with anyone)
+                                <p data-fact-id="distribution-access" data-status="complete">Open access: this distribution will be shared with anyone.</p>
                             {%- elif distroShareAUuid == uuids.publishedDistroShareSharedAUuid %}
-                                Shared with a predefined list of people
+                                <p data-fact-id="distribution-access" data-status="complete">Access will be limited to a predefined group of people.</p>
                             {%- elif distroShareAUuid == uuids.publishedDistroShareClosedAUuid %}
-                                Closed (not meant for sharing)
+                                <p data-fact-id="distribution-access" data-status="explicit-no">This distribution is not intended for sharing.</p>
+                            {% else %}
+                                <p class="data-gap" data-fact-id="distribution-access" data-status="missing">The access arrangement for this distribution has not been provided.</p>
                             {%- endif %}
+                            <div class="repository-arrangement">
                             {% if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
-                                using a domain-specific repository
+                                Domain-specific repository
                                 {%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
                                 {%- set domainSpecificRepoNameReply = repliesMap[domainSpecificRepoNamePath] -%}
                                 {%- if domainSpecificRepoNameReply -%}
@@ -93,7 +92,7 @@
                                 We have made other arrangements{{ ": " ~ domainSpecificRepoContactBeforeOther|markdown if domainSpecificRepoContactBeforeOther else "." }}
                                 {%- endif -%}
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}
-                                using a general-purpose repository
+                                General-purpose repository
                                 {%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                                 {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
                                 {%- if generalPurposeRepoNameReply -%}
@@ -101,34 +100,34 @@
                                 {%- else -%}.
                                 {%- endif -%}
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid %}
-                                using our national repository.
+                                <p>This distribution will be deposited in a national repository.</p>
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryInstitutionalAUuid %}
-                                using our institutional repository.
+                                <p>This distribution will be deposited in an institutional repository.</p>
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid %}
-                                using a special-purpose repository for the project.
+                                <p>This distribution will be deposited in a special-purpose repository for the project.</p>
+                            {% else %}
+                                <p class="data-gap" data-fact-id="distribution-repository" data-status="missing">The repository for this distribution has not been provided.</p>
                             {%- endif -%}
-                        {%- endif -%}
+                            </div>
                         {# Licenses #}
                         {%- set licensesPath = [distroPrefix, uuids.publishedDataLicensesQUuid]|reply_path -%}
                         {%- set licensesItems = repliesMap[licensesPath]|reply_items -%}
                         {%- if licensesItems|length > 0 %}
-                            The distribution will be available under the following {{ "licenses" if licensesItems|length > 1 else "license" }}:
-                            <ul>
                             {%- for k in licensesItems -%}
-                                <li>
+                                <div class="license-entry" data-item-id="{{ k }}">
                                 {%- set licensePrefix = [licensesPath, k]|reply_path -%}
                                 {%- set licenseStartPath = [licensePrefix, uuids.publishedDataLicenseStartQUuid]|reply_path -%}
                                 {%- set licenseStart = repliesMap[licenseStartPath]|reply_str_value -%}
                                 {% if licenseStart %}
-                                    Starting {{ licenseStart }}: 
+                                    <p class="answer-lead">Licence start date: {{ licenseStart|e }}.</p>
                                 {% endif %}
                                 
                                 {%- set publishedDataLicensePath = [licensePrefix, uuids.publishedDataLicenseQUuid]|reply_path -%}
                                 {%- set publishedDataLicenseAUuid = repliesMap[publishedDataLicensePath]|reply_str_value -%}
                                 {%- if publishedDataLicenseAUuid == uuids.publishedDataLicenseCC0AUuid %}
-                                    Freely available for any use (public domain or CC0).
+                                    <p>Freely available for any use (public domain or CC0).</p>
                                 {%- elif publishedDataLicenseAUuid == uuids.publishedDataLicenseCCBYAUuid %}
-                                    Freely available with obligation to quote the source (e.g. CC-BY).
+                                    <p>Freely available with obligation to quote the source (e.g. CC-BY).</p>
                                 {%- elif publishedDataLicenseAUuid == uuids.publishedDataLicenseRestrictAUuid -%}
                                     {%- set licenseRestrictConditionsPath = [publishedDataLicensePath, uuids.publishedDataLicenseRestrictAUuid, uuids.licenseRestrictConditionsQUuid]|reply_path -%}
                                     {%- set licenseRestrictConditions = repliesMap[licenseRestrictConditionsPath]|reply_str_value -%}
@@ -143,7 +142,7 @@
                                     {%- if licenseRestrictAccessAUuid == uuids.licenseRestrictAccessRequestAUuid %}
                                     Re-users will be able to get access by request to the contact person.
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessCommitteeAUuid %}
-                                    Re-users will be able to get access through a <em>Data Access Committee</em> for the project.
+                                    Re-users can request access through the project's Data Access Committee.
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessAnotherAUuid -%}
                                     {%- set licenseRestrictAccessAnotherPath = [licenseRestrictAccessPath, uuids.licenseRestrictAccessAnotherAUuid, uuids.licenseRestrictAccessAnotherQUuid]|reply_path -%}
                                     {%- set licenseRestrictAccessAnother = repliesMap[licenseRestrictAccessAnotherPath]|reply_str_value %}
@@ -153,41 +152,48 @@
                                     The conditions will be published as part of open metadata.
                                     {%- endif -%}
                                     {% if licenseRestrictLink %}
-                                    More information about the restrictions can be found here: <a href="{{ licenseRestrictLink }}" target="_blank">{{ licenseRestrictLink }}</a>.
+                                    Restriction details: <a href="{{ licenseRestrictLink }}" target="_blank">{{ licenseRestrictLink }}</a>.
                                     {% endif %}
+                                {% else %}
+                                    <p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>
                                 {%- endif -%}
-                                </li>
+                                </div>
                             {%- endfor -%}
-                            </ul>
+                        {% else %}
+                            <p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>
                         {%- endif -%}
-                        </li>
+                        </div>
                     {%- endfor -%}
-                    </ul>
+                {% else %}
+                    <p class="data-gap" data-fact-id="publication-distributions" data-status="missing">The publication locations have not been listed.</p>
                 {%- endif -%}
+            {% else %}
+                <p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>
             {%- endif -%}
             {# Catalogue #}
             {%- set publishedDataCataloguePath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid]|reply_path -%}
             {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
             {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
-                <br>We will be adding a reference to the published data to at least one data catalogue.
+                <p>We will be adding a reference to the published data to at least one data catalogue.</p>
             {%- endif -%}
             {# When published #}
             {%- set publishedWhenPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedWhenQUuid]|reply_path -%}
             {%- set publishedWhenAUuid = repliesMap[publishedWhenPath]|reply_str_value -%}
             {%- if publishedWhenAUuid == uuids.publishedWhenSoonAUuid %}
-                <br>The dataset will published as soon as possible after collecting it.
+                <p>The dataset will be published as soon as possible after collection.</p>
             {%- elif publishedWhenAUuid == uuids.publishedWhenCleanupAUuid %}
-                <br>The dataset will published after initial cleanup.
+                <p>The dataset will be published after initial cleanup.</p>
             {%- elif publishedWhenAUuid == uuids.publishedWhenFinishedAUuid %}
-                <br>The dataset will published after all our processing has finished.
+                <p>The dataset will be published after all processing has finished.</p>
             {%- elif publishedWhenAUuid == uuids.publishedWhenWrappedAUuid %}
-                <br>The dataset will published when the project is wrapped up.
+                <p>The dataset will be published when the project is completed.</p>
             {%- elif publishedWhenAUuid == uuids.publishedWhenEmbargoAUuid %}
-                <br>The dataset will published after an embargo.
+                <p>The dataset will be published after an embargo.</p>
             {%- endif %}
             {# Qualified references #}
             {%- set publishedQReferencesPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedQReferencesQUuid]|reply_path -%}
             {%- set publishedQReferencesAUuid = repliesMap[publishedQReferencesPath]|reply_str_value -%}
+            {%- set qreferences = [] -%}
             {%- if publishedQReferencesAUuid == uuids.publishedQReferencesYesAUuid -%}
                 {%- set publishedQReferencesItemsPath = [publishedQReferencesPath, uuids.publishedQReferencesYesAUuid, uuids.publishedQReferencesItemQUuid ]|reply_path -%}
                 {%- set publishedQReferencesItems = repliesMap[publishedQReferencesItemsPath]|reply_items -%}
@@ -204,16 +210,15 @@
                 {%- endfor -%}
             {%- endif -%}
             {%- if qreferences|length > 0 -%}
-                <br>The following qualified references to other data sets will be included:
+                <p>The following qualified references to other data sets will be included:</p>
                 <ul>
                     {%- for qref in qreferences -%}
                     <li><em>{{ qref.id|e }}</em> &ndash; {{ qref.relation|markdown }}</li>
                     {%- endfor -%}
                 </ul>
             {%- endif -%}
-            </li>
+            </div>
         {%- endfor -%}
-        </ul>
     {%- endif -%}
 
     {# Restrictions #}
