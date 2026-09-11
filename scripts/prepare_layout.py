@@ -86,6 +86,9 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     label.paragraph_format.keep_with_next = True
     label.paragraph_format.space_before = Pt(4)
     label.paragraph_format.space_after = Pt(3)
+    lead = document.styles.add_style("Pilot Lead", WD_STYLE_TYPE.PARAGRAPH)
+    lead.base_style = document.styles["Body Text"]
+    lead.paragraph_format.keep_with_next = True
     document.save(reference)
     # python-docx assigns wall-clock ZIP timestamps; canonicalize for rebuilds.
     original = reference.read_bytes()

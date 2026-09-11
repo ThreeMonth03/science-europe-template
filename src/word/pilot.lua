@@ -23,6 +23,14 @@ end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
+  if div.classes:includes("answer-lead") then
+    div.attributes["custom-style"] = "Pilot Lead"
+    return div
+  end
+  if div.classes:includes("answer-detail") and #div.content > 1 and div.content[1].t == "Para" then
+    div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+    return div
+  end
   if div.identifier == "dmp-content" and FORMAT == "docx" then
     div.content:insert(1, pandoc.RawBlock("openxml", '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'))
     return div

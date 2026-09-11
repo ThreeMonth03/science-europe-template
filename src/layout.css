@@ -17,6 +17,7 @@ html body li > strong:first-child { display: block; break-after: avoid; }
 html body ul { padding-left: 1.4em; margin: .4em 0 .8em; }
 html body .answer-detail { margin: .3em 0 .75em; }
 html body .answer-detail > p:first-child { break-after: avoid; }
+html body .answer-lead { break-after: avoid; }
 html body a { overflow-wrap: anywhere; word-break: break-word; color: #185778; }
 html body table { border-collapse: collapse; width: 100%; margin: .6em 0; }
 html body th, html body td { border: 1px solid #bcc6cc; padding: .4em .5em; vertical-align: top; }

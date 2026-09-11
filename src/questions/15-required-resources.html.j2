@@ -12,7 +12,7 @@
     {%- elif expertiseAUuid == uuids.additionalExpertiseYesTrainAUuid -%}
       {%- set expertiseTrainPath = [expertisePath, uuids.additionalExpertiseYesTrainAUuid, uuids.additionalExpertiseYesTrainTrainingQUuid]|reply_path -%}
       {%- set expertiseTrainText = repliesMap[expertiseTrainPath]|reply_str_value -%}
-      <p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseTrainText else 'partial' }}">Additional specialist expertise is required. Existing staff will receive training.</p>
+      <div class="answer-lead"><p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseTrainText else 'partial' }}">Additional specialist expertise is required. Existing staff will receive training.</p></div>
       {% if expertiseTrainText %}
         <div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete">
           {{ expertiseTrainText|markdown }}
