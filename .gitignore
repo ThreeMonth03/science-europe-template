@@ -3,3 +3,5 @@ env/
 template.zip
 template*.zip
 .DS_Store
+__pycache__/
+*.py[cod]

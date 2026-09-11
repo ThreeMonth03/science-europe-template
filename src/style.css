@@ -62,6 +62,26 @@ p {
   margin-bottom: 8px;
 }
 
+/* Visible completion gaps: unanswered replies must never look like "No". */
+.data-gap {
+  border-left: 3px solid #b26a00;
+  background: #fff8e8;
+  color: #573600;
+  padding: 0.45rem 0.65rem;
+  break-inside: avoid;
+}
+
+.data-gap strong {
+  color: #7a4600;
+}
+
+@media print {
+  .data-gap {
+    border: 1px solid #8a6d3b;
+    border-left-width: 3px;
+  }
+}
+
 /* Sections */
 
 section {

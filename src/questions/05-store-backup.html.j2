@@ -1,33 +1,41 @@
-<div id="q-store-backup" class="question">
-  <h3>5. How will data and metadata be stored and backed up during the research?</h3>
+<div id="q-store-backup" class="question" data-requirement-id="SE-3a">
+  <h3>5. How will data and metadata be stored and backed up during the research process?</h3>
 
   <div class="answer">
     {# Data stored by members (no shared workspace) #}
     {%- set sharedWorkspacePath = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid]|reply_path -%}
     {%- set sharedWorkspaceAUuid = repliesMap[sharedWorkspacePath]|reply_str_value -%}
     {%- if sharedWorkspaceAUuid == uuids.sharedWorkspaceNoAUuid -%}
-      <p>There is no shared workspace used during the project for working with data.</p>
+      <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">There is no shared workspace used during the project for working with data.</p>
       {%- set notSharedBackupPath = [sharedWorkspacePath, uuids.sharedWorkspaceNoAUuid, uuids.notSharedBackupQUuid]|reply_path -%}
       {%- set notSharedBackupAUuid = repliesMap[notSharedBackupPath]|reply_str_value -%}
       {%- if notSharedBackupAUuid == uuids.notSharedBackupYesAUuid -%}
-        <p>Data that project members themselves store are adequately backed up and traceable. Therefore data are protected against both equipment failure and human error.</p>
+        <p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="complete">Data that project members themselves store are adequately backed up and traceable. Therefore data are protected against both equipment failure and human error.</p>
+      {%- elif notSharedBackupAUuid == uuids.notSharedBackupNoAUuid -%}
+        <p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="explicit-no">Data stored by individual project members are not yet adequately backed up and traceable.</p>
+      {%- else -%}
+        {{ macros.missing("SE-3a", "backup-reliability", "whether data stored by individual project members are adequately backed up and traceable") }}
       {%- endif -%}
     {%- elif sharedWorkspaceAUuid == uuids.sharedWorkspaceYesAUuid -%}
-      <p>There is a shared workspace used during the project for working with data.</p>
+      <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">There is a shared workspace used during the project for working with data.</p>
       {%- set sharedHowPath = [sharedWorkspacePath, uuids.sharedWorkspaceYesAUuid, uuids.sharedHowQUuid]|reply_path -%}
       {%- set sharedHowAUuid = repliesMap[sharedHowPath]|reply_str_value -%}
       {%- if sharedHowAUuid == uuids.sharedHowExploreAUuid -%}
         {%- set sharedHowChangePath = [sharedHowPath, uuids.sharedHowExploreAUuid, uuids.sharedHowChangeQUuid]|reply_path -%}
         {%- set sharedHowChangeAUuid = repliesMap[sharedHowChangePath]|reply_str_value -%}
         {%- if sharedHowChangeAUuid == uuids.sharedHowChangeSameAUuid -%}
-          <p>Storage needs will be the same during the whole project.</p>
+          <p data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="complete">Storage needs will be the same during the whole project.</p>
         {%- elif sharedHowChangeAUuid == uuids.sharedHowChangeLargeAUuid -%}
-          <p>Storage needs are large at the beginning and will be reduced later.</p>
+          <p data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="complete">Storage needs are large at the beginning and will be reduced later.</p>
         {%- elif sharedHowChangeAUuid == uuids.sharedHowChangeSmallAUuid -%}
-          <p>Storage needs are small at the beginning and will grow later.</p>
+          <p data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="complete">Storage needs are small at the beginning and will grow later.</p>
         {%- elif sharedHowChangeAUuid == uuids.sharedHowChangeMiddleAUuid -%}
-          <p>Storage needs are largest in the middle of the project.</p>
+          <p data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="complete">Storage needs are largest in the middle of the project.</p>
+        {%- else -%}
+          {{ macros.missing("SE-3a", "storage-capacity", "how storage capacity needs will change during the project") }}
         {%- endif -%}
+      {%- else -%}
+        {{ macros.missing("SE-3a", "storage-capacity", "how storage capacity needs will change during the project") }}
       {%- endif -%}
       {%- set sharedReliablePath = [sharedWorkspacePath, uuids.sharedWorkspaceYesAUuid, uuids.sharedReliableQUuid]|reply_path -%}
       {%- set sharedReliableAUuid = repliesMap[sharedReliablePath]|reply_str_value -%}
@@ -36,26 +44,34 @@
         {%- set sharedReliablePreventLossAUuid = repliesMap[sharedReliablePreventLossPath]|reply_str_value -%}
         {%- set sharedReliableBackupPath = [sharedReliablePath, uuids.sharedReliableExploreAUuid, uuids.sharedReliableBackupQUuid]|reply_path -%}
         {%- set sharedReliableBackupAUuid = repliesMap[sharedReliableBackupPath]|reply_str_value -%}
-        {%- if sharedReliablePreventLossAUuid or sharedReliableBackupAUuid -%}
-          <p>
-          {%- if sharedReliablePreventLossAUuid == uuids.sharedReliablePreventLossSufficientAUuid %}
-            The work space provides sufficient guarantees in terms of preventing a total loss of data.
-          {%- elif sharedReliablePreventLossAUuid == uuids.sharedReliablePreventLossStoredAUuid %}
-            All essential data is also stored elsewhere to prevent a total loss of data.
-          {%- endif -%}
-          {%- if sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyLeftAUuid %}
-            Backup of project data that is not in the work space is left to the project participants.
-          {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyNoDataAUuid %}
-            Data is stored only in the work space, therefore additional backup copies of files outside work space are necessary.</p>
-          {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyAllSomewhereAUuid %}
-            All project data stored outside of the working area will be adequately backed up.
-          {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyBackupsAUuid %}
-            We will make (automated) backups of all data stored outside of the working area.
-          {%- endif -%}
-          </p>
+        {%- if sharedReliablePreventLossAUuid == uuids.sharedReliablePreventLossSufficientAUuid %}
+          <p data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="complete">The workspace provides sufficient safeguards against a total loss of data.</p>
+        {%- elif sharedReliablePreventLossAUuid == uuids.sharedReliablePreventLossStoredAUuid %}
+          <p data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="complete">All essential data will also be stored elsewhere to prevent a total loss of data.</p>
+        {%- else -%}
+          {{ macros.missing("SE-3a", "loss-prevention", "how a total loss of data will be prevented") }}
         {%- endif -%}
+        {%- if sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyLeftAUuid %}
+          <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">Project participants are responsible for backing up project data stored outside the workspace.</p>
+        {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyNoDataAUuid %}
+          <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">Data are stored only in the workspace, so no additional copies of files outside the workspace need to be backed up.</p>
+        {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyAllSomewhereAUuid %}
+          <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">All project data stored outside the workspace will be adequately backed up.</p>
+        {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyBackupsAUuid %}
+          <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">We will make automated backups of all data stored outside the workspace.</p>
+        {%- else -%}
+          {{ macros.missing("SE-3a", "backup-arrangement", "how data in and outside the shared workspace will be backed up") }}
+        {%- endif -%}
+      {%- else -%}
+        {{ macros.missing("SE-3a", "loss-prevention", "how a total loss of data will be prevented") }}
+        {{ macros.missing("SE-3a", "backup-arrangement", "how data in and outside the shared workspace will be backed up") }}
       {%- endif -%}
+    {%- else -%}
+      {{ macros.missing("SE-3a", "working-storage-arrangement", "whether data will be kept in a shared workspace or by individual project members") }}
+      {{ macros.missing("SE-3a", "backup-arrangement", "how project data and metadata will be backed up") }}
     {%- endif -%}
+    {{ macros.missing("SE-3a", "storage-location", "the locations where data and metadata will be stored and backed up") }}
+    {{ macros.missing("SE-3a", "backup-frequency", "how often backups will be performed") }}
   </div>
 
 </div>

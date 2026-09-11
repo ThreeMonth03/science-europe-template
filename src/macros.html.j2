@@ -1,4 +1,17 @@
 {# Formatting macros #}
+{#
+  Completeness contract
+
+  Never turn an unanswered DSW reply into a negative statement.  The stable
+  attributes are deliberately language-neutral so that translated documents
+  can be compared without asking an LLM to align prose.
+#}
+{%- macro missing(requirementId, factId, description) -%}
+  <p class="data-gap" data-requirement-id="{{ requirementId }}" data-fact-id="{{ factId }}" data-status="missing">
+    <strong>Information not provided:</strong> {{ description }}.
+  </p>
+{%- endmacro -%}
+
 {%- macro formatEmail(email) -%}
   <span class="contact-email"><a href="mailto:{{ email }}">{{ email }}</a></span>
 {%- endmacro -%}

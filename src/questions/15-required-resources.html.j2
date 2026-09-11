@@ -1,4 +1,4 @@
-<div id="q-required-resources" class="question">
+<div id="q-required-resources" class="question" data-requirement-id="SE-6b">
   <h3>15. What resources (for example financial and time) will be dedicated to data management and ensuring that data will be FAIR (Findable, Accessible, Interoperable, Re-usable)?</h3>
 
   <div class="answer">
@@ -6,44 +6,42 @@
     {%- set expertisePath = [uuids.adminDetailsCUuid, uuids.additionalExpertiseQUuid]|reply_path -%}
     {%- set expertiseAUuid = repliesMap[expertisePath]|reply_str_value -%}
     {%- if expertiseAUuid == uuids.additionalExpertiseNoAUuid -%}
-      <p>To execute the DMP, no additional specialist expertise is required.</p>
+      <p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="explicit-no">To execute the DMP, no additional specialist expertise is required.</p>
     {%- elif expertiseAUuid == uuids.additionalExpertiseYesAvailableAUuid -%}
-      <p>To execute the DMP, additional specialist expertise is required and we have such trained support staff available.</p>
+      <p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="complete">To execute the DMP, additional specialist expertise is required and we have such trained support staff available.</p>
     {%- elif expertiseAUuid == uuids.additionalExpertiseYesTrainAUuid -%}
-      <p>
-        To execute the DMP, additional specialist expertise is required. We will be training existing staff
-        {%- set expertiseTrainPath = [expertisePath, uuids.additionalExpertiseYesTrainAUuid, uuids.additionalExpertiseYesTrainTrainingQUuid]|reply_path -%}
-        {%- set expertiseTrainText = repliesMap[expertiseTrainPath]|reply_str_value -%}
-        {%- if expertiseTrainText %}
-          {{" "}}on: {{ expertiseTrainText|markdown }}
-        {%- else -%}
-          .
-        {%- endif -%}
-      </p>
+      {%- set expertiseTrainPath = [expertisePath, uuids.additionalExpertiseYesTrainAUuid, uuids.additionalExpertiseYesTrainTrainingQUuid]|reply_path -%}
+      {%- set expertiseTrainText = repliesMap[expertiseTrainPath]|reply_str_value -%}
+      <p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseTrainText else 'partial' }}">To execute the DMP, additional specialist expertise is required. We will train existing staff{% if expertiseTrainText %} in {{ expertiseTrainText|markdown }}{% else %}.{% endif %}</p>
+      {%- if not expertiseTrainText -%}
+        {{ macros.missing("SE-6b", "specialist-expertise-detail", "the training that existing staff will receive") }}
+      {%- endif -%}
     {%- elif expertiseAUuid == uuids.additionalExpertiseYesHireAUuid -%}
-      <p>
-        To execute the DMP, additional specialist expertise is required. We will be hiring new people with additional expertise
-        {%- set expertiseHirePath = [expertisePath, uuids.additionalExpertiseYesHireAUuid, uuids.additionalExpertiseYesHireExpertiseQUuid]|reply_path -%}
-        {%- set expertiseHireText = repliesMap[expertiseHirePath]|reply_str_value -%}
-        {%- if expertiseHireText %}
-          {{" "}}in: {{ expertiseHireText}}
-        {%- endif -%}
-        .
-      </p>
+      {%- set expertiseHirePath = [expertisePath, uuids.additionalExpertiseYesHireAUuid, uuids.additionalExpertiseYesHireExpertiseQUuid]|reply_path -%}
+      {%- set expertiseHireText = repliesMap[expertiseHirePath]|reply_str_value -%}
+      <p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseHireText else 'partial' }}">To execute the DMP, additional specialist expertise is required. We will hire new staff{% if expertiseHireText %} with expertise in {{ expertiseHireText|markdown }}{% else %}.{% endif %}</p>
+      {%- if not expertiseHireText -%}
+        {{ macros.missing("SE-6b", "specialist-expertise-detail", "the expertise for which new staff will be hired") }}
+      {%- endif -%}
+    {%- else -%}
+      {{ macros.missing("SE-6b", "specialist-expertise", "whether additional specialist expertise is required") }}
     {%- endif -%}
     {# additional hw/sw #}
     {%- set additionalHWSWPath = [uuids.adminDetailsCUuid, uuids.additionalHWSWQUuid]|reply_path -%}
     {%- set additionalHWSWAUuid = repliesMap[additionalHWSWPath]|reply_str_value -%}
     {%- if additionalHWSWAUuid == uuids.additionalHWSWNoAUuid -%}
-      <p>We do not require any hardware or software in addition to what is usually available in the institute.</p>
+      <p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no">We do not require any hardware or software in addition to what is usually available in the institute.</p>
     {%- elif additionalHWSWAUuid == uuids.additionalHWSWYesAUuid -%}
       {%- set additionalHWSWWhatPath = [additionalHWSWPath, uuids.additionalHWSWYesAUuid, uuids.additionalHWSWYesWhatQUuid]|reply_path -%}
       {%- set additionalHWSWWhat = repliesMap[additionalHWSWWhatPath]|reply_str_value -%}
       {%- if additionalHWSWWhat -%}
-        <p>We require the following hardware or software in addition to what is usually available in the institute: {{ additionalHWSWWhat|markdown }}</p>
+        <p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="complete">We require the following hardware or software in addition to what is usually available in the institute: {{ additionalHWSWWhat|markdown }}</p>
       {%- else -%}
-        <p>We require hardware or software in addition to what is usually available in the institute.</p>
+        <p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="partial">We require hardware or software in addition to what is usually available in the institute.</p>
+        {{ macros.missing("SE-6b", "hardware-software-detail", "the additional hardware or software required") }}
       {%- endif -%}
+    {%- else -%}
+      {{ macros.missing("SE-6b", "hardware-software", "whether additional hardware or software is required") }}
     {%- endif -%}
     {# charges #}
     <p>Charges applied by data repositories (if any) are mentioned already in Section 4, Question 11.</p>
@@ -73,12 +71,16 @@
                         {%- set projectCostItemTitleQUuid = [projectCostItem, uuids.costTitleQUuid]|reply_path -%}
                         {%- set projectCostItemTitleReply = repliesMap[projectCostItemTitleQUuid]|reply_str_value -%}
                         <li>
-                        <strong>{{ projectCostItemTitleReply if projectCostItemTitleReply else "(no name given)" }}</strong>
+                        <strong>{{ projectCostItemTitleReply if projectCostItemTitleReply else "(no resource name given)" }}</strong>
                         
                         {%- set projectCostItemDescriptionQUuid = [projectCostItem, uuids.costDescriptionQUuid]|reply_path -%}
                         {%- set projectCostItemDescriptionReply = repliesMap[projectCostItemDescriptionQUuid]|reply_str_value  -%}
                         
-                        {{" - "+projectCostItemDescriptionReply|dot}}
+                        {%- if projectCostItemDescriptionReply -%}
+                          {{" - "+projectCostItemDescriptionReply|dot}}
+                        {%- else -%}
+                          {{ macros.missing("SE-6b", "resource-justification", "why this resource is needed to deliver FAIR data") }}
+                        {%- endif -%}
 
                         {%- set projectCostItemCurrencyQUuid = [projectCostItem, uuids.costCurrencyQUuid]|reply_path  -%}
                         {%- set projectCostItemCurrencyReply = repliesMap[projectCostItemCurrencyQUuid] -%}
@@ -89,6 +91,8 @@
 
                         {%- if  projectCostItemAmountReply and projectCostItemCurrencyReply -%}
                             <p>The amount is {{projectCostItemAmountReply}} {{macros.integrationCurrency(projectCostItemCurrencyReply) }}.</p>
+                        {%- else -%}
+                            {{ macros.missing("SE-6b", "resource-amount", "the amount and currency budgeted for this resource") }}
                         {%- endif -%}
 
                         {%- set projectCostItemAllocationQUuid = [projectCostItem, uuids.costAllocationQUuid]|reply_path  -%}
@@ -123,6 +127,8 @@
                               {{ projectCostItemAllocations[0] }} of data.
                             {%- endif %}
                           </p>
+                        {%- else -%}
+                          {{ macros.missing("SE-6b", "resource-allocation", "which FAIR or data-management activities this resource supports") }}
                         {%- endif -%}
                        
  
@@ -132,31 +138,39 @@
                         {%- if projectCostItemCoverReply == uuids.costCoverGrantAUuid -%}
                           {%- set costCoverGrantIdQUuid = [projectCostItemCoverQUuid, uuids.costCoverGrantAUuid, uuids.costCoverGrantIdQUuid]|reply_path -%}
                           {%- set costCoverGrantIdReply = repliesMap[costCoverGrantIdQUuid]|reply_str_value -%}
-                          <p>This cost will be covered by funding grant
+                          <p>This cost will be covered by a funding grant
                           {%- if costCoverGrantIdReply -%}
-                            {{" "}}(grant number: {{costCoverGrantIdReply}})
+                            {{" "}}(grant number: {{costCoverGrantIdReply}}).
                           {%- else -%}
-                            . </p>
+                            .
                           {%- endif -%}
+                          </p>
                         {%- elif projectCostItemCoverReply == uuids.costCoverOtherAUuid -%}
                           {%- set costCoverOtherHowQUuid = [projectCostItemCoverQUuid,uuids.costCoverOtherAUuid, uuids.costCoverOtherHowQUuid]|reply_path  -%}
                           {%- set costCoverOtherHowReply = repliesMap[costCoverOtherHowQUuid]|reply_str_value -%}
                           {%- if costCoverOtherHowReply -%}
                             <p>This cost will be covered as follows: {{costCoverOtherHowReply}}.</p>
+                          {%- else -%}
+                            {{ macros.missing("SE-6b", "cost-coverage", "how this cost will be covered") }}
                           {%- endif -%}
-
+                        {%- else -%}
+                          {{ macros.missing("SE-6b", "cost-coverage", "how this cost will be covered") }}
                         {%- endif -%}
 
 
                         </li>
                     {%- endfor -%}
                     </ul>
+                {%- else -%}
+                    {{ macros.missing("SE-6b", "resources-costing", "resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project") }}
                 {%- endif -%}
 
             </li>
 
         {%- endfor -%}
     </ul>
+    {%- else -%}
+      {{ macros.missing("SE-6b", "resources-costing", "the financial and time resources budgeted for data management and FAIR data") }}
     {%- endif -%}
   </div>
 </div>

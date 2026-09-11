@@ -1,4 +1,4 @@
-<div id="q-how-data" class="question">
+<div id="q-how-data" class="question" data-requirement-id="SE-1a">
   <h3>1. How will new data be collected or produced and/or how will existing data be re-used?</h3>
 
   <div class="answer">
@@ -136,9 +136,13 @@
           </li>
         {%- endfor -%}
       </ul>
+    {%- else -%}
+      {{ macros.missing("SE-1a", "collection-methods", "the datasets to be collected or produced and the methods, instruments, or software that will be used") }}
     {%- endif -%}
+  {%- elif measuredAUuid == uuids.measuredNoAUuid -%}
+    <p data-requirement-id="SE-1a" data-fact-id="new-data" data-status="explicit-no">No new instrument datasets will be produced in this project.</p>
   {%- else -%}
-    <p>There will be no instrument dataset in this project.</p>
+    {{ macros.missing("SE-1a", "new-data", "whether the project will collect or produce new instrument data") }}
   {%- endif -%}
 
  {# Existing datasets #}
@@ -505,7 +509,7 @@
       </ul>
       </div>
     {%- else -%}
-      <p>There are no re-used datasets.</p>
+      {{ macros.missing("SE-1a", "reuse-sources", "the existing datasets considered for re-use, including any sources that were considered but discarded") }}
     {%- endif -%}
 
     {# Constrains - Data Harmonization #}
@@ -567,8 +571,10 @@
       {%- endif -%}
       </p>
     {%- endif -%}
-    
-
+  {%- elif preexistingAUuid == uuids.preexistingNoAUuid -%}
+    <p data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="explicit-no">No relevant pre-existing datasets were identified for re-use.</p>
+  {%- else -%}
+    {{ macros.missing("SE-1a", "reuse-sources", "whether existing data will be re-used, including constraints or reasons for discarding candidate sources") }}
   {%- endif -%}
 
   {# Provenance (lab notebooks)#}
@@ -578,19 +584,27 @@
       {%- set provenancePath = [metadataPath, uuids.metadataExploreAUuid, uuids.provenanceQUuid]|reply_path -%}
       {%- set provenanceAUuid = repliesMap[provenancePath]|reply_str_value -%}
       {%- if provenanceAUuid %}
-      <h4>Provenance</h4>
-      {%- if provenanceAUuid == uuids.provenanceLabNotebooksAUuid -%}
-        <p>We will use lab notebooks to make sure that there is good provenance of the data analysis.</p>
-      {%- elif provenanceAUuid == uuids.provenanceELabNotebookAUuid -%}
-        <p>We will use an electronic lab notebook to make sure that there is good provenance of the data analysis.</p>
-      {%- elif provenanceAUuid == uuids.provenanceSystemAUuid -%}
-        <p>Our computing workflow system keeps provenance information about the data analysis.</p>
-      {%- elif provenanceAUuid == uuids.provenanceOtherAUuid -%}
-        {%- set provenanceOtherPath = [provenancePath, uuids.provenanceOtherAUuid, uuids.provenanceOtherQUuid]|reply_path -%}
-        {%- set provenanceOther = repliesMap[provenanceOtherPath]|reply_str_value -%}
-        <p>We will use other solution than (electronic) lab notebooks to make sure that there is good provenance of the data analysis{{ ": " ~ provenanceOther|markdown if provenanceOther else "." }}
+        <h4>Provenance</h4>
+        {%- if provenanceAUuid == uuids.provenanceLabNotebooksAUuid -%}
+          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We will use lab notebooks to document the provenance of the data analysis.</p>
+        {%- elif provenanceAUuid == uuids.provenanceELabNotebookAUuid -%}
+          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We will use an electronic lab notebook to document the provenance of the data analysis.</p>
+        {%- elif provenanceAUuid == uuids.provenanceSystemAUuid -%}
+          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">Our computing workflow system records provenance information about the data analysis.</p>
+        {%- elif provenanceAUuid == uuids.provenanceOtherAUuid -%}
+          {%- set provenanceOtherPath = [provenancePath, uuids.provenanceOtherAUuid, uuids.provenanceOtherQUuid]|reply_path -%}
+          {%- set provenanceOther = repliesMap[provenanceOtherPath]|reply_str_value -%}
+          {%- if provenanceOther -%}
+            <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We will use the following arrangement to document the provenance of the data analysis: {{ provenanceOther|markdown }}</p>
+          {%- else -%}
+            {{ macros.missing("SE-1a", "provenance-detail", "the other arrangement that will document data provenance") }}
+          {%- endif -%}
+        {%- endif -%}
+      {%- else -%}
+        {{ macros.missing("SE-1a", "provenance", "how data provenance will be documented") }}
       {%- endif -%}
-      {%- endif -%}
+    {%- else -%}
+      {{ macros.missing("SE-1a", "provenance", "how data provenance will be documented") }}
     {%- endif -%}
   </div>
 </div>
