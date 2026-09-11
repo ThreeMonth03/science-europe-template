@@ -7,7 +7,7 @@ substantive completeness or Science Europe compliance.
 ## Owned changes
 
 - PDF and Word now include the same `frontmatter.html.j2`, research overview,
-  contributor list, questions and final document-provenance note. Contact/creator
+  contributor list, low-emphasis frontmatter provenance note, and questions. Contact/creator
   information is represented once by the contributor roles. A sole research
   project supplies the main title; the DSW document name remains visible.
 - The original `header.html.j2` and `word/frontpage.html.j2` remain in the source
