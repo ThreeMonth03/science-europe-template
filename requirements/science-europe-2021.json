@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "title": "Practical Guide to the International Alignment of Research Data Management — Extended Edition",
+    "publisher": "Science Europe",
+    "published": "2021-01",
+    "doi": "10.5281/zenodo.4915861",
+    "url": "https://scienceeurope.org/media/4brkxxe5/se_rdm_practical_guide_extended_final.pdf",
+    "license": "CC BY 4.0",
+    "pages": "17–26"
+  },
+  "outputContract": {
+    "missingIsNotNegative": true,
+    "preservePartialAnswers": true,
+    "visibleMissingMarker": "Information not provided",
+    "stableAttributes": [
+      "data-requirement-id",
+      "data-fact-id",
+      "data-status"
+    ],
+    "statuses": [
+      "complete",
+      "partial",
+      "explicit-no",
+      "missing"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "SE-1a",
+      "number": 1,
+      "section": "Data description and collection or re-use of existing data",
+      "question": "How will new data be collected or produced and/or how will existing data be re-used?",
+      "requiredTopics": [
+        "methodologies or software used to collect or produce new data",
+        "constraints on re-use of existing data",
+        "documentation of data provenance",
+        "reasons for discarding existing data sources considered for re-use"
+      ],
+      "template": "src/questions/01-how-data.html.j2",
+      "implementationStatus": "experiment",
+      "facts": [
+        {
+          "id": "collection-methods",
+          "dswBindings": ["measuredQUuid", "measuredDataQUuid", "measuredDataInstrQUuid"],
+          "coverage": "partial",
+          "gap": "The KM captures instrument datasets and instruments but has no general field for methodology or software."
+        },
+        {
+          "id": "reuse-sources",
+          "dswBindings": ["preexistingQUuid", "refDataQUuid", "nrefDataQUuid", "refDataConditionsQUuid", "nrefDataConditionsQUuid"],
+          "coverage": "mapped"
+        },
+        {
+          "id": "discarded-reuse-reasons",
+          "dswBindings": ["refDataUseNoWhyQUuid", "nrefDataUseNoWhyQUuid"],
+          "coverage": "mapped"
+        },
+        {
+          "id": "provenance",
+          "dswBindings": ["metadataQUuid", "provenanceQUuid", "provenanceOtherQUuid"],
+          "coverage": "mapped"
+        }
+      ]
+    },
+    {
+      "id": "SE-1b",
+      "number": 2,
+      "section": "Data description and collection or re-use of existing data",
+      "question": "What data (for example the kinds, formats, and volumes) will be collected or produced?",
+      "requiredTopics": ["kinds of data", "data formats", "format rationale and preference for open standards", "estimated data volumes"],
+      "template": "src/questions/02-what-data.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-2a",
+      "number": 3,
+      "section": "Documentation and data quality",
+      "question": "What metadata and documentation (for example the methodology of data collection and way of organising data) will accompany the data?",
+      "requiredTopics": ["discovery metadata", "community metadata standards", "data organisation and version control", "documentation needed for re-use", "where documentation is recorded"],
+      "template": "src/questions/03-docs-metadata.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-2b",
+      "number": 4,
+      "section": "Documentation and data quality",
+      "question": "What data quality control measures will be used?",
+      "requiredTopics": ["controls for consistency and quality", "documentation of quality-control processes"],
+      "template": "src/questions/04-quality-control.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-3a",
+      "number": 5,
+      "section": "Storage and backup during the research process",
+      "question": "How will data and metadata be stored and backed up during the research process?",
+      "requiredTopics": ["storage locations", "backup locations", "backup frequency", "robust managed storage and automatic backup"],
+      "template": "src/questions/05-store-backup.html.j2",
+      "implementationStatus": "experiment",
+      "facts": [
+        {
+          "id": "working-storage-arrangement",
+          "dswBindings": ["sharedWorkspaceQUuid"],
+          "coverage": "mapped"
+        },
+        {
+          "id": "loss-prevention",
+          "dswBindings": ["sharedReliablePreventLossQUuid"],
+          "coverage": "mapped"
+        },
+        {
+          "id": "backup-arrangement",
+          "dswBindings": ["notSharedBackupQUuid", "sharedReliableBackupQUuid"],
+          "coverage": "partial",
+          "gap": "The answers describe responsibility or strategy but not a complete backup schedule."
+        },
+        {
+          "id": "storage-location",
+          "dswBindings": [],
+          "coverage": "unmapped",
+          "gap": "No directly mapped answer states the primary and backup locations."
+        },
+        {
+          "id": "backup-frequency",
+          "dswBindings": [],
+          "coverage": "unmapped",
+          "gap": "No directly mapped answer states backup frequency."
+        }
+      ]
+    },
+    {
+      "id": "SE-3b",
+      "number": 6,
+      "section": "Storage and backup during the research process",
+      "question": "How will data security and protection of sensitive data be taken care of during the research?",
+      "requiredTopics": ["incident recovery", "access and access control", "sensitive-data risks and mitigations", "institutional data-protection policies"],
+      "template": "src/questions/06-access-security.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-4a",
+      "number": 7,
+      "section": "Legal and ethical requirements, codes of conduct",
+      "question": "If personal data are processed, how will compliance with legislation on personal data and on security be ensured?",
+      "requiredTopics": ["applicable data-protection law", "informed consent", "anonymisation or pseudonymisation", "encryption and key separation", "managed access"],
+      "template": "src/questions/07-personal-data.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-4b",
+      "number": 8,
+      "section": "Legal and ethical requirements, codes of conduct",
+      "question": "How will other legal issues, such as intellectual property rights and ownership, be managed? What legislation is applicable?",
+      "requiredTopics": ["data ownership", "access conditions and licences", "multi-partner ownership", "intellectual-property rights", "third-party re-use restrictions"],
+      "template": "src/questions/08-copyright-ipr.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-4c",
+      "number": 9,
+      "section": "Legal and ethical requirements, codes of conduct",
+      "question": "What ethical issues and codes of conduct are there, and how will they be taken into account?",
+      "requiredTopics": ["ethical effects on storage, transfer, access, and retention", "national, international, and institutional guidance", "need for ethical review"],
+      "template": "src/questions/09-ethical-issues.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-5a",
+      "number": 10,
+      "section": "Data sharing and long-term preservation",
+      "question": "How and when will data be shared? Are there possible restrictions to data sharing or embargo reasons?",
+      "requiredTopics": ["discovery and sharing mechanism", "preservation and retention period", "release timing or embargo", "eligible users and access restrictions", "measures to minimise restrictions"],
+      "template": "src/questions/10-share-restrictions.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-5b",
+      "number": 11,
+      "section": "Data sharing and long-term preservation",
+      "question": "How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?",
+      "requiredTopics": ["legal or contractual retention and destruction", "selection of data for preservation", "foreseeable re-use", "deposit location", "repository policies, procedures, standards, and costs"],
+      "template": "src/questions/11-data-preservation.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-5c",
+      "number": 12,
+      "section": "Data sharing and long-term preservation",
+      "question": "What methods or software tools are needed to access and use data?",
+      "requiredTopics": ["special tools needed for access or re-use", "software sustainability", "data-access mechanism"],
+      "template": "src/questions/12-access-data.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-5d",
+      "number": 13,
+      "section": "Data sharing and long-term preservation",
+      "question": "How will the application of a unique and persistent identifier (such as a Digital Object Identifier (DOI)) to each data set be ensured?",
+      "requiredTopics": ["expected contexts for re-use", "persistent identifier plan", "repository support for persistent identifiers"],
+      "template": "src/questions/13-persistent-identifier.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-6a",
+      "number": 14,
+      "section": "Data management responsibilities and resources",
+      "question": "Who (for example role, position, and institution) will be responsible for data management (i.e. the data steward)?",
+      "requiredTopics": ["roles and named responsibilities across the data lifecycle", "coordination across partners", "responsibility for implementation and review", "regular DMP updates"],
+      "template": "src/questions/14-dm-responsible.html.j2",
+      "implementationStatus": "upstream-unreviewed"
+    },
+    {
+      "id": "SE-6b",
+      "number": 15,
+      "section": "Data management responsibilities and resources",
+      "question": "What resources (for example financial and time) will be dedicated to data management and ensuring that data will be FAIR (Findable, Accessible, Interoperable, Re-usable)?",
+      "requiredTopics": ["costed time and resources for curation, sharing, and preservation", "storage, hardware, staff, deposit, and repository costs", "additional resources needed", "amount and source of cost coverage"],
+      "template": "src/questions/15-required-resources.html.j2",
+      "implementationStatus": "experiment",
+      "facts": [
+        {
+          "id": "specialist-expertise",
+          "dswBindings": ["additionalExpertiseQUuid", "additionalExpertiseYesTrainTrainingQUuid", "additionalExpertiseYesHireExpertiseQUuid"],
+          "coverage": "mapped"
+        },
+        {
+          "id": "hardware-software",
+          "dswBindings": ["additionalHWSWQUuid", "additionalHWSWYesWhatQUuid"],
+          "coverage": "mapped"
+        },
+        {
+          "id": "resources-costing",
+          "dswBindings": ["projectsQUuid", "costQUuid", "costTitleQUuid", "costDescriptionQUuid", "costAmountQUuid", "costCurrencyQUuid", "costAllocationQUuid", "costCoverQUuid"],
+          "coverage": "partial",
+          "gap": "Cost items can include staff time and other resources, but completeness depends on free-text descriptions and project cost entries."
+        }
+      ]
+    }
+  ]
+}

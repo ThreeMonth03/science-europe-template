@@ -1,11 +1,48 @@
 # Science Europe DMP
 
+> **Local experiment:** this repository is based on the official
+> `dsw:science-europe:1.30.1` template and is testing an explicit completeness
+> contract. It packages as
+> `myorg:science-europe-completeness-experiment:0.1.0`, so it cannot overwrite
+> the official template accidentally.
+
+The experiment keeps the upstream Jinja structure but changes how incomplete
+answers are rendered. An unanswered branch is displayed as **Information not
+provided**; it is never silently omitted and never treated as an explicit
+negative answer. Stable `data-requirement-id`, `data-fact-id`, and
+`data-status` attributes also give the English and translated outputs a
+deterministic alignment key.
+
 This is the DMP template recommended by [Science Europe](https://www.scienceeurope.org) in their [Science Europe Guidance Document](https://scienceeurope.org/media/4brkxxe5/se_rdm_practical_guide_extended_final.pdf) designed for use in [Data Stewardship Wizard](https://ds-wizard.org) with [*Common Data Stewardship knowledge model*](https://registry.ds-wizard.org/knowledge-models/dsw:root:latest) and [*Life Sciences DSW Knowledge Model*](https://registry.ds-wizard.org/knowledge-models/dsw:lifesciences:latest). It applies various rules and synthesizes the text answers from questionnaire replies to relevant questions.
 
 
 ## Usage
 
 This template is available through [DSW Registry](https://registry.ds-wizard.org/templates).
+
+
+## Local experiment and development
+
+The first vertical slice covers Science Europe requirements **SE-1a**
+(collection/re-use), **SE-3a** (storage/backup), and **SE-6b** (resources).
+The machine-readable source of truth for all 15 Science Europe questions is
+[`requirements/science-europe-2021.json`](requirements/science-europe-2021.json).
+See [`docs/completeness-experiment.md`](docs/completeness-experiment.md) for
+the hypotheses and acceptance criteria.
+
+```bash
+python -m pip install -r requirements-dev.txt
+make check
+```
+
+The official repository is configured locally as the `upstream` Git remote.
+Before adopting a new release, follow
+[`docs/upstream-upgrades.md`](docs/upstream-upgrades.md) and run:
+
+```bash
+git fetch upstream --tags
+python scripts/audit_upstream.py --target upstream/main
+```
 
 
 ## Issues and Contributing
