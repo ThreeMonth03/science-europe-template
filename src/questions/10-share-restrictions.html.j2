@@ -19,7 +19,7 @@
             {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
                 <p>This dataset will not be published.</p>
             {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
-                <p>This dataset will be published.</p>
+                <div class="answer-lead"><p>This dataset will be published.</p></div>
                 {# Identifiers #}
                 {% set identifiersPath = [pathPrefix, uuids.producedDataIdentifiersQUuid]|reply_path -%}
                 {%- set identifiersItems = repliesMap[identifiersPath]|reply_items -%}
@@ -58,6 +58,7 @@
                         {%- set distroSharePath = [distroPrefix, uuids.publishedDistroShareQUuid]|reply_path -%}
                         {%- set distroShareAUuid = repliesMap[distroSharePath]|reply_str_value -%}
                         <div class="distribution-section" data-item-id="{{ j }}">
+                        {% set distributionContent %}
                             {% if distrosItems|length > 1 %}<p class="answer-lead"><strong>Distribution {{ loop.index }}</strong></p>{% endif %}
                             {%- if distroShareAUuid == uuids.publishedDistroShareOpenAUuid %}
                                 <p data-fact-id="distribution-access" data-status="complete">Open access: this distribution will be shared with anyone.</p>
@@ -167,6 +168,8 @@
                         {% else %}
                             <p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>
                         {%- endif -%}
+                        {% endset %}
+                        <div class="distribution-reading-unit{{ ' short-reading-unit' if distributionContent|striptags|trim|length <= 500 and 'answer-detail' not in distributionContent else '' }}">{{ distributionContent }}</div>
                         </div>
                     {%- endfor -%}
                 {% else %}

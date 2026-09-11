@@ -23,6 +23,10 @@ not produce the Word keep-with-next style in actual 0.3.0 output.
 Q9's fixed personal/sensitive-data flag list is kept together in PDF. Q14's owned
 responsibility block requests keep-together only below 500 rendered characters;
 the Word filter also checks the length and permits only plain paragraph blocks.
+Short publication distributions use the same bounded rule, allowing nested divs
+but excluding free-answer, list and table blocks from the Word paragraph chain.
+This follows a real 0.3.1 first-pass PDF where compact Q5 moved an otherwise short
+Q10 distribution across a page boundary. Long restrictions remain breakable.
 No whole question, arbitrary long answer, or multi-page section is made unbreakable.
 Font size, body spacing and line height are unchanged from 0.3.0.
 

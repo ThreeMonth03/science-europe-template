@@ -78,3 +78,12 @@ class NarrativePaginationTests(unittest.TestCase):
         output = render_question('src/questions/14-dm-responsible.html.j2', replies)
         self.assertNotIn('short-reading-unit', output)
         self.assertEqual(2, output.count('Very long institutional group name ' * 30))
+
+    def test_short_distribution_is_bounded_but_free_terms_are_not_kept_whole(self):
+        from generate_storage_fixtures import storage_cases
+        replies = {k: v['value'] for k, v in storage_cases('en')['storage-sharing'].items()}
+        output = render_question('src/questions/10-share-restrictions.html.j2', replies)
+        self.assertEqual(2, output.count('class="distribution-section"'))
+        self.assertEqual(1, output.count('class="distribution-reading-unit short-reading-unit"'))
+        self.assertEqual(1, output.count('class="distribution-reading-unit"'))
+        self.assertIn('Do not redistribute the preliminary files.', output)

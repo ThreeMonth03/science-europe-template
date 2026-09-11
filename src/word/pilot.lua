@@ -37,15 +37,26 @@ end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
-  if div.classes:includes("short-reading-unit") and #div.content > 1 and utf8.len(pandoc.utils.stringify(div)) <= 500 then
-    -- Only bounded, template-owned responsibility paragraphs; never long answers.
-    local simple = true
-    for _, block in ipairs(div.content) do
-      if block.t ~= "Para" then simple = false end
+  if div.classes:includes("short-reading-unit") and utf8.len(pandoc.utils.stringify(div)) <= 500 then
+    -- Only bounded owned prose. Preserve nested divs and inline content, and
+    -- reject free-answer/list/table units rather than making them unbreakable.
+    local paragraphs, simple = {}, true
+    local function scan(blocks)
+      for index, block in ipairs(blocks) do
+        if block.t == "Para" or block.t == "Plain" then
+          table.insert(paragraphs, {blocks = blocks, index = index, block = block})
+        elseif block.t == "Div" and not block.classes:includes("answer-detail") then
+          scan(block.content)
+        elseif block.t ~= "Header" then
+          simple = false
+        end
+      end
     end
+    scan(div.content)
     if simple then
-      for index = 1, #div.content - 1 do
-        div.content[index] = pandoc.Div({div.content[index]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+      for index = 1, #paragraphs - 1 do
+        local item = paragraphs[index]
+        item.blocks[item.index] = pandoc.Div({pandoc.Para(item.block.content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
       end
     end
     return div
