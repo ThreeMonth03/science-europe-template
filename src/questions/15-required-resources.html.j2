@@ -87,6 +87,7 @@
 
                 {%- if projectCostItems|length > 0  -%}
                     <table class="resource-table">
+                      <colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup>
                       <thead><tr><th scope="col">Resource and purpose</th><th scope="col">Budget</th><th scope="col">Funding source</th></tr></thead>
                       <tbody>
                     {%- for j in projectCostItems -%}

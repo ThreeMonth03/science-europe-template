@@ -21,13 +21,27 @@ function Para(paragraph)
   end
 end
 
+-- Keep genuinely short lists together, without making long free answers unbreakable.
+function BulletList(list)
+  if #list.content > 1 and #list.content <= 3 and #pandoc.utils.stringify(list) <= 600 then
+    for index = 1, #list.content - 1 do
+      local item = list.content[index]
+      local last = item[#item]
+      if last.t == "Para" or last.t == "Plain" then
+        item[#item] = pandoc.Div({pandoc.Para(last.content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot List Lead"}))
+      end
+    end
+    return list
+  end
+end
+
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
   if div.classes:includes("answer-lead") then
     div.attributes["custom-style"] = "Pilot Lead"
     return div
   end
-  if div.classes:includes("answer-detail") and #div.content > 1 and div.content[1].t == "Para" then
+  if (div.classes:includes("answer-detail") or div.classes:includes("answer")) and #div.content > 1 and div.content[1].t == "Para" then
     div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
     return div
   end

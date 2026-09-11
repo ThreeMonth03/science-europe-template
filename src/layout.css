@@ -60,9 +60,9 @@ html body .answer-detail li { margin-bottom: .2em; }
 html body .answer-detail ul:has(> li:last-child:nth-child(-n+3)) { break-inside: avoid; }
 html body li > p:first-child { break-after: avoid; }
 html body .resource-table { font-size: 10pt; table-layout: fixed; }
-html body .resource-table th:nth-child(1) { width: 57%; }
-html body .resource-table th:nth-child(2) { width: 17%; }
-html body .resource-table th:nth-child(3) { width: 26%; }
+html body .resource-table col.resource-purpose { width: 57%; }
+html body .resource-table col.resource-budget { width: 17%; }
+html body .resource-table col.resource-funding { width: 26%; }
 html body .resource-table tr { break-inside: auto; }
 html body .resource-table:has(tbody > tr:last-child:nth-child(-n+3)) { break-inside: avoid; }
 html body .resource-table p { margin-bottom: .3em; }

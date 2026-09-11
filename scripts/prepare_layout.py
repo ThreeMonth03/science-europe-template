@@ -72,6 +72,7 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         if f"Heading {level}" in document.styles:
             item = document.styles[f"Heading {level}"]
             item.font.size, item.font.bold = Pt(size), True
+            item.font.italic = False
             if level == 3:
                 item.font.bold = False
                 item.font.color.rgb = RGBColor.from_string("47565C")
@@ -89,6 +90,9 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     lead = document.styles.add_style("Pilot Lead", WD_STYLE_TYPE.PARAGRAPH)
     lead.base_style = document.styles["Body Text"]
     lead.paragraph_format.keep_with_next = True
+    list_lead = document.styles.add_style("Pilot List Lead", WD_STYLE_TYPE.PARAGRAPH)
+    list_lead.base_style = document.styles["Compact"]
+    list_lead.paragraph_format.keep_with_next = True
     document.save(reference)
     # python-docx assigns wall-clock ZIP timestamps; canonicalize for rebuilds.
     original = reference.read_bytes()

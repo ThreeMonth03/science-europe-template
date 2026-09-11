@@ -32,6 +32,9 @@ class LayoutTests(unittest.TestCase):
                 document = Document(folder / "src/word/reference.docx")
                 self.assertFalse(document.styles["Heading 2"].paragraph_format.page_break_before)
                 self.assertTrue(document.styles["Pilot Label"].paragraph_format.keep_with_next)
+                self.assertTrue(document.styles["Pilot Lead"].paragraph_format.keep_with_next)
+                self.assertTrue(document.styles["Pilot List Lead"].paragraph_format.keep_with_next)
+                self.assertFalse(document.styles["Heading 4"].font.italic)
                 self.assertEqual(0, document.styles["Body Text"].paragraph_format.space_before)
                 for section in document.sections:
                     for container in (
