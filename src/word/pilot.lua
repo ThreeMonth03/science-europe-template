@@ -130,6 +130,11 @@ function Div(div)
     end
     return div
   end
+  if div.classes:includes("distribution-reading-unit") then
+    -- Longer/restricted units skip the short-unit rule but still need to return
+    -- their bounded paragraph edits; otherwise Pandoc discards this mutation.
+    return div
+  end
   if div.classes:includes("answer-lead") then
     div.attributes["custom-style"] = "Pilot Lead"
     return div
