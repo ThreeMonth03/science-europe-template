@@ -90,7 +90,8 @@ class ScienceEuropeContractTests(unittest.TestCase):
         for filename in (
             "03-docs-metadata", "06-access-security", "07-personal-data",
             "09-ethical-issues", "10-share-restrictions", "11-data-preservation",
-            "12-access-data", "13-persistent-identifier",
+            "12-access-data", "13-persistent-identifier", "04-quality-control",
+            "08-copyright-ipr", "14-dm-responsible",
         ):
             with self.subTest(question=filename):
                 result = render_question(f"src/questions/{filename}.html.j2", {})

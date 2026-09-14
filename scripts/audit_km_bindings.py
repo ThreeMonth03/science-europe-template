@@ -22,7 +22,9 @@ def audit(km):
     entities = {key: value for group in km['entities'].values() if isinstance(group, dict) for key, value in group.items()}
     env = Environment(extensions=['jinja2.ext.do'])
     result = []
-    for file in sorted((ROOT / 'src/questions').glob('*.html.j2')):
+    # Include shared helpers too; moving bindings must not make them disappear
+    # from the audit merely because the question now includes a partial.
+    for file in sorted((ROOT / 'src').rglob('*.j2')):
         references = sorted({node.attr for node in env.parse(file.read_text()).find_all(nodes.Getattr)
                              if isinstance(node.node, nodes.Name) and node.node.name == 'uuids'})
         result.append({
@@ -51,7 +53,7 @@ def main():
             client.delete_project(project['uuid'])
         client.close()
     report = {
-        'scope': 'Static references in fifteen question templates; Common DSW KM 2.7.0 only; not answer coverage',
+        'scope': 'Static UUID references in all src Jinja files, including shared helpers; Common DSW KM 2.7.0 only; not answer coverage',
         'source_commit': subprocess.check_output(['git', '-C', str(ROOT), 'rev-parse', 'HEAD'], text=True).strip(),
         'source_dirty': bool(subprocess.check_output(['git', '-C', str(ROOT), 'status', '--porcelain'], text=True).strip()),
         'km_sha256': hashlib.sha256(bundle.read_bytes()).hexdigest(),

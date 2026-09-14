@@ -19,6 +19,8 @@
       "severity": "critical",
       "patterns": [
         "src/macros.html.j2",
+        "src/quality-control.html.j2",
+        "src/questions/04-quality-control.html.j2",
         "src/questions/01-how-data.html.j2",
         "src/questions/05-store-backup.html.j2",
         "src/questions/06-access-security.html.j2",

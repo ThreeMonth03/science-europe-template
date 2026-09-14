@@ -3,6 +3,7 @@
 </h3>
 
   <div class="answer">
+    {% set legalContent %}
     {# Open philosophy #}
     {%- set asOpenAsPossiblePath = [uuids.accessCUuid, uuids.asOpenAsPossibleQUuid]|reply_path -%}
     {%- set asOpenAsPossibleAUuid = repliesMap[asOpenAsPossiblePath]|reply_str_value -%}
@@ -235,5 +236,11 @@
         </ul>
       {%- endif -%}
     {%- endif -%}
+    {% endset %}
+    {% if legalContent|striptags|trim %}
+      {{ legalContent }}
+    {% else %}
+      <p class="data-gap" data-requirement-id="SE-4b" data-status="missing-output">This document does not yet describe arrangements for data ownership, intellectual property rights, or applicable legislation. Please review and complete this section.</p>
+    {% endif %}
   </div>
 </div>

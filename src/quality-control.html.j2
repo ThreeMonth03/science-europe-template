@@ -1,0 +1,53 @@
+{# Shared by Q1/Q4. Only selected fixed methods form a sentence; free Markdown
+   remains an independent block. The existing translator localizes join(", ").
+   Do not join user-provided paragraphs or append punctuation to list entries. #}
+{% set measuredDataQualityPath = [pathPrefix, uuids.measuredDataQualityQUuid]|reply_path %}
+{% set qualityAnswer = repliesMap[measuredDataQualityPath]|reply_str_value %}
+{% if measuredDataName %}
+  {% set qualityName = measuredDataName|e %}
+{% else %}
+  {% set qualityName %}<span>(no name given)</span>{% endset %}
+{% endif %}
+{% if qualityAnswer == uuids.measuredDataQualityNoAUuid %}
+  <p class="quality-summary" data-fact-id="quality-control" data-status="explicit-no">No quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>
+{% elif qualityAnswer == uuids.measuredDataQualityYesAUuid %}
+  {% set mdqPrefix = [measuredDataQualityPath, uuids.measuredDataQualityYesAUuid]|reply_path %}
+  {% set qualityMethods = [] %}
+  {% if repliesMap[[mdqPrefix, uuids.mdQualityCalibratingQUuid]|reply_path]|reply_str_value == uuids.mdQualityCalibratingYesAUuid %}
+    {% do qualityMethods.append("measurement calibration") %}
+  {% endif %}
+  {% if repliesMap[[mdqPrefix, uuids.mdQualityRepetitionQUuid]|reply_path]|reply_str_value == uuids.mdQualityRepetitionYesAUuid %}
+    {% do qualityMethods.append("repeat sampling or measurement") %}
+  {% endif %}
+  {% if repliesMap[[mdqPrefix, uuids.mdQualityStandardizedQUuid]|reply_path]|reply_str_value == uuids.mdQualityStandardizedYesAUuid %}
+    {% do qualityMethods.append("standardized data capture and recording") %}
+  {% endif %}
+  {% if repliesMap[[mdqPrefix, uuids.mdQualityValidationQUuid]|reply_path]|reply_str_value == uuids.mdQualityValidationYesAUuid %}
+    {% do qualityMethods.append("data entry validation") %}
+  {% endif %}
+  {% if repliesMap[[mdqPrefix, uuids.mdQualityPeerReviewQUuid]|reply_path]|reply_str_value == uuids.mdQualityPeerReviewYesAUuid %}
+    {% do qualityMethods.append("data peer review") %}
+  {% endif %}
+  {% if repliesMap[[mdqPrefix, uuids.mdQualityVocabulariesQUuid]|reply_path]|reply_str_value == uuids.mdQualityVocabulariesYesAUuid %}
+    {% do qualityMethods.append("use of controlled vocabularies") %}
+  {% endif %}
+  {% if repliesMap[[mdqPrefix, uuids.mdQualityConsistencyQUuid]|reply_path]|reply_str_value == uuids.mdQualityConsistencyYesAUuid %}
+    {% do qualityMethods.append("measurement of samples with known outcomes to monitor consistency") %}
+  {% endif %}
+  {% set otherPath = [mdqPrefix, uuids.mdQualityOtherQUuid]|reply_path %}
+  {% set otherAnswer = repliesMap[otherPath]|reply_str_value %}
+  {% set otherText = repliesMap[[otherPath, uuids.mdQualityOtherYesAUuid, uuids.mdQualityOtherWhatQUuid]|reply_path]|reply_str_value if otherAnswer == uuids.mdQualityOtherYesAUuid else '' %}
+  {% if qualityMethods %}
+    <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">Quality control measures for <strong>{{ qualityName }}</strong>: {{ qualityMethods|join(", ") }}.</p>
+  {% elif not otherText %}
+    <p class="data-gap" data-fact-id="quality-methods" data-status="missing">Quality control is planned for <strong>{{ qualityName }}</strong>, but the methods have not been specified.</p>
+  {% endif %}
+  {% if otherText %}
+    <div class="answer-lead"><p>Additional quality control details for <strong>{{ qualityName }}</strong>:</p></div>
+    <div class="answer-detail" data-fact-id="quality-other" data-status="complete">{{ otherText|markdown }}</div>
+  {% elif otherAnswer == uuids.mdQualityOtherYesAUuid %}
+    <p class="data-gap" data-fact-id="quality-other" data-status="missing">Other quality control methods were selected for <strong>{{ qualityName }}</strong>, but the details have not been provided.</p>
+  {% endif %}
+{% else %}
+  <p class="data-gap" data-fact-id="quality-control" data-status="missing">It has not been specified whether quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>
+{% endif %}
