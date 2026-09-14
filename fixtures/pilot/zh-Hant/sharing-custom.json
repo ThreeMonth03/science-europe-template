@@ -1,0 +1,8 @@
+{
+  "name": "Science Europe sharing/preservation experiment / sharing-custom",
+  "events_file": "sharing-custom.events.json",
+  "knowledge_model_package_id": "../../knowledge-models/root-zh-hant-2.7.0.km",
+  "question_tag_uuids": [],
+  "visibility": "PrivateProjectVisibility",
+  "sharing": "RestrictedProjectSharing"
+}

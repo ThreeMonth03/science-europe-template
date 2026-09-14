@@ -12,6 +12,7 @@
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
         <div class="dataset-section" data-item-id="{{ i }}">
           <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
+          <div class="preservation-summary dataset-policy">
           {# If will be published #}
           {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
           {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
@@ -39,19 +40,19 @@
                 <p>This data set will be kept available for a fixed period (prepaid).</p>
               {% endif %}
               {% if not publishedDataHowLongFixed %}
-                <p class="data-gap" data-fact-id="retention-period" data-status="missing-output">The retention period has not been provided.</p>
+                <div class="reading-gap"><p class="data-gap" data-fact-id="retention-period" data-status="missing-output">The retention period has not been provided.</p></div>
               {% elif (publishedDataHowLongFixed|string|trim).replace('.', '', 1).isdigit() %}
-                <p class="data-gap" data-fact-id="retention-period" data-status="needs-review">Please specify a time unit for the retention period.</p>
+                <div class="reading-gap"><p class="data-gap" data-fact-id="retention-period" data-status="needs-review">Please specify a time unit for the retention period.</p></div>
               {% endif %}
               {% if repliesMap[[uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path]|reply_str_value == uuids.repoChargesNoAUuid %}
-                <p class="data-gap" data-fact-id="retention-payment" data-status="needs-review">Please check how the prepaid retention period relates to the answer that repository services have no charges.</p>
+                <div class="reading-gap"><p class="data-gap" data-fact-id="retention-payment" data-status="needs-review">Please check how the prepaid retention period relates to the answer that repository services have no charges.</p></div>
               {% endif %}
             {%- endif -%}
             {%- if publishedDataMetadataPersistentAUuid == uuids.publishedDataMetadataPersistentYesAUuid %}
               <p>The metadata will be available even when the data no longer exists.</p>
             {%- endif -%}
           {%- endif -%}
-
+          </div>
            {# Distributions #}
           {% set distrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
           {%- set distrosItems = repliesMap[distrosPath]|reply_items -%}
@@ -126,11 +127,12 @@
           {%- set publishedDataCataloguePath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid]|reply_path -%}
           {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
           {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
-            <br>We will be adding a reference to the published data to at least one data catalogue.
+            <p>We will be adding a reference to the published data to at least one data catalogue.</p>
           {%- endif -%}
         </div>
       {%- endfor -%}
     {%- endif -%}
+    <div class="preservation-resources dataset-policy">
     {# Repository charges #}
     {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}
     {%- set repoChargesAUuid = repliesMap[repoChargesPath]|reply_str_value -%}
@@ -149,7 +151,8 @@
         {%- set repoChargesHowPayOtherPath = [repoChargesHowPayPath, uuids.repoChargesHowPayOtherAUuid, uuids.repoChargesHowPayOtherQUuid]|reply_path -%}
         {%- set repoChargesHowPayOther = repliesMap[repoChargesHowPayOtherPath]|reply_str_value -%}
         {%- if repoChargesHowPayOther -%}
-          <div class="answer-detail">We will carry the costs related to the used repositories by: {{ repoChargesHowPayOther|markdown }}</div>
+          <div class="answer-lead"><p>Other arrangements for paying repository costs:</p></div>
+          <div class="answer-detail">{{ repoChargesHowPayOther|markdown }}</div>
         {%- endif -%}
       {%- endif -%}
     {%- endif -%}
@@ -159,6 +162,7 @@
     {%- if budgetTimeEffortAUuid == uuids.budgetTimeEffortYesAUuid -%}
       <p>We have a reserved budget for the time and effort it will take to prepare the data for publication.</p>
     {%- endif -%}
+    </div>
   {% endset %}
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}

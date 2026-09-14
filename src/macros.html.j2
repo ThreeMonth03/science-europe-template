@@ -53,6 +53,16 @@
   {%- endif -%}
 {%- endmacro -%}
 
+{# A date-shaped field, not date validation or a rewrite of arbitrary prose. #}
+{%- macro calendarDate(value) -%}
+  {%- set dateText = value|string -%}
+  {%- if dateText|length == 10 and dateText[4] == '-' and dateText[7] == '-' and (dateText[:4] ~ dateText[5:7] ~ dateText[8:]).isascii() and (dateText[:4] ~ dateText[5:7] ~ dateText[8:]).isdigit() -%}
+    <span class="date-value" data-iso-date="{{ dateText|e }}">{{ dateText|e }}</span>
+  {%- else -%}
+    {{ dateText|e }}
+  {%- endif -%}
+{%- endmacro -%}
+
 {%- macro integrationFairSharing(reply) -%}
   {%- if reply and reply.value.value.type == "IntegrationType" -%}
     {%- if reply.value.value.raw -%}

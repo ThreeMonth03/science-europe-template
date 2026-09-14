@@ -119,19 +119,26 @@
                                 {%- set publishedDataLicensePath = [licensePrefix, uuids.publishedDataLicenseQUuid]|reply_path -%}
                                 {%- set publishedDataLicenseAUuid = repliesMap[publishedDataLicensePath]|reply_str_value -%}
                                 <div class="license-entry{{ ' joined-policy' if publishedDataLicenseAUuid in [uuids.publishedDataLicenseCC0AUuid, uuids.publishedDataLicenseCCBYAUuid] else '' }}" data-item-id="{{ k }}">
-                                {%- set licensePrefix = [licensesPath, k]|reply_path -%}
                                 {%- set licenseStartPath = [licensePrefix, uuids.publishedDataLicenseStartQUuid]|reply_path -%}
                                 {%- set licenseStart = repliesMap[licenseStartPath]|reply_str_value -%}
+                                {% set licenseSummary %}
                                 {% if licenseStart %}
-                                    <div class="answer-lead"><p>Licence start date: {{ licenseStart|e }}.</p></div>
+                                    {% set licenseDate = macros.calendarDate(licenseStart) %}
+                                    <p>Licence start date: {{ licenseDate }}.</p>
                                 {% endif %}
-                                
-                                {%- set publishedDataLicensePath = [licensePrefix, uuids.publishedDataLicenseQUuid]|reply_path -%}
-                                {%- set publishedDataLicenseAUuid = repliesMap[publishedDataLicensePath]|reply_str_value -%}
                                 {%- if publishedDataLicenseAUuid == uuids.publishedDataLicenseCC0AUuid %}
                                     <p>Freely available for any use (public domain or CC0).</p>
                                 {%- elif publishedDataLicenseAUuid == uuids.publishedDataLicenseCCBYAUuid %}
                                     <p>Freely available with obligation to quote the source (e.g. CC-BY).</p>
+                                {%- elif publishedDataLicenseAUuid == uuids.publishedDataLicenseRestrictAUuid %}
+                                    <p>Access to this distribution is subject to restrictions.</p>
+                                {% endif %}
+                                {% endset %}
+                                {% if licenseSummary|striptags|trim %}
+                                  <div class="answer-lead"><div class="license-summary dataset-policy">{{ licenseSummary }}</div></div>
+                                {% endif %}
+                                {% if publishedDataLicenseAUuid in [uuids.publishedDataLicenseCC0AUuid, uuids.publishedDataLicenseCCBYAUuid] %}
+                                    {# All standard licence facts are in the summary above. #}
                                 {%- elif publishedDataLicenseAUuid == uuids.publishedDataLicenseRestrictAUuid -%}
                                     {%- set licenseRestrictConditionsPath = [publishedDataLicensePath, uuids.publishedDataLicenseRestrictAUuid, uuids.licenseRestrictConditionsQUuid]|reply_path -%}
                                     {%- set licenseRestrictConditions = repliesMap[licenseRestrictConditionsPath]|reply_str_value -%}
@@ -142,27 +149,40 @@
                                     {%- set licenseRestrictMetadataPath = [publishedDataLicensePath, uuids.publishedDataLicenseRestrictAUuid, uuids.licenseRestrictMetadataQUuid]|reply_path -%}
                                     {%- set licenseRestrictMetadataAUuid = repliesMap[licenseRestrictMetadataPath]|reply_str_value %}
                                     
-                                    <div class="answer-lead"><p>Access to this distribution is subject to restrictions.</p></div>
                                     {% if licenseRestrictConditions %}
                                       <div class="answer-detail">{{ licenseRestrictConditions|markdown }}</div>
                                     {% else %}
                                       <p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">The conditions of restricted access have not been provided.</p>
                                     {% endif %}
+                                    <div class="restriction-process dataset-policy">
                                     {%- if licenseRestrictAccessAUuid == uuids.licenseRestrictAccessRequestAUuid %}
-                                    Re-users will be able to get access by request to the contact person.
+                                    <p>Re-users will be able to get access by request to the contact person.</p>
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessCommitteeAUuid %}
-                                    Re-users can request access through the project's Data Access Committee.
+                                    <p>Re-users can request access through the project's Data Access Committee.</p>
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessAnotherAUuid -%}
                                     {%- set licenseRestrictAccessAnotherPath = [licenseRestrictAccessPath, uuids.licenseRestrictAccessAnotherAUuid, uuids.licenseRestrictAccessAnotherQUuid]|reply_path -%}
                                     {%- set licenseRestrictAccessAnother = repliesMap[licenseRestrictAccessAnotherPath]|reply_str_value %}
-                                    Re-users will be able to get access through a specialized process{{ ": " ~ licenseRestrictAccessAnother|markdown if licenseRestrictAccessAnother else "." }}
+                                    <p>Access requests will follow a specialized process.</p>
+                                    {% if licenseRestrictAccessAnother %}
+                                      <div class="answer-detail" data-fact-id="restriction-custom-process" data-status="complete">{{ licenseRestrictAccessAnother|markdown }}</div>
+                                    {% else %}
+                                      <div class="reading-gap"><p class="data-gap" data-fact-id="restriction-custom-process" data-status="missing">The specialized access process has not been described.</p></div>
+                                    {% endif %}
+                                    {% else %}
+                                      <div class="reading-gap"><p class="data-gap" data-fact-id="restriction-access-process" data-status="missing">How to request restricted access has not been specified.</p></div>
                                     {%- endif -%}
                                     {%- if licenseRestrictMetadataAUuid == uuids.licenseRestrictMetadataYesAUuid %}
-                                    The conditions will be published as part of open metadata.
+                                    <p>The conditions will be published as part of open metadata.</p>
+                                    {% elif licenseRestrictMetadataAUuid == uuids.licenseRestrictMetadataNoAUuid %}
+                                    <p>The conditions will not be published as part of open metadata.</p>
+                                    {% else %}
+                                      <div class="reading-gap"><p class="data-gap" data-fact-id="restriction-metadata-publication" data-status="missing">It has not been specified whether the access conditions will be included in open metadata.</p></div>
                                     {%- endif -%}
                                     {% if licenseRestrictLink %}
-                                    Restriction details: <a href="{{ licenseRestrictLink }}" target="_blank">{{ licenseRestrictLink }}</a>.
+                                    {% set restrictionLink %}<a href="{{ licenseRestrictLink|e }}" target="_blank">{{ licenseRestrictLink|e }}</a>{% endset %}
+                                    <p>Restriction details: {{ restrictionLink }}.</p>
                                     {% endif %}
+                                    </div>
                                 {% else %}
                                     <p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>
                                 {%- endif -%}

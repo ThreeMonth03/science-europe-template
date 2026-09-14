@@ -3,7 +3,7 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.5`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.3.6`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
@@ -39,6 +39,10 @@ The 0.3.5 [reading-polish experiment](docs/reading-polish.md) consolidates Q2
 missing-field prompts, keeps short quantities together, and joins only owned
 Q10 sentences. Navigation updates here do not change bilingual package content;
 the stable package description is maintained in `PACKAGE_README.md`.
+
+The 0.3.6 [sharing/preservation experiment](docs/sharing-preservation.md) joins
+bounded licence and preservation prose, retains custom process paragraphs and
+missing decisions, and prevents line breaks inside marked licence dates.
 
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers

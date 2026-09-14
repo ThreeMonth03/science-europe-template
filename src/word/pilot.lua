@@ -21,6 +21,18 @@ function Para(paragraph)
   end
 end
 
+-- Only an explicitly marked ISO-shaped date gets non-breaking hyphens in Word.
+-- Leave file names, URLs and authored prose unchanged.
+function Span(span)
+  if span.classes:includes("date-value") then
+    local value = pandoc.utils.stringify(span)
+    if value:match("^%d%d%d%d%-%d%d%-%d%d$") then
+      span.content = {pandoc.Str(value:gsub("-", utf8.char(0x2011)))}
+      return span
+    end
+  end
+end
+
 -- Keep genuinely short lists together, without making long free answers unbreakable.
 function BulletList(list)
   if #list.content > 1 and #list.content <= 3 and #pandoc.utils.stringify(list) <= 600 then
@@ -43,7 +55,7 @@ function Div(div)
       for _, block in ipairs(blocks) do
         if block.t == "Div" and (
           block.classes:includes("joined-policy") or
-          (owned and block.classes:includes("answer-lead")) or
+          (owned and (block.classes:includes("answer-lead") or block.classes:includes("license-summary"))) or
           (block.attributes["data-fact-id"] == "distribution-access" and
             (block.attributes["data-status"] == "complete" or block.attributes["data-status"] == "explicit-no"))
         ) then
