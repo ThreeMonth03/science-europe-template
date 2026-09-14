@@ -68,7 +68,7 @@
               {%- set distroRepositoryKindPath = [distroPrefix, uuids.publishedDataRepositoryKindQUuid]|reply_path -%}
               {%- set distroRepositoryKindAUuid = repliesMap[distroRepositoryKindPath]|reply_str_value -%}
                 <li class="repository-distribution" data-item-id="{{ j }}">
-                  {% if distrosItems|length > 1 %}<span class="repository-label"><strong>Distribution {{ loop.index }}:</strong></span> {% endif %}
+                  {% if distrosItems|length > 1 %}<span class="repository-label">Distribution {{ loop.index }}:</span> {% endif %}
                   {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
                     Domain-specific repository
                     {%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}

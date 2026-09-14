@@ -24,6 +24,11 @@ end
 -- Only an explicitly marked ISO-shaped date gets non-breaking hyphens in Word.
 -- Leave file names, URLs and authored prose unchanged.
 function Span(span)
+  if span.classes:includes("repository-label") then
+    -- Own label emphasis here: translation handles words, not decorative markup.
+    span.content = {pandoc.Strong(span.content)}
+    return span
+  end
   if span.classes:includes("date-value") then
     local value = pandoc.utils.stringify(span)
     if value:match("^%d%d%d%d%-%d%d%-%d%d$") then

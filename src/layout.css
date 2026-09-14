@@ -84,6 +84,7 @@ html body .short-reading-unit, html body .ethical-data-flags { break-inside: avo
 html body .short-table-unit { break-inside: avoid; }
 /* Q11 emits this hint only for <=3 bounded, inline-only repository summaries. */
 html body .short-repository-list { break-inside: avoid; }
+html body .repository-label { font-weight: bold; }
 html body .reading-gap { margin: .5em 0; }
 html body .reading-gap > p { margin-bottom: 0; }
 html body .answer-reference { font-size: 9.5pt; color: #526169; margin-top: .7em; }

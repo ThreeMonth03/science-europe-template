@@ -8,6 +8,8 @@ appear only for multiple distributions. A missing repository choice retains its
 row and number with an explicit gap; an unsupported choice is a review issue,
 not a missing answer. The lead describes destinations without asserting every
 respondent has supplied one. Long-term-support states remain distribution-local.
+Label weight belongs to the shared PDF CSS / Word Lua layer, not decorative
+markup inside translation units. Native checks must verify it in both languages.
 
 Only inline-only lists with at most three items and at most 900 normalized
 characters receive the `short-repository-list` keep hint. Arbitrary contact
