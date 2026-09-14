@@ -22,6 +22,7 @@
         "src/quality-control.html.j2",
         "src/questions/04-quality-control.html.j2",
         "src/questions/01-how-data.html.j2",
+        "src/questions/02-what-data.html.j2",
         "src/questions/05-store-backup.html.j2",
         "src/questions/06-access-security.html.j2",
         "src/questions/03-docs-metadata.html.j2",

@@ -37,6 +37,47 @@ end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
+  if div.classes:includes("short-table-unit") then
+    -- Recheck AST bounds independently of the HTML hint. Keep every cell in
+    -- non-final rows with the next row; the final row must NOT keep Q2 with it.
+    local rows, paragraphs, simple, tables = {}, {}, true, 0
+    for index, block in ipairs(div.content) do
+      if block.t == "Para" or block.t == "Plain" then
+        if tables > 0 then simple = false end
+        table.insert(paragraphs, index)
+      elseif block.t == "Table" then
+        tables = tables + 1
+        if #block.colspecs > 4 or #block.caption.long > 0 then simple = false end
+        for _, row in ipairs(block.head.rows) do table.insert(rows, row) end
+        for _, body in ipairs(block.bodies) do
+          for _, row in ipairs(body.head) do table.insert(rows, row) end
+          for _, row in ipairs(body.body) do table.insert(rows, row) end
+        end
+        for _, row in ipairs(block.foot.rows) do table.insert(rows, row) end
+      else simple = false end
+    end
+    if tables ~= 1 or #rows < 2 or #rows > 4 or utf8.len(pandoc.utils.stringify(div)) > 500 then simple = false end
+    for _, row in ipairs(rows) do
+      if #row.cells > 4 then simple = false end
+      for _, cell in ipairs(row.cells) do
+        if cell.row_span ~= 1 or cell.col_span ~= 1 or #cell.contents ~= 1 or utf8.len(pandoc.utils.stringify(cell.contents)) > 80 then simple = false end
+        for _, block in ipairs(cell.contents) do
+          if block.t ~= "Para" and block.t ~= "Plain" then simple = false end
+        end
+      end
+    end
+    if simple then
+      for _, index in ipairs(paragraphs) do
+        div.content[index] = pandoc.Div({pandoc.Para(div.content[index].content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Table Lead"}))
+      end
+      for index = 1, #rows - 1 do
+        for _, cell in ipairs(rows[index].cells) do
+          cell.contents = {pandoc.Div({pandoc.Para(cell.contents[1].content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Table Lead"}))}
+        end
+      end
+    end
+    return div
+  end
   if div.classes:includes("short-reading-unit") and utf8.len(pandoc.utils.stringify(div)) <= 500 then
     -- Only bounded owned prose. Preserve nested divs and inline content, and
     -- reject free-answer/list/table units rather than making them unbreakable.

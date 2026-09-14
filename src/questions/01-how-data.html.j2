@@ -534,7 +534,7 @@
           {%- set provenanceOther = repliesMap[provenanceOtherPath]|reply_str_value -%}
           {%- if provenanceOther -%}
             <div class="answer-detail" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">
-              {{ provenanceOther|markdown }}
+              {{ macros.provenanceReading(provenanceOther) }}
             </div>
           {%- else -%}
             <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance-detail" data-status="missing"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>

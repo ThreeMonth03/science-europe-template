@@ -11,50 +11,68 @@
     {%- if measuredDataItems|length > 0 -%}
       <div>
       <h4>Instrument datasets</h4>
-      The following instrument datasets will be acquired in the project:
-      <ul>
         {%- for datasetItem in measuredDataItems -%}
           {%- set pathPrefix = [measuredDataPath, datasetItem]|reply_path -%}
-          <li>
+          <div class="collection-dataset" data-item-id="{{ datasetItem }}">
             {%- set measuredDataNamePath = [pathPrefix, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataName = repliesMap[measuredDataNamePath]|reply_str_value -%}
             {%- set measuredDataWhoPath = [pathPrefix, uuids.measuredDataWhoQUuid]|reply_path -%}
             {%- set measuredDataWhoAUuid = repliesMap[measuredDataWhoPath]|reply_str_value -%}
             {%- set measuredDataEquipPath = [pathPrefix, uuids.measuredDataEquipQUuid]|reply_path -%}
             {%- set measuredDataEquipAUuid = repliesMap[measuredDataEquipPath]|reply_str_value -%}
-            <strong>{{ measuredDataName if measuredDataName else "(no name given)" }}</strong>
+            {%- set collectionName -%}{% if measuredDataName %}{{ measuredDataName|e }}{% else %}<span>(no name given)</span>{% endif %}{%- endset -%}
+            {%- set collectionSentences = [] -%}
+            {%- set ownershipOther = "" -%}
+            {%- set ownershipMissing = false -%}
             {# Who will collect #}
             {%- if measuredDataWhoAUuid == uuids.measuredDataWhoExpertsOwnAUuid -%}
-              <p>This dataset will be collected by experts in the project, with our own equipment.</p>
+              {%- do collectionSentences.append("This dataset will be collected by experts in the project, with our own equipment.") -%}
             {%- elif measuredDataWhoAUuid == uuids.measuredDataWhoExpertsOutAUuid -%}
-              <p>This dataset will be collected by experts in the project, at a specialized infrastructure.</p>
+              {%- do collectionSentences.append("This dataset will be collected by experts in the project, at a specialized infrastructure.") -%}
             {%- elif measuredDataWhoAUuid == uuids.measuredDataWhoExternalAUuid -%}
               {%- set mdExternalOwnershipPath = [measuredDataWhoPath, uuids.measuredDataWhoExternalAUuid, uuids.mdExternalOwnershipQUuid]|reply_path -%}
               {%- set mdExternalOwnershipAUuid = repliesMap[mdExternalOwnershipPath]|reply_str_value -%}
-              <p>
-                This dataset will be collected by an external party.
+              {%- do collectionSentences.append("This dataset will be collected by an external party.") -%}
                 {% if mdExternalOwnershipAUuid == uuids.mdExternalOwnershipPartyAUuid -%}
-                  The ownership of the resulting data will remain with the external party.
+                  {%- do collectionSentences.append("The ownership of the resulting data will remain with the external party.") -%}
                 {%- elif mdExternalOwnershipAUuid == uuids.mdExternalOwnershipPartnersAUuid -%}
-                  The project partners acquire full ownership of the data.
+                  {%- do collectionSentences.append("The project partners acquire full ownership of the data.") -%}
                 {%- elif mdExternalOwnershipAUuid == uuids.mdExternalOwnershipOtherAUuid -%}
                   {%- set mdExternalOwnershipOtherPath = [mdExternalOwnershipPath, uuids.mdExternalOwnershipOtherAUuid, uuids.mdExternalOwnershipOtherQUuid]|reply_path -%}
                   {%- set mdExternalOwnershipOther = repliesMap[mdExternalOwnershipOtherPath]|reply_str_value -%}
-                  {%- if mdExternalOwnershipOther -%}
-                    For the ownership of the data we have made the following arrangements: {{ mdExternalOwnershipOther|markdown }}
-                  {%- endif -%}
+                  {%- set ownershipOther = mdExternalOwnershipOther -%}
+                  {%- set ownershipMissing = not mdExternalOwnershipOther -%}
+                {%- else -%}
+                  {%- set ownershipMissing = true -%}
                 {%- endif -%}
-              </p>
             {%- endif -%}
             {# Equipment standard? #}
             {% if measuredDataEquipAUuid == uuids.measuredDataEquipDescribedAUuid -%}
-              <p>The equipment is very well described and known.</p>
+              {%- do collectionSentences.append("The equipment is very well described and known.") -%}
             {%- elif measuredDataEquipAUuid == uuids.measuredDataEquipCareAUuid -%}
-              <p>The equipment is less well described or not completely standard, so we will need to take extra care documenting the process.</p>
+              {%- do collectionSentences.append("The equipment is less well described or not completely standard, so we will need to take extra care documenting the process.") -%}
             {%- endif -%}
-          </li>
+            {% if collectionSentences %}
+              <p class="collection-summary">Data collection for <strong>{{ collectionName }}</strong>: {{ collectionSentences|join(" ") }}</p>
+            {% else %}
+              <p class="collection-summary">Data collection for <strong>{{ collectionName }}</strong> has not yet been described.</p>
+            {% endif %}
+            {% if measuredDataWhoAUuid not in [uuids.measuredDataWhoExpertsOwnAUuid, uuids.measuredDataWhoExpertsOutAUuid, uuids.measuredDataWhoExternalAUuid] %}
+              <p class="data-gap" data-requirement-id="SE-1b" data-fact-id="data-collector" data-status="missing">Information not provided: who will collect this dataset.</p>
+            {% endif %}
+            {% if measuredDataEquipAUuid not in [uuids.measuredDataEquipDescribedAUuid, uuids.measuredDataEquipCareAUuid] %}
+              <p class="data-gap" data-requirement-id="SE-1b" data-fact-id="equipment-documentation" data-status="missing">Information not provided: whether the equipment is adequately documented or needs additional process documentation.</p>
+            {% endif %}
+            {% if ownershipOther %}
+              <div class="answer-detail" data-fact-id="external-ownership" data-status="complete">
+                <div class="answer-lead"><p>Data ownership arrangements:</p></div>
+                {{ ownershipOther|markdown }}
+              </div>
+            {% elif ownershipMissing %}
+              <p class="data-gap" data-requirement-id="SE-1b" data-fact-id="external-ownership" data-status="missing">Information not provided: ownership arrangements for data collected by the external party.</p>
+            {% endif %}
+          </div>
         {%- endfor -%}
-      </ul>
       </div>
     {%- endif -%}
   {%- endif -%}
@@ -96,9 +114,10 @@
               {{ typesNames[0] }}, {{ typesNames[1] }}, and {{ typesNames[2] }}.
           {%- endif -%}
         {% endif %}
+      </p>
         {# Datasets #}
         {%- if neqDataSetsItems|length > 0 -%}
-          The non-equipment datasets are:
+          <p>The non-equipment datasets are:</p>
           <ul>
           {%- for neqDataSetItem in neqDataSetsItems -%}
             {%- set pathPrefix = [neqDataSetsPath, neqDataSetItem]|reply_path -%}
@@ -106,12 +125,11 @@
             {%- set neqDataSetsDesc = repliesMap[[pathPrefix, uuids.neqDataSetsDescQUuid]|reply_path]|reply_str_value -%}
             <li>
               <strong>{{ neqDataSetsName if neqDataSetsName else "(no name given)" }}</strong>
-              {% if neqDataSetsDesc -%}<span class="separator">&ndash;</span> {{ neqDataSetsDesc|markdown }}{%- endif -%}
+              {% if neqDataSetsDesc -%}<div class="answer-detail">{{ neqDataSetsDesc|markdown }}</div>{%- endif -%}
             </li>
           {%- endfor -%}
           </ul>
         {%- endif -%}
-      </p>
       </div>
     {%- endif -%}
   {%- endif -%}

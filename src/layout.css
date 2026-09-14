@@ -80,6 +80,8 @@ html body .license-entry + .license-entry { border-top: 1px dotted #cbd2d5; padd
 html body .storage-detail-limits li { margin-bottom: .25em; }
 /* Narrow reading units, not whole-question keep-together rules. */
 html body .short-reading-unit, html body .ethical-data-flags { break-inside: avoid; }
+/* Only provenanceReading marks bounded, simple tables; long answers stay free. */
+html body .short-table-unit { break-inside: avoid; }
 html body .reading-gap { margin: .5em 0; }
 html body .reading-gap > p { margin-bottom: 0; }
 html body .answer-reference { font-size: 9.5pt; color: #526169; margin-top: .7em; }

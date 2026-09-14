@@ -93,6 +93,10 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     list_lead = document.styles.add_style("Pilot List Lead", WD_STYLE_TYPE.PARAGRAPH)
     list_lead.base_style = document.styles["Compact"]
     list_lead.paragraph_format.keep_with_next = True
+    table_lead = document.styles.add_style("Pilot Table Lead", WD_STYLE_TYPE.PARAGRAPH)
+    table_lead.base_style = document.styles["Compact"]
+    table_lead.paragraph_format.keep_with_next = True
+    table_lead.paragraph_format.keep_together = True
     document.save(reference)
     # python-docx assigns wall-clock ZIP timestamps; canonicalize for rebuilds.
     original = reference.read_bytes()

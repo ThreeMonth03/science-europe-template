@@ -1,4 +1,25 @@
 {# Formatting macros #}
+{%- macro provenanceReading(value) -%}
+  {# Conservative keep hint, never a Markdown rewrite. Unknown/complex HTML
+     remains breakable. Bounds include the lead, header and every data cell. #}
+  {%- set rendered = value|markdown -%}
+  {%- set small = namespace(ok=rendered.count('<table>') == 1 and rendered.count('</table>') == 1 and rendered.count('<tr>') >= 2 and rendered.count('<tr>') <= 4 and rendered|striptags|length <= 500) -%}
+  {%- for fragment in rendered.split('<')[1:] -%}
+    {%- if fragment.split('>')[0] not in ['p', '/p', 'table', '/table', 'thead', '/thead', 'tbody', '/tbody', 'tr', '/tr', 'th', '/th', 'td', '/td', 'strong', '/strong', 'em', '/em', 'code', '/code'] -%}
+      {%- set small.ok = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- for row in rendered.split('<tr>')[1:] -%}
+    {%- set cells = row.split('</tr>')[0] -%}
+    {%- if cells.count('<td>') + cells.count('<th>') > 4 -%}{%- set small.ok = false -%}{%- endif -%}
+  {%- endfor -%}
+  {%- set normalized = rendered|replace('<th>', '<td>')|replace('</th>', '</td>') -%}
+  {%- for cell in normalized.split('<td>')[1:] -%}
+    {%- if cell.split('</td>')[0]|striptags|length > 80 -%}{%- set small.ok = false -%}{%- endif -%}
+  {%- endfor -%}
+  {% if small.ok %}<div class="short-table-unit">{{ rendered }}</div>{% else %}{{ rendered }}{% endif %}
+{%- endmacro -%}
+
 {%- macro formatEmail(email) -%}
   <span class="contact-email"><a href="mailto:{{ email }}">{{ email }}</a></span>
 {%- endmacro -%}
