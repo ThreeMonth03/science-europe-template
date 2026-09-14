@@ -131,7 +131,7 @@
       <p data-fact-id="during-project-archive" data-status="explicit-no">Data will not be archived in cold storage during the project.</p>
     {% endif %}
     <div class="data-gap template-gap storage-detail-limits">
-      <p>The mapped answers describe storage arrangements and backup needs, but do not establish all operational details:</p>
+    <p>The fields mapped by this template are insufficient to establish the following operational details:</p>
       <ul>
         <li data-requirement-id="SE-3a" data-fact-id="storage-location" data-status="{{ 'partial' if remoteKnown else 'unmapped' }}">Exact working-storage and backup locations are not established by these mapped answers.</li>
         <li data-requirement-id="SE-3a" data-fact-id="backup-frequency" data-status="{{ 'partial' if frequencyKnown else 'unmapped' }}">An actual backup schedule is not established by these mapped answers; a need for frequent backups is not a schedule.</li>

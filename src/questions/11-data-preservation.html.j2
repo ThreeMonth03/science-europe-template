@@ -68,7 +68,7 @@
               {%- set distroRepositoryKindPath = [distroPrefix, uuids.publishedDataRepositoryKindQUuid]|reply_path -%}
               {%- set distroRepositoryKindAUuid = repliesMap[distroRepositoryKindPath]|reply_str_value -%}
               {%- if distroRepositoryKindAUuid -%}
-                <li>
+                <li class="repository-distribution" data-item-id="{{ j }}">
                   {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
                     Domain-specific repository
                     {%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
@@ -109,7 +109,11 @@
                     {%- set specialRepoLongTermSupportPath = [distroRepositoryKindPath, uuids.publishedDataRepositorySpecialAUuid, uuids.specialRepoLongTermSupportQUuid]|reply_path -%}
                     {%- set specialRepoLongTermSupportAUuid = repliesMap[specialRepoLongTermSupportPath]|reply_str_value -%}
                     {%- if specialRepoLongTermSupportAUuid == uuids.specialRepoLongTermSupportYesAUuid %}
-                      We will be able to support this repository for a sufficiently long time.
+                      <span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="complete">We will be able to support this repository for a sufficiently long time.</span>
+                    {%- elif specialRepoLongTermSupportAUuid == uuids.specialRepoLongTermSupportNoAUuid %}
+                      <span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="explicit-no">We will not be able to support this repository for a sufficiently long time.</span>
+                    {%- else %}
+                      <span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="missing">Whether we will be able to support this repository for a sufficiently long time has not been specified.</span>
                     {%- endif -%}
                     {# Service level #}
                     {%- set specialRepoServiceLevelPath = [distroRepositoryKindPath, uuids.publishedDataRepositorySpecialAUuid, uuids.specialRepoServiceLevelQUuid]|reply_path -%}
