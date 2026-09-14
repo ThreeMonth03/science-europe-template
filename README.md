@@ -3,8 +3,11 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.12`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.3.13`, so it cannot overwrite
 > the official template accidentally.
+
+The 0.3.13 [paper reference experiment](docs/paper-reference.md) moves the full
+related-paper value into its own reference row after the preservation prose.
 
 The 0.3.12 [preservation context flow experiment](docs/preservation-context-flow.md)
 joins adjacent template-owned Q11 context and policy sentences. It preserves

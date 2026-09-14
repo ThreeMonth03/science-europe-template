@@ -1,0 +1,16 @@
+{# A reference is not a preservation decision. Keep its full scalar value outside
+   the owned policy run, and gate it by its own stage question, not publication. #}
+{% set paperStagePath = [pathPrefix, uuids.producedDataStageQUuid]|reply_path %}
+{% if repliesMap[paperStagePath]|reply_str_value == uuids.producedDataStagePublishedAUuid %}
+  {% set paper = repliesMap[[paperStagePath, uuids.producedDataStagePublishedAUuid, uuids.producedDataPaperQUuid]|reply_path]|reply_str_value %}
+  {% if paper|trim %}
+    {# Conservative whole-value HTTP(S) linking, not URL extraction or repair.
+       Never shorten the displayed value or append template punctuation to it. #}
+    {% set paperLink = namespace(eligible=false) %}
+    {% if (paper.startswith('https://') or paper.startswith('http://')) and paper.split()|join('') == paper and '<' not in paper and '>' not in paper and '"' not in paper and '\\' not in paper %}
+      {% set authority = paper.split('://', 1)[1].split('/', 1)[0].split('?', 1)[0].split('#', 1)[0] %}
+      {% set paperLink.eligible = authority|length > 0 and '@' not in authority %}
+    {% endif %}
+    <div class="paper-reference" data-fact-id="preservation-related-paper" data-status="complete"><p><span class="paper-reference-label">Related paper:</span> <span class="paper-reference-value">{% if paperLink.eligible %}<a href="{{ paper|e }}">{{ paper|e }}</a>{% else %}{{ paper|e }}{% endif %}</span></p></div>
+  {% endif %}
+{% endif %}

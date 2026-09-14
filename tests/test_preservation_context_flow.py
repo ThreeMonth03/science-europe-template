@@ -31,7 +31,8 @@ class PreservationContextFlowTests(unittest.TestCase):
                 run = next(r for r in runs(policy) if stage in r)
                 self.assertTrue(any('This dataset will' in p.get_text() for p in run))
             paper = soup.select_one('[data-fact-id="preservation-related-paper"]')
-            self.assertIs(paper.parent, soup.select_one('.preservation-summary'))
+            self.assertIs(paper.parent, soup.select_one('.dataset-section'))
+            self.assertIsNone(paper.find_parent(class_='preservation-summary'))
 
     def test_authored_blocks_remain_byte_identical_and_interrupt_runs(self):
         replies = plain('preservation-custom')

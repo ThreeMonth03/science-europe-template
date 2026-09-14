@@ -55,6 +55,8 @@ html body .dataset-version p { margin-bottom: .2em; }
 html body .dataset-policy > p { display: inline; margin: 0; }
 html body .dataset-policy > p::after { content: ' '; }
 html body .dataset-policy { margin: .4em 0 .6em; }
+/* Q11 scalar references may wrap, but their original text/href is never edited. */
+html body .paper-reference { overflow-wrap: anywhere; word-break: break-word; }
 html body .answer-detail ul { margin-top: .2em; }
 html body .answer-detail li { margin-bottom: .2em; }
 html body .answer-detail ul:has(> li:last-child:nth-child(-n+3)) { break-inside: avoid; }

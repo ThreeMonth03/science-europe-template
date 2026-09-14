@@ -14,6 +14,4 @@
   <p data-fact-id="preservation-data-stage" data-status="complete">This dataset contains processed data leading to unpublishable results.</p>
 {% elif stage == uuids.producedDataStagePublishedAUuid %}
   <p data-fact-id="preservation-data-stage" data-status="complete">This dataset contains processed data leading to published results.</p>
-  {% set paper = repliesMap[[stagePath, uuids.producedDataStagePublishedAUuid, uuids.producedDataPaperQUuid]|reply_path]|reply_str_value %}
-  {% if paper|trim %}<p data-fact-id="preservation-related-paper" data-status="complete">Related paper: {{ paper|e }}.</p>{% endif %}
 {% endif %}

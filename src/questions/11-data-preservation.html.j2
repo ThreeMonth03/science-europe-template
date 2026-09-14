@@ -60,6 +60,7 @@
             {%- endif -%}
           {%- endif -%}
           </div>
+          {% include "src/preservation-paper.html.j2" %}
            {# Distributions #}
           {% set distrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
           {%- set distrosItems = repliesMap[distrosPath]|reply_items -%}
