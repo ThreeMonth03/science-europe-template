@@ -15,6 +15,13 @@ without credentials / quotes / angle brackets / backslashes, is linked. This is
 conservative eligibility, not a general URL validator. Do not extract or repair
 embedded URLs. Other values remain literal text.
 
+Capture the translatable label separately from conditional value markup. The
+first combined prototype lost span wrappers when a reviewed plain-text label was
+applied by the translation pipeline; the bilingual structure audit rejected it.
+The source fix isolates the label without changing its visible placement. Keep
+that boundary on upgrades rather than repairing generated Chinese or weakening
+the audit.
+
 The paper follows its own data-stage branch. It is not gated by the independent
 publication decision, and a stale paper under another stage must not leak.
 Missing / blank values retain the prior behavior: no empty reference row, while

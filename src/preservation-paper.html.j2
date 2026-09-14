@@ -11,6 +11,8 @@
       {% set authority = paper.split('://', 1)[1].split('/', 1)[0].split('?', 1)[0].split('#', 1)[0] %}
       {% set paperLink.eligible = authority|length > 0 and '@' not in authority %}
     {% endif %}
-    <div class="paper-reference" data-fact-id="preservation-related-paper" data-status="complete"><p><span class="paper-reference-label">Related paper:</span> <span class="paper-reference-value">{% if paperLink.eligible %}<a href="{{ paper|e }}">{{ paper|e }}</a>{% else %}{{ paper|e }}{% endif %}</span></p></div>
+    {# Capture the translatable label separately from the conditional value markup. #}
+    {% set paperLabel %}<span class="paper-reference-label">Related paper:</span>{% endset %}
+    <div class="paper-reference" data-fact-id="preservation-related-paper" data-status="complete"><p>{{ paperLabel }} <span class="paper-reference-value">{% if paperLink.eligible %}<a href="{{ paper|e }}">{{ paper|e }}</a>{% else %}{{ paper|e }}{% endif %}</span></p></div>
   {% endif %}
 {% endif %}
