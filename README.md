@@ -35,6 +35,11 @@ The 0.3.1 [narrative and pagination experiment](docs/narrative-pagination.md)
 consolidates archival facts in Q5, preserves the independent Q6 security gap,
 and tests bounded reading units and long free answers in PDF and Word.
 
+The 0.3.5 [reading-polish experiment](docs/reading-polish.md) consolidates Q2
+missing-field prompts, keeps short quantities together, and joins only owned
+Q10 sentences. Navigation updates here do not change bilingual package content;
+the stable package description is maintained in `PACKAGE_README.md`.
+
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers
 to the [Science Europe Guidance Document](https://scienceeurope.org/media/4brkxxe5/se_rdm_practical_guide_extended_final.pdf).
