@@ -3,8 +3,12 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.8`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.3.12`, so it cannot overwrite
 > the official template accidentally.
+
+The 0.3.12 [preservation context flow experiment](docs/preservation-context-flow.md)
+joins adjacent template-owned Q11 context and policy sentences. It preserves
+authored paragraphs and visible gaps; no questionnaire facts or wording change.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
 answers are rendered in the Q1/Q5/Q15 pilot. Covered unanswered branches display

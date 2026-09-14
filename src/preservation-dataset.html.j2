@@ -1,11 +1,11 @@
-{# Per-produced-dataset facts. Description and stage are not preservation decisions. #}
+{# Included inside Q11's dataset-policy. Only direct owned paragraphs may join.
+   Description and stage are context, not evidence of preservation decisions. #}
 {% set producedDescription = repliesMap[[pathPrefix, uuids.producedDataDescriptionQUuid]|reply_path]|reply_str_value %}
 {% if producedDescription|trim %}
   <div class="answer-detail" data-fact-id="preservation-dataset-description" data-status="complete">{{ producedDescription|markdown }}</div>
 {% endif %}
 {% set stagePath = [pathPrefix, uuids.producedDataStageQUuid]|reply_path %}
 {% set stage = repliesMap[stagePath]|reply_str_value %}
-<div class="dataset-policy">
 {% if stage == uuids.producedDataStageRawAUuid %}
   <p data-fact-id="preservation-data-stage" data-status="complete">This dataset contains raw data.</p>
 {% elif stage == uuids.producedDataStageIntermediateAUuid %}
@@ -17,4 +17,3 @@
   {% set paper = repliesMap[[stagePath, uuids.producedDataStagePublishedAUuid, uuids.producedDataPaperQUuid]|reply_path]|reply_str_value %}
   {% if paper|trim %}<p data-fact-id="preservation-related-paper" data-status="complete">Related paper: {{ paper|e }}.</p>{% endif %}
 {% endif %}
-</div>

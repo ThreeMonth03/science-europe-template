@@ -13,8 +13,10 @@
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
         <div class="dataset-section" data-item-id="{{ i }}">
           <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
-          {% include "src/preservation-dataset.html.j2" %}
           <div class="preservation-summary dataset-policy">
+          {# One owned prose run for dataset context and preservation arrangements.
+             Authored answer-detail and reading-gap blocks remain hard boundaries. #}
+          {% include "src/preservation-dataset.html.j2" %}
           {# If will be published #}
           {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
           {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
