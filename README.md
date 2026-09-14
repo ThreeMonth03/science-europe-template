@@ -3,7 +3,7 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.7`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.3.8`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
@@ -48,6 +48,11 @@ The 0.3.7 [preservation-coverage experiment](docs/preservation-coverage.md)
 restores selected dataset descriptions, non-publication reasons and project-wide
 post-project archival answers. It does not equate publication with preservation
 or claim to establish a complete data-selection policy.
+
+The 0.3.8 [Word rhythm experiment](docs/word-rhythm.md) adjusts relative line
+spacing and the distinction between heading/list/body spacing without changing
+Jinja text or PDF CSS. The accompanying [selection-policy review](docs/selection-policy-review.md)
+records verified mapping limits and a proposed future KM design, not new answers.
 
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers

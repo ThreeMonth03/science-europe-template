@@ -64,9 +64,11 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         if name in document.styles:
             item = document.styles[name]
             item.font.size = Pt(10.5)
-            item.paragraph_format.line_spacing = 1.4
+            # A relative line height keeps mixed-script text expandable. Do not
+            # use an exact height or smaller type merely to reduce page count.
+            item.paragraph_format.line_spacing = 1.2
             item.paragraph_format.space_before = Pt(0)
-            item.paragraph_format.space_after = Pt(4)
+            item.paragraph_format.space_after = Pt(2 if name == "Compact" else 4)
             item.paragraph_format.widow_control = True
     for level, size in enumerate((21, 15, 11, 11, 10.5), 1):
         if f"Heading {level}" in document.styles:
@@ -80,8 +82,8 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
             item.paragraph_format.keep_together = True
             item.paragraph_format.page_break_before = False
-            item.paragraph_format.space_before = Pt(12)
-            item.paragraph_format.space_after = Pt(6)
+            item.paragraph_format.space_before = Pt(8 if level >= 4 else 12)
+            item.paragraph_format.space_after = Pt(3 if level >= 4 else 4 if level == 3 else 6)
     label = document.styles.add_style("Pilot Label", WD_STYLE_TYPE.PARAGRAPH)
     label.base_style = document.styles["Body Text"]
     label.paragraph_format.keep_with_next = True

@@ -49,7 +49,7 @@
     {
       "name": "word-layout",
       "severity": "high",
-      "patterns": ["src/word/*", "src/word/**/*"]
+      "patterns": ["src/word/*", "src/word/**/*", "scripts/prepare_layout.py"]
     },
     {
       "name": "document-layout",
