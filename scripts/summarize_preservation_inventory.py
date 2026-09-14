@@ -23,6 +23,7 @@ def main():
     for lang, km in raw['knowledge_models'].items():
         by_id = {q['uuid']: q for q in km['questions']}
         selected = {name: by_id[IDS[name]] for name in SELECTED}
+        assert all(not q['static_template_references'] for q in selected.values()), 'This is a before-state omission record, not an after-state report'
         languages[lang] = {'km_sha256': km['km_sha256'], 'inventory_question_count': km['reachable_question_count'],
                            'selected_questions': selected}
     report = {'schema_version': 1, 'scope': 'Selected Q11 additions; static before-state, not DMP completeness',

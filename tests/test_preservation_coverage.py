@@ -129,6 +129,14 @@ class PreservationCoverageTests(unittest.TestCase):
         replies[key] = ''
         self.assertFalse(render(replies).select('.post-project-archive'))
 
+    def test_repository_funding_does_not_fall_under_the_cold_storage_heading(self):
+        soup=render(plain())
+        archive=soup.select_one('.post-project-archive')
+        resources=soup.select_one('.preservation-resources')
+        self.assertFalse(resources.find_parent(class_='post-project-archive'))
+        self.assertIn(archive,list(resources.next_siblings))
+        self.assertEqual('Repository costs and publication preparation',resources.find_previous('h4').get_text())
+
     def test_negative_migration_choices_remain_visible_and_unknown_is_not_no(self):
         ap = path('preservingCUuid','archivedAfterQUuid','archivedAfterYesAUuid')
         for name, fact in [('Formats','archive-format-migration'),('Media','archive-media-migration')]:
