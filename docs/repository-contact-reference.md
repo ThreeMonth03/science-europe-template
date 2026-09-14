@@ -17,6 +17,10 @@ These are document-local anchors, not persistent IDs across edited questionnaire
 
 No CSS, Lua, reference DOCX, KM bindings, official question titles or upstream
 baseline change. This remains the derivative of official 1.30.1. Upgrade checks
+retain the existing `answer-lead` rule on the Other-contact repository heading,
+so its label follows the opening of the contact answer without keeping the whole
+free answer on one page. The first unwrapped prototype orphaned a label and is
+not a final accepted sample. Upgrade checks
 must cover BOTH Q10 and Q11; a clean Git merge cannot establish that a reference
 still points to the correct answer in HTML, PDF and Word.
 
