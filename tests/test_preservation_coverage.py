@@ -136,6 +136,9 @@ class PreservationCoverageTests(unittest.TestCase):
         self.assertFalse(resources.find_parent(class_='post-project-archive'))
         self.assertIn(archive,list(resources.next_siblings))
         self.assertEqual('Repository costs and publication preparation',resources.find_previous('h4').get_text())
+        only_archive=render({path('preservingCUuid','archivedAfterQUuid'):IDS['archivedAfterNoAUuid']})
+        self.assertFalse(only_archive.select('.preservation-resources'))
+        self.assertEqual(['Project-wide cold storage after the project'],[h.get_text() for h in only_archive.select('h4')])
 
     def test_negative_migration_choices_remain_visible_and_unknown_is_not_no(self):
         ap = path('preservingCUuid','archivedAfterQUuid','archivedAfterYesAUuid')

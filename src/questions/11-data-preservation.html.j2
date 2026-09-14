@@ -137,9 +137,7 @@
       {%- endfor -%}
     {%- endif -%}
     {% set archiveChoice = repliesMap[[uuids.preservingCUuid, uuids.archivedAfterQUuid]|reply_path]|reply_str_value %}
-    {% if archiveChoice in [uuids.archivedAfterYesAUuid, uuids.archivedAfterNoAUuid] %}
-      <h4>Repository costs and publication preparation</h4>
-    {% endif %}
+    {% set resourceContent %}
     <div class="preservation-resources dataset-policy">
     {# Repository charges #}
     {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}
@@ -171,6 +169,13 @@
       <p>We have a reserved budget for the time and effort it will take to prepare the data for publication.</p>
     {%- endif -%}
     </div>
+    {% endset %}
+    {% if resourceContent|striptags|trim or '<img' in resourceContent or '<table' in resourceContent %}
+      {% if archiveChoice in [uuids.archivedAfterYesAUuid, uuids.archivedAfterNoAUuid] %}
+        <h4>Repository costs and publication preparation</h4>
+      {% endif %}
+      {{ resourceContent }}
+    {% endif %}
     {% include "src/post-project-archive.html.j2" %}
   {% endset %}
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
