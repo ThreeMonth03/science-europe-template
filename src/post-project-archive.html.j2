@@ -1,0 +1,101 @@
+{# Project-wide cold storage after the project; not a dataset's publication repository. #}
+{% set archivePath = [uuids.preservingCUuid, uuids.archivedAfterQUuid]|reply_path %}
+{% set archive = repliesMap[archivePath]|reply_str_value %}
+{% if archive in [uuids.archivedAfterYesAUuid, uuids.archivedAfterNoAUuid] %}
+<div class="post-project-archive" data-scope="project">
+<h4>Project-wide cold storage after the project</h4>
+<div class="dataset-policy">
+{% if archive == uuids.archivedAfterNoAUuid %}
+  <p data-fact-id="post-project-archive" data-status="explicit-no">The project will not use cold storage after it finishes. This answer does not rule out other forms of preservation.</p>
+{% else %}
+  <p data-fact-id="post-project-archive" data-status="complete">The project will keep copies of its data in cold storage after it finishes.</p>
+  {% set archivePrefix = [archivePath, uuids.archivedAfterYesAUuid]|reply_path %}
+  {% set payer = repliesMap[[archivePrefix, uuids.archivedAfterPayerQUuid]|reply_path]|reply_str_value %}
+  {% if payer == uuids.archivedAfterPayerGrantAUuid %}
+    <p data-fact-id="archive-payer" data-status="complete">The grant will pay for this long-term storage.</p>
+  {% elif payer == uuids.archivedAfterPayerDepartmentAUuid %}
+    <p data-fact-id="archive-payer" data-status="complete">Departmental budgets of one or more project participants will pay for this long-term storage.</p>
+  {% elif payer == uuids.archivedAfterPayerInstituteAUuid %}
+    <p data-fact-id="archive-payer" data-status="complete">One or more participating institutes have budgeted for this long-term storage service.</p>
+  {% else %}
+    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-payer" data-status="missing">The payer for post-project cold storage has not been specified.</p></div>
+  {% endif %}
+  {% set periodPath = [archivePrefix, uuids.archivedAfterPeriodQUuid]|reply_path %}
+  {% set period = repliesMap[periodPath]|reply_str_value %}
+  {% set years = '' %}
+  {% if period == uuids.archivedAfterPeriodFiveAUuid %}{% set years = '5' %}
+  {% elif period == uuids.archivedAfterPeriodTenAUuid %}{% set years = '10' %}
+  {% elif period == uuids.archivedAfterPeriodFifteenAUuid %}{% set years = '15' %}
+  {% elif period == uuids.archivedAfterPeriodYearsAUuid %}
+    {% set years = repliesMap[[periodPath, uuids.archivedAfterPeriodYearsAUuid, uuids.archivedAfterYearsQUuid]|reply_path]|reply_str_value %}
+  {% endif %}
+  {% if years|trim %}
+    {% set archiveDuration %}{{ macros.quantity(years, 'years') }}{% endset %}
+    <p data-fact-id="archive-minimum-period" data-status="complete">The archive will be kept for at least {{ archiveDuration }}.</p>
+  {% elif period == uuids.archivedAfterPeriodOtherAUuid %}
+    <div class="answer-lead"><p>Other arrangements for the archive's minimum lifetime:</p></div>
+    {% set arrangement = repliesMap[[periodPath, uuids.archivedAfterPeriodOtherAUuid, uuids.archivedAfterPeriodOtherQUuid]|reply_path]|reply_str_value %}
+    {% if arrangement|trim %}
+      <div class="answer-detail" data-fact-id="archive-minimum-period" data-status="complete">{{ arrangement|markdown }}</div>
+    {% else %}
+      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The other arrangements for the archive's minimum lifetime have not been described.</p></div>
+    {% endif %}
+  {% else %}
+    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The archive's minimum lifetime has not been provided.</p></div>
+  {% endif %}
+  {% set extensionPath = [archivePrefix, uuids.archivedAfterExtendQUuid]|reply_path %}
+  {% set extension = repliesMap[extensionPath]|reply_str_value %}
+  {% if extension == uuids.archivedAfterExtendNoAUuid %}
+    <p data-fact-id="archive-extension" data-status="explicit-no">The archival period cannot be extended.</p>
+    {% set limit = repliesMap[[extensionPath, uuids.archivedAfterExtendNoAUuid, uuids.archivedAfterExtendNoReasonQUuid]|reply_path]|reply_str_value %}
+    {% if limit == uuids.archivedAfterExtendNoLegalAUuid %}
+      <p data-fact-id="archive-extension-limit" data-status="complete">The archival period is limited by law or contract.</p>
+    {% elif limit == uuids.archivedAfterExtendNoBudgetAUuid %}
+      <p data-fact-id="archive-extension-limit" data-status="complete">The archival period is limited by the budget.</p>
+    {% else %}
+      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-limit" data-status="missing">The reason the archival period cannot be extended has not been specified.</p></div>
+    {% endif %}
+  {% elif extension == uuids.archivedAfterExtendYesAUuid %}
+    <p data-fact-id="archive-extension" data-status="complete">The archival period can be extended.</p>
+    {% set authority = repliesMap[[extensionPath, uuids.archivedAfterExtendYesAUuid, uuids.archivedAfterExtendWhoQUuid]|reply_path]|reply_str_value %}
+    {% if authority == uuids.archivedAfterExtendWhoPiAUuid %}
+      <p data-fact-id="archive-extension-authority" data-status="complete">A principal investigator involved in the project will decide on an extension.</p>
+    {% elif authority == uuids.archivedAfterExtendWhoArchiveAUuid %}
+      <p data-fact-id="archive-extension-authority" data-status="complete">Library or archive staff will decide on an extension.</p>
+    {% else %}
+      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-authority" data-status="missing">The person or team responsible for deciding on an extension has not been specified.</p></div>
+    {% endif %}
+    {% set basis = repliesMap[[extensionPath, uuids.archivedAfterExtendYesAUuid, uuids.archivedAfterExtendBasisQUuid]|reply_path]|reply_items %}
+    {% if basis %}
+      <div class="answer-lead"><p>The extension decision will take the following into account:</p></div>
+      <ul>
+        {% if uuids.archivedAfterExtendBasisActualChoiceUuid in basis %}<li data-fact-id="archive-extension-actual-use" data-status="complete">Actual use of the archived data.</li>{% endif %}
+        {% if uuids.archivedAfterExtendBasisPredictedChoiceUuid in basis %}<li data-fact-id="archive-extension-predicted-use" data-status="complete">Predicted use of the archived data.</li>{% endif %}
+        {% if uuids.archivedAfterExtendBasisBudgetChoiceUuid in basis %}<li data-fact-id="archive-extension-budget" data-status="complete">Available budget.</li>{% endif %}
+      </ul>
+    {% else %}
+      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-basis" data-status="missing">The basis for deciding on an extension has not been specified.</p></div>
+    {% endif %}
+  {% else %}
+    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension" data-status="missing">It has not been specified whether the archival period can be extended.</p></div>
+  {% endif %}
+  {% set formats = repliesMap[[archivePrefix, uuids.archivedAfterFormatsQUuid]|reply_path]|reply_str_value %}
+  {% if formats == uuids.archivedAfterFormatsYesAUuid %}
+    <p data-fact-id="archive-format-migration" data-status="complete">Obsolete data formats in cold storage will be upgraded.</p>
+  {% elif formats == uuids.archivedAfterFormatsNoAUuid %}
+    <p data-fact-id="archive-format-migration" data-status="explicit-no">Obsolete data formats in cold storage will not be upgraded.</p>
+  {% else %}
+    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-format-migration" data-status="missing">The arrangement for obsolete data formats in cold storage has not been specified.</p></div>
+  {% endif %}
+  {% set media = repliesMap[[archivePrefix, uuids.archivedAfterMediaQUuid]|reply_path]|reply_str_value %}
+  {% if media == uuids.archivedAfterMediaYesAUuid %}
+    <p data-fact-id="archive-media-migration" data-status="complete">Archived data will be migrated regularly to more modern storage media.</p>
+  {% elif media == uuids.archivedAfterMediaNoAUuid %}
+    <p data-fact-id="archive-media-migration" data-status="explicit-no">Archived data will not be migrated regularly to more modern storage media.</p>
+  {% else %}
+    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-media-migration" data-status="missing">The arrangement for migration to more modern storage media has not been specified.</p></div>
+  {% endif %}
+{% endif %}
+</div>
+</div>
+{% endif %}

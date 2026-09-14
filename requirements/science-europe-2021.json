@@ -181,7 +181,15 @@
       "question": "How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?",
       "requiredTopics": ["legal or contractual retention and destruction", "selection of data for preservation", "foreseeable re-use", "deposit location", "repository policies, procedures, standards, and costs"],
       "template": "src/questions/11-data-preservation.html.j2",
-      "implementationStatus": "upstream-unreviewed"
+      "implementationStatus": "experiment",
+      "bindingAudit": "requirements/preservation-bindings-2.7.0.json",
+      "facts": [
+        {"id": "preservation-dataset-context", "dswBindings": ["producedDataDescriptionQUuid", "producedDataStageQUuid", "producedDataPaperQUuid"], "coverage": "partial", "gap": "These fields describe produced datasets, not a decision identifying all datasets/versions to retain or destroy."},
+        {"id": "nonpublication-reason", "dswBindings": ["notPublishedReasonQUuid", "notPublishedReasonOtherQUuid"], "coverage": "mapped", "gap": "Publication reasons are preserved but must not be recast as reasons to discard data."},
+        {"id": "post-project-archive", "dswBindings": ["archivedAfterQUuid", "archivedAfterPayerQUuid", "archivedAfterPeriodQUuid", "archivedAfterYearsQUuid", "archivedAfterPeriodOtherQUuid", "archivedAfterExtendQUuid", "archivedAfterExtendNoReasonQUuid", "archivedAfterExtendWhoQUuid", "archivedAfterExtendBasisQUuid", "archivedAfterFormatsQUuid", "archivedAfterMediaQUuid"], "coverage": "partial", "gap": "Project-wide post-project cold storage, including renewal criteria. Does not identify a physical archive or map each dataset to it; legal/contractual limits are not the full retention/destruction rationale."},
+        {"id": "preservation-selection-review", "dswBindings": [], "coverage": "partial", "gap": "The reviewed mappings do not establish a complete initial dataset/version selection policy. Raw-data workspace choices and selection of additional outputs have different scopes. Full-KM absence is not asserted."},
+        {"id": "foreseeable-reuse", "dswBindings": ["measuredDataReuseQUuid", "measuredDataReuseOtherFieldHowQUuid"], "coverage": "partial", "gap": "Existing measured-data reuse prose is in Q13. It is not proven to map one-to-one to the produced datasets in Q11; do not duplicate it by matching names."}
+      ]
     },
     {
       "id": "SE-5c",

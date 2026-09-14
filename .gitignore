@@ -6,3 +6,4 @@ template*.zip
 __pycache__/
 *.py[cod]
 fixtures/knowledge-models/*.km
+outputs/

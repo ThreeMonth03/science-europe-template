@@ -12,14 +12,18 @@
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
         <div class="dataset-section" data-item-id="{{ i }}">
           <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
+          {% include "src/preservation-dataset.html.j2" %}
           <div class="preservation-summary dataset-policy">
           {# If will be published #}
           {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
           {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
           {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
             <p>This dataset will not be published.</p>
+            {% include "src/preservation-publication-reason.html.j2" %}
           {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
             <p>This dataset will be published.</p>
+          {% else %}
+            <div class="reading-gap"><p class="data-gap" data-fact-id="preservation-publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p></div>
           {% endif -%}
           {# How long will be stored + Metadata FAIRness #}
           {%- set publishedDataHowLongPath = [pathPrefix, uuids.publishedDataHowLongQUuid]|reply_path -%}
@@ -56,7 +60,7 @@
            {# Distributions #}
           {% set distrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
           {%- set distrosItems = repliesMap[distrosPath]|reply_items -%}
-          {%- if distrosItems|length > 0 -%}
+          {%- if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and distrosItems|length > 0 -%}
             <div class="answer-lead"><p>The distributions will be stored in:</p></div>
             <ul>
             {%- for j in distrosItems -%}
@@ -126,12 +130,13 @@
           {# Catalogue #}
           {%- set publishedDataCataloguePath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid]|reply_path -%}
           {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
-          {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
+          {%- if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
             <p>We will be adding a reference to the published data to at least one data catalogue.</p>
           {%- endif -%}
         </div>
       {%- endfor -%}
     {%- endif -%}
+    {% include "src/post-project-archive.html.j2" %}
     <div class="preservation-resources dataset-policy">
     {# Repository charges #}
     {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}
@@ -166,6 +171,7 @@
   {% endset %}
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
+    <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-5b" data-fact-id="preservation-selection-review" data-status="needs-review">Preservation selection still requires review: publication decisions and archive renewal criteria do not by themselves explain which datasets and versions must be retained or destroyed.</p></div>
   {% else %}
     <p class="data-gap" data-requirement-id="SE-5b" data-status="missing-output">This document does not yet contain an answer about data selection and long-term preservation.</p>
   {% endif %}

@@ -27,6 +27,9 @@ def check(knowledge_model, replies):
                 return
             for child in entities["answers"][value]["followUpUuids"]:
                 visit(child, path + "." + value)
+        elif question["questionType"] == "MultiChoiceQuestion":
+            if not isinstance(value, list) or any(choice not in question['choiceUuids'] for choice in value):
+                errors.append({"path": path, "error": "invalid multi-choice UUID"})
         elif question["questionType"] == "ListQuestion":
             for item in value:
                 for child in question["itemTemplateQuestionUuids"]:

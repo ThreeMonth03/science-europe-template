@@ -3,7 +3,7 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.6`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.3.7`, so it cannot overwrite
 > the official template accidentally.
 
 The experiment keeps the upstream Jinja structure but changes how incomplete
@@ -43,6 +43,11 @@ the stable package description is maintained in `PACKAGE_README.md`.
 The 0.3.6 [sharing/preservation experiment](docs/sharing-preservation.md) joins
 bounded licence and preservation prose, retains custom process paragraphs and
 missing decisions, and prevents line breaks inside marked licence dates.
+
+The 0.3.7 [preservation-coverage experiment](docs/preservation-coverage.md)
+restores selected dataset descriptions, non-publication reasons and project-wide
+post-project archival answers. It does not equate publication with preservation
+or claim to establish a complete data-selection policy.
 
 This is a customized derivative of the official DSW Science Europe template,
 not an officially endorsed Science Europe template. Its content contract refers

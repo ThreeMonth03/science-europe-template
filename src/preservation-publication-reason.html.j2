@@ -1,0 +1,26 @@
+{# This branch is a publication decision, never proof of destruction/non-preservation. #}
+{% set reasonPath = [isPublishedDataPath, uuids.isPublishedDataNoAUuid, uuids.notPublishedReasonQUuid]|reply_path %}
+{% set reason = repliesMap[reasonPath]|reply_str_value %}
+{% if reason == uuids.notPublishedReasonRawAUuid %}
+  <p data-fact-id="nonpublication-reason" data-status="complete">The stated reason for not publishing is that the raw data will not need to be reprocessed.</p>
+{% elif reason == uuids.notPublishedReasonResultsAUuid %}
+  <p data-fact-id="nonpublication-reason" data-status="complete">The stated reason for not publishing is that this dataset only led to unpublishable results.</p>
+{% elif reason == uuids.notPublishedReasonIntermediateAUuid %}
+  <p data-fact-id="nonpublication-reason" data-status="complete">The stated reason for not publishing is that the intermediate data can be reproduced easily.</p>
+{% elif reason == uuids.notPublishedReasonNoReuseAUuid %}
+  <p data-fact-id="nonpublication-reason" data-status="complete">According to the questionnaire, this dataset will not be published because it has no value for re-use.</p>
+{% elif reason == uuids.notPublishedReasonCostAUuid %}
+  <p data-fact-id="nonpublication-reason" data-status="complete">The stated reason for not publishing is the cost.</p>
+{% elif reason == uuids.notPublishedReasonLostAUuid %}
+  <p data-fact-id="nonpublication-reason" data-status="complete">According to the questionnaire, this dataset will not be published because it was lost.</p>
+{% elif reason == uuids.notPublishedReasonOtherAUuid %}
+  <div class="answer-lead"><p>Other reasons for not publishing this dataset:</p></div>
+  {% set reasonText = repliesMap[[reasonPath, uuids.notPublishedReasonOtherAUuid, uuids.notPublishedReasonOtherQUuid]|reply_path]|reply_str_value %}
+  {% if reasonText|trim %}
+    <div class="answer-detail" data-fact-id="nonpublication-reason" data-status="complete">{{ reasonText|markdown }}</div>
+  {% else %}
+    <div class="reading-gap"><p class="data-gap" data-fact-id="nonpublication-reason" data-status="missing">The other reasons for not publishing have not been described.</p></div>
+  {% endif %}
+{% else %}
+  <div class="reading-gap"><p class="data-gap" data-fact-id="nonpublication-reason" data-status="missing">The reason for not publishing has not been provided.</p></div>
+{% endif %}

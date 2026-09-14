@@ -1,0 +1,997 @@
+{
+  "schema_version": 1,
+  "scope": "Selected Q11 additions; static before-state, not DMP completeness",
+  "inventory_sha256": "dfcda3b4ef9b9d384d33034c0149a6b2558a1b8acdf4c827c544f1dce3fc1f47",
+  "inventory_checker_sha256": "dc34c4894d0abfedee621a0fd7d58c12f24be20b1558c8529c9c13138c4d07b3",
+  "source_commit": "431ad56aeaa42c3752f0fe6e851276790504f2b1",
+  "source_template_sha256": {
+    "src/content.html.j2": "a7208a6634f73b3f2a52c46675af36c32efdece2d0d315729fa8d541ac5c2d03",
+    "src/contributors.html.j2": "90f90fba14cfc678a05cbb4ba6c6493b15bdf6cd2c04805118736b476dc53007",
+    "src/document-provenance.html.j2": "916ab72e56730ce285506fbba61cee056ab5f44ba62041dc2afb903496193232",
+    "src/frontmatter.html.j2": "6ca4bd37d0cb79922671b72df8ea5639e224bc92d726fc6da79aa727e374b90b",
+    "src/globals.j2": "cad53b617cc77d7bdaa61187d47bb8526f8e1edd8eed42f6e9db46f3a1f2afc0",
+    "src/header.html.j2": "57060cceee1193d4c1e0445a945ebb8e4289f8d27af81ab8cbf809734d0281b0",
+    "src/index.html.j2": "393eea4438f24a0c551e64f255b5b1e49a857ae29bf1f87a2827098698396438",
+    "src/macros.html.j2": "d75cb2d6433208af2ea07004c0faede5df7eb31f6a3ee50ed5d8835e948c4413",
+    "src/projects.html.j2": "a9dfd886a9df5077239ca034a80750353c4e7386d56498ce79fd6da126f78016",
+    "src/quality-control.html.j2": "ed83bb7cd836eded96c1d7a420870399701d16f36384f47a99eb34fd835f5833",
+    "src/questions/01-how-data.html.j2": "66dc404732f54554ab8d44caf3f00f75c4356a30961d9d8be3b96005571cf3fc",
+    "src/questions/02-what-data.html.j2": "9ae958eae76cd2b2523b9e961d4cb58497ed7449c3fc32b0b1e8f42017e56224",
+    "src/questions/03-docs-metadata.html.j2": "0f929ac601ffb00aa6d8a7352fa4edcb2fd1ab0ed2d4a3daa3b07190bac7dded",
+    "src/questions/04-quality-control.html.j2": "8bfdddafb16588e21c511e73e6fe06ace8df22f04b96d36160b43eeace4c078e",
+    "src/questions/05-store-backup.html.j2": "cd306250705611cd64a9e87446dc5e60c6fcddd63e525da63eef58b7bfb1ddd3",
+    "src/questions/06-access-security.html.j2": "c451d0f629f323923c7ce331e82f10a0fd4dc3521acee450360395a16ece8467",
+    "src/questions/07-personal-data.html.j2": "87eab897cc5b200d2daf160e64c0f6296af2bc44b747d44b7bbd48ff918ec1b8",
+    "src/questions/08-copyright-ipr.html.j2": "1ab4215ca7e31d1c8726cdeae0b06c0c4461507efb196ae1a4adfcb1113ba9ca",
+    "src/questions/09-ethical-issues.html.j2": "b9c1265add9a0c393372a610725ed164ca2d29a050462173fc892f8d84e5fc72",
+    "src/questions/10-share-restrictions.html.j2": "5cc2742f9a349930c77b58623ca4893f869cfb0430df0aa90c9a6921e9354f1d",
+    "src/questions/11-data-preservation.html.j2": "862da019e405f562a70b061702bac9312176dc6338752c619a0053e5a6fd1ced",
+    "src/questions/12-access-data.html.j2": "4b57404c39b6e1a4447d438477920206e90c76f8b4fa5ceb14a417fd50a6c7da",
+    "src/questions/13-persistent-identifier.html.j2": "908ed8d59daa7465519a8e55c66222ded1a526b0d3b22bf0c98069817a62b050",
+    "src/questions/14-dm-responsible.html.j2": "eb6d7464ed0710adf3d15224f452064ae23e8b065f3170053c8a7924ec1f4f23",
+    "src/questions/15-required-resources.html.j2": "f0a66c85094dee18fa8b1aa246e3a2ab47b7491777faf5f4859b8b2d9893e55a",
+    "src/uuids.j2": "c77fca2334b1f7f967e8130ecd6f1ea1e6aee44240f080308aa3acac950d8729",
+    "src/versions.html.j2": "ded0a143a9db03aa6f49e980758200d9cb7988b61ef8448548a14038dc3af171",
+    "src/word/frontpage.html.j2": "c8fe6c9f4f9fb07f8c29f3702cada16c86bd2c55ceecb8ca674208c20c775710",
+    "src/word/index.html.j2": "fab18472223b73d728cc565dc7e6b819db0d301858ed99ce9493104de13cea07",
+    "src/word/versions.html.j2": "dac94bd2a2b4bd1533f168eb9aebd1f2c257c2e22cb53b1e398ed543001a8dbc"
+  },
+  "knowledge_models": {
+    "en": {
+      "km_sha256": "aabca6f7de8ad41cf9989afd25d4827f3de134fb8f0d965fcc6c336cfeb3e965",
+      "inventory_question_count": 592,
+      "selected_questions": {
+        "producedDataDescriptionQUuid": {
+          "uuid": "205a886d-83d7-4359-ae63-7103e05357c3",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "205a886d-83d7-4359-ae63-7103e05357c3"
+          ],
+          "type": "ValueQuestion",
+          "title": "Description of the data set",
+          "guidance": "What type of data is in this data set? Examples could be \"Field observations\", \"raw instrument data\", \"genomic variants\".",
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "producedDataStageQUuid": {
+          "uuid": "3a8ed3fc-b1a6-4119-80ed-238804861734",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "3a8ed3fc-b1a6-4119-80ed-238804861734"
+          ],
+          "type": "OptionsQuestion",
+          "title": "What type of data is in this data set?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "79f7797e-f7b1-4930-b691-84bee936af20",
+              "label": "Raw data",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "5b49df5e-1d06-446f-a518-33a06928b598",
+              "label": "Intermediate data",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "4fa0c31a-bd3b-4ae0-8f56-639ae2212124",
+              "label": "Processed data leading to unpublishable results",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "626a610e-34ac-40ca-8bf6-7926f580ae80",
+              "label": "Processed data leading to published results",
+              "follow_up_uuids": [
+                "19f71935-c4fa-4085-98a6-82686d656526"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "producedDataPaperQUuid": {
+          "uuid": "19f71935-c4fa-4085-98a6-82686d656526",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "3a8ed3fc-b1a6-4119-80ed-238804861734",
+            "626a610e-34ac-40ca-8bf6-7926f580ae80",
+            "19f71935-c4fa-4085-98a6-82686d656526"
+          ],
+          "type": "ValueQuestion",
+          "title": "Specify a link to the paper",
+          "guidance": "Provide a DOI if possible.",
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "notPublishedReasonQUuid": {
+          "uuid": "2a34dbf7-3a9e-446e-9dfd-695903bd2a07",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "a063da1c-aaea-4e18-85ec-f560d833f292",
+            "771279ea-3ffe-4d22-aeb4-8d656a77c25c",
+            "2a34dbf7-3a9e-446e-9dfd-695903bd2a07"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Why not?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "deff3d55-a7bb-426e-94e7-8b6d46a27f8e",
+              "label": "It is raw data that never needs to be reprocessed",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "309ee279-cd5a-47dd-ad11-7b111d0ac1ff",
+              "label": "This data set only led to unpublishable results",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "cf378a0e-9efe-4221-a7a7-c0631fd71c3e",
+              "label": "It is intermediate data that is easily reproduced",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "f040fdff-e9d4-4777-a482-af584fd7b3ba",
+              "label": "There is no value, nobody will ever reuse it",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c0b6d52a-2fde-4e3f-835f-e49fffc67ccb",
+              "label": "It is too expensive",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "f9bd9b58-c400-4a0f-b66f-0ce991e0e3e2",
+              "label": "It was lost",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "9af201fa-bf32-4e44-b44d-efea6f69d631",
+              "label": "There are other reasons",
+              "follow_up_uuids": [
+                "c3f2eeb9-a9e7-46e7-a5df-8d9ca50ed8ce"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "notPublishedReasonOtherQUuid": {
+          "uuid": "c3f2eeb9-a9e7-46e7-a5df-8d9ca50ed8ce",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "a063da1c-aaea-4e18-85ec-f560d833f292",
+            "771279ea-3ffe-4d22-aeb4-8d656a77c25c",
+            "2a34dbf7-3a9e-446e-9dfd-695903bd2a07",
+            "9af201fa-bf32-4e44-b44d-efea6f69d631",
+            "c3f2eeb9-a9e7-46e7-a5df-8d9ca50ed8ce"
+          ],
+          "type": "ValueQuestion",
+          "title": "What other reasons?",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterQUuid": {
+          "uuid": "f9d84278-b61d-4314-94e9-12644bfa1d00",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Will you be archiving your data in 'cold storage' after the project finishes?",
+          "guidance": "Will you be storing (in cold storage) copies of your own data for a longer period after the project has ended? Possibly as a continuation of archival as part of data storage strategy during the project? Data archival is distinct from data publishing, an archive is usually strictly limited in who can access the data.",
+          "choices": [
+            {
+              "uuid": "b6890d88-88e4-4667-8b28-82bc73c728be",
+              "label": "No",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "562a4823-3e58-44da-ba65-db522c4bbbd9",
+              "label": "Yes",
+              "follow_up_uuids": [
+                "6467fff1-33ae-47f6-829c-9e3817298d1f",
+                "22f28294-f990-4686-87dd-ecca65a0ed26",
+                "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+                "553834d6-ff71-4b76-b4b4-b90d19a3f0a4",
+                "5a192c70-d824-49d2-965c-dca90deb04ac"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterPayerQUuid": {
+          "uuid": "6467fff1-33ae-47f6-829c-9e3817298d1f",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "6467fff1-33ae-47f6-829c-9e3817298d1f"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Who will be paying for the long term storage?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "3aabde57-dabd-456f-b351-1b81a74bb2d5",
+              "label": "It will be paid from the grant",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "2171b472-3569-468a-911f-5df375cb244f",
+              "label": "It will be paid out of departmental budgets from one or more of the project participants",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "f6dba54d-bb72-4fcf-bebc-f5651adba0c0",
+              "label": "This is a service budgeted by one or more of the participating institutes",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterPeriodQUuid": {
+          "uuid": "22f28294-f990-4686-87dd-ecca65a0ed26",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "22f28294-f990-4686-87dd-ecca65a0ed26"
+          ],
+          "type": "OptionsQuestion",
+          "title": "What is the minimum lifetime of the archive?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "15f9c764-1aaa-4de1-b65d-b92ae6bd3fb8",
+              "label": "5 years",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "37672102-6b96-4c69-a24a-ce3b8672ccc1",
+              "label": "10 years",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c0c80589-203d-4564-8f00-89d5cd538fae",
+              "label": "15 years",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "820c78f6-81d0-442f-80c7-bfa3d04b282a",
+              "label": "Another period",
+              "follow_up_uuids": [
+                "075e934b-e9a3-45b6-a91e-5e19a1e56e06"
+              ]
+            },
+            {
+              "uuid": "3116fe33-8baf-4085-a8ba-688e8b062b78",
+              "label": "It is arranged in a different way",
+              "follow_up_uuids": [
+                "0b42bbcc-5102-4619-b8e3-9409dbc0379a"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterYearsQUuid": {
+          "uuid": "075e934b-e9a3-45b6-a91e-5e19a1e56e06",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "22f28294-f990-4686-87dd-ecca65a0ed26",
+            "820c78f6-81d0-442f-80c7-bfa3d04b282a",
+            "075e934b-e9a3-45b6-a91e-5e19a1e56e06"
+          ],
+          "type": "ValueQuestion",
+          "title": "For how many years will the archive minimally be kept?",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterPeriodOtherQUuid": {
+          "uuid": "0b42bbcc-5102-4619-b8e3-9409dbc0379a",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "22f28294-f990-4686-87dd-ecca65a0ed26",
+            "3116fe33-8baf-4085-a8ba-688e8b062b78",
+            "0b42bbcc-5102-4619-b8e3-9409dbc0379a"
+          ],
+          "type": "ValueQuestion",
+          "title": "How is the archival period arranged?",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendQUuid": {
+          "uuid": "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Can the archival period be extended?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "4c9c792f-d0ea-440d-87dd-15a83efcb85f",
+              "label": "No",
+              "follow_up_uuids": [
+                "e5f3081b-df3a-4059-83e2-5c69baa83c49"
+              ]
+            },
+            {
+              "uuid": "fc93bf39-c996-40d2-811e-9324f033a27a",
+              "label": "Yes",
+              "follow_up_uuids": [
+                "5d153cdd-9d37-4e38-b5eb-1b867ed01e32",
+                "b51878eb-fdaf-4e3a-940e-8ecc98059d58"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendNoReasonQUuid": {
+          "uuid": "e5f3081b-df3a-4059-83e2-5c69baa83c49",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+            "4c9c792f-d0ea-440d-87dd-15a83efcb85f",
+            "e5f3081b-df3a-4059-83e2-5c69baa83c49"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Why will the archival period not be extended?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "91a03f0c-3d3d-4bfe-a7eb-46749706e749",
+              "label": "The archival period is limited by law or contract",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "cb6a4747-0bf3-447d-8d7d-dc1b7a077be0",
+              "label": "The archival period is limited by budget",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendWhoQUuid": {
+          "uuid": "5d153cdd-9d37-4e38-b5eb-1b867ed01e32",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+            "fc93bf39-c996-40d2-811e-9324f033a27a",
+            "5d153cdd-9d37-4e38-b5eb-1b867ed01e32"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Who will decide whether the archival period is extended?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "1c805499-e407-489c-81ee-87ac76b6b2b6",
+              "label": "One of the principle investigators involved in the project will decide",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c42196af-a4eb-4026-8a4a-8e46012ac47f",
+              "label": "Library or archive staff will decide",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendBasisQUuid": {
+          "uuid": "b51878eb-fdaf-4e3a-940e-8ecc98059d58",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+            "fc93bf39-c996-40d2-811e-9324f033a27a",
+            "b51878eb-fdaf-4e3a-940e-8ecc98059d58"
+          ],
+          "type": "MultiChoiceQuestion",
+          "title": "What will the decision whether or not to extend the renewal be based on?",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [
+            {
+              "uuid": "f6d68b58-7996-453f-a033-71272aa01204",
+              "label": "It will be based on the actual use of the archived data"
+            },
+            {
+              "uuid": "b84a59dd-73a3-48f9-9556-04ce3750df73",
+              "label": "It will be based on the predicted use of the archived data"
+            },
+            {
+              "uuid": "4071f707-d2c0-4102-9916-2dcab77c27a8",
+              "label": "It will be based on available budget"
+            }
+          ],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterFormatsQUuid": {
+          "uuid": "553834d6-ff71-4b76-b4b4-b90d19a3f0a4",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "553834d6-ff71-4b76-b4b4-b90d19a3f0a4"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Will data formats of data in cold storage be upgraded if they become obsolete?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "24782dc1-c7f9-4b9f-868e-09f6f6e5a0ed",
+              "label": "No",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "522019ce-14d8-4f74-b4a5-79b05a2abac1",
+              "label": "Yes",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterMediaQUuid": {
+          "uuid": "5a192c70-d824-49d2-965c-dca90deb04ac",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "5a192c70-d824-49d2-965c-dca90deb04ac"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Will data be migrated regularly to more modern storage media (e.g. newer tapes)?",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "2bb32b88-b374-4090-82e4-64f5eab44850",
+              "label": "No",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "6a1acee5-200a-449f-8200-4b294c8bc5f0",
+              "label": "Yes",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        }
+      }
+    },
+    "zh-Hant": {
+      "km_sha256": "a3030cb9048a8842fe43ebac9ece00011e26936111789443d85422473c4cae47",
+      "inventory_question_count": 592,
+      "selected_questions": {
+        "producedDataDescriptionQUuid": {
+          "uuid": "205a886d-83d7-4359-ae63-7103e05357c3",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "205a886d-83d7-4359-ae63-7103e05357c3"
+          ],
+          "type": "ValueQuestion",
+          "title": "資料集的描述",
+          "guidance": "這個資料集中包含哪一種類型的資料？例如：「田野觀察資料」、「原始儀器資料」、「基因組變異」。",
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "producedDataStageQUuid": {
+          "uuid": "3a8ed3fc-b1a6-4119-80ed-238804861734",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "3a8ed3fc-b1a6-4119-80ed-238804861734"
+          ],
+          "type": "OptionsQuestion",
+          "title": "此資料集包含哪一類資料？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "79f7797e-f7b1-4930-b691-84bee936af20",
+              "label": "原始資料",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "5b49df5e-1d06-446f-a518-33a06928b598",
+              "label": "中間資料",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "4fa0c31a-bd3b-4ae0-8f56-639ae2212124",
+              "label": "產出無法發表結果的處理後資料",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "626a610e-34ac-40ca-8bf6-7926f580ae80",
+              "label": "產出已發表結果的處理後資料",
+              "follow_up_uuids": [
+                "19f71935-c4fa-4085-98a6-82686d656526"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "producedDataPaperQUuid": {
+          "uuid": "19f71935-c4fa-4085-98a6-82686d656526",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "3a8ed3fc-b1a6-4119-80ed-238804861734",
+            "626a610e-34ac-40ca-8bf6-7926f580ae80",
+            "19f71935-c4fa-4085-98a6-82686d656526"
+          ],
+          "type": "ValueQuestion",
+          "title": "請指定論文連結",
+          "guidance": "若可行，請提供 DOI。",
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "notPublishedReasonQUuid": {
+          "uuid": "2a34dbf7-3a9e-446e-9dfd-695903bd2a07",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "a063da1c-aaea-4e18-85ec-f560d833f292",
+            "771279ea-3ffe-4d22-aeb4-8d656a77c25c",
+            "2a34dbf7-3a9e-446e-9dfd-695903bd2a07"
+          ],
+          "type": "OptionsQuestion",
+          "title": "原因是什麼？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "deff3d55-a7bb-426e-94e7-8b6d46a27f8e",
+              "label": "這是永遠不需要重新處理的原始資料",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "309ee279-cd5a-47dd-ad11-7b111d0ac1ff",
+              "label": "這個資料集只產生了無法發表的結果",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "cf378a0e-9efe-4221-a7a7-c0631fd71c3e",
+              "label": "這是容易重新產生的中間資料",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "f040fdff-e9d4-4777-a482-af584fd7b3ba",
+              "label": "沒有價值，永遠不會有人再次使用",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c0b6d52a-2fde-4e3f-835f-e49fffc67ccb",
+              "label": "成本太高",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "f9bd9b58-c400-4a0f-b66f-0ce991e0e3e2",
+              "label": "已遺失",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "9af201fa-bf32-4e44-b44d-efea6f69d631",
+              "label": "還有其他原因",
+              "follow_up_uuids": [
+                "c3f2eeb9-a9e7-46e7-a5df-8d9ca50ed8ce"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "notPublishedReasonOtherQUuid": {
+          "uuid": "c3f2eeb9-a9e7-46e7-a5df-8d9ca50ed8ce",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "4e0c1edf-660c-4ebf-81f5-9fa959dead30",
+            "ITEM",
+            "a063da1c-aaea-4e18-85ec-f560d833f292",
+            "771279ea-3ffe-4d22-aeb4-8d656a77c25c",
+            "2a34dbf7-3a9e-446e-9dfd-695903bd2a07",
+            "9af201fa-bf32-4e44-b44d-efea6f69d631",
+            "c3f2eeb9-a9e7-46e7-a5df-8d9ca50ed8ce"
+          ],
+          "type": "ValueQuestion",
+          "title": "還有哪些其他原因？",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterQUuid": {
+          "uuid": "f9d84278-b61d-4314-94e9-12644bfa1d00",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00"
+          ],
+          "type": "OptionsQuestion",
+          "title": "專案結束後，您是否會以「冷儲存」方式典藏資料？",
+          "guidance": "專案結束後，您是否會以「冷儲存」方式長期保存自己的資料副本？這可能是專案期間資料儲存策略中典藏作業的延續。資料典藏不同於資料發布；典藏庫通常會嚴格限制可取用資料的人員。",
+          "choices": [
+            {
+              "uuid": "b6890d88-88e4-4667-8b28-82bc73c728be",
+              "label": "否",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "562a4823-3e58-44da-ba65-db522c4bbbd9",
+              "label": "是",
+              "follow_up_uuids": [
+                "6467fff1-33ae-47f6-829c-9e3817298d1f",
+                "22f28294-f990-4686-87dd-ecca65a0ed26",
+                "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+                "553834d6-ff71-4b76-b4b4-b90d19a3f0a4",
+                "5a192c70-d824-49d2-965c-dca90deb04ac"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterPayerQUuid": {
+          "uuid": "6467fff1-33ae-47f6-829c-9e3817298d1f",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "6467fff1-33ae-47f6-829c-9e3817298d1f"
+          ],
+          "type": "OptionsQuestion",
+          "title": "誰會支應長期儲存成本？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "3aabde57-dabd-456f-b351-1b81a74bb2d5",
+              "label": "由補助經費支應",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "2171b472-3569-468a-911f-5df375cb244f",
+              "label": "由一位或多位專案參與者所屬部門的預算支應",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "f6dba54d-bb72-4fcf-bebc-f5651adba0c0",
+              "label": "這是由一個或多個參與機構編列預算支應的服務",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterPeriodQUuid": {
+          "uuid": "22f28294-f990-4686-87dd-ecca65a0ed26",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "22f28294-f990-4686-87dd-ecca65a0ed26"
+          ],
+          "type": "OptionsQuestion",
+          "title": "資料典藏的最短保存期限為何？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "15f9c764-1aaa-4de1-b65d-b92ae6bd3fb8",
+              "label": "5 年",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "37672102-6b96-4c69-a24a-ce3b8672ccc1",
+              "label": "10 年",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c0c80589-203d-4564-8f00-89d5cd538fae",
+              "label": "15 年",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "820c78f6-81d0-442f-80c7-bfa3d04b282a",
+              "label": "其他期間",
+              "follow_up_uuids": [
+                "075e934b-e9a3-45b6-a91e-5e19a1e56e06"
+              ]
+            },
+            {
+              "uuid": "3116fe33-8baf-4085-a8ba-688e8b062b78",
+              "label": "另有其他安排",
+              "follow_up_uuids": [
+                "0b42bbcc-5102-4619-b8e3-9409dbc0379a"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterYearsQUuid": {
+          "uuid": "075e934b-e9a3-45b6-a91e-5e19a1e56e06",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "22f28294-f990-4686-87dd-ecca65a0ed26",
+            "820c78f6-81d0-442f-80c7-bfa3d04b282a",
+            "075e934b-e9a3-45b6-a91e-5e19a1e56e06"
+          ],
+          "type": "ValueQuestion",
+          "title": "典藏資料至少會保存多少年？",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterPeriodOtherQUuid": {
+          "uuid": "0b42bbcc-5102-4619-b8e3-9409dbc0379a",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "22f28294-f990-4686-87dd-ecca65a0ed26",
+            "3116fe33-8baf-4085-a8ba-688e8b062b78",
+            "0b42bbcc-5102-4619-b8e3-9409dbc0379a"
+          ],
+          "type": "ValueQuestion",
+          "title": "資料典藏的保存期限如何安排？",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendQUuid": {
+          "uuid": "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf"
+          ],
+          "type": "OptionsQuestion",
+          "title": "資料典藏的保存期限是否可延長？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "4c9c792f-d0ea-440d-87dd-15a83efcb85f",
+              "label": "否",
+              "follow_up_uuids": [
+                "e5f3081b-df3a-4059-83e2-5c69baa83c49"
+              ]
+            },
+            {
+              "uuid": "fc93bf39-c996-40d2-811e-9324f033a27a",
+              "label": "是",
+              "follow_up_uuids": [
+                "5d153cdd-9d37-4e38-b5eb-1b867ed01e32",
+                "b51878eb-fdaf-4e3a-940e-8ecc98059d58"
+              ]
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendNoReasonQUuid": {
+          "uuid": "e5f3081b-df3a-4059-83e2-5c69baa83c49",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+            "4c9c792f-d0ea-440d-87dd-15a83efcb85f",
+            "e5f3081b-df3a-4059-83e2-5c69baa83c49"
+          ],
+          "type": "OptionsQuestion",
+          "title": "為什麼不延長典藏期間？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "91a03f0c-3d3d-4bfe-a7eb-46749706e749",
+              "label": "典藏期限受法律或契約限制",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "cb6a4747-0bf3-447d-8d7d-dc1b7a077be0",
+              "label": "典藏期限受預算限制",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendWhoQUuid": {
+          "uuid": "5d153cdd-9d37-4e38-b5eb-1b867ed01e32",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+            "fc93bf39-c996-40d2-811e-9324f033a27a",
+            "5d153cdd-9d37-4e38-b5eb-1b867ed01e32"
+          ],
+          "type": "OptionsQuestion",
+          "title": "由誰決定是否延長典藏期間？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "1c805499-e407-489c-81ee-87ac76b6b2b6",
+              "label": "參與本專案的其中一位計畫主持人將作出決定",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c42196af-a4eb-4026-8a4a-8e46012ac47f",
+              "label": "將由圖書館或檔案館人員決定",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterExtendBasisQUuid": {
+          "uuid": "b51878eb-fdaf-4e3a-940e-8ecc98059d58",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "1a754b08-2a93-4d90-ac52-96f2a69097bf",
+            "fc93bf39-c996-40d2-811e-9324f033a27a",
+            "b51878eb-fdaf-4e3a-940e-8ecc98059d58"
+          ],
+          "type": "MultiChoiceQuestion",
+          "title": "是否延長典藏期限，會依據什麼做決定？",
+          "guidance": null,
+          "choices": [],
+          "multi_choices": [
+            {
+              "uuid": "f6d68b58-7996-453f-a033-71272aa01204",
+              "label": "這將取決於典藏資料的實際使用情況"
+            },
+            {
+              "uuid": "b84a59dd-73a3-48f9-9556-04ce3750df73",
+              "label": "這將取決於典藏資料的預期使用情況"
+            },
+            {
+              "uuid": "4071f707-d2c0-4102-9916-2dcab77c27a8",
+              "label": "這將取決於可用預算"
+            }
+          ],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterFormatsQUuid": {
+          "uuid": "553834d6-ff71-4b76-b4b4-b90d19a3f0a4",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "553834d6-ff71-4b76-b4b4-b90d19a3f0a4"
+          ],
+          "type": "OptionsQuestion",
+          "title": "如果「冷儲存」中的資料格式變得過時，是否會更新為較新的格式？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "24782dc1-c7f9-4b9f-868e-09f6f6e5a0ed",
+              "label": "否",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "522019ce-14d8-4f74-b4a5-79b05a2abac1",
+              "label": "是",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        },
+        "archivedAfterMediaQUuid": {
+          "uuid": "5a192c70-d824-49d2-965c-dca90deb04ac",
+          "path": [
+            "d5b27482-b598-4b8c-b534-417d4ad27394",
+            "f9d84278-b61d-4314-94e9-12644bfa1d00",
+            "562a4823-3e58-44da-ba65-db522c4bbbd9",
+            "5a192c70-d824-49d2-965c-dca90deb04ac"
+          ],
+          "type": "OptionsQuestion",
+          "title": "資料是否會定期遷移到較新的儲存媒體（例如較新的磁帶）？",
+          "guidance": null,
+          "choices": [
+            {
+              "uuid": "2bb32b88-b374-4090-82e4-64f5eab44850",
+              "label": "否",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "6a1acee5-200a-449f-8200-4b294c8bc5f0",
+              "label": "是",
+              "follow_up_uuids": []
+            }
+          ],
+          "multi_choices": [],
+          "bindings": [],
+          "static_template_references": []
+        }
+      }
+    }
+  },
+  "limits": [
+    "These 16 questions were not referenced by the recorded source templates",
+    "A publication decision is not a preservation selection decision",
+    "Post-project cold storage is project-wide, not per produced dataset",
+    "Renewal criteria are not a full initial data-selection policy"
+  ]
+}

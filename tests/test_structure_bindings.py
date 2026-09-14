@@ -3,6 +3,7 @@
 import sys
 import unittest
 from html.parser import HTMLParser
+from bs4 import BeautifulSoup
 
 from jinja2 import Environment, nodes
 from test_answer_retention import ROOT, IDS, path
@@ -46,7 +47,9 @@ class StructureBindingTests(unittest.TestCase):
             else:
                 self.assertIn('10 years', output)
                 self.assertIn('We have budgeted for the costs', output)
-                self.assertNotIn('needs-review', output)
+                soup = BeautifulSoup(output, 'html.parser')
+                self.assertFalse(soup.select('.preservation-summary [data-status="needs-review"]'))
+                self.assertEqual('needs-review', soup.select_one('[data-fact-id="preservation-selection-review"]')['data-status'])
 
     def test_explicit_no_ethical_approval_is_retained(self):
         projects = path('adminDetailsCUuid', 'projectsQUuid')

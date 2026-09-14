@@ -19,6 +19,9 @@
       "severity": "critical",
       "patterns": [
         "src/macros.html.j2",
+        "src/preservation-dataset.html.j2",
+        "src/preservation-publication-reason.html.j2",
+        "src/post-project-archive.html.j2",
         "src/quality-control.html.j2",
         "src/questions/04-quality-control.html.j2",
         "src/questions/01-how-data.html.j2",
