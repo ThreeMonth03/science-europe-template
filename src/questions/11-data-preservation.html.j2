@@ -8,6 +8,7 @@
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
     {%- if producedDataItems|length > 0 -%}
       {%- for i in producedDataItems -%}
+        {%- set repositoryDatasetIndex = loop.index -%}
         {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
         <div class="dataset-section" data-item-id="{{ i }}">
@@ -90,7 +91,14 @@
                       {%- set repositoryReading.simple = false -%}
                       {%- set domainSpecificRepoContactBeforeOtherPath = [domainSpecificRepoContactBeforePath, uuids.domainSpecificRepoContactBeforeOtherAUuid, uuids.domainSpecificRepoContactBeforeOtherQUuid]|reply_path -%}
                       {%- set domainSpecificRepoContactBeforeOther = repliesMap[domainSpecificRepoContactBeforeOtherPath]|reply_str_value %}
-                      We have made other arrangements instead of contacting the repository directly{{ ": " ~ domainSpecificRepoContactBeforeOther|markdown if domainSpecificRepoContactBeforeOther else "." }}
+                      <div class="repository-contact" id="repository-contact-{{ repositoryDatasetIndex }}-{{ loop.index }}">
+                        {% if domainSpecificRepoContactBeforeOther|trim %}
+                          <div class="answer-lead"><p>Other repository contact arrangements:</p></div>
+                          <div class="answer-detail" data-fact-id="repository-contact-arrangements" data-status="complete">{{ domainSpecificRepoContactBeforeOther|markdown }}</div>
+                        {% else %}
+                          <p class="data-gap" data-fact-id="repository-contact-arrangements" data-status="missing">The other repository contact arrangements have not been described.</p>
+                        {% endif %}
+                      </div>
                     {%- endif -%}
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}
                     <em>General-purpose repository</em>

@@ -9,6 +9,7 @@
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
     {%- if producedDataItems|length > 0 -%}
         {%- for i in producedDataItems -%}
+            {%- set repositoryDatasetIndex = loop.index -%}
             {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
             {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
             <div class="dataset-section" data-item-id="{{ i }}">
@@ -88,9 +89,7 @@
                                 {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesWillAUuid %}
                                 We are going to contact the repository.
                                 {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeOtherAUuid %}
-                                {%- set domainSpecificRepoContactBeforeOtherPath = [domainSpecificRepoContactBeforePath, uuids.domainSpecificRepoContactBeforeOtherAUuid, uuids.domainSpecificRepoContactBeforeOtherQUuid]|reply_path -%}
-                                {%- set domainSpecificRepoContactBeforeOther = repliesMap[domainSpecificRepoContactBeforeOtherPath]|reply_str_value %}
-                                We have made other arrangements{{ ": " ~ domainSpecificRepoContactBeforeOther|markdown if domainSpecificRepoContactBeforeOther else "." }}
+                                <span class="repository-contact-reference"><a href="#repository-contact-{{ repositoryDatasetIndex }}-{{ loop.index }}">{% if distrosItems|length > 1 %}For repository contact arrangements, see Question 11, distribution {{ loop.index }} of this dataset.{% else %}For repository contact arrangements, see Question 11 under this dataset.{% endif %}</a></span>
                                 {%- endif -%}
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}
                                 General-purpose repository
