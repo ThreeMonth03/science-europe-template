@@ -37,6 +37,34 @@ end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
+  if div.classes:includes("distribution-reading-unit") then
+    local flattened = pandoc.List()
+    local function collect(blocks, owned)
+      for _, block in ipairs(blocks) do
+        if block.t == "Div" and (
+          block.classes:includes("joined-policy") or
+          (owned and block.classes:includes("answer-lead")) or
+          (block.attributes["data-fact-id"] == "distribution-access" and
+            (block.attributes["data-status"] == "complete" or block.attributes["data-status"] == "explicit-no"))
+        ) then
+          collect(block.content, true)
+        else flattened:insert(block) end
+      end
+    end
+    collect(div.content, false)
+    local blocks, inlines = pandoc.List(), pandoc.List()
+    local function flush()
+      if #inlines > 0 then blocks:insert(pandoc.Para(inlines)); inlines = pandoc.List() end
+    end
+    for _, block in ipairs(flattened) do
+      if block.t == "Para" then
+        if #inlines > 0 then inlines:insert(pandoc.Space()) end
+        inlines:extend(block.content)
+      else flush(); blocks:insert(block) end
+    end
+    flush(); div.content = blocks
+    -- Continue into the existing bounded keep-with-next rule, if applicable.
+  end
   if div.classes:includes("short-table-unit") then
     -- Recheck AST bounds independently of the HTML hint. Keep every cell in
     -- non-final rows with the next row; the final row must NOT keep Q2 with it.

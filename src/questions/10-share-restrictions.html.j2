@@ -67,9 +67,9 @@
                             {%- elif distroShareAUuid == uuids.publishedDistroShareClosedAUuid %}
                                 <p data-fact-id="distribution-access" data-status="explicit-no">This distribution is not intended for sharing.</p>
                             {% else %}
-                                <p class="data-gap" data-fact-id="distribution-access" data-status="missing">The access arrangement for this distribution has not been provided.</p>
+                                <div class="reading-gap"><p class="data-gap" data-fact-id="distribution-access" data-status="missing">The access arrangement for this distribution has not been provided.</p></div>
                             {%- endif %}
-                            <div class="repository-arrangement">
+                            <div class="repository-arrangement{{ ' joined-policy' if distroRepositoryKindAUuid in [uuids.publishedDataRepositoryNationalAUuid, uuids.publishedDataRepositoryInstitutionalAUuid, uuids.publishedDataRepositorySpecialAUuid] else '' }}">
                             {% if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
                                 Domain-specific repository
                                 {%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
@@ -115,7 +115,10 @@
                         {%- set licensesItems = repliesMap[licensesPath]|reply_items -%}
                         {%- if licensesItems|length > 0 %}
                             {%- for k in licensesItems -%}
-                                <div class="license-entry" data-item-id="{{ k }}">
+                                {%- set licensePrefix = [licensesPath, k]|reply_path -%}
+                                {%- set publishedDataLicensePath = [licensePrefix, uuids.publishedDataLicenseQUuid]|reply_path -%}
+                                {%- set publishedDataLicenseAUuid = repliesMap[publishedDataLicensePath]|reply_str_value -%}
+                                <div class="license-entry{{ ' joined-policy' if publishedDataLicenseAUuid in [uuids.publishedDataLicenseCC0AUuid, uuids.publishedDataLicenseCCBYAUuid] else '' }}" data-item-id="{{ k }}">
                                 {%- set licensePrefix = [licensesPath, k]|reply_path -%}
                                 {%- set licenseStartPath = [licensePrefix, uuids.publishedDataLicenseStartQUuid]|reply_path -%}
                                 {%- set licenseStart = repliesMap[licenseStartPath]|reply_str_value -%}
@@ -166,7 +169,7 @@
                                 </div>
                             {%- endfor -%}
                         {% else %}
-                            <p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>
+                            <div class="reading-gap"><p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p></div>
                         {%- endif -%}
                         {% endset %}
                         <div class="distribution-reading-unit{{ ' short-reading-unit' if distributionContent|striptags|trim|length <= 500 and 'answer-detail' not in distributionContent else '' }}">{{ distributionContent }}</div>

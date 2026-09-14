@@ -44,6 +44,15 @@
   {%- endif -%}
 {%- endmacro -%}
 
+{# Keep a short owned quantity together in PDF and Word; never bind a long free answer. #}
+{%- macro quantity(value, unit) -%}
+  {%- if value|trim|length <= 24 -%}
+    <span class="quantity">{{ value|e }}&#160;{{ unit|e }}</span>
+  {%- else -%}
+    {{ value|e }} {{ unit|e }}
+  {%- endif -%}
+{%- endmacro -%}
+
 {%- macro integrationFairSharing(reply) -%}
   {%- if reply and reply.value.value.type == "IntegrationType" -%}
     {%- if reply.value.value.raw -%}

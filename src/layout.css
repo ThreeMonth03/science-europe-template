@@ -86,3 +86,13 @@ html body .reading-gap { margin: .5em 0; }
 html body .reading-gap > p { margin-bottom: 0; }
 html body .answer-reference { font-size: 9.5pt; color: #526169; margin-top: .7em; }
 html body .data-gap[data-status="missing-output"] { border: none; border-left: 2px solid #b5bec1; background: #f5f6f6; color: #526169; font-size: 10pt; padding: .4em .65em; }
+.quantity { white-space: nowrap; }
+/* Only fixed access / simple repository / standard licence facts join in Q10.
+   Restricted terms, complex repositories, missing answers and labels stay blocks. */
+.distribution-reading-unit > p:not(.data-gap):not(.answer-lead),
+.distribution-reading-unit > .joined-policy,
+.distribution-reading-unit .joined-policy > p,
+.distribution-reading-unit .joined-policy > .answer-lead,
+.distribution-reading-unit .joined-policy > .answer-lead > p { display: inline; margin: 0; }
+.distribution-reading-unit > p:not(.data-gap):not(.answer-lead)::after,
+.distribution-reading-unit .joined-policy p::after { content: " "; }

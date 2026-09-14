@@ -48,7 +48,7 @@ class FormatVolumeTests(unittest.TestCase):
                 self.assertEqual(not bool((count or '').strip()), bool(soup.select('[data-fact-id="format-file-count"]')))
                 self.assertEqual(not bool((size or '').strip()), bool(soup.select('[data-fact-id="format-file-size"]')))
                 if (count or '').strip(): self.assertIn(f'We expect {count} files', soup.get_text())
-                if (size or '').strip(): self.assertIn(f'average file size is {size} GB.', soup.get_text())
+                if (size or '').strip(): self.assertIn(f'average file size is {size} GB.', soup.get_text().replace('\xa0', ' '))
                 self.assertFalse(soup.select('.format-summary .data-gap, .format-summary ul, .format-summary br'))
 
     def test_total_and_small_are_distinct_from_unknown(self):
@@ -57,7 +57,7 @@ class FormatVolumeTests(unittest.TestCase):
             if total is not None: data[TOTAL] = total
             soup = self.render(data)
             self.assertEqual(not bool((total or '').strip()), bool(soup.select('[data-fact-id="format-total-volume"]')))
-            if (total or '').strip(): self.assertIn(f'{total} GB of data', soup.get_text())
+            if (total or '').strip(): self.assertIn(f'{total} GB of data', soup.get_text().replace('\xa0', ' '))
         data[VOLUME] = IDS['formatsVolumeSmallAUuid']
         self.assertIn('small amount of data', self.render(data).get_text())
         del data[VOLUME]
@@ -95,7 +95,7 @@ class FormatVolumeTests(unittest.TestCase):
     def test_no_numeric_coercion_or_rounded_zero_total(self):
         for count, size in [('2', '0.0001'), ('2.5', 'invalid'), ('1e3', '0.5')]:
             data = values(); data[VOLUME] = IDS['formatsVolumeFileSizeAUuid']; data[COUNT] = count; data[SIZE] = size
-            text = self.render(data).get_text()
+            text = self.render(data).get_text().replace('\xa0', ' ')
             self.assertIn(f'We expect {count} files', text); self.assertIn(f'is {size} GB.', text)
             self.assertNotIn('GB in total', text)
 

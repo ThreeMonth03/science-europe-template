@@ -174,6 +174,8 @@
         {%- set formatsVolumeTotalGB = repliesMap[[formatsVolumePath, uuids.formatsVolumeTotalAUuid, uuids.formatsVolumeTotalGBQUuid]|reply_path]|reply_str_value -%}
         {%- set formatsVolumeFiles = repliesMap[[formatsVolumePath, uuids.formatsVolumeFileSizeAUuid, uuids.formatsVolumeFilesQUuid]|reply_path]|reply_str_value -%}
         {%- set formatsVolumeFileGB = repliesMap[[formatsVolumePath, uuids.formatsVolumeFileSizeAUuid, uuids.formatsVolumeFileGBQUuid]|reply_path]|reply_str_value -%}
+        {%- set formatTotalQuantity = macros.quantity(formatsVolumeTotalGB, "GB") -%}
+        {%- set formatAverageQuantity = macros.quantity(formatsVolumeFileGB, "GB") -%}
         <div class="format-description" data-item-id="{{ formatItem }}">
           <div class="dataset-policy format-summary">
             {% if formatName|striptags|trim %}
@@ -210,7 +212,7 @@
               <p>We will have only a small amount of data stored in this format.</p>
             {%- elif formatsVolumeAUuid == uuids.formatsVolumeTotalAUuid -%}
               {%- if formatsVolumeTotalGB|trim %}
-                <p>We expect to have {{ formatsVolumeTotalGB|e }} GB of data in this format.</p>
+                <p>We expect to have {{ formatTotalQuantity }} of data in this format.</p>
               {%- endif -%}
             {%- elif formatsVolumeAUuid == uuids.formatsVolumeFileSizeAUuid -%}
               {# Keep each entered quantity independently; do not coerce/round it into an invented total. #}
@@ -218,7 +220,7 @@
                 <p>We expect {{ formatsVolumeFiles|e }} files in this format.</p>
               {%- endif -%}
               {%- if formatsVolumeFileGB|trim %}
-                <p>The estimated average file size is {{ formatsVolumeFileGB|e }} GB.</p>
+                <p>The estimated average file size is {{ formatAverageQuantity }}.</p>
               {%- endif -%}
             {%- endif -%}
           </div>
@@ -228,30 +230,29 @@
               {{ formatsWhyNSAnotherReason|markdown }}
             </div>
           {% endif %}
-          {% set formatGaps %}
+          {% set formatGaps = [] %}
             {% if not formatName|striptags|trim %}
-              <span data-fact-id="format-name" data-status="missing">The name of this data format has not been provided.</span>
+              {% set fieldGap %}<span data-fact-id="format-name" data-status="missing">data format name</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% endif %}
             {% if formatsIsStandardAUuid not in [uuids.formatsIsStandardYesAUuid, uuids.formatsIsStandardNoAUuid] %}
-              <span data-fact-id="format-standard" data-status="missing">Whether this is a standardized format has not been specified.</span>
+              {% set fieldGap %}<span data-fact-id="format-standard" data-status="missing">whether the format is standardized</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% elif formatsIsStandardAUuid == uuids.formatsIsStandardNoAUuid and (formatsWhyNonStandardAUuid not in [uuids.formatsWhyNSThereIsNoStandardAUuid, uuids.formatsWhyNSItIsOptimizedAUuid, uuids.formatsWhyNSAnotherReasonAUuid] or (formatsWhyNonStandardAUuid == uuids.formatsWhyNSAnotherReasonAUuid and not formatsWhyNSAnotherReason|trim)) %}
-              <span data-fact-id="nonstandard-reason" data-status="missing">The reason for using a non-standard format has not been provided.</span>
+              {% set fieldGap %}<span data-fact-id="nonstandard-reason" data-status="missing">reason for using a non-standard format</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% endif %}
             {% if formatsIsLTSuitableAUuid not in [uuids.formatsIsLTSuitableYesAUuid, uuids.formatsIsLTSuitableNoAUuid] %}
-              <span data-fact-id="format-archiving" data-status="missing">Whether this format is suitable for long-term archiving has not been specified.</span>
+              {% set fieldGap %}<span data-fact-id="format-archiving" data-status="missing">suitability for long-term archiving</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% elif formatsIsLTSuitableAUuid == uuids.formatsIsLTSuitableNoAUuid and formatsConvertLTSuitableAUuid not in [uuids.formatsConvertLTSuitableYesAUuid, uuids.formatsConvertLTSuitableNoAUuid] %}
-              <span data-fact-id="format-conversion" data-status="missing">Whether this format will be converted for long-term archiving has not been specified.</span>
+              {% set fieldGap %}<span data-fact-id="format-conversion" data-status="missing">whether the data will be converted to a suitable archival format</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% endif %}
             {% if formatsVolumeAUuid == uuids.formatsVolumeTotalAUuid %}
-              {% if not formatsVolumeTotalGB|trim %}<span data-fact-id="format-total-volume" data-status="missing">The estimated total volume in GB has not been provided.</span>{% endif %}
+              {% if not formatsVolumeTotalGB|trim %}{% set fieldGap %}<span data-fact-id="format-total-volume" data-status="missing">estimated total volume (GB)</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
             {% elif formatsVolumeAUuid == uuids.formatsVolumeFileSizeAUuid %}
-              {% if not formatsVolumeFiles|trim %}<span data-fact-id="format-file-count" data-status="missing">The estimated number of files has not been provided.</span>{% endif %}
-              {% if not formatsVolumeFileGB|trim %}<span data-fact-id="format-file-size" data-status="missing">The estimated average file size in GB has not been provided.</span>{% endif %}
+              {% if not formatsVolumeFiles|trim %}{% set fieldGap %}<span data-fact-id="format-file-count" data-status="missing">estimated number of files</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
+              {% if not formatsVolumeFileGB|trim %}{% set fieldGap %}<span data-fact-id="format-file-size" data-status="missing">estimated average file size (GB)</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
             {% elif formatsVolumeAUuid != uuids.formatsVolumeSmallAUuid %}
-              <span data-fact-id="format-volume" data-status="missing">The estimated data volume has not been provided.</span>
+              {% set fieldGap %}<span data-fact-id="format-volume" data-status="missing">estimated data volume</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% endif %}
-          {% endset %}
-          {% if formatGaps|striptags|trim %}<p class="data-gap" data-requirement-id="SE-1b">{{ formatGaps }}</p>{% endif %}
+          {% if formatGaps %}<p class="data-gap" data-requirement-id="SE-1b">Information still needed: {{ formatGaps|join(", ") }}.</p>{% endif %}
         </div>
       {%- endfor -%}
     </div>
