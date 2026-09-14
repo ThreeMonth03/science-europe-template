@@ -95,6 +95,12 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     list_lead = document.styles.add_style("Pilot List Lead", WD_STYLE_TYPE.PARAGRAPH)
     list_lead.base_style = document.styles["Compact"]
     list_lead.paragraph_format.keep_with_next = True
+    # Q11-specific styles: do not alter free-answer or other list pagination.
+    for name, keep_next in (("Pilot Repository Lead", True), ("Pilot Repository Item", False)):
+        item = document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+        item.base_style = document.styles["Compact"]
+        item.paragraph_format.keep_with_next = keep_next
+        item.paragraph_format.keep_together = True
     table_lead = document.styles.add_style("Pilot Table Lead", WD_STYLE_TYPE.PARAGRAPH)
     table_lead.base_style = document.styles["Compact"]
     table_lead.paragraph_format.keep_with_next = True

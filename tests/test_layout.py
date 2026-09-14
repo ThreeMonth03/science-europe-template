@@ -37,6 +37,11 @@ class LayoutTests(unittest.TestCase):
                 self.assertTrue(document.styles["Pilot List Lead"].paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Table Lead"].paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Table Lead"].paragraph_format.keep_together)
+                self.assertTrue(document.styles["Pilot Repository Lead"].paragraph_format.keep_with_next)
+                self.assertFalse(document.styles["Pilot Repository Item"].paragraph_format.keep_with_next)
+                for name in ["Pilot Repository Lead", "Pilot Repository Item"]:
+                    self.assertTrue(document.styles[name].paragraph_format.keep_together)
+                    self.assertEqual('Compact', document.styles[name].base_style.name)
                 self.assertFalse(document.styles["Heading 4"].font.italic)
                 self.assertEqual(0, document.styles["Body Text"].paragraph_format.space_before)
                 for style_name in ("Normal", "Body Text", "First Paragraph", "Compact"):

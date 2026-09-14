@@ -49,6 +49,33 @@ end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
+  if div.classes:includes("repository-destinations") then
+    -- Recheck the HTML hint against the actual AST, counting Unicode characters.
+    -- BulletList may already have styled short items; normalize those wrappers
+    -- locally so an authored/long Q11 list cannot inherit that generic keep chain.
+    local list, simple = nil, true
+    for _, block in ipairs(div.content) do
+      if block.t == "BulletList" and list == nil then list = block
+      elseif not (block.t == "Div" and block.classes:includes("answer-lead")) then simple = false end
+    end
+    if list == nil then return div end
+    for _, item in ipairs(list.content) do
+      for index, block in ipairs(item) do
+        if block.t == "Div" and block.attributes["custom-style"] == "Pilot List Lead" and #block.content == 1 then
+          item[index] = block.content[1]
+        end
+      end
+      if #item ~= 1 or (item[1].t ~= "Para" and item[1].t ~= "Plain") then simple = false end
+    end
+    if div.classes:includes("short-repository-list") and simple and #list.content <= 3 and
+       utf8.len(pandoc.utils.stringify(list)) <= 900 then
+      for index, item in ipairs(list.content) do
+        local style = index < #list.content and "Pilot Repository Lead" or "Pilot Repository Item"
+        item[1] = pandoc.Div({pandoc.Para(item[1].content)}, pandoc.Attr("", {}, {["custom-style"] = style}))
+      end
+    end
+    return div
+  end
   if div.classes:includes("distribution-reading-unit") then
     local flattened = pandoc.List()
     local function collect(blocks, owned)
