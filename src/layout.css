@@ -87,6 +87,10 @@ html body .short-table-unit { break-inside: avoid; }
 /* Q11 emits this hint only for <=3 bounded, inline-only repository summaries. */
 html body .short-repository-list { break-inside: avoid; }
 html body .repository-label { font-weight: bold; }
+/* Q13: one owned heading, then one contiguous identifier arrangement. */
+html body .identifier-heading { margin: .25em 0 .35em; break-after: avoid; }
+html body .identifier-heading > p { display: inline; margin: 0; }
+html body .identifier-heading > p::after { content: ' '; }
 html body .reading-gap { margin: .5em 0; }
 html body .reading-gap > p { margin-bottom: 0; }
 html body .answer-reference { font-size: 9.5pt; color: #526169; margin-top: .7em; }

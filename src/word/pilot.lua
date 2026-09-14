@@ -54,6 +54,29 @@ end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
 function Div(div)
+  if div.classes:includes("identifier-heading") then
+    -- Q13 only: combine the existing distribution number and repository type.
+    -- Para may already wrap all-Strong labels. Reject unexpected/free blocks;
+    -- do not turn this into a generic label/paragraph-flattening operation.
+    if #div.content > 2 or utf8.len(pandoc.utils.stringify(div)) > 240 then return div end
+    local inlines = pandoc.List()
+    for _, block in ipairs(div.content) do
+      if block.t == "Div" and block.attributes["custom-style"] == "Pilot Label" and #block.content == 1 then
+        block = block.content[1]
+      end
+      if block.t ~= "Para" and block.t ~= "Plain" then return div end
+      if #block.content > 0 then
+        if #block.content ~= 1 or block.content[1].t ~= "Strong" then return div end
+        if #inlines > 0 then inlines:insert(pandoc.Space()) end
+        inlines:extend(block.content)
+      end
+    end
+    if #inlines > 0 then
+      div.content = {pandoc.Para(inlines)}
+      div.attributes["custom-style"] = "Pilot Label"
+    end
+    return div
+  end
   if div.classes:includes("repository-destinations") then
     -- Recheck the HTML hint against the actual AST, counting Unicode characters.
     -- BulletList may already have styled short items; normalize those wrappers

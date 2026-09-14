@@ -27,6 +27,7 @@
                             {%- set repositoryKindQUuid = [publishedDistrosItem, uuids.publishedDataRepositoryKindQUuid]|reply_path -%}
                             {%- set repositoryKindAUuid = repliesMap[repositoryKindQUuid]|reply_str_value -%}
                             <div class="distribution-section" data-item-id="{{ j }}">
+                            <div class="identifier-heading">
                             {% if publishedDistrosItems|length > 1 %}<p class="answer-lead"><strong>Distribution {{ loop.index }}</strong></p>{% endif %}
                             <p class="answer-lead">
                             {%- if repositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid -%}
@@ -41,11 +42,12 @@
                                 <strong>Special-purpose repository</strong>
                             {%- endif -%}
                             </p>
+                            </div>
 
                             {# Will this data be assigned persistent identifier? #}
                             {%- if publishedDataIdentifierAUuid == uuids.publishedDataIdentifierYesAUuid -%}
-                            <p data-fact-id="persistent-identifier" data-status="complete">Persistent identifiers will be assigned.</p>
                             <div class="identifier-arrangement dataset-policy">
+                            <p data-fact-id="persistent-identifier" data-status="complete">Persistent identifiers will be assigned.</p>
                                 {# Who assigns #}
                                 {%- set publishedDataIdentifierAssignsQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierAssignsQUuid]|reply_path -%}
                                 {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}

@@ -23,7 +23,9 @@ class RepositoryReadingTests(unittest.TestCase):
         self.assertFalse(middle.select('[data-fact-id="repository-long-term-support"]'))
         for q in ['10-share-restrictions', '13-persistent-identifier']:
             other = BeautifulSoup(render_question(f'src/questions/{q}.html.j2', replies), 'html.parser')
-            self.assertEqual(['Distribution 1', 'Distribution 2', 'Distribution 3'], [n.get_text() for n in other.select('.distribution-section > .answer-lead:first-child strong, .distribution-reading-unit > .answer-lead:first-child strong')])
+            selector = ('.identifier-heading > .answer-lead:first-child strong' if q.startswith('13-') else
+                        '.distribution-section > .answer-lead:first-child strong, .distribution-reading-unit > .answer-lead:first-child strong')
+            self.assertEqual(['Distribution 1', 'Distribution 2', 'Distribution 3'], [n.get_text() for n in other.select(selector)])
 
     def test_single_repository_has_no_redundant_number_and_inactive_parent_has_no_list(self):
         self.assertFalse(render(support_replies()).select('.repository-label'))
