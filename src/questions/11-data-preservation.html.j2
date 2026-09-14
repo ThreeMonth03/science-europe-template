@@ -72,7 +72,7 @@
               {%- set domainSpecificRepoContactBeforeAUuid = repliesMap[domainSpecificRepoContactBeforePath]|reply_str_value -%}
               {%- set repositoryOtherContact = distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid and domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeOtherAUuid -%}
                 <li class="repository-distribution" data-item-id="{{ j }}">
-                  {% if repositoryOtherContact %}<div class="answer-lead repository-contact-heading">{% endif %}
+                  {% if repositoryOtherContact %}<div class="answer-lead repository-contact-heading"><p>{% endif %}
                   {% if distrosItems|length > 1 %}<span class="repository-label">Distribution {{ loop.index }}:</span> {% endif %}
                   {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
                     Domain-specific repository
@@ -82,7 +82,7 @@
                       : {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.
                     {%- else -%}.
                     {% endif -%}
-                    {% if repositoryOtherContact %}</div>{% endif %}
+                    {% if repositoryOtherContact %}</p></div>{% endif %}
                     {# Contact the repository #}
                     {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid %}
                       We don't need to contact the repository because it is a routine for us.

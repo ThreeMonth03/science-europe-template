@@ -35,7 +35,8 @@ class RepositoryContactTests(unittest.TestCase):
             detail = target[0].select_one('.answer-detail')
             heading = target[0].find_parent(class_='repository-distribution').select_one('.repository-contact-heading')
             self.assertIn('answer-lead', heading['class'])
-            self.assertFalse(heading.select('.answer-detail, p, ul, table'))
+            self.assertEqual(1, len(heading.find_all('p', recursive=False)))
+            self.assertFalse(heading.select('.answer-detail, ul, table'))
             self.assertEqual('complete', detail['data-status'])
             self.assertEqual(value, detail.decode_contents())
         self.assertEqual(3, soup.get_text().count('Contact-2027.csv'))  # Three different supplied fields.
