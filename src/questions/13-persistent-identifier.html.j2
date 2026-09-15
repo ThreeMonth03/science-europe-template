@@ -53,13 +53,13 @@
                                 {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}
 
                                 {%- if publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
-                                    <p>A project data steward or principal investigator will assign the persistent identifier.</p>
+                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">A project data steward or principal investigator will assign the persistent identifier.</p>
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid -%}
-                                    <p>An institutional data steward will assign the persistent identifier.</p>
+                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">An institutional data steward will assign the persistent identifier.</p>
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsRepositoryAUuid -%}
-                                    <p>The repository will assign the persistent identifier.</p>
+                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">The repository will assign the persistent identifier.</p>
                                 {%- endif -%}
 
                                 {# Resolvable #}
@@ -67,14 +67,31 @@
                                 {%- set publishedDataIdentifierResolvableAUuid = repliesMap[publishedDataIdentifierResolvableQUuid]|reply_str_value -%}
 
                                 {%- if publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid -%}
-                                    <p>The repository will make sure the persistent identifier can be resolved to a digital object.</p>
+                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="complete">The repository will make sure the persistent identifier can be resolved to a digital object.</p>
 
                                 {%- elif publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableNoAUuid -%}
-                                    <p>The repository will not make sure the persistent identifier can be resolved to a digital object.</p>
+                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="explicit-no">The repository will not make sure the persistent identifier can be resolved to a digital object.</p>
                                 {%- endif -%}
 
                                 {# The old identifier-specification question is absent from KM 2.7.0. #}
                             </div>
+                            {# Missing/unsupported follow-ups are distinct from the supplied policy.
+                               Capture each translatable label before joining, as in Q2. #}
+                            {% set identifierMissing = [] %}{% set identifierReview = [] %}
+                            {% if publishedDataIdentifierAssignsAUuid not in [uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid, uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid, uuids.publishedDataIdentifierAssignsRepositoryAUuid] %}
+                              {% set fieldGap %}<span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="{{ 'needs-review' if publishedDataIdentifierAssignsAUuid|trim else 'missing' }}">who will assign the persistent identifier</span>{% endset %}
+                              {% if publishedDataIdentifierAssignsAUuid|trim %}{% do identifierReview.append(fieldGap) %}{% else %}{% do identifierMissing.append(fieldGap) %}{% endif %}
+                            {% endif %}
+                            {% if publishedDataIdentifierResolvableAUuid not in [uuids.publishedDataIdentifierResolvableYesAUuid, uuids.publishedDataIdentifierResolvableNoAUuid] %}
+                              {% set fieldGap %}<span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="{{ 'needs-review' if publishedDataIdentifierResolvableAUuid|trim else 'missing' }}">whether the repository guarantees resolution of the persistent identifier to a digital object</span>{% endset %}
+                              {% if publishedDataIdentifierResolvableAUuid|trim %}{% do identifierReview.append(fieldGap) %}{% else %}{% do identifierMissing.append(fieldGap) %}{% endif %}
+                            {% endif %}
+                            {% if identifierMissing or identifierReview %}
+                              <div class="identifier-followups reading-gap">
+                                {% if identifierMissing %}<p class="data-gap" data-requirement-id="SE-5d">Information still needed: {{ identifierMissing|join(", ") }}.</p>{% endif %}
+                                {% if identifierReview %}<p class="data-gap" data-requirement-id="SE-5d">This template cannot interpret the selected answers for: {{ identifierReview|join(", ") }}.</p>{% endif %}
+                              </div>
+                            {% endif %}
                             {%- elif publishedDataIdentifierAUuid == uuids.publishedDataIdentifierNoAUuid -%}
                               <p>Within this repository, unique and persistent identifiers will not be applied.</p>
                             {%- else -%}

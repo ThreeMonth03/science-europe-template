@@ -3,8 +3,11 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.14`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:0.3.15`, so it cannot overwrite
 > the official template accidentally.
+
+The 0.3.15 [identifier follow-up experiment](docs/identifier-followups.md) makes
+missing or unsupported assignment/resolution answers visible without inventing policy.
 
 The 0.3.14 [identifier reading experiment](docs/identifier-reading.md) groups
 Q13's existing labels and policy sentences without rewriting any answers.
