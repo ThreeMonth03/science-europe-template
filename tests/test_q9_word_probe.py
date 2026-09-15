@@ -9,10 +9,22 @@ from generate_q9_word_fixtures import q9_word_cases,IDS
 
 class Q9ProbeTests(unittest.TestCase):
     def test_only_identical_strong_label_in_styled_para(self):
-        old={'t':'Plain','c':[{'t':'Strong','c':[{'t':'Str','c':'Original.csv'}]}]}
-        new={'t':'Div','c':[['',[],[['custom-style','Pilot List Lead']]],[{'t':'Para','c':copy.deepcopy(old['c'])}]]}
+        label={'t':'Plain','c':[{'t':'Strong','c':[{'t':'Str','c':'Original.csv'}]}]}
+        flag={'t':'Plain','c':[{'t':'Str','c':'Personal.'}]}
+        old=[label,{'t':'BulletList','c':[[flag]]}]
+        new=[{'t':'Div','c':[['',[],[['custom-style','Pilot List Lead']]],[{'t':'Para','c':copy.deepcopy(label['c'])}]]},copy.deepcopy(old[1])]
         self.assertEqual(1,allowed_changes(old,new))
-        new['c'][1][0]['c'][0]['c'][0]['c']='changed.csv'
+        new[0]['c'][1][0]['c'][0]['c'][0]['c']='changed.csv'
+        with self.assertRaises(AssertionError):allowed_changes(old,new)
+
+    def test_both_flag_texts_and_order_survive_joining(self):
+        label={'t':'Plain','c':[{'t':'Strong','c':[{'t':'Str','c':'Original.csv'}]}]}
+        a,b=[{'t':'Plain','c':[{'t':'Str','c':v}]} for v in ['Personal.','Sensitive.']]
+        old=[label,{'t':'BulletList','c':[[a],[b]]}]
+        new=[{'t':'Div','c':[['',[],[['custom-style','Pilot List Lead']]],[{'t':'Para','c':copy.deepcopy(label['c'])}]]},
+             {'t':'BulletList','c':[[{'t':'Plain','c':a['c']+[{'t':'Space'}]+b['c']}]]}]
+        self.assertEqual(1,allowed_changes(old,new))
+        new[1]['c'][0][0]['c']=b['c']+[{'t':'Space'}]+a['c']
         with self.assertRaises(AssertionError):allowed_changes(old,new)
 
     def test_deleted_flags_and_wrong_style_are_rejected(self):

@@ -102,7 +102,7 @@ end
 
 -- Q9: a produced-data name is a Strong-only Plain followed by 1-2 flags.
 -- Only inspect direct answer lists, never authored answer-detail subtrees.
--- Preserve every inline and nested-list item; style only the bounded name.
+-- Preserve every fact/inline; join two fixed flags into one short list paragraph.
 local function keep_q9_dataset_labels(div)
   -- Returning a rebuilt Div makes Pandoc normalize empty list items into empty
   -- Plain blocks. Reject that malformed shape even in an unrelated subtree.
@@ -133,7 +133,7 @@ local function keep_q9_dataset_labels(div)
               if label.t == "Plain" and #label.content == 1 and label.content[1].t == "Strong" and
                  simple(label.content[1].content) and width(label) > 0 and width(label) <= 80 and
                  flags.t == "BulletList" and #flags.content >= 1 and #flags.content <= 2 then
-                local eligible = true
+                local eligible, paragraphs = true, {}
                 for _, flag in ipairs(flags.content) do
                   if #flag ~= 1 then eligible = false
                   else
@@ -144,10 +144,22 @@ local function keep_q9_dataset_labels(div)
                        #block.content == 1 then block = block.content[1] end
                     if (block.t ~= "Plain" and block.t ~= "Para") or not simple(block.content) or
                        width(block) == 0 or width(block) > 160 then eligible = false end
+                    table.insert(paragraphs, block)
                   end
                 end
                 if eligible then
                   item[1] = pandoc.Div({pandoc.Para(label.content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot List Lead"}))
+                  if #paragraphs == 2 then
+                    local inlines = pandoc.List()
+                    local left, right = pandoc.utils.stringify(paragraphs[1]), pandoc.utils.stringify(paragraphs[2])
+                    local last = utf8.codepoint(left, utf8.offset(left, -1))
+                    inlines:extend(paragraphs[1].content)
+                    -- A Chinese full stop already separates the fixed sentences;
+                    -- avoid inserting a Western-font space between CJK runs.
+                    if not (last >= 0x2E80 and utf8.codepoint(right) >= 0x2E80) then inlines:insert(pandoc.Space()) end
+                    inlines:extend(paragraphs[2].content)
+                    item[2] = pandoc.BulletList({{pandoc.Plain(inlines)}})
+                  end
                   changed = true
                 end
               end

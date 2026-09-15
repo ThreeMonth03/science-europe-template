@@ -21,13 +21,14 @@ with tempfile.TemporaryDirectory() as tmp:
  subprocess.run(common+["--to=docx","--reference-doc="+str(ref),"-o",str(doc)],input=p["html"].encode(),check=True)
  with zipfile.ZipFile(doc) as z: body=E.fromstring(z.read("word/document.xml"))
  ns={"w":"http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
+ blocks=[E.tostring(n,encoding="unicode") for n in body.find("w:body",ns)]
  paragraphs=[]
  for node in body.findall(".//w:body/w:p",ns):
   style=node.find("w:pPr/w:pStyle",ns)
   value=style.get("{"+ns["w"]+"}val") if style is not None else None
   if style is not None:node.find("w:pPr",ns).remove(style)
   paragraphs.append({"text":"".join(t.text or "" for t in node.findall(".//w:t",ns)),"style":value,"other_xml":E.tostring(node,encoding="unicode")})
- print(json.dumps({"ast":ast,"paragraphs":paragraphs}))
+ print(json.dumps({"ast":ast,"paragraphs":paragraphs,"word_blocks":blocks}))
 '''
 
 HANDLER = '  if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end'
