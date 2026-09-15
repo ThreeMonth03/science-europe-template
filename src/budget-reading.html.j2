@@ -6,7 +6,7 @@
   {%- set result.long = row.purpose.count('<p>') >= 12 and row.purpose.count('<p>') <= 160 and row.purpose|striptags|length <= 30000 -%}
   {%- for fragment in row.purpose.split('<')[1:] -%}
     {%- set tag = fragment.split('>')[0] -%}
-    {%- if tag not in ['p', '/p', 'strong', '/strong', 'em', '/em', 'code', '/code', 'ul', '/ul', 'li', '/li', '/a', '/div', 'div class="answer-detail" data-fact-id="resource-justification" data-status="complete"'] and not tag.startswith('a href="') -%}
+      {%- if tag not in ['p', '/p', 'strong', '/strong', 'em', '/em', 'code', '/code', 'ul', '/ul', 'li', '/li', '/a', '/div', 'div class="answer-detail" data-fact-id="resource-justification" data-status="complete"', 'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-allocation" data-status="missing"'] and not tag.startswith('a href="') -%}
       {%- set result.long = false -%}
     {%- endif -%}
   {%- endfor -%}
@@ -15,10 +15,19 @@
   {%- endfor -%}
   {%- if row.purpose.count('<ul>') > 1 or row.purpose.count('<li>') > 8 -%}{%- set result.long = false -%}{%- endif -%}
   {%- for value, limit in [(row.title, 80), (row.budget, 80), (row.funding, 100)] -%}
-    {%- if not value|striptags|trim or value|striptags|length > limit or value.count('<p') > 3 -%}{%- set result.long = false -%}{%- endif -%}
+    {# Collapse source indentation for the height estimate only, never output.
+       Missing values retain the original facts, wording and attributes. #}
+    {%- set visible = (value|striptags).split()|join(' ') -%}
+    {%- if not visible or visible|length > limit or value|length > 2000 or value.count('<p') > 3 -%}{%- set result.long = false -%}{%- endif -%}
     {%- for fragment in value.split('<')[1:] -%}
       {%- set tag = fragment.split('>')[0] -%}
-      {%- if tag not in ['p', '/p', 'strong', '/strong', 'div class="answer-detail"', '/div'] -%}{%- set result.long = false -%}{%- endif -%}
+      {%- if tag not in ['p', '/p', 'strong', '/strong', 'div class="answer-detail"', '/div',
+        'p data-fact-id="resource-amount-value" data-status="complete"',
+        'p data-fact-id="resource-currency" data-status="complete"',
+        'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing"',
+        'p data-fact-id="cost-coverage" data-status="complete"',
+        'p class="data-gap" data-fact-id="grant-number" data-status="missing"',
+        'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"'] -%}{%- set result.long = false -%}{%- endif -%}
     {%- endfor -%}
   {%- endfor -%}
 {%- endmacro -%}

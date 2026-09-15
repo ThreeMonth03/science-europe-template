@@ -16,7 +16,7 @@ class PdfBudgetReadingTests(unittest.TestCase):
 
     def test_fragments_scopes_and_historic_non_pdf_output(self):
         result = check(ROOT, (ROOT/'tests/fixtures/budget-0.3.18.html.j2').read_text())
-        self.assertEqual(28, len(result)); self.assertEqual(28, len({name for name, _, _ in matrix()}))
+        self.assertEqual(32, len(result)); self.assertEqual(32, len({name for name, _, _ in matrix()}))
 
     def test_only_pdf_uses_the_pdf_entry(self):
         formats = json.loads((ROOT/'template.json').read_text())['formats']

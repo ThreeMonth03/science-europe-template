@@ -43,10 +43,14 @@ def matrix():
         case('long-title', {first+desc: long, first+'.'+IDS['costTitleQUuid']: 'T'*81}, []),
         case('long-funding', {first+desc: long, first+funding: '<p>'+'F'*101+'</p>'}, []),
         case('funding-link', {first+desc: long, first+funding: '<p><a href="https://example.org/funder">Funder</a></p>'}, []),
-        case('missing-amount', {first+desc: long, first+'.'+IDS['costAmountQUuid']: ''}, []),
-        case('missing-currency', {first+desc: long, first+'.'+IDS['costCurrencyQUuid']: ''}, []),
-        case('missing-funding', {first+desc: long, first+funding: ''}, []),
-        case('missing-allocation', {first+desc: long, first+'.'+IDS['costAllocationQUuid']: []}, []),
+        case('missing-amount', {first+desc: long, first+'.'+IDS['costAmountQUuid']: ''}, [0]),
+        case('missing-currency', {first+desc: long, first+'.'+IDS['costCurrencyQUuid']: ''}, [0]),
+        case('missing-funding', {first+desc: long, first+funding: ''}, [0]),
+        case('missing-allocation', {first+desc: long, first+'.'+IDS['costAllocationQUuid']: []}, [0]),
+        case('missing-amount-and-currency', {first+desc: long, first+'.'+IDS['costAmountQUuid']: '', first+'.'+IDS['costCurrencyQUuid']: ''}, [0]),
+        case('zero-missing-currency', {first+desc: long, first+'.'+IDS['costAmountQUuid']: '0', first+'.'+IDS['costCurrencyQUuid']: ''}, [0]),
+        case('grant-missing-number', {first+desc: long, first+'.'+IDS['costCoverQUuid']: IDS['costCoverGrantAUuid']}, [0]),
+        case('unknown-gap-attributes', {first+desc: long, first+funding: '<p class="data-gap" style="height:1000px">Unknown markup.</p>'}, []),
         case('single-huge-paragraph', {first+desc: '<p>'+'Long '*1000+'</p>'}, []),
         case('wide-paragraph', {first+desc: paragraphs(20, '中'*401)}, []),
         case('too-many-paragraphs', {first+desc: paragraphs(161)}, []),
@@ -157,10 +161,14 @@ def main():
     prior_path = a.prior_question or (ROOT / 'tests/fixtures/budget-0.3.18.html.j2' if a.source_dir.resolve() == ROOT else None)
     result = {'passed': True, 'release_acceptance': False, 'rows': check(a.source_dir, prior_path.read_text() if prior_path else None)}
     if a.engine:
-        replies = next(r for name, r, _ in matrix() if name == 'long'); html = render(a.source_dir, replies, True)
-        soup = BeautifulSoup(html, 'html.parser'); identity = [n.get_text() for n in soup.select_one('.pdf-resource-reading thead').select('tr')[-1].select('td')]
-        payload = {'css': (a.source_dir/'src/layout.css').read_text(), 'html': html, 'identity': identity}
-        result['engine'] = json.loads(subprocess.check_output(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',ENGINE], input=json.dumps(payload).encode()))
+        result['engine'] = []
+        for name, replies, _ in matrix():
+            if name not in ['long', 'missing-amount', 'missing-currency', 'missing-funding', 'missing-allocation', 'missing-amount-and-currency', 'zero-missing-currency', 'grant-missing-number']: continue
+            html = render(a.source_dir, replies, True)
+            soup = BeautifulSoup(html, 'html.parser'); identity = [n.get_text() for n in soup.select_one('.pdf-resource-reading thead').select('tr')[-1].select('td')]
+            payload = {'css': (a.source_dir/'src/layout.css').read_text(), 'html': html, 'identity': identity}
+            engine = json.loads(subprocess.check_output(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',ENGINE], input=json.dumps(payload).encode()))
+            result['engine'].append({'case': name, **engine})
     digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
     result.update({'checker_sha256': digest(Path(__file__)), 'source_sha256': {name: digest(a.source_dir/name) for name in [QUESTION, 'src/budget-reading.html.j2', 'src/pdf/index.html.j2', 'src/layout.css']},
         'helper_sha256': {name: digest(ROOT/name) for name in ['scripts/generate_budget_fixtures.py','scripts/generate_preservation_fixtures.py','scripts/generate_pilot_fixtures.py','scripts/probe_budget_word.py','tests/test_science_europe_contract.py']},

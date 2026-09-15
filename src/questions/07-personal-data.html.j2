@@ -69,6 +69,8 @@
                         <p>We plan to transfer data outside the EU/EEA and these are measures we will place to protect data:
                         {{personalDataSafeguardTransferMeasuresReply|markdown}}</p>
                     {%- endif -%}
+                {%- elif not personalDataSafeguardReply -%}
+                    <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-safeguards" data-status="missing"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>
                 {%- endif -%}
             {%- endif -%}
         {%- elif personalDataReply == uuids.collectPersonalNoAUuid -%}

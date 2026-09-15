@@ -79,6 +79,14 @@ html body .resource-table .data-gap { padding: .2em .35em; }
 html body #q-required-resources .pdf-resource-reading { break-inside: auto; }
 html body .pdf-resource-reading thead td { background: #eef2f4; }
 html body .pdf-resource-reading tbody td { border-top: none; }
+/* Missing metadata needs room for the original prompt, not a three-line label
+   in a 17% column. The full-width purpose and complete-header controls stay as-is. */
+html body .pdf-resource-reading:has(thead > tr > td > .data-gap) col.resource-purpose { width: 40%; }
+html body .pdf-resource-reading:has(thead > tr > td > .data-gap) col.resource-budget { width: 29%; }
+html body .pdf-resource-reading:has(thead > tr > td > .data-gap) col.resource-funding { width: 31%; }
+/* Exactly the four fixed, unanswered Q15 facts: bounded prose with no authored
+   paragraphs, resource rows or nested details. Keep its question with the group. */
+html body #q-required-resources:has(.answer > p.data-gap[data-fact-id="specialist-expertise"]:first-child):has(.answer > p.data-gap[data-fact-id="hardware-software"]:nth-child(2)):has(.answer > p.data-gap[data-fact-id="repository-charges"]:nth-child(3)):has(.answer > p.data-gap[data-fact-id="resources-costing"]:nth-child(4):last-child) { break-inside: avoid; }
 html body .template-gap { font-size: 9.5pt; color: #526169; border-left-color: #8c999e; background: #f3f5f5; }
 /* Owned publication reading blocks: structure, not hidden list markers. */
 html body .dataset-section { margin: .6em 0 1em; }
