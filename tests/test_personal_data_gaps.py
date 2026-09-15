@@ -27,6 +27,9 @@ class PersonalDataGapTests(unittest.TestCase):
         replies = case()
         self.assertEqual(1, len(self.gap(replies)))
         self.assertIn('based on public interest.', render_question(QUESTION, replies))
+        soup = BeautifulSoup(render_question(QUESTION, replies), 'html.parser')
+        self.assertFalse(soup.select('p p, p div, p ul, p table'))
+        self.assertEqual(2, len(soup.select('.answer > p')))
 
     def test_missing_legal_basis_still_prompts_for_reachable_safeguards(self):
         self.assertEqual(1, len(self.gap(case(legal=False))))

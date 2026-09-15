@@ -17,22 +17,23 @@
                     <h4>Legal basis for collecting and processing personal data</h4>
                     <p> We are collecting and processing personal data{{+" "}}
                     {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisPublicAUuid -%}
-                        based on public interest.</p>
+                        based on public interest.
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisAskAUuid -%}
-                        based on subject's consent.</p>
+                        based on subject's consent.
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid -%}
                         {%- set personalDataLegalBasisOtherQUuid = [personalDataLegalBasisQUuid, uuids.cpersGdprLegalBasisOtherAUuid, uuids. cpersGdprLegalBasisOtherWhichQUuid ]|reply_path -%}
                         {%- set personalDataLegalBasisOtherReply = repliesMap[personalDataLegalBasisOtherQUuid]|reply_str_value  -%}
                         {%- if personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichContractAUuid -%}
-                            in order to fulfil contract.</p>
+                            in order to fulfil contract.
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichLegitAUuid -%}
-                            based on legitimate interest.</p>
+                            based on legitimate interest.
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichVitalAUuid -%}
-                            based on vital interest.</p>
+                            based on vital interest.
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichLegalAUuid -%}
-                            based on legal requirement.</p>
+                            based on legal requirement.
                         {%- endif -%}
                     {%- endif -%}
+                    </p>
                 {%- endif -%}
 
                 {# Technical and procedural safeguards #}
