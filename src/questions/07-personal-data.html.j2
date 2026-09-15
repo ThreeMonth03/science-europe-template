@@ -13,7 +13,13 @@
                 {# Legal basis be4651c9-9a8c-4e10-a158-61b94ca0e139 #}
                 {%- set personalDataLegalBasisQUuid = [personalDataGDPRPath, uuids.cpersGdprExploreAUuid, uuids.cpersGdprLegalBasisQUuid]|reply_path  -%}
                 {%- set personalDataLegalBasisReply = repliesMap[personalDataLegalBasisQUuid]|reply_str_value -%}
-                {%- if personalDataLegalBasisReply  -%}
+                {%- set personalDataLegalBasisOtherQUuid = [personalDataLegalBasisQUuid, uuids.cpersGdprLegalBasisOtherAUuid, uuids.cpersGdprLegalBasisOtherWhichQUuid]|reply_path -%}
+                {%- set personalDataLegalBasisOtherReply = repliesMap[personalDataLegalBasisOtherQUuid]|reply_str_value -%}
+                {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid and not personalDataLegalBasisOtherReply -%}
+                    <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-other-legal-basis" data-status="missing"><strong>Information not provided:</strong> the alternative legal basis selected for collecting and processing personal data.</p>
+                {%- elif not personalDataLegalBasisReply -%}
+                    <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-legal-basis" data-status="missing"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>
+                {%- else -%}
                     <h4>Legal basis for collecting and processing personal data</h4>
                     <p> We are collecting and processing personal data{{+" "}}
                     {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisPublicAUuid -%}
@@ -21,8 +27,6 @@
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisAskAUuid -%}
                         based on subject's consent.
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid -%}
-                        {%- set personalDataLegalBasisOtherQUuid = [personalDataLegalBasisQUuid, uuids.cpersGdprLegalBasisOtherAUuid, uuids. cpersGdprLegalBasisOtherWhichQUuid ]|reply_path -%}
-                        {%- set personalDataLegalBasisOtherReply = repliesMap[personalDataLegalBasisOtherQUuid]|reply_str_value  -%}
                         {%- if personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichContractAUuid -%}
                             in order to fulfil contract.
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichLegitAUuid -%}
@@ -50,25 +54,39 @@
                     {%- if personalDataSafeguardLvlIdentifReply == uuids.cpersGdprSafeguardsIdentifAnonymAUuid -%}
                         <p>The stored data are irrevocably anonymized.</p>
                     {%- elif personalDataSafeguardLvlIdentifReply == uuids.cpersGdprSafeguardsIdentifPseudoAUuid -%}
-                        <p>The stored data are psuedoanonymized.</p>
+                        <p>The stored data are pseudonymized.</p>
                     {%- elif personalDataSafeguardLvlIdentifReply == uuids.cpersGdprSafeguardsIdentifIdentifiableAUuid -%}
                         <p>The stored data are identifiable.</p>
+                    {%- elif not personalDataSafeguardLvlIdentifReply -%}
+                        <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-identifiability" data-status="missing"><strong>Information not provided:</strong> whether the stored data are anonymized, pseudonymized, or identifiable.</p>
                     {%- endif -%}
 
                     {%- set personalDataSafeguardElaborateQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardElaborateQUuid ]|reply_path  -%}
                     {%- set personalDataSafeguardElaborateReply = repliesMap[personalDataSafeguardElaborateQUuid]|reply_str_value -%}
-                    {%- if personalDataSafeguardElaborateReply -%}
-                        <p>We will use the following technical and procedural safeguards : {{personalDataSafeguardElaborateReply|markdown}}</p>
-                   {%- endif -%}
+                    {%- if personalDataSafeguardElaborateReply|trim -%}
+                        <p class="answer-lead">Other technical and procedural safeguards:</p>
+                        <div class="answer-detail" data-fact-id="personal-data-additional-safeguards" data-status="complete">{{personalDataSafeguardElaborateReply|markdown}}</div>
+                    {%- else -%}
+                        <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-additional-safeguards" data-status="missing"><strong>Information not provided:</strong> details of any other technical and procedural safeguards.</p>
+                    {%- endif -%}
 
                     {%- set personalDataSafeguardTransferQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardsTransferQUuid]|reply_path -%}
                     {%- set personalDataSafeguardTransferReply = repliesMap[personalDataSafeguardTransferQUuid]|reply_str_value -%}
                     {%- set personalDataSafeguardTransferMeasuresQUuid = [personalDataSafeguardTransferQUuid, uuids.cpersGdprSafeguardsTransferYesAUuid, uuids.cpersGdprSafeguardsTransferMeasuresQUuid]|reply_path -%}
                     {%- set personalDataSafeguardTransferMeasuresReply = repliesMap[personalDataSafeguardTransferMeasuresQUuid]|reply_str_value -%}
 
-                    {%- if (personalDataSafeguardTransferReply == uuids.cpersGdprSafeguardsTransferYesAUuid) and (personalDataSafeguardTransferMeasuresReply) -%}
-                        <p>We plan to transfer data outside the EU/EEA and these are measures we will place to protect data:
-                        {{personalDataSafeguardTransferMeasuresReply|markdown}}</p>
+                    {%- if personalDataSafeguardTransferReply == uuids.cpersGdprSafeguardsTransferYesAUuid -%}
+                        {%- if personalDataSafeguardTransferMeasuresReply|trim -%}
+                            <p class="answer-lead">We plan to transfer data outside the EU/EEA with the following protection measures:</p>
+                            <div class="answer-detail" data-fact-id="personal-data-transfer-measures" data-status="complete">{{personalDataSafeguardTransferMeasuresReply|markdown}}</div>
+                        {%- else -%}
+                            <p>We plan to transfer data outside the EU/EEA.</p>
+                            <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer-measures" data-status="missing"><strong>Information not provided:</strong> the measures for protecting data transferred outside the EU/EEA.</p>
+                        {%- endif -%}
+                    {%- elif personalDataSafeguardTransferReply == uuids.cpersGdprSafeguardsTransferNoAUuid -%}
+                        <p>We do not plan to transfer data outside the EU/EEA.</p>
+                    {%- elif not personalDataSafeguardTransferReply -%}
+                        <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer" data-status="missing"><strong>Information not provided:</strong> whether data will be transferred outside the EU/EEA.</p>
                     {%- endif -%}
                 {%- elif not personalDataSafeguardReply -%}
                     <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-safeguards" data-status="missing"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>

@@ -6,6 +6,10 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.21 [personal-data follow-up regression](docs/personal-data-followups.md)
+distinguishes missing and negative Q7 replies, preserves free-text blocks, and
+removes unsupported Q9 assessment/privacy claims. PDF/Word styles are unchanged.
+
 The 0.3.20 [missing-information regression](docs/missing-info-reading.md) fixes
 the Q7 safeguards prompt and paragraph boundary, long-PDF missing metadata, and
 the bounded empty-Q15 group. It remains experimental, not a full-DMP acceptance.
