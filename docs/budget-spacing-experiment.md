@@ -17,6 +17,13 @@ identity need separate experiments. Fewer pages is not itself acceptance.
 Use the paired native artifacts and checks in the Chinese repository; disposable
 HTML/DOCX rehearsals are diagnosis only. LibreOffice is not Microsoft Word.
 
+The first native attempt exposed a selector-engine discrepancy: the leading
+child combinator in `:has(> tbody > ...)` matched in SoupSieve, not the pinned
+worker's engine. Use `:has(tbody > ...)` and keep `probe_budget_pdf.py` in CI:
+it tests both matches and computed table break rules in worker WeasyPrint 68.1.
+Never accept selector-library tests as native PDF proof. The failed native
+attempt remains in the Chinese repository's local outputs; it is not promoted.
+
 Chinese 0.3.18 must pin the exact English commit in `pipeline.yml`; it carries
 no separate layout patch. Rebase/squash the feature branch only during an approved
 integration, then update the Chinese lock and rebuild. Do not merge official

@@ -9,7 +9,7 @@ from docx.oxml.ns import qn
 from test_layout import module
 
 ROOT = Path(__file__).resolve().parents[1]
-SELECTOR = 'html body #q-required-resources .resource-table:has(> tbody > tr > td:first-child > .answer-detail > :nth-child(12))'
+SELECTOR = 'html body #q-required-resources .resource-table:has(tbody > tr > td:first-child > .answer-detail > :nth-child(12))'
 
 
 def fixture(n=12, question='q-required-resources', table='resource-table', detail='answer-detail'):

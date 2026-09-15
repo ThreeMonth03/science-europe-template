@@ -21,3 +21,5 @@ jobs:
         run: python scripts/probe_budget_word.py --output outputs/budget-word-probe.json
       - name: Check long-budget Word structure with pinned worker Pandoc
         run: python scripts/probe_long_budget_word.py --output outputs/long-budget-word-probe.json
+      - name: Check budget CSS with the pinned worker rendering engine
+        run: python scripts/probe_budget_pdf.py --output outputs/budget-pdf-probe.json
