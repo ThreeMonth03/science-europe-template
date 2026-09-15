@@ -86,21 +86,16 @@
                 {%- set projectCostItems = repliesMap[projectCostPath]|reply_items -%}
 
                 {%- if projectCostItems|length > 0  -%}
-                    {%- set budgetLayout = namespace(header='', rows=[]) -%}
-                    {%- set originalBudgetTable -%}
                     <table class="resource-table">
                       <colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup>
-                      <thead>{% set budgetLayout.header %}<tr><th scope="col">Resource and purpose</th><th scope="col">Budget</th><th scope="col">Funding source</th></tr>{% endset %}{{ budgetLayout.header }}</thead>
+                      <thead><tr><th scope="col">Resource and purpose</th><th scope="col">Budget</th><th scope="col">Funding source</th></tr></thead>
                       <tbody>
                     {%- for j in projectCostItems -%}
                         {%- set projectCostItem = [projectCostPath, j]|reply_path -%}
                         {%- set projectCostItemTitleQUuid = [projectCostItem, uuids.costTitleQUuid]|reply_path -%}
                         {%- set projectCostItemTitleReply = repliesMap[projectCostItemTitleQUuid]|reply_str_value -%}
-                        {%- set budgetRow = namespace(id=projectCostItem, title='', purpose='', budget='', funding='', original='') -%}
-                        {%- set budgetRow.original -%}
                         <tr data-item-id="{{ projectCostItem }}"><td>
-                        {% set budgetRow.title %}<p><strong>{{ projectCostItemTitleReply if projectCostItemTitleReply else "(no resource name given)" }}</strong></p>{% endset %}{{ budgetRow.title }}
-                        {%- set budgetRow.purpose -%}
+                        <p><strong>{{ projectCostItemTitleReply if projectCostItemTitleReply else "(no resource name given)" }}</strong></p>
                         
                         {%- set projectCostItemDescriptionQUuid = [projectCostItem, uuids.costDescriptionQUuid]|reply_path -%}
                         {%- set projectCostItemDescriptionReply = repliesMap[projectCostItemDescriptionQUuid]|reply_str_value  -%}
@@ -118,7 +113,7 @@
                         {%- set projectCostItemAmountQUuid = [projectCostItem, uuids.costAmountQUuid]|reply_path   -%}
                         {%- set projectCostItemAmountReply = repliesMap[projectCostItemAmountQUuid]|reply_str_value -%}
 
-                        {%- set budgetRow.budget -%}
+                        {%- set resourceBudget -%}
                         {%- if  projectCostItemAmountReply and projectCostItemCurrencyReply -%}
                             <p>{{projectCostItemAmountReply}} {{macros.integrationCurrency(projectCostItemCurrencyReply) }}</p>
                         {%- else -%}
@@ -169,8 +164,7 @@
                         {%- endif -%}
                        
  
-                        {% endset %}{{ budgetRow.purpose }}</td><td>{{ budgetRow.budget }}</td><td>
-                        {%- set budgetRow.funding -%}
+                        </td><td>{{ resourceBudget }}</td><td>
                         {%- set projectCostItemCoverQUuid = [projectCostItem, uuids.costCoverQUuid]|reply_path  -%}
                         {%- set projectCostItemCoverReply = repliesMap[projectCostItemCoverQUuid]|reply_str_value -%}
 
@@ -196,17 +190,10 @@
                         {%- endif -%}
 
 
-                        {% endset %}{{ budgetRow.funding }}</td></tr>
-                        {%- endset -%}{{ budgetRow.original }}
-                        {%- do budgetLayout.rows.append(budgetRow) -%}
+                        </td></tr>
                     {%- endfor -%}
                       </tbody>
                     </table>
-                    {%- endset -%}
-                    {%- if pdf_budget_reading|default(false) -%}
-                      {%- import 'src/budget-reading.html.j2' as budgetReading -%}
-                      {{ budgetReading.render(originalBudgetTable, budgetLayout.header, budgetLayout.rows) }}
-                    {%- else -%}{{ originalBudgetTable }}{%- endif -%}
                 {%- else -%}
                     <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project.</p>
                 {%- endif -%}

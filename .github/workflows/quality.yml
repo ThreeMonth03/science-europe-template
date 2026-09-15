@@ -23,3 +23,5 @@ jobs:
         run: python scripts/probe_long_budget_word.py --output outputs/long-budget-word-probe.json
       - name: Check budget CSS with the pinned worker rendering engine
         run: python scripts/probe_budget_pdf.py --output outputs/budget-pdf-probe.json
+      - name: Check PDF budget reading structure and repeating headers
+        run: python scripts/probe_pdf_budget_reading.py --engine --output outputs/pdf-budget-reading-probe.json

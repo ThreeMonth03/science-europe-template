@@ -1,0 +1,48 @@
+{# Presentation only. Capture original fragments once in Q15; never parse them
+   into replacement prose or modify their text/attributes/paragraph boundaries. #}
+{%- macro classify(row, result) -%}
+  {# Conservative height bounds, not a complete HTML parser or text validator.
+     Unknown tags/attributes fall back to the original table, never lose data. #}
+  {%- set result.long = row.purpose.count('<p>') >= 12 and row.purpose.count('<p>') <= 160 and row.purpose|striptags|length <= 30000 -%}
+  {%- for fragment in row.purpose.split('<')[1:] -%}
+    {%- set tag = fragment.split('>')[0] -%}
+    {%- if tag not in ['p', '/p', 'strong', '/strong', 'em', '/em', 'code', '/code', 'ul', '/ul', 'li', '/li', '/a', '/div', 'div class="answer-detail" data-fact-id="resource-justification" data-status="complete"'] and not tag.startswith('a href="') -%}
+      {%- set result.long = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- for paragraph in row.purpose.split('<p>')[1:] -%}
+    {%- if paragraph.split('</p>')[0]|striptags|length > 400 -%}{%- set result.long = false -%}{%- endif -%}
+  {%- endfor -%}
+  {%- if row.purpose.count('<ul>') > 1 or row.purpose.count('<li>') > 8 -%}{%- set result.long = false -%}{%- endif -%}
+  {%- for value, limit in [(row.title, 80), (row.budget, 80), (row.funding, 100)] -%}
+    {%- if not value|striptags|trim or value|striptags|length > limit or value.count('<p') > 3 -%}{%- set result.long = false -%}{%- endif -%}
+    {%- for fragment in value.split('<')[1:] -%}
+      {%- set tag = fragment.split('>')[0] -%}
+      {%- if tag not in ['p', '/p', 'strong', '/strong', 'div class="answer-detail"', '/div'] -%}{%- set result.long = false -%}{%- endif -%}
+    {%- endfor -%}
+  {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro ordinary(header, rows) -%}
+<table class="resource-table"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody>{% for row in rows %}{{ row.original }}{% endfor %}</tbody></table>
+{%- endmacro -%}
+
+{%- macro render(original, header, rows) -%}
+  {%- set selection = namespace(any=false, eligible=[]) -%}
+  {%- for row in rows -%}
+    {%- set result = namespace(long=false) -%}
+    {%- if rows|length <= 32 -%}{{ classify(row, result) }}{%- endif -%}
+    {%- do selection.eligible.append(result.long) -%}
+    {%- set selection.any = selection.any or result.long -%}
+  {%- endfor -%}
+  {%- if not selection.any -%}{{ original }}{%- else -%}
+    {%- set pending = [] -%}
+    {%- for row in rows -%}
+      {%- if selection.eligible[loop.index0] -%}
+        {%- if pending -%}{{ ordinary(header, pending) }}{%- do pending.clear() -%}{%- endif -%}
+        <table class="resource-table pdf-resource-reading" data-item-id="{{ row.id }}"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}<tr><td>{{ row.title }}</td><td>{{ row.budget }}</td><td>{{ row.funding }}</td></tr></thead><tbody><tr><td colspan="3">{{ row.purpose }}</td></tr></tbody></table>
+      {%- else -%}{%- do pending.append(row) -%}{%- endif -%}
+    {%- endfor -%}
+    {%- if pending -%}{{ ordinary(header, pending) }}{%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}

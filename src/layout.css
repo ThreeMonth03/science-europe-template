@@ -75,6 +75,10 @@ html body .resource-table p { margin-bottom: .3em; }
 html body .resource-table ul { padding-left: 1.2em; }
 html body .resource-table .answer-detail { margin: .25em 0; }
 html body .resource-table .data-gap { padding: .2em .35em; }
+/* PDF-only long resource: identity repeats in thead, purpose spans all columns. */
+html body #q-required-resources .pdf-resource-reading { break-inside: auto; }
+html body .pdf-resource-reading thead td { background: #eef2f4; }
+html body .pdf-resource-reading tbody td { border-top: none; }
 html body .template-gap { font-size: 9.5pt; color: #526169; border-left-color: #8c999e; background: #f3f5f5; }
 /* Owned publication reading blocks: structure, not hidden list markers. */
 html body .dataset-section { margin: .6em 0 1em; }
