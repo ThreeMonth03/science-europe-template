@@ -6,6 +6,10 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.24 [empty-Q15 panel experiment](docs/empty-pdf-reading.md) groups exactly
+four fixed missing-information paragraphs visually, without changing their text,
+font size, Jinja, translations or Word. Partial answers retain their original layout.
+
 The 0.3.23 [Q9 Word label regression](docs/q9-word-labels.md) keeps bounded dataset
 names with their own ethics flags, with unchanged bilingual content and native PDF.
 The 0.3.22 [Q8 Word label regression](docs/q8-word-labels.md) keeps bounded dataset
