@@ -100,6 +100,66 @@ local function keep_q8_reference_labels(div)
   return div
 end
 
+-- Q9: a produced-data name is a Strong-only Plain followed by 1-2 flags.
+-- Only inspect direct answer lists, never authored answer-detail subtrees.
+-- Preserve every inline and nested-list item; style only the bounded name.
+local function keep_q9_dataset_labels(div)
+  -- Returning a rebuilt Div makes Pandoc normalize empty list items into empty
+  -- Plain blocks. Reject that malformed shape even in an unrelated subtree.
+  local empty_item = false
+  div:walk({BulletList = function(list)
+    for _, item in ipairs(list.content) do if #item == 0 then empty_item = true end end
+  end})
+  if empty_item then return nil end
+  local changed = false
+  local function width(block)
+    local result = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(block)) do result = result + (code >= 0x2E80 and 2 or 1) end
+    return result
+  end
+  local function simple(inlines)
+    for _, value in ipairs(inlines) do
+      if value.t ~= "Str" and value.t ~= "Space" and value.t ~= "SoftBreak" then return false end
+    end
+    return true
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      for _, list in ipairs(answer.content) do
+        if list.t == "BulletList" and #list.content <= 32 then
+          for _, item in ipairs(list.content) do
+            if #item == 2 then
+              local label, flags = item[1], item[2]
+              if label.t == "Plain" and #label.content == 1 and label.content[1].t == "Strong" and
+                 simple(label.content[1].content) and width(label) > 0 and width(label) <= 80 and
+                 flags.t == "BulletList" and #flags.content >= 1 and #flags.content <= 2 then
+                local eligible = true
+                for _, flag in ipairs(flags.content) do
+                  if #flag ~= 1 then eligible = false
+                  else
+                    local block = flag[1]
+                    -- The generic list rule may already keep the first flag.
+                    if block.t == "Div" and block.identifier == "" and #block.classes == 0 and
+                       #block.attributes == 1 and block.attributes["custom-style"] == "Pilot List Lead" and
+                       #block.content == 1 then block = block.content[1] end
+                    if (block.t ~= "Plain" and block.t ~= "Para") or not simple(block.content) or
+                       width(block) == 0 or width(block) > 160 then eligible = false end
+                  end
+                end
+                if eligible then
+                  item[1] = pandoc.Div({pandoc.Para(label.content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot List Lead"}))
+                  changed = true
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  if changed then return div end
+end
+
 -- Q15: keep a genuinely short overview with its small budget, without a forced
 -- page break. Inspect the entire unit before changing anything. Long, complex,
 -- or multi-project budgets retain the original AST and pagination rules.
@@ -284,6 +344,7 @@ local function expand_long_budget_tables(div)
 end
 
 function Div(div)
+  if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
   if div.identifier == "q-required-resources" then return keep_short_budget_overview(div) end

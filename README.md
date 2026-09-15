@@ -6,6 +6,8 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.23 [Q9 Word label regression](docs/q9-word-labels.md) keeps bounded dataset
+names with their own ethics flags, with unchanged bilingual content and native PDF.
 The 0.3.22 [Q8 Word label regression](docs/q8-word-labels.md) keeps bounded dataset
 names with their permission text. Jinja, translations and native PDF styles stay
 unchanged; long/complex content is not forced into an unbreakable block.
