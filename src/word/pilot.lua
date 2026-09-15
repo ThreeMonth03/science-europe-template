@@ -53,6 +53,50 @@ function BulletList(list)
 end
 
 -- Only template-owned policy sentences may be joined; never flatten free answers.
+-- Q8 reference entries are a plain name Div followed by a permission paragraph.
+-- The generic BulletList rule only links the end of an item to the next item;
+-- it does not link a name to its own permission. Bound each pair independently.
+-- No recursive walk into authored Divs/lists, no new text or paragraph merging.
+local function keep_q8_reference_labels(div)
+  local function width(value)
+    local total = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(value)) do
+      total = total + (code >= 0x2E80 and 2 or 1)
+    end
+    return total
+  end
+  local function plain(block)
+    if block.t ~= "Para" and block.t ~= "Plain" then return false end
+    for _, inline in ipairs(block.content) do
+      if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return false end
+    end
+    return width(block) > 0
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      for _, list in ipairs(answer.content) do
+        if list.t == "BulletList" and #list.content <= 32 then
+          for _, item in ipairs(list.content) do
+            if #item == 2 then
+              local label, permission = item[1], item[2]
+              -- BulletList may have wrapped only the permission in this style.
+              if permission.t == "Div" and permission.identifier == "" and #permission.classes == 0 and
+                 #permission.attributes == 1 and permission.attributes["custom-style"] == "Pilot List Lead" and
+                 #permission.content == 1 then permission = permission.content[1] end
+              if label.t == "Div" and label.identifier == "" and #label.classes == 0 and #label.attributes == 0 and
+                 #label.content == 1 and plain(label.content[1]) and width(label) <= 80 and
+                 plain(permission) and width(permission) <= 320 then
+                label.attributes["custom-style"] = "Pilot List Lead"
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
 -- Q15: keep a genuinely short overview with its small budget, without a forced
 -- page break. Inspect the entire unit before changing anything. Long, complex,
 -- or multi-project budgets retain the original AST and pagination rules.
@@ -237,6 +281,7 @@ local function expand_long_budget_tables(div)
 end
 
 function Div(div)
+  if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
   if div.identifier == "q-required-resources" then return keep_short_budget_overview(div) end
   if div.classes:includes("identifier-heading") then

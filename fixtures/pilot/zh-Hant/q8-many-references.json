@@ -1,0 +1,8 @@
+{
+  "name": "Q8 Word continuity QA / q8-many-references",
+  "events_file": "q8-many-references.events.json",
+  "knowledge_model_package_id": "../../knowledge-models/root-zh-hant-2.7.0.km",
+  "question_tag_uuids": [],
+  "visibility": "PrivateProjectVisibility",
+  "sharing": "RestrictedProjectSharing"
+}
