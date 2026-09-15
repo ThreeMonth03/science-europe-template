@@ -1,0 +1,8 @@
+{
+  "name": "Science Europe budget pagination / budget-long",
+  "events_file": "budget-long.events.json",
+  "knowledge_model_package_id": "../../knowledge-models/root-2.7.0.km",
+  "question_tag_uuids": [],
+  "visibility": "PrivateProjectVisibility",
+  "sharing": "RestrictedProjectSharing"
+}
