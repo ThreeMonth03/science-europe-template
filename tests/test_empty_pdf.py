@@ -1,9 +1,10 @@
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from bs4 import BeautifulSoup
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from probe_empty_pdf import ROOT, SELECTOR, cases, split_css, render
+from probe_empty_pdf import ROOT, SELECTOR, cases, split_css, render, prepared_css
 
 
 class EmptyPdfTests(unittest.TestCase):
@@ -19,3 +20,16 @@ class EmptyPdfTests(unittest.TestCase):
             self.assertNotIn(forbidden,panel)
         self.assertIn('border-left-width: 3px',panel)
         self.assertIn('break-inside: avoid',before)
+
+    def test_prepared_font_is_embedded_in_engine_input(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'src/fonts').mkdir(parents=True)
+            (root/'src/layout.css').write_text('{{ assets("src/fonts/PilotTC.ttf").data_base64 }}')
+            (root/'src/fonts/PilotTC.ttf').write_bytes(b'test-font')
+            self.assertEqual('dGVzdC1mb250',prepared_css(root))
+
+    def test_missing_font_is_not_silently_replaced(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'src').mkdir()
+            (root/'src/layout.css').write_text('{{ assets("src/fonts/PilotTC.ttf").data_base64 }}')
+            with self.assertRaises(AssertionError):prepared_css(root)

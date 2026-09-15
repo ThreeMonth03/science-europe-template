@@ -1,5 +1,6 @@
 """Pinned-engine check of the exact four-gap panel; not native DSW acceptance."""
 import argparse
+import base64
 import copy
 import hashlib
 import json
@@ -22,6 +23,17 @@ def split_css(css):
     assert css.count(BEGIN) == css.count(END) == 1
     before, rest = css.split(BEGIN); panel, after = rest.split(END)
     return before+after.removeprefix('\n'), BEGIN+panel+END
+
+
+def prepared_css(root):
+    css=(root/'src/layout.css').read_text()
+    placeholder='{{ assets("src/fonts/PilotTC.ttf").data_base64 }}'
+    font=root/'src/fonts/PilotTC.ttf'
+    if placeholder in css:
+        assert font.is_file()
+        css=css.replace(placeholder,base64.b64encode(font.read_bytes()).decode())
+    assert '{{ assets(' not in css
+    return css
 
 
 def cases(source):
@@ -55,13 +67,15 @@ from cssselect2 import ElementWrapper,compile_selector_list
 p=json.load(sys.stdin);rows=[]
 keys=['font_size','line_height','margin_bottom','padding_top','padding_bottom','border_top_width','border_bottom_width','border_left_width']
 for case,source,eligible in p['cases']:
+    print(case,file=sys.stderr,flush=True)
     snapshots=[]
     for css in [p['before'],p['after']]:
         doc=HTML(string='<style>'+css+'</style><div style="height:205mm">Before.</div>'+source).render()
         paragraphs=[b for page in doc.pages for b in page._page_box.descendants() if type(b).__name__=='BlockBox' and b.element.tag=='p']
         panels=[b for page in doc.pages for b in page._page_box.descendants() if type(b).__name__=='BlockBox' and b.element.get('class')=='answer']
         texts=[''.join(b.text for b in page._page_box.descendants() if type(b).__name__=='TextBox') for page in doc.pages]
-        snapshots.append((paragraphs,panels,texts))
+        # Retain each document/font configuration while inspecting its boxes.
+        snapshots.append((paragraphs,panels,texts,doc))
     a,b=snapshots; compact=lambda texts:re.sub(r'\\s+','',''.join(texts))
     assert compact(a[2])==compact(b[2]),(case,'text changed')
     assert len(a[0])==len(b[0]),(case,'paragraph count changed')
@@ -85,12 +99,19 @@ print(json.dumps({'weasyprint':__version__,'rows':rows}))
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--source-dir',type=Path,default=ROOT);p.add_argument('--output',type=Path,required=True);a=p.parse_args()
-    css=(a.source_dir/'src/layout.css').read_text();before,panel=split_css(css)
+    css=prepared_css(a.source_dir);before,panel=split_css(css)
     assert panel.count(SELECTOR)==3
     payload={'cases':cases(render(a.source_dir,{},True)),'before':before,'after':css,'selector':SELECTOR}
-    report=json.loads(subprocess.check_output(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',RUNNER],input=json.dumps(payload).encode()))
+    result=subprocess.run(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',RUNNER],input=json.dumps(payload).encode(),capture_output=True)
+    if result.returncode:
+        failure=a.output.with_suffix('.failure.json');assert not failure.exists()
+        failure.write_text(json.dumps({'passed':False,'returncode':result.returncode,'stderr':result.stderr.decode(),'checker_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest()},indent=2)+'\n')
+        raise RuntimeError('Pinned engine failed; see '+str(failure))
+    report=json.loads(result.stdout)
     digest=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
     report.update(passed=True,release_acceptance=False,worker_image=IMAGE,checker_sha256=digest(Path(__file__)),css_sha256=digest(a.source_dir/'src/layout.css'))
+    font=a.source_dir/'src/fonts/PilotTC.ttf'
+    report['embedded_font_sha256']=digest(font) if font.is_file() else None
     assert not a.output.exists();a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps({'passed':True,'cases':len(report['rows'])}))
 
