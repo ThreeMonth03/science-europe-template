@@ -22,6 +22,15 @@ existing translation pipeline localizes the separator and punctuation. Do not
 hand-edit generated Chinese, add bullets per missing field, or flatten author text.
 Reset lists within every active distribution; use item identity, never names.
 
+Visual review caught an English PDF orphan: a child notice moved to the next
+page without its distribution. Wrap only the fixed policy and notices in an
+`identifier-followup-unit short-reading-unit`, reusing existing PDF and Word
+rules. The independent oracle enforces the 500-character bound and rejects
+author prose, lists and tables inside this unit. Keep notices as separate
+paragraphs; only non-final paragraphs inherit the existing Pilot Lead style.
+Check the complete heading, policy and notices together on one native page,
+not merely the heading and first answer. Complete controls keep their style.
+
 Inactive, negative, missing or unsupported parent decisions must not produce
 child promises or child notices. Publication gating is unchanged. No new KM
 questions, types or options; no upstream baseline update. The four-distribution
@@ -38,8 +47,8 @@ locks the exact English commit and maintains reviewed translations, not independ
 branch logic. This existing critical Q13 overlap must be revalidated on upgrades.
 
 Acceptance must compare the same fixtures through stock and patched workers.
-Only the two child markers and validated notice paragraphs may differ from 0.3.14;
-restore those exact additions before comparing all 15 questions, Word body/tables
+Only the two child markers, validated notices, bounded wrapper and its non-final
+Word keep styles may differ from 0.3.14; restore those exact additions before comparing all 15 questions, Word body/tables
 and PDF/preview body text. Validate native notice boundaries and punctuation.
 This is not whole-DMP or Microsoft Word acceptance: Q13 unknown repository-type
 wording, other uncovered branches, Word's budget tail page and stock Markdown

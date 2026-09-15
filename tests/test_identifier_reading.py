@@ -36,7 +36,9 @@ class IdentifierReadingTests(unittest.TestCase):
             policy = distro.select_one('.identifier-arrangement.dataset-policy')
             self.assertEqual(3, len(policy.find_all('p', recursive=False)))
             self.assertIs(policy.select_one('[data-fact-id="persistent-identifier"]').parent, policy)
-            self.assertIs(heading.find_next_sibling(), policy)
+            unit=distro.select_one('.identifier-followup-unit.short-reading-unit')
+            self.assertIs(heading.find_next_sibling(), unit)
+            self.assertIs(policy.parent,unit)
         self.assertFalse(soup.select('p p, p div, p ul'))
 
     def test_single_distribution_retains_type_without_number(self):

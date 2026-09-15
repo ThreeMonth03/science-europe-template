@@ -13,6 +13,9 @@ class IdentifierFollowupTests(unittest.TestCase):
             self.assertEqual(['missing','missing'],[s['data-status'] for s in gap.select('span')])
             self.assertIs(gap.find_previous_sibling(),distro.select_one('.identifier-arrangement'))
             self.assertFalse(distro.select('.identifier-arrangement .data-gap'))
+            unit=distro.select_one('.identifier-followup-unit.short-reading-unit')
+            self.assertIs(gap.parent,unit)
+            self.assertLessEqual(len(unit.get_text()),500)
 
     def test_known_sibling_and_explicit_no_survive_missing_followup(self):
         for assigns,resolves,fact in [(None,'No','identifier-resolution'),('Repository',None,'identifier-assigner')]:
@@ -54,7 +57,7 @@ class IdentifierFollowupTests(unittest.TestCase):
                 replies.pop(key)
         soup=render(replies)
         self.assertEqual(1,len(soup.select('.identifier-followups')))
-        self.assertEqual('distro-0',soup.select_one('.identifier-followups').parent['data-item-id'])
+        self.assertEqual('distro-0',soup.select_one('.identifier-followups').find_parent(class_='distribution-section')['data-item-id'])
 
     def test_duplicate_dataset_names_do_not_mix_child_states(self):
         replies=identifier_replies(assigns=None,resolves='No')

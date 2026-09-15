@@ -46,6 +46,8 @@
 
                             {# Will this data be assigned persistent identifier? #}
                             {%- if publishedDataIdentifierAUuid == uuids.publishedDataIdentifierYesAUuid -%}
+                            {# Only bounded, fixed template prose: keep child notices with their policy. #}
+                            <div class="identifier-followup-unit short-reading-unit">
                             <div class="identifier-arrangement dataset-policy">
                             <p data-fact-id="persistent-identifier" data-status="complete">Persistent identifiers will be assigned.</p>
                                 {# Who assigns #}
@@ -92,6 +94,7 @@
                                 {% if identifierReview %}<p class="data-gap" data-requirement-id="SE-5d">This template cannot interpret the selected answers for: {{ identifierReview|join(", ") }}.</p>{% endif %}
                               </div>
                             {% endif %}
+                            </div>
                             {%- elif publishedDataIdentifierAUuid == uuids.publishedDataIdentifierNoAUuid -%}
                               <p>Within this repository, unique and persistent identifiers will not be applied.</p>
                             {%- else -%}
