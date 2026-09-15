@@ -117,6 +117,18 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     borders.append(inside)
     properties.append(borders)
     long_budget.element.append(properties)
+    # Each purpose block occupies a row only to support Word pagination. Avoid
+    # adding the base table's 2.85 pt padding twice to every authored paragraph.
+    # Keep a modest 1.4 pt per edge; font/line/paragraph spacing stays unchanged.
+    cells = OxmlElement("w:tcPr")
+    margins = OxmlElement("w:tcMar")
+    for edge in ("top", "bottom"):
+        margin = OxmlElement("w:" + edge)
+        margin.set(qn("w:w"), "28")
+        margin.set(qn("w:type"), "dxa")
+        margins.append(margin)
+    cells.append(margins)
+    long_budget.element.append(cells)
     # Conditional header formatting is not consistently inherited by readers.
     for conditional in document.styles["Table"].element.findall(qn("w:tblStylePr")):
         long_budget.element.append(copy.deepcopy(conditional))

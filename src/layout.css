@@ -67,6 +67,10 @@ html body .resource-table col.resource-budget { width: 17%; }
 html body .resource-table col.resource-funding { width: 26%; }
 html body .resource-table tr { break-inside: auto; }
 html body .resource-table:has(tbody > tr:last-child:nth-child(-n+3)) { break-inside: avoid; }
+/* Row count alone cannot bound a table's height. Release the whole-table keep
+   for Q15 purposes with >=12 direct authored blocks; do not rewrite answers or
+   change the short/many-row controls. One huge paragraph is outside this hint. */
+html body #q-required-resources .resource-table:has(> tbody > tr > td:first-child > .answer-detail > :nth-child(12)) { break-inside: auto; }
 html body .resource-table p { margin-bottom: .3em; }
 html body .resource-table ul { padding-left: 1.2em; }
 html body .resource-table .answer-detail { margin: .25em 0; }
