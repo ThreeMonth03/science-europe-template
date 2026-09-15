@@ -3,8 +3,12 @@
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as
-> `threemonth03:science-europe-enhanced:0.3.15`, so it cannot overwrite
+> `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
+
+The 0.3.20 [missing-information regression](docs/missing-info-reading.md) fixes
+the Q7 safeguards prompt and paragraph boundary, long-PDF missing metadata, and
+the bounded empty-Q15 group. It remains experimental, not a full-DMP acceptance.
 
 The 0.3.15 [identifier follow-up experiment](docs/identifier-followups.md) makes
 missing or unsupported assignment/resolution answers visible without inventing policy.

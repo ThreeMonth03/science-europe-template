@@ -17,6 +17,12 @@ This bounded change addresses three native bilingual counterexamples:
 - Q15 PDF: keep the question and exactly four fixed, wholly unanswered facts
   together. No authored prose, resource table or long answer gets this rule.
 
+Native revalidation also exposed a malformed translated Q7 paragraph: the legal
+basis closed inside separate answer branches, and translation dropped those
+closures. Its closing tag now sits after the conditional. The six existing
+legal-basis translations are rebound exactly, not retranslated. The initial
+failure and the separate final native rerun are retained in the Chinese repo.
+
 Non-PDF Q15 output is still compared to frozen 0.3.18. Word Lua and reference
 styles are unchanged. Q7's new content deliberately applies to every format.
 The PDF fragment oracle now contains 32 cases; 8 run against the pinned worker's
