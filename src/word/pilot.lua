@@ -132,7 +132,112 @@ local function keep_short_budget_overview(div)
   return div
 end
 
+-- Long Q15 purposes get full-width paragraph rows and a repeating identity
+-- header. Validate all rows first; unknown/nested/oversized units keep the old
+-- layout. Reuse translated headers and original blocks; never synthesize prose.
+local function expand_long_budget_tables(div)
+  local function width(value)
+    local total = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(value)) do total = total + (code >= 0x2E80 and 2 or 1) end
+    return total
+  end
+  local function inline_ok(items)
+    for _, item in ipairs(items) do
+      if item.t == "Strong" or item.t == "Emph" or item.t == "Span" or item.t == "Link" then
+        if not inline_ok(item.content) then return false end
+      elseif item.t ~= "Str" and item.t ~= "Space" and item.t ~= "SoftBreak" and item.t ~= "Code" then return false end
+    end
+    return true
+  end
+  local units
+  units = function(blocks, allow_list)
+    local result = pandoc.List()
+    for _, block in ipairs(blocks) do
+      if block.t == "Para" or block.t == "Plain" then
+        if width(block) > 800 or not inline_ok(block.content) then return nil end
+        result:insert(block:clone())
+      elseif block.t == "Div" then
+        local style = block.attributes["custom-style"]
+        if block.identifier ~= "" or (style and style ~= "Pilot Label" and style ~= "Pilot Lead" and style ~= "Pilot List Lead") then return nil end
+        local children = units(block.content, allow_list)
+        if not children then return nil end
+        for _, child in ipairs(children) do
+          local wrapper = block:clone(); wrapper.content = {child}; result:insert(wrapper)
+        end
+      elseif block.t == "BulletList" and allow_list and #block.content <= 8 and width(block) <= 800 then
+        for _, item in ipairs(block.content) do
+          local children = units(item, false)
+          if not children or #children ~= 1 then return nil end
+        end
+        result:insert(block:clone())
+      else return nil end
+    end
+    return result
+  end
+  local function expand(tbl)
+    if not tbl.classes:includes("resource-table") or #tbl.colspecs ~= 3 or #tbl.head.rows ~= 1 or
+       #tbl.bodies ~= 1 or #tbl.bodies[1].head ~= 0 or #tbl.foot.rows ~= 0 or #tbl.caption.long ~= 0 then return tbl end
+    local rows = tbl.bodies[1].body
+    if #rows == 0 or #rows > 32 then return tbl end
+    local plans, any_long = {}, false
+    for _, row in ipairs(tbl.head.rows) do
+      if #row.cells ~= 3 then return tbl end
+      for _, cell in ipairs(row.cells) do
+        if cell.col_span ~= 1 or cell.row_span ~= 1 or width(cell.contents) > 160 or not units(cell.contents, false) then return tbl end
+      end
+    end
+    for index, row in ipairs(rows) do
+      if #row.cells ~= 3 then return tbl end
+      for _, cell in ipairs(row.cells) do if cell.col_span ~= 1 or cell.row_span ~= 1 then return tbl end end
+      local first = row.cells[1].contents
+      if #first < 2 or width(first[1]) > 160 then return tbl end
+      local title = first[1]
+      if title.t == "Div" and title.attributes["custom-style"] == "Pilot Label" and #title.content == 1 then title = title.content[1] end
+      if (title.t ~= "Para" and title.t ~= "Plain") or #title.content ~= 1 or title.content[1].t ~= "Strong" then return tbl end
+      if not inline_ok(title.content) then return tbl end
+      for col = 2, 3 do
+        local metadata = units(row.cells[col].contents, false)
+        if not metadata or #metadata > 3 or width(row.cells[col].contents) > (col == 2 and 80 or 160) then return tbl end
+      end
+      local rest = pandoc.List()
+      for i = 2, #first do rest:insert(first[i]) end
+      local parts = units(rest, true)
+      if not parts or #parts > 160 then return tbl end
+      local long = #parts >= 12
+      plans[index] = {long=long, parts=parts}; any_long = any_long or long
+    end
+    if not any_long then return tbl end
+    local output, pending = pandoc.List(), pandoc.List()
+    local function flush()
+      if #pending > 0 then
+        local short = tbl:clone(); short.bodies[1].body = pending; output:insert(short); pending = pandoc.List()
+      end
+    end
+    for index, row in ipairs(rows) do
+      if not plans[index].long then pending:insert(row:clone())
+      else
+        flush()
+        local expanded = tbl:clone()
+        expanded.classes:insert("long-resource-table")
+        -- Pandoc's DOCX table writer expects the reference style ID here.
+        expanded.attributes["custom-style"] = "PilotLongBudget"
+        local identity = row:clone(); identity.cells[1].contents = {row.cells[1].contents[1]:clone()}
+        expanded.head.rows = {tbl.head.rows[1]:clone(), identity}
+        local detail = pandoc.List()
+        for _, part in ipairs(plans[index].parts) do
+          local line = row:clone(); local cell = line.cells[1]
+          cell.contents = {part}; cell.col_span = 3; line.cells = {cell}; detail:insert(line)
+        end
+        expanded.bodies[1].body = detail; output:insert(expanded)
+      end
+    end
+    flush(); return output
+  end
+  return div:walk({Table=expand})
+end
+
 function Div(div)
+  if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
   if div.identifier == "q-required-resources" then return keep_short_budget_overview(div) end
   if div.classes:includes("identifier-heading") then
     -- Q13 only: combine the existing distribution number and repository type.

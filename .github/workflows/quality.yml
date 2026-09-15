@@ -19,3 +19,5 @@ jobs:
       - run: make check
       - name: Check bounded Word pagination with pinned worker Pandoc
         run: python scripts/probe_budget_word.py --output outputs/budget-word-probe.json
+      - name: Check long-budget Word structure with pinned worker Pandoc
+        run: python scripts/probe_long_budget_word.py --output outputs/long-budget-word-probe.json

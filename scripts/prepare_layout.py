@@ -1,6 +1,7 @@
 """Prepare PDF fonts and Word styles in a disposable build directory."""
 
 import argparse
+import copy
 import io
 import shutil
 import zipfile
@@ -105,6 +106,20 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     table_lead.base_style = document.styles["Compact"]
     table_lead.paragraph_format.keep_with_next = True
     table_lead.paragraph_format.keep_together = True
+    # Only expanded long Q15 tables: retain the existing header styling, but
+    # paragraph rows must not look like dozens of separate budget entries.
+    long_budget = document.styles.add_style("Pilot Long Budget", WD_STYLE_TYPE.TABLE)
+    long_budget.base_style = document.styles["Table"]
+    properties = OxmlElement("w:tblPr")
+    borders = OxmlElement("w:tblBorders")
+    inside = OxmlElement("w:insideH")
+    inside.set(qn("w:val"), "nil")
+    borders.append(inside)
+    properties.append(borders)
+    long_budget.element.append(properties)
+    # Conditional header formatting is not consistently inherited by readers.
+    for conditional in document.styles["Table"].element.findall(qn("w:tblStylePr")):
+        long_budget.element.append(copy.deepcopy(conditional))
     document.save(reference)
     # python-docx assigns wall-clock ZIP timestamps; canonicalize for rebuilds.
     original = reference.read_bytes()
