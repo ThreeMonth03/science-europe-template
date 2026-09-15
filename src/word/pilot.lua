@@ -87,6 +87,9 @@ local function keep_q8_reference_labels(div)
                  #label.content == 1 and plain(label.content[1]) and width(label) <= 80 and
                  plain(permission) and width(permission) <= 320 then
                 label.attributes["custom-style"] = "Pilot List Lead"
+                -- DOCX ignores custom styles on Plain; preserve all inlines in
+                -- one Para so the existing keep-with-next style reaches Word.
+                label.content[1] = pandoc.Para(label.content[1].content)
               end
             end
           end

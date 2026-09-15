@@ -9,15 +9,18 @@ keeps the end of an item with the next item, but not the name with its own text.
 
 Only `src/word/pilot.lua` changes presentation. In Q8's direct answer lists, a
 plain name Div and one short permission paragraph receive the existing
-`Pilot List Lead` style on the name. The name's text, blocks and attributes are
-otherwise preserved, including the list numbering. No prose is merged or added.
+`Pilot List Lead` style on the name. A Plain name becomes one Para with identical
+inlines: the DOCX writer ignores the custom style on Plain. Text, paragraph
+count, other attributes and list numbering are preserved. No prose is merged or added.
 Names are bounded to 80 display units, permissions to 320 (CJK counts double),
 and lists to 32 entries. Each qualifying pair is considered independently.
 Long, attributed, nested or complex content falls back unchanged. Other questions,
 PDF CSS, Word reference styles, Jinja, bindings and translations are unchanged.
 
-`probe_q8_word.py` checks 26 cases with the pinned Pandoc image. Its oracle permits
-only the exact style attribute on a previously unstyled name Div. Tests include
+`probe_q8_word.py` checks 26 cases with the pinned Pandoc image, both AST and actual
+DOCX output. Its AST oracle permits only the exact style attribute on a previously
+unstyled name Div and Plain-to-Para with identical inlines. The DOCX oracle allows
+only Compact-to-PilotListLead, preserving all other paragraph XML. Tests include
 English/Chinese boundaries, many entries, missing text, long paragraphs, tables,
 nested lists, images, links, attributes and unrelated question scopes.
 
@@ -27,6 +30,9 @@ Compare those cases to fresh native 0.3.21 baselines, and the original failure,
 empty/negative and complete controls to their preserved 0.3.21 outputs.
 The Chinese repository records unchanged HTML/PDF, Word XML allowing only Q8
 name styles, actual name/permission page locations and the original failure.
+The first 0.3.22 native attempt caught the ignored Plain style despite its passing
+AST-only probe. Preserve that failed output separately; the new DOCX probe must
+not be replaced by an AST-only test.
 
 The Chinese pipeline locks this English commit; all 731 translation files must
 remain byte-identical. Future upstream upgrades must re-run the AST and native
