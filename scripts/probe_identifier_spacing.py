@@ -30,6 +30,15 @@ def old_lua(source):
     return baseline(source, LUA_BEGIN, LUA_END).replace(NEW_JOIN, OLD_JOIN)
 
 
+def without_reviewed_archive_panels(source):
+    """Admit exactly the reviewed 0.3.30 block; keep the old Q13 hash gate."""
+    from probe_archive_gap_panels import BEGIN, END, split_css
+    if BEGIN not in source and END not in source: return source
+    previous, block = split_css(source)
+    assert hashlib.sha256(block.encode()).hexdigest() == 'bcdbb69bcfd2ddce20f6c55f4ee2ab81754e4059988d6c255eae98c97a77d7f5', 'Unreviewed Q11 CSS'
+    return previous
+
+
 def fixture(left, right, language='zh-Hant', kind='identifier-arrangement dataset-policy', extra=''):
     return '<html lang="'+language+'"><body><div class="'+kind+'"><p>'+left+'</p><p>'+right+'</p>'+extra+'</div></body></html>'
 
@@ -134,7 +143,7 @@ def main():
     # new behavior. This probe deliberately requires a prepared build folder.
     digest=lambda s:hashlib.sha256(s.encode()).hexdigest()
     assert digest(old_lua(lua))=='7136b5e64ac731b736ed3dd400e7e69994e89448c54bb2b6e35ccbc189275fa7'
-    assert digest(baseline((a.source_dir/'src/layout.css').read_text(),CSS_BEGIN,CSS_END))=='840c42a6fe505d73dcaf6eb9c57a92dd2c26d67416206f1a7d73f539cc812362'
+    assert digest(baseline(without_reviewed_archive_panels((a.source_dir/'src/layout.css').read_text()),CSS_BEGIN,CSS_END))=='840c42a6fe505d73dcaf6eb9c57a92dd2c26d67416206f1a7d73f539cc812362'
     matrix=cases();rows=[]
     command=['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c']
     for name,html,left,right,eligible in matrix:
