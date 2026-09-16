@@ -135,3 +135,6 @@ html body .data-gap[data-status="missing-output"] { border: none; border-left: 2
 .distribution-reading-unit .joined-policy > .answer-lead > p { display: inline; margin: 0; }
 .distribution-reading-unit > p:not(.data-gap):not(.answer-lead)::after,
 .distribution-reading-unit .joined-policy p::after { content: " "; }
+/* BEGIN identifier CJK separator: fixed Q13 sentences only, not headings. */
+html[lang="zh-Hant"] body .identifier-arrangement.dataset-policy > p::after { content: none; }
+/* END identifier CJK separator */

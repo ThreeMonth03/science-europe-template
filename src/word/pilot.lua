@@ -1,5 +1,20 @@
 -- Keep standalone labels with the next paragraph without changing their words.
 -- This output-specific rule is independent of the English/Chinese translation.
+-- BEGIN identifier CJK separator
+-- Q13 contains fixed policy sentences, not authored prose. Remove only the
+-- separator we would otherwise INSERT after an ideographic full stop before
+-- a Han character. Never delete an existing inline or edit internal spaces.
+local function identifier_cjk_boundary(left, right)
+  local a, b = pandoc.utils.stringify(left), pandoc.utils.stringify(right)
+  if a == "" or b == "" then return false end
+  local last, first = utf8.codepoint(a, utf8.offset(a, -1)), utf8.codepoint(b)
+  return last == 0x3002 and (
+    (first >= 0x3400 and first <= 0x4DBF) or
+    (first >= 0x4E00 and first <= 0x9FFF) or
+    (first >= 0x20000 and first <= 0x323AF))
+end
+-- END identifier CJK separator
+
 function Meta(meta)
   -- The shared frontmatter already provides a title; avoid Pandoc's extra cover.
   meta.title = nil
@@ -555,7 +570,7 @@ function Div(div)
     end
     for _, block in ipairs(div.content) do
       if block.t == "Para" then
-        if #inlines > 0 then inlines:insert(pandoc.Space()) end
+        if #inlines > 0 and not (div.classes:includes("identifier-arrangement") and identifier_cjk_boundary(inlines, block.content)) then inlines:insert(pandoc.Space()) end
         inlines:extend(block.content)
       else
         flush()
