@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.29 [archival-extension criteria experiment](docs/archive-basis-reading.md)
+joins only the three fixed Q11 choice labels into a paragraph, preserving
+per-choice facts, missing prompts and unsupported-choice review. Authored text
+and all styles stay unchanged; native output acceptance remains separate.
+
 The 0.3.26 [short-budget Word experiment](docs/word-short-budget.md) reuses the
 shared eligibility check to widen missing-budget prompts in Word only. PDF and
 HTML retain their previous behavior; answers, font sizes and paragraph styles

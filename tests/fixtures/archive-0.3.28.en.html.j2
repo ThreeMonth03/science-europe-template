@@ -66,29 +66,15 @@
       <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-authority" data-status="missing">The person or team responsible for deciding on an extension has not been specified.</p></div>
     {% endif %}
     {% set basis = repliesMap[[extensionPath, uuids.archivedAfterExtendYesAUuid, uuids.archivedAfterExtendBasisQUuid]|reply_path]|reply_items %}
-    {# Only the three fixed choices form a sentence; no authored blocks join it.
-       Capture translated spans before joining, retaining each choice's fact. #}
-    {% set basisItems = [] %}
-    {% set basisChoices = [uuids.archivedAfterExtendBasisActualChoiceUuid, uuids.archivedAfterExtendBasisPredictedChoiceUuid, uuids.archivedAfterExtendBasisBudgetChoiceUuid] %}
-    {% if uuids.archivedAfterExtendBasisActualChoiceUuid in basis %}
-      {% set basisItem %}<span data-fact-id="archive-extension-actual-use" data-status="complete">actual use of the archived data</span>{% endset %}
-      {% do basisItems.append(basisItem) %}
-    {% endif %}
-    {% if uuids.archivedAfterExtendBasisPredictedChoiceUuid in basis %}
-      {% set basisItem %}<span data-fact-id="archive-extension-predicted-use" data-status="complete">predicted use of the archived data</span>{% endset %}
-      {% do basisItems.append(basisItem) %}
-    {% endif %}
-    {% if uuids.archivedAfterExtendBasisBudgetChoiceUuid in basis %}
-      {% set basisItem %}<span data-fact-id="archive-extension-budget" data-status="complete">available budget</span>{% endset %}
-      {% do basisItems.append(basisItem) %}
-    {% endif %}
-    {% if basisItems %}
-      <div class="archive-extension-basis-summary"><p>Basis for extending the archival period: {{ basisItems|join(", ") }}.</p></div>
-    {% endif %}
-    {% if not basis %}
+    {% if basis %}
+      <div class="answer-lead"><p>The extension decision will take the following into account:</p></div>
+      <ul>
+        {% if uuids.archivedAfterExtendBasisActualChoiceUuid in basis %}<li data-fact-id="archive-extension-actual-use" data-status="complete">Actual use of the archived data.</li>{% endif %}
+        {% if uuids.archivedAfterExtendBasisPredictedChoiceUuid in basis %}<li data-fact-id="archive-extension-predicted-use" data-status="complete">Predicted use of the archived data.</li>{% endif %}
+        {% if uuids.archivedAfterExtendBasisBudgetChoiceUuid in basis %}<li data-fact-id="archive-extension-budget" data-status="complete">Available budget.</li>{% endif %}
+      </ul>
+    {% else %}
       <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-basis" data-status="missing">The basis for deciding on an extension has not been specified.</p></div>
-    {% elif basis|reject("in", basisChoices)|list %}
-      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-basis" data-status="needs-review">Some selected reasons for extending the archival period cannot be interpreted by this template. Please review the answer.</p></div>
     {% endif %}
   {% else %}
     <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension" data-status="missing">It has not been specified whether the archival period can be extended.</p></div>
