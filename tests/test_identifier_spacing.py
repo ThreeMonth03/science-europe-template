@@ -7,6 +7,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from probe_identifier_spacing import baseline,old_lua,CSS_BEGIN,CSS_END,word_delta
+from probe_archive_gap_panels import split_css
 
 
 class IdentifierSpacingTests(unittest.TestCase):
@@ -15,7 +16,7 @@ class IdentifierSpacingTests(unittest.TestCase):
         self.assertEqual('7136b5e64ac731b736ed3dd400e7e69994e89448c54bb2b6e35ccbc189275fa7',
                          sha(old_lua((ROOT/'src/word/pilot.lua').read_text())))
         self.assertEqual('2647f94a302062d334ca663350f1484c31ffba1dd247a8f4c58344cb66467159',
-                         sha(baseline((ROOT/'src/layout.css').read_text(),CSS_BEGIN,CSS_END)))
+                         sha(baseline(split_css((ROOT/'src/layout.css').read_text())[0],CSS_BEGIN,CSS_END)))
 
     def test_control_oracle_rejects_any_change(self):
         old={'ast':{'blocks':[]},'word_blocks':[]}

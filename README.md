@@ -6,6 +6,10 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.30 [archive gap panel experiment](docs/archive-gap-panels.md) groups
+three explicitly named pairs of adjacent missing Q11 details in print/PDF.
+All wording, Jinja, translations, screen HTML and Word are unchanged.
+
 The 0.3.29 [archival-extension criteria experiment](docs/archive-basis-reading.md)
 joins only the three fixed Q11 choice labels into a paragraph, preserving
 per-choice facts, missing prompts and unsupported-choice review. Authored text

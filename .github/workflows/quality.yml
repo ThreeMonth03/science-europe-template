@@ -33,3 +33,5 @@ jobs:
         run: python scripts/probe_empty_pdf.py --output outputs/empty-pdf-probe.json
       - name: Check PDF budget reading structure and repeating headers
         run: python scripts/probe_pdf_budget_reading.py --engine --output outputs/pdf-budget-reading-probe.json
+      - name: Check Q11 fixed gap pairs in print, screen and near-page-end controls
+        run: python scripts/probe_archive_gap_panels.py --output outputs/archive-gap-panels-engine.json
