@@ -27,15 +27,18 @@ def render(replies): return BeautifulSoup(render_question(Q13, replies), 'html.p
 
 
 class IdentifierReadingTests(unittest.TestCase):
-    def test_two_labels_and_three_sentences_form_two_owned_reading_units(self):
+    def test_known_assigner_states_assignment_once_with_both_facts(self):
         soup = render(identifier_replies())
         for index, distro in enumerate(soup.select('.distribution-section'), 1):
             heading = distro.select_one('.identifier-heading')
             self.assertEqual([f'Distribution {index}', 'Institutional repository'],
                              [p.get_text(strip=True) for p in heading.find_all('p', recursive=False)])
             policy = distro.select_one('.identifier-arrangement.dataset-policy')
-            self.assertEqual(3, len(policy.find_all('p', recursive=False)))
-            self.assertIs(policy.select_one('[data-fact-id="persistent-identifier"]').parent, policy)
+            self.assertEqual(2, len(policy.find_all('p', recursive=False)))
+            parent = policy.select_one('[data-fact-id="persistent-identifier"]')
+            self.assertIs(parent.parent, policy)
+            self.assertIs(parent.select_one('[data-fact-id="identifier-assigner"]').parent, parent)
+            self.assertNotIn('Persistent identifiers will be assigned.', policy.get_text())
             unit=distro.select_one('.identifier-followup-unit.short-reading-unit')
             self.assertIs(heading.find_next_sibling(), unit)
             self.assertIs(policy.parent,unit)

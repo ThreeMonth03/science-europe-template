@@ -49,19 +49,23 @@
                             {# Only bounded, fixed template prose: keep child notices with their policy. #}
                             <div class="identifier-followup-unit short-reading-unit">
                             <div class="identifier-arrangement dataset-policy">
-                            <p data-fact-id="persistent-identifier" data-status="complete">Persistent identifiers will be assigned.</p>
                                 {# Who assigns #}
                                 {%- set publishedDataIdentifierAssignsQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierAssignsQUuid]|reply_path -%}
                                 {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}
 
+                                {# A known assigner sentence already states that identifiers will be
+                                   assigned. Keep both facts, without repeating that assertion.
+                                   Missing/unsupported assigners must retain the known parent answer. #}
                                 {%- if publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
-                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">A project data steward or principal investigator will assign the persistent identifier.</p>
+                                    <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">A project data steward or principal investigator will assign the persistent identifier.</span></p>
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid -%}
-                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">An institutional data steward will assign the persistent identifier.</p>
+                                    <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">An institutional data steward will assign the persistent identifier.</span></p>
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsRepositoryAUuid -%}
-                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">The repository will assign the persistent identifier.</p>
+                                    <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">The repository will assign the persistent identifier.</span></p>
+                                {%- else -%}
+                                    <p data-fact-id="persistent-identifier" data-status="complete">Persistent identifiers will be assigned.</p>
                                 {%- endif -%}
 
                                 {# Resolvable #}
