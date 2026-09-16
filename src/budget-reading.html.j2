@@ -62,7 +62,7 @@
     {%- endfor -%}
   {%- endfor -%}
   {%- if selection.short and selection.gap -%}
-    {{- original|replace('<table class="resource-table">', '<table class="resource-table pdf-short-budget">', 1) -}}
+    {{- original|replace('<table class="resource-table">', '<table class="resource-table pdf-short-budget">'|safe, 1) -}}
   {%- else -%}{{ original }}{%- endif -%}
 {%- endmacro -%}
 

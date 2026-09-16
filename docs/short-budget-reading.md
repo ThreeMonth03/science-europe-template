@@ -17,7 +17,11 @@ Frozen-native-HTML preflights rejected 40/29/31: it shortened the prompt but mad
 the English purpose column/table taller. Preflights are not native acceptance.
 
 `probe_short_budget.py` checks 42 original-fragment/real-question cases per
-language; the existing long-budget and empty-Q15 probes remain active. The
+language both with and without Jinja autoescaping; the existing long-budget and
+empty-Q15 probes remain active. The first native trial caught an escaped opening
+table tag that the initial non-autoescaped adapter missed. Only the fixed,
+template-owned replacement tag is marked safe; authored titles remain escaped.
+Rejected native PDFs and their source manifest are retained in the review. The
 Chinese repository additionally checks all 731 translations and prepared source
 hashes against frozen 0.3.24, and keeps native bilingual comparisons separately.
 

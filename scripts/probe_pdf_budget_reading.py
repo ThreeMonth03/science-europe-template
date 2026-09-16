@@ -8,6 +8,7 @@ import subprocess
 import sys
 from bs4 import BeautifulSoup, Tag, Comment
 from jinja2 import Environment, FileSystemLoader, ChoiceLoader, DictLoader
+from markupsafe import Markup
 from generate_budget_fixtures import budget_cases
 from generate_pilot_fixtures import IDS
 from generate_preservation_fixtures import preservation_cases
@@ -75,10 +76,10 @@ def matrix():
     return cases
 
 
-def render(root, replies, pdf=False, question=None):
+def render(root, replies, pdf=False, question=None, autoescape=False):
     loaders = ([DictLoader({QUESTION: question})] if question is not None else []) + [FileSystemLoader(root)]
-    env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'])
-    env.filters.update(reply_path=reply_path, reply_items=reply_items, reply_str_value=reply_str_value, markdown=lambda value: value)
+    env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=autoescape)
+    env.filters.update(reply_path=reply_path, reply_items=reply_items, reply_str_value=reply_str_value, markdown=lambda value: Markup(value) if autoescape else value)
     template = env.from_string("{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include '"+QUESTION+"' %}")
     return template.render(repliesMap=replies, pdf_budget_reading=pdf)
 

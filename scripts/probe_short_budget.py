@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
+from markupsafe import Markup
 from probe_pdf_budget_reading import matrix as long_matrix, render
 from generate_pilot_fixtures import IDS
 from probe_budget_word import ROOT
@@ -53,12 +54,14 @@ def fragments():
 def check(root):
     env = Environment(loader=FileSystemLoader(root), extensions=['jinja2.ext.do'])
     helper = env.get_template('src/budget-reading.html.j2').module
+    escaped_helper = Environment(loader=FileSystemLoader(root), extensions=['jinja2.ext.do'], autoescape=True).get_template('src/budget-reading.html.j2').module
     results = []
     for name, rows, eligible in fragments():
         original = '<table class="resource-table"><tbody>'+''.join('<tr>'+''.join('<td>'+r[k]+'</td>' for k in ['title', 'purpose', 'budget', 'funding'])+'</tr>' for r in rows)+'</tbody></table>'
         actual = helper.short_table(original, rows)
         expected = original.replace('class="resource-table"', 'class="resource-table pdf-short-budget"', 1) if eligible else original
         assert actual == expected, (name, 'Hint must be the only byte change')
+        assert escaped_helper.short_table(Markup(original), rows) == expected, (name, 'Autoescaped captured fragments changed')
         results.append({'case': name, 'eligible': eligible, 'passed': True})
     _, base, _ = long_matrix()[0]
     costs = next(p for p in base if p.endswith(IDS['costQUuid'])); first = costs+'.'+base[costs][0]
@@ -73,6 +76,10 @@ def check(root):
         original = render(root, replies); actual = render(root, replies, True)
         assert len(BeautifulSoup(actual, 'html.parser').select('.pdf-short-budget')) == int(eligible), name
         assert actual.replace('class="resource-table pdf-short-budget"', 'class="resource-table"') == original, name
+        escaped_original = render(root, replies, autoescape=True)
+        escaped_actual = render(root, replies, True, autoescape=True)
+        assert len(BeautifulSoup(escaped_actual, 'html.parser').select('.pdf-short-budget')) == int(eligible), (name, 'Autoescaped PDF hint')
+        assert escaped_actual.replace('class="resource-table pdf-short-budget"', 'class="resource-table"') == escaped_original, (name, 'Autoescaped answer changed')
         results.append({'case': 'question-'+name, 'eligible': eligible, 'passed': True})
     return results
 
