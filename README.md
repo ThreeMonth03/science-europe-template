@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.26 [short-budget Word experiment](docs/word-short-budget.md) reuses the
+shared eligibility check to widen missing-budget prompts in Word only. PDF and
+HTML retain their previous behavior; answers, font sizes and paragraph styles
+are unchanged. Native and Microsoft Word acceptance remain separate gates.
+
 The 0.3.25 [short-budget PDF experiment](docs/short-budget-reading.md) gives bounded
 incomplete budget tables more room for missing-value prompts. It preserves all
 original text; long/complex tables, HTML and Word retain their previous behavior.

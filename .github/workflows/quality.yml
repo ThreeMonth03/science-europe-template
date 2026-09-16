@@ -21,6 +21,8 @@ jobs:
         run: python scripts/probe_budget_word.py --output outputs/budget-word-probe.json
       - name: Check long-budget Word structure with pinned worker Pandoc
         run: python scripts/probe_long_budget_word.py --output outputs/long-budget-word-probe.json
+      - name: Check short-budget Word widths and unchanged fallbacks
+        run: python scripts/probe_word_short_budget.py --output outputs/word-short-budget-probe.json
       - name: Check Q8 and Q9 labels in actual DOCX as well as AST
         run: |
           python scripts/probe_q8_word.py --output outputs/q8-word-probe.json

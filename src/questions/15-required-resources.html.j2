@@ -206,6 +206,9 @@
                     {%- if pdf_budget_reading|default(false) -%}
                       {%- import 'src/budget-reading.html.j2' as budgetReading -%}
                       {{ budgetReading.render(originalBudgetTable, budgetLayout.header, budgetLayout.rows) }}
+                    {%- elif word_budget_reading|default(false) -%}
+                      {%- import 'src/budget-reading.html.j2' as budgetReading -%}
+                      {{ budgetReading.short_table(originalBudgetTable, budgetLayout.rows, true) }}
                     {%- else -%}{{ originalBudgetTable }}{%- endif -%}
                 {%- else -%}
                     <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project.</p>

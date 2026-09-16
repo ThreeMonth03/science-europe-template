@@ -76,12 +76,12 @@ def matrix():
     return cases
 
 
-def render(root, replies, pdf=False, question=None, autoescape=False):
+def render(root, replies, pdf=False, question=None, autoescape=False, word=False):
     loaders = ([DictLoader({QUESTION: question})] if question is not None else []) + [FileSystemLoader(root)]
     env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=autoescape)
     env.filters.update(reply_path=reply_path, reply_items=reply_items, reply_str_value=reply_str_value, markdown=lambda value: Markup(value) if autoescape else value)
     template = env.from_string("{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include '"+QUESTION+"' %}")
-    return template.render(repliesMap=replies, pdf_budget_reading=pdf)
+    return template.render(repliesMap=replies, pdf_budget_reading=pdf, word_budget_reading=word)
 
 
 def dom(node):

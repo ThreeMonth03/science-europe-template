@@ -355,9 +355,34 @@ local function expand_long_budget_tables(div)
   return div:walk({Table=expand})
 end
 
+-- BEGIN short-budget Word columns
+-- The shared Jinja classifier supplies this hint only for short, simple budgets
+-- with missing amounts/currencies. Do not match translated prompt text here.
+local function widen_short_budget_columns(div)
+  return div:walk({Table=function(tbl)
+    if not tbl.classes:includes("resource-table") or not tbl.classes:includes("word-short-budget") or
+       #tbl.colspecs ~= 3 or #tbl.bodies ~= 1 or #tbl.head.rows ~= 1 or
+       #tbl.foot.rows ~= 0 or #tbl.caption.long ~= 0 or tbl.attributes["custom-style"] then return tbl end
+    local body = tbl.bodies[1]
+    if #body.head ~= 0 or #body.body < 1 or #body.body > 3 then return tbl end
+    local rows = {tbl.head.rows[1]}
+    for _, row in ipairs(body.body) do table.insert(rows, row) end
+    for _, row in ipairs(rows) do
+      if #row.cells ~= 3 then return tbl end
+      for _, cell in ipairs(row.cells) do
+        if cell.row_span ~= 1 or cell.col_span ~= 1 then return tbl end
+      end
+    end
+    tbl.colspecs = {{pandoc.AlignLeft, 0.49}, {pandoc.AlignLeft, 0.25}, {pandoc.AlignLeft, 0.26}}
+    return tbl
+  end})
+end
+-- END short-budget Word columns
+
 function Div(div)
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
+  if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
   if div.identifier == "q-required-resources" then return keep_short_budget_overview(div) end
   if div.classes:includes("identifier-heading") then

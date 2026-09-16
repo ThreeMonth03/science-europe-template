@@ -32,8 +32,8 @@
   {%- endfor -%}
 {%- endmacro -%}
 
-{%- macro short_table(original, rows) -%}
-  {# A PDF-only hint, not a new answer renderer. Unknown or large fragments
+{%- macro short_table(original, rows, word=false) -%}
+  {# An output-specific hint, not a new answer renderer. Unknown or large fragments
      retain the original table. Never trim/rewrite the captured output. #}
   {%- set selection = namespace(short=1 <= rows|length <= 3, gap=false) -%}
   {%- for row in rows -%}
@@ -62,7 +62,11 @@
     {%- endfor -%}
   {%- endfor -%}
   {%- if selection.short and selection.gap -%}
-    {{- original|replace('<table class="resource-table">', '<table class="resource-table pdf-short-budget">'|safe, 1) -}}
+    {%- if word -%}
+      {{- original|replace('<table class="resource-table">', '<table class="resource-table word-short-budget">'|safe, 1) -}}
+    {%- else -%}
+      {{- original|replace('<table class="resource-table">', '<table class="resource-table pdf-short-budget">'|safe, 1) -}}
+    {%- endif -%}
   {%- else -%}{{ original }}{%- endif -%}
 {%- endmacro -%}
 
