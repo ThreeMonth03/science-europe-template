@@ -6,6 +6,10 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.25 [short-budget PDF experiment](docs/short-budget-reading.md) gives bounded
+incomplete budget tables more room for missing-value prompts. It preserves all
+original text; long/complex tables, HTML and Word retain their previous behavior.
+
 The 0.3.24 [empty-Q15 panel experiment](docs/empty-pdf-reading.md) groups exactly
 four fixed missing-information paragraphs visually, without changing their text,
 font size, Jinja, translations or Word. Partial answers retain their original layout.

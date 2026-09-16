@@ -19,6 +19,8 @@
       "severity": "critical",
       "patterns": [
         "src/macros.html.j2",
+        "src/budget-reading.html.j2",
+        "src/pdf/index.html.j2",
         "src/preservation-dataset.html.j2",
         "src/preservation-publication-reason.html.j2",
         "src/post-project-archive.html.j2",

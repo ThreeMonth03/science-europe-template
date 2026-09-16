@@ -32,6 +32,40 @@
   {%- endfor -%}
 {%- endmacro -%}
 
+{%- macro short_table(original, rows) -%}
+  {# A PDF-only hint, not a new answer renderer. Unknown or large fragments
+     retain the original table. Never trim/rewrite the captured output. #}
+  {%- set selection = namespace(short=1 <= rows|length <= 3, gap=false) -%}
+  {%- for row in rows -%}
+    {%- set selection.gap = selection.gap or 'data-fact-id="resource-amount" data-status="missing"' in row.budget -%}
+    {%- for value, limit, paragraphs in [(row.title, 80, 1), (row.purpose, 200, 2), (row.budget, 80, 3), (row.funding, 100, 3)] -%}
+      {%- set visible = (value|striptags).split()|join(' ') -%}
+      {%- if not visible or visible|length > limit or value|length > 2000 or value.count('<p') > paragraphs -%}
+        {%- set selection.short = false -%}
+      {%- endif -%}
+      {%- for fragment in value.split('<')[1:] -%}
+        {%- set tag = fragment.split('>')[0] -%}
+        {%- if tag not in ['p', '/p', 'strong', '/strong', 'em', '/em', 'code', '/code', '/div',
+          'div class="answer-detail"',
+          'div class="answer-detail" data-fact-id="resource-justification" data-status="complete"',
+          'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-justification" data-status="missing"',
+          'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-allocation" data-status="missing"',
+          'p data-fact-id="resource-amount-value" data-status="complete"',
+          'p data-fact-id="resource-currency" data-status="complete"',
+          'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing"',
+          'p data-fact-id="cost-coverage" data-status="complete"',
+          'p class="data-gap" data-fact-id="grant-number" data-status="missing"',
+          'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"'] -%}
+          {%- set selection.short = false -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  {%- endfor -%}
+  {%- if selection.short and selection.gap -%}
+    {{- original|replace('<table class="resource-table">', '<table class="resource-table pdf-short-budget">', 1) -}}
+  {%- else -%}{{ original }}{%- endif -%}
+{%- endmacro -%}
+
 {%- macro ordinary(header, rows) -%}
 <table class="resource-table"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody>{% for row in rows %}{{ row.original }}{% endfor %}</tbody></table>
 {%- endmacro -%}
@@ -44,7 +78,7 @@
     {%- do selection.eligible.append(result.long) -%}
     {%- set selection.any = selection.any or result.long -%}
   {%- endfor -%}
-  {%- if not selection.any -%}{{ original }}{%- else -%}
+  {%- if not selection.any -%}{{ short_table(original, rows) }}{%- else -%}
     {%- set pending = [] -%}
     {%- for row in rows -%}
       {%- if selection.eligible[loop.index0] -%}

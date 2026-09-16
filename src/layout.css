@@ -75,6 +75,13 @@ html body .resource-table p { margin-bottom: .3em; }
 html body .resource-table ul { padding-left: 1.2em; }
 html body .resource-table .answer-detail { margin: .25em 0; }
 html body .resource-table .data-gap { padding: .2em .35em; }
+/* BEGIN short-budget panel: PDF-only, <=3 bounded rows with a budget gap. */
+html body .pdf-short-budget col.resource-purpose { width: 49%; }
+html body .pdf-short-budget col.resource-budget { width: 25%; }
+html body .pdf-short-budget col.resource-funding { width: 26%; }
+html body .pdf-short-budget th, html body .pdf-short-budget td { padding-top: .25em; padding-bottom: .25em; }
+html body .pdf-short-budget p { margin-bottom: .2em; }
+/* END short-budget panel */
 /* PDF-only long resource: identity repeats in thead, purpose spans all columns. */
 html body #q-required-resources .pdf-resource-reading { break-inside: auto; }
 html body .pdf-resource-reading thead td { background: #eef2f4; }
