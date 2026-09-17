@@ -184,9 +184,7 @@
               <p>Unnamed data format {{ loop.index }}.</p>
             {% endif %}
             {# standard? #}
-            {%- if formatsIsStandardAUuid == uuids.formatsIsStandardYesAUuid and formatsIsLTSuitableAUuid == uuids.formatsIsLTSuitableYesAUuid %}
-              <p>It is a standardized format suitable for long-term archiving.</p>
-            {%- elif formatsIsStandardAUuid == uuids.formatsIsStandardYesAUuid %}
+            {%- if formatsIsStandardAUuid == uuids.formatsIsStandardYesAUuid %}
               <p>It is a standardized format.</p>
             {%- elif formatsIsStandardAUuid == uuids.formatsIsStandardNoAUuid -%}
               {%- if formatsWhyNonStandardAUuid == uuids.formatsWhyNSThereIsNoStandardAUuid %}
@@ -198,7 +196,7 @@
               {%- endif -%}
             {%- endif -%}
             {# long-term suitable? #}
-            {%- if formatsIsLTSuitableAUuid == uuids.formatsIsLTSuitableYesAUuid and formatsIsStandardAUuid != uuids.formatsIsStandardYesAUuid %}
+            {%- if formatsIsLTSuitableAUuid == uuids.formatsIsLTSuitableYesAUuid %}
               <p>This is a suitable format for long-term archiving.</p>
             {%- elif formatsIsLTSuitableAUuid == uuids.formatsIsLTSuitableNoAUuid -%}
               {%- if formatsConvertLTSuitableAUuid == uuids.formatsConvertLTSuitableYesAUuid %}
@@ -211,18 +209,17 @@
             {%- endif -%}
             {# volume #}
             {%- if formatsVolumeAUuid == uuids.formatsVolumeSmallAUuid %}
-              <p>Only a small volume of data is expected.</p>
+              <p>We will have only a small amount of data stored in this format.</p>
             {%- elif formatsVolumeAUuid == uuids.formatsVolumeTotalAUuid -%}
               {%- if formatsVolumeTotalGB|trim %}
-                <p>The estimated data volume is {{ formatTotalQuantity }}.</p>
+                <p>We expect to have {{ formatTotalQuantity }} of data in this format.</p>
               {%- endif -%}
             {%- elif formatsVolumeAUuid == uuids.formatsVolumeFileSizeAUuid -%}
               {# Keep each entered quantity independently; do not coerce/round it into an invented total. #}
-              {%- if formatsVolumeFiles|trim and formatsVolumeFileGB|trim %}
-                <p>We expect {{ formatsVolumeFiles|e }} files, with an estimated average size of {{ formatAverageQuantity }}.</p>
-              {%- elif formatsVolumeFiles|trim %}
-                <p>We expect {{ formatsVolumeFiles|e }} files.</p>
-              {%- elif formatsVolumeFileGB|trim %}
+              {%- if formatsVolumeFiles|trim %}
+                <p>We expect {{ formatsVolumeFiles|e }} files in this format.</p>
+              {%- endif -%}
+              {%- if formatsVolumeFileGB|trim %}
                 <p>The estimated average file size is {{ formatAverageQuantity }}.</p>
               {%- endif -%}
             {%- endif -%}

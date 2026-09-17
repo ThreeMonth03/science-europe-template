@@ -6,6 +6,10 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.31 [format reading experiment](docs/format-reading.md) combines complete
+Q2 facts into fewer sentences while retaining independent partial answers and
+all quantities. Styles and authored text are unchanged; native checks are separate.
+
 The 0.3.30 [archive gap panel experiment](docs/archive-gap-panels.md) groups
 three explicitly named pairs of adjacent missing Q11 details in print/PDF.
 All wording, Jinja, translations, screen HTML and Word are unchanged.
