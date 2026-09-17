@@ -30,6 +30,12 @@ def old_lua(source):
     return baseline(source, LUA_BEGIN, LUA_END).replace(NEW_JOIN, OLD_JOIN)
 
 
+def frozen_lua(source):
+    """Compose the exact reviewed Q5 delta before checking the older Q13 hash."""
+    from storage_context_contract import without_reviewed_context
+    return old_lua(without_reviewed_context(source, 'lua'))
+
+
 def without_reviewed_archive_panels(source):
     """Admit exactly the reviewed 0.3.30 block; keep the old Q13 hash gate."""
     from probe_archive_gap_panels import BEGIN, END, split_css
@@ -142,8 +148,7 @@ def main():
     # Freeze 0.3.27's actual prepared source, not a baseline inferred from the
     # new behavior. This probe deliberately requires a prepared build folder.
     digest=lambda s:hashlib.sha256(s.encode()).hexdigest()
-    assert digest(old_lua(lua))=='7136b5e64ac731b736ed3dd400e7e69994e89448c54bb2b6e35ccbc189275fa7'
-    from storage_context_contract import without_reviewed_context
+    assert digest(frozen_lua(lua))=='7136b5e64ac731b736ed3dd400e7e69994e89448c54bb2b6e35ccbc189275fa7'
     # Prepared CSS contains the font/profile prefix; strip the exact source
     # addition before retaining the original prepared-CSS hash gate.
     from probe_storage_context import strip
