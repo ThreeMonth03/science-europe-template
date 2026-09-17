@@ -30,3 +30,18 @@ gate. Long/complex fallbacks cannot be judged from unchanged total page count.
 This is a short-lived `fix/q5-context-pagination` experiment derived from the
 previous reviewed branch; the Chinese repo pins its exact English source. No
 upstream merge, production upload, release tag or full-DMP acceptance is implied.
+
+## Native outcome: partial success, not visual acceptance
+
+Ten synthetic cases in both languages were compared against 0.3.33: 120 native
+outputs before/after, with 40 LibreOffice Word previews. Body content is retained
+and all document page counts are unchanged. Four separations improve: Chinese
+metadata-private PDF/Word, Chinese metadata-private-text PDF, and English
+metadata-complete PDF. Chinese metadata-partial Word remains split across pages
+3 and 4 despite the correct keep-with-next styles. Four local diagnostic copies
+with direct keep-next/keep-lines changes also remain split; they are not native
+template outputs and were not adopted as a fix.
+
+The native checker exits nonzero for that remaining separation. Build/engine CI
+success is not a substitute for this failed visual gate. Evidence is archived
+in the Chinese repository under `reviews/2026-09-17-storage-context-pagination`.

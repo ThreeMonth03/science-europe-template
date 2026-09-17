@@ -7,9 +7,11 @@
 > the official template accidentally.
 
 The 0.3.34 [short Q5 pagination experiment](docs/storage-context-pagination.md)
-keeps bounded fixed storage answers with their operational limitations in PDF
-and Word. Prose, translation pairs and shared style definitions are unchanged;
-long/complex/cold-archive fallbacks remain breakable. Native checks are separate.
+adds bounded grouping for fixed storage answers and operational limitations.
+Native comparisons improve four PDF/Word separations, but Chinese
+`metadata-partial` Word still separates its policy and limitations. This is a
+known failing visual gate, not a release. Prose, translations and shared style
+definitions are unchanged; long/complex/cold-archive fallbacks remain breakable.
 
 The 0.3.33 [metadata follow-up experiment](docs/metadata-followups.md) preserves
 dictionary Yes/No and makes missing metadata-policy follow-ups visible.
