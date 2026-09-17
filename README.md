@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.35 [joined Q5 Word lead experiment](docs/q5-word-join.md) joins two
+bounded, template-owned paragraphs with a visible line break. HTML/PDF,
+translations and styles are unchanged. Exact AST/DOCX and unchanged-fallback
+checks are separate from native bilingual and Microsoft Word acceptance.
+
 The 0.3.34 [short Q5 pagination experiment](docs/storage-context-pagination.md)
 adds bounded grouping for fixed storage answers and operational limitations.
 Native comparisons improve four PDF/Word separations, but Chinese

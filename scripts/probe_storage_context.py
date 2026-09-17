@@ -93,7 +93,10 @@ def main():
     cases.append(('missing-hint',cases[0][1].replace(' q5-short-context',''),False))
     css=prepared_css(a.source_dir);prior,_=strip(css,'css')
     pdf=json.loads(subprocess.check_output(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',PDF_RUNNER],input=json.dumps(dict(cases=cases,before=prior,after=css)).encode()))
-    lua=(a.source_dir/'src/word/pilot.lua').read_text();old_lua,_=strip(lua,'lua')
+    from q5_word_join_contract import prior_lua
+    # Preserve the original 0.3.34 style-only oracle; the incremental join has
+    # its own exact AST/DOCX probe, not a broadened style-only acceptance gate.
+    lua=prior_lua((a.source_dir/'src/word/pilot.lua').read_text());old_lua,_=strip(lua,'lua')
     # Also test forged hints on long/complex content: the actual AST must reject.
     # Pandoc discards p data-* attributes: semantic eligibility belongs to the
     # Jinja classifier. Independently recheck only length/structure retained in AST.

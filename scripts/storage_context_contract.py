@@ -13,6 +13,9 @@ FACTS = {'working-storage-arrangement', 'backup-reliability', 'workspace-managem
 def without_reviewed_context(source,kind):
     import hashlib
     from probe_storage_context import strip
+    if kind == 'lua' and '-- BEGIN joined Q5 Word lead' in source:
+        from q5_word_join_contract import prior_lua
+        source = prior_lua(source)
     prior,block=strip(source,kind)
     delta=json.loads((Path(__file__).resolve().parents[1]/'docs/storage-context-style-delta.json').read_text())[kind]
     assert hashlib.sha256(block.encode()).hexdigest()==delta['block_sha256'], 'Unreviewed Q5 style block'

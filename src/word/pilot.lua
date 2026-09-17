@@ -423,9 +423,19 @@ local function keep_q5_context(div)
     for _, code in utf8.codes(pandoc.utils.stringify(paragraph)) do units = units + (code >= 0x2E80 and 2 or 1) end
   end
   if units > 900 then return div end
-  policy.content[1] = pandoc.Div({paragraphs[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
-  limits.content[1] = pandoc.Div({paragraphs[2]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+  -- BEGIN joined Q5 Word lead
+  -- One bounded owned paragraph, with a visible line boundary before limitations.
+  -- Keep the independent HTML facts and all authored/long fallbacks unchanged.
+  local joined = pandoc.List()
+  joined:extend(paragraphs[1].content)
+  joined:insert(pandoc.LineBreak())
+  joined:extend(paragraphs[2].content)
+  policy.content[1] = pandoc.Div({pandoc.Para(joined)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+  -- END joined Q5 Word lead
   limits.content[2].content[1][1] = pandoc.Div({pandoc.Para(paragraphs[3].content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot List Lead"}))
+  -- BEGIN remove joined Q5 introduction
+  limits.content:remove(1)
+  -- END remove joined Q5 introduction
   return div
 end
 -- END short Q5 context
