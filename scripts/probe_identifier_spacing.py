@@ -45,6 +45,16 @@ def without_reviewed_archive_panels(source):
     return previous
 
 
+def frozen_prepared_css(source):
+    """Strip exact later additions, retaining the original prepared Q13 hash."""
+    from metadata_gap_panel_contract import prior_css
+    from probe_storage_context import strip
+    prepared, block = strip(prior_css(source), 'css')
+    delta = json.loads((ROOT / 'docs/storage-context-style-delta.json').read_text())
+    assert hashlib.sha256(block.encode()).hexdigest() == delta['css']['block_sha256']
+    return baseline(without_reviewed_archive_panels(prepared), CSS_BEGIN, CSS_END)
+
+
 def fixture(left, right, language='zh-Hant', kind='identifier-arrangement dataset-policy', extra=''):
     return '<html lang="'+language+'"><body><div class="'+kind+'"><p>'+left+'</p><p>'+right+'</p>'+extra+'</div></body></html>'
 
@@ -142,6 +152,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--source-dir',type=Path,required=True)
     p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--preflight-only',action='store_true',help='Check frozen prepared-source gates before expensive engine probes')
     a=p.parse_args(); assert not a.output.exists()
     lua=(a.source_dir/'src/word/pilot.lua').read_text()
     css=prepared_css(a.source_dir)
@@ -151,11 +162,14 @@ def main():
     assert digest(frozen_lua(lua))=='7136b5e64ac731b736ed3dd400e7e69994e89448c54bb2b6e35ccbc189275fa7'
     # Prepared CSS contains the font/profile prefix; strip the exact source
     # addition before retaining the original prepared-CSS hash gate.
-    from probe_storage_context import strip
-    prepared, block = strip((a.source_dir/'src/layout.css').read_text(), 'css')
-    delta = json.loads((ROOT/'docs/storage-context-style-delta.json').read_text())
-    assert digest(block) == delta['css']['block_sha256']
-    assert digest(baseline(without_reviewed_archive_panels(prepared),CSS_BEGIN,CSS_END))=='840c42a6fe505d73dcaf6eb9c57a92dd2c26d67416206f1a7d73f539cc812362'
+    assert digest(frozen_prepared_css((a.source_dir/'src/layout.css').read_text()))=='840c42a6fe505d73dcaf6eb9c57a92dd2c26d67416206f1a7d73f539cc812362'
+    if a.preflight_only:
+        a.output.parent.mkdir(parents=True, exist_ok=True)
+        a.output.write_text(json.dumps(dict(passed=True, preflight_only=True, release_acceptance=False,
+            checker_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+            source_sha256={name:hashlib.sha256((a.source_dir/name).read_bytes()).hexdigest() for name in ['src/layout.css','src/word/pilot.lua']}), indent=2)+'\n')
+        print(json.dumps(dict(passed=True, preflight_only=True)))
+        return
     matrix=cases();rows=[]
     command=['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c']
     for name,html,left,right,eligible in matrix:

@@ -8,9 +8,19 @@ sys.path[:0] = [str(ROOT / 'scripts'), str(ROOT / 'tests')]
 from metadata_gap_panel_contract import SELECTOR, prior_css
 from probe_metadata_gap_panel import branch_rows, cases
 from storage_context_contract import without_reviewed_context
+from probe_identifier_spacing import frozen_prepared_css, baseline, without_reviewed_archive_panels, CSS_BEGIN, CSS_END
 
 
 class MetadataGapPanelTests(unittest.TestCase):
+    def test_q13_prepared_gate_strips_only_exact_reviewed_later_additions(self):
+        source = (ROOT / 'src/layout.css').read_text()
+        prefix = '/* Simulated prepared font/profile prefix. */\n'
+        expected = prefix + baseline(without_reviewed_archive_panels(without_reviewed_context(source, 'css')), CSS_BEGIN, CSS_END)
+        self.assertEqual(frozen_prepared_css(prefix + source), expected)
+        with self.assertRaises(AssertionError):
+            frozen_prepared_css((prefix + source).replace('margin-bottom: .25em; }\n}\n/* END metadata gap', 'margin-bottom: .35em; }\n}\n/* END metadata gap'))
+        self.assertNotEqual(frozen_prepared_css(prefix + source + '\n'), expected)
+
     def test_reachable_missing_no_and_unknown_branches(self):
         rows = list(branch_rows(ROOT))
         self.assertEqual(len(rows), 30)
