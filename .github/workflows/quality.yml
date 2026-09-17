@@ -39,5 +39,5 @@ jobs:
         run: python scripts/probe_storage_context.py --output outputs/storage-context-engine.json
       - name: Check exact Q5 Word join against the preserved 0.3.34 behavior
         run: python scripts/probe_q5_word_join.py --output outputs/q5-word-join-engine.json
-      - name: Check Q3 paired missing prompts without altering answered or review states
-        run: python scripts/probe_metadata_gap_panel.py --output outputs/metadata-gap-panel-engine.json
+      - name: Check Q3 concise missing prose in PDF, screen and editable Word
+        run: python scripts/probe_metadata_gap_prose.py --output outputs/metadata-gap-prose-engine.json

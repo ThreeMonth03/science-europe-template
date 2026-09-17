@@ -86,7 +86,8 @@ def expected(before, data, language):
             value = data.get(field, '')
             if value not in [IDS[n] for n in allowed]: additions.append(gap(fact, value, words, prefix))
         if additions: policy.append(group(additions))
-    return result
+    from metadata_gap_prose_contract import project
+    return project(result, language)
 
 
 def compare(before, after, data, language):

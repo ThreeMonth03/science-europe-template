@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'scripts'), str(ROOT / 'tests')]
-from metadata_gap_panel_contract import SELECTOR, prior_css
+from metadata_gap_panel_contract import SELECTOR, prior_css, historical_css
 from probe_metadata_gap_panel import branch_rows, cases
 from storage_context_contract import without_reviewed_context
 from probe_identifier_spacing import frozen_prepared_css, baseline, without_reviewed_archive_panels, CSS_BEGIN, CSS_END
@@ -13,7 +13,7 @@ from probe_identifier_spacing import frozen_prepared_css, baseline, without_revi
 
 class MetadataGapPanelTests(unittest.TestCase):
     def test_q13_prepared_gate_strips_only_exact_reviewed_later_additions(self):
-        source = (ROOT / 'src/layout.css').read_text()
+        source = historical_css((ROOT / 'src/layout.css').read_text())
         prefix = '/* Simulated prepared font/profile prefix. */\n'
         expected = prefix + baseline(without_reviewed_archive_panels(without_reviewed_context(source, 'css')), CSS_BEGIN, CSS_END)
         self.assertEqual(frozen_prepared_css(prefix + source), expected)
@@ -30,7 +30,7 @@ class MetadataGapPanelTests(unittest.TestCase):
             self.assertEqual(len(soup.select(SELECTOR)), int(selected), name)
 
     def test_exact_delta_and_historic_gate(self):
-        source = (ROOT / 'src/layout.css').read_text()
+        source = historical_css((ROOT / 'src/layout.css').read_text())
         before = prior_css(source)
         self.assertNotIn('BEGIN metadata gap panel:', before)
         without_reviewed_context(source, 'css')

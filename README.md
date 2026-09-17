@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.37 [concise missing metadata experiment](docs/metadata-gap-prose.md)
+joins only two simultaneously absent Q3 follow-ups into one paragraph, retaining
+independent fact markers. It retires the 0.3.36 special CSS panel; no Lua,
+font, reference document or translation-tool change is needed.
+
 The 0.3.35 [joined Q5 Word lead experiment](docs/q5-word-join.md) joins two
 bounded, template-owned paragraphs with a visible line break. HTML/PDF,
 translations and styles are unchanged. Exact AST/DOCX and unchanged-fallback

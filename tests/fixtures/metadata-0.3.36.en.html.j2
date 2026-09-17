@@ -107,11 +107,6 @@
       {%- set formKnown = metadataOpenFormAUuid in [uuids.metadataOpenFormNoAUuid, uuids.metadataOpenFormYesRepoAUuid, uuids.metadataOpenFormYesCareAUuid] -%}
       {%- if not instructionKnown or not formKnown -%}
       <div class="reading-gap">
-        {%- if not metadataOpenInstrAUuid|trim and not metadataOpenFormAUuid|trim -%}
-          {%- set metadataInstructionsGap -%}<span data-fact-id="metadata-access-instructions" data-status="missing">whether the metadata will include instructions for accessing the data</span>{%- endset -%}
-          {%- set metadataHarvestGap -%}<span data-fact-id="metadata-harvestable" data-status="missing">whether the metadata will be available in a form that can be harvested and indexed</span>{%- endset -%}
-          <p class="data-gap metadata-publication-gap">Information not provided: {{ metadataInstructionsGap }}; {{ metadataHarvestGap }}.</p>
-        {%- else -%}
         {%- if not instructionKnown -%}
           {%- if metadataOpenInstrAUuid|trim -%}
           <p class="data-gap" data-fact-id="metadata-access-instructions" data-status="needs-review">The selected metadata access-instructions option cannot be represented by this template; please review it.</p>
@@ -125,7 +120,6 @@
           {%- else -%}
           <p class="data-gap" data-fact-id="metadata-harvestable" data-status="missing">Information not provided: whether the metadata will be available in a form that can be harvested and indexed.</p>
           {%- endif -%}
-        {%- endif -%}
         {%- endif -%}
       </div>
       {%- endif -%}

@@ -1,4 +1,4 @@
-"""Q3 two-gap print panel: real Jinja branches, strict controls, pinned PDF engine."""
+"""Historical 0.3.36 two-gap panel; current prose is verified in its own probe."""
 import argparse
 import copy
 import itertools
@@ -9,7 +9,7 @@ import sys
 from bs4 import BeautifulSoup
 from probe_budget_word import IMAGE, ROOT
 from probe_empty_pdf import prepared_css
-from metadata_gap_panel_contract import SELECTOR, prior_css, digest
+from metadata_gap_panel_contract import SELECTOR, prior_css, historical_css, digest
 
 
 def branch_rows(root):
@@ -24,6 +24,9 @@ def branch_rows(root):
         for i, (instruction, form) in enumerate(itertools.product(instructions, forms)):
             replies = {ACCESS: IDS['metadataOpenYesAUuid'], INSTRUCTIONS: instruction, FORM: form}
             html = adapter.render_question('src/questions/03-docs-metadata.html.j2', replies)
+            from metadata_gap_prose_contract import restore
+            language = 'chinese' if '尚待補充' in html else 'english'
+            html = str(restore(BeautifulSoup(html, 'html.parser'), language))
             yield 'branch-' + str(i), html, not instruction.strip() and not form.strip()
     finally:
         adapter.ROOT = previous
@@ -106,7 +109,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     assert not args.output.exists()
-    css = prepared_css(args.source_dir)
+    css = historical_css(prepared_css(args.source_dir))
     legacy = (args.source_dir / 'src/style.css').read_text()
     branches = list(branch_rows(args.source_dir))
     for name, source, selected in branches:
@@ -121,7 +124,7 @@ def main():
         target.write_text(json.dumps(dict(passed=False, stderr=result.stderr.decode()), indent=2) + '\n')
         raise RuntimeError('Pinned engine failed: ' + str(target))
     report = json.loads(result.stdout)
-    report.update(passed=True, release_acceptance=False, worker_image=IMAGE,
+    report.update(passed=True, historical_not_current_template=True, release_acceptance=False, worker_image=IMAGE,
         branch_checks=len(branches), checker_sha256=digest(Path(__file__)),
         css_sha256=digest(args.source_dir / 'src/layout.css'),
         limits=['Only the two named unanswered Q3 publication follow-ups', 'No wording, Jinja, font or Word changes', 'Native DSW and Microsoft Word acceptance are separate'])

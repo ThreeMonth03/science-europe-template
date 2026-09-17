@@ -49,7 +49,7 @@ def frozen_prepared_css(source):
     """Strip exact later additions, retaining the original prepared Q13 hash."""
     from metadata_gap_panel_contract import prior_css
     from probe_storage_context import strip
-    prepared, block = strip(prior_css(source), 'css')
+    prepared, block = strip(prior_css(source) if '/* BEGIN metadata gap panel:' in source else source, 'css')
     delta = json.loads((ROOT / 'docs/storage-context-style-delta.json').read_text())
     assert hashlib.sha256(block.encode()).hexdigest() == delta['css']['block_sha256']
     return baseline(without_reviewed_archive_panels(prepared), CSS_BEGIN, CSS_END)
