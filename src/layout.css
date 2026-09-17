@@ -108,6 +108,11 @@ html body .distribution-section + .distribution-section { border-top: 1px solid 
 html body .license-entry { margin: .25em 0 .5em; }
 html body .license-entry + .license-entry { border-top: 1px dotted #cbd2d5; padding-top: .4em; }
 html body .storage-detail-limits li { margin-bottom: .25em; }
+/* BEGIN short Q5 context: bounded owned prose and its operational limitations. */
+@media print {
+html body #q-store-backup > .answer.q5-short-context { break-inside: avoid; }
+}
+/* END short Q5 context */
 /* Narrow reading units, not whole-question keep-together rules. */
 html body .short-reading-unit, html body .ethical-data-flags { break-inside: avoid; }
 /* Only provenanceReading marks bounded, simple tables; long answers stay free. */

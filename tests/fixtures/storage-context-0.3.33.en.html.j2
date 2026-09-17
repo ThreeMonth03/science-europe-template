@@ -1,8 +1,7 @@
 <div id="q-store-backup" class="question" data-requirement-id="SE-3a">
   <h3>5. How will data and metadata be stored and backed up during the research process?</h3>
 
-  {%- import 'src/storage-reading.html.j2' as storageReading -%}
-  {% set storageAnswer %}
+  <div class="answer">
     {# Data stored by members (no shared workspace) #}
     {%- set sharedWorkspacePath = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid]|reply_path -%}
     {%- set sharedWorkspaceAUuid = repliesMap[sharedWorkspacePath]|reply_str_value -%}
@@ -138,7 +137,6 @@
         <li data-requirement-id="SE-3a" data-fact-id="backup-frequency" data-status="{{ 'partial' if frequencyKnown else 'unmapped' }}">An actual backup schedule is not established by these mapped answers; a need for frequent backups is not a schedule.</li>
       </ul>
     </div>
-  {% endset %}
-  {{ storageReading.answer(storageAnswer) }}
+  </div>
 
 </div>

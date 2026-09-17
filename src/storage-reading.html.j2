@@ -1,0 +1,31 @@
+{# Presentation hint for one bounded owned Q5 answer. Never rewrite its content.
+   Unknown markup/states or extra archive paragraphs retain ordinary pagination. #}
+{%- macro answer(original) -%}
+  {%- set visible = ((original|replace('</p>', ' ')|replace('</li>', ' '))|striptags).split()|join(' ') -%}
+  {%- set selection = namespace(ok=original|length <= 12000 and original.count('<div') == 2 and original.count('</div>') == 2 and original.count('<ul>') == 1 and original.count('<li ') == 2 and original.count('<p>') == 1 and 2 <= original.count('<p') <= 6, width=0) -%}
+  {%- for character in visible -%}{%- set selection.width = selection.width + (2 if character >= '⺀' else 1) -%}{%- endfor -%}
+  {%- if not visible or selection.width > 900 -%}{%- set selection.ok = false -%}{%- endif -%}
+  {%- set parts = original.split('</div>') -%}
+  {%- if parts|length != 3 or not parts[0].lstrip().startswith('<div class="workspace-policy dataset-policy">') or not parts[1].lstrip().startswith('<div class="data-gap template-gap storage-detail-limits">') or parts[2]|trim -%}{%- set selection.ok = false -%}{%- endif -%}
+  {%- set tags = [
+    'div class="workspace-policy dataset-policy"',
+    'div class="data-gap template-gap storage-detail-limits"',
+    '/div', 'p', '/p', 'ul', '/ul', '/li',
+    'p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete"',
+    'p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="complete"',
+    'p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="explicit-no"',
+    'p data-fact-id="workspace-management" data-status="complete"',
+    'p data-fact-id="workspace-management" data-status="explicit-no"',
+    'p data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="complete"',
+    'p data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="complete"',
+    'p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete"',
+    'li data-requirement-id="SE-3a" data-fact-id="storage-location" data-status="unmapped"',
+    'li data-requirement-id="SE-3a" data-fact-id="backup-frequency" data-status="unmapped"'
+  ] -%}
+  {%- for fragment in original.split('<')[1:] -%}
+    {%- set tag = fragment.split('>')[0] -%}
+    {%- if tag not in tags -%}{%- set selection.ok = false -%}{%- endif -%}
+    {%- if (tag == 'p' or tag.startswith('p ') or tag.startswith('li ')) and not fragment.split('>', 1)[-1]|trim -%}{%- set selection.ok = false -%}{%- endif -%}
+  {%- endfor -%}
+  <div class="answer{% if selection.ok %} q5-short-context{% endif %}">{{ original }}</div>
+{%- endmacro -%}

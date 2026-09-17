@@ -8,15 +8,16 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 from probe_identifier_spacing import baseline,old_lua,CSS_BEGIN,CSS_END,word_delta,without_reviewed_archive_panels
 from probe_archive_gap_panels import split_css
+from storage_context_contract import without_reviewed_context
 
 
 class IdentifierSpacingTests(unittest.TestCase):
     def test_only_scoped_additions_to_frozen_0327(self):
         sha=lambda s:hashlib.sha256(s.encode()).hexdigest()
         self.assertEqual('7136b5e64ac731b736ed3dd400e7e69994e89448c54bb2b6e35ccbc189275fa7',
-                         sha(old_lua((ROOT/'src/word/pilot.lua').read_text())))
+                         sha(old_lua(without_reviewed_context((ROOT/'src/word/pilot.lua').read_text(),'lua'))))
         self.assertEqual('2647f94a302062d334ca663350f1484c31ffba1dd247a8f4c58344cb66467159',
-                         sha(baseline(without_reviewed_archive_panels((ROOT/'src/layout.css').read_text()),CSS_BEGIN,CSS_END)))
+                         sha(baseline(without_reviewed_archive_panels(without_reviewed_context((ROOT/'src/layout.css').read_text(),'css')),CSS_BEGIN,CSS_END)))
 
     def test_later_block_is_exactly_reviewed_not_a_free_hash_exception(self):
         source=(ROOT/'src/layout.css').read_text();before,block=split_css(source)

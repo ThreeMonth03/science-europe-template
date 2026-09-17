@@ -143,7 +143,14 @@ def main():
     # new behavior. This probe deliberately requires a prepared build folder.
     digest=lambda s:hashlib.sha256(s.encode()).hexdigest()
     assert digest(old_lua(lua))=='7136b5e64ac731b736ed3dd400e7e69994e89448c54bb2b6e35ccbc189275fa7'
-    assert digest(baseline(without_reviewed_archive_panels((a.source_dir/'src/layout.css').read_text()),CSS_BEGIN,CSS_END))=='840c42a6fe505d73dcaf6eb9c57a92dd2c26d67416206f1a7d73f539cc812362'
+    from storage_context_contract import without_reviewed_context
+    # Prepared CSS contains the font/profile prefix; strip the exact source
+    # addition before retaining the original prepared-CSS hash gate.
+    from probe_storage_context import strip
+    prepared, block = strip((a.source_dir/'src/layout.css').read_text(), 'css')
+    delta = json.loads((ROOT/'docs/storage-context-style-delta.json').read_text())
+    assert digest(block) == delta['css']['block_sha256']
+    assert digest(baseline(without_reviewed_archive_panels(prepared),CSS_BEGIN,CSS_END))=='840c42a6fe505d73dcaf6eb9c57a92dd2c26d67416206f1a7d73f539cc812362'
     matrix=cases();rows=[]
     command=['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c']
     for name,html,left,right,eligible in matrix:

@@ -394,7 +394,44 @@ local function widen_short_budget_columns(div)
 end
 -- END short-budget Word columns
 
+-- BEGIN short Q5 context
+-- Recheck the Jinja hint against the real AST. Only two fixed blocks qualify;
+-- reject cold-archive/free/long/complex content and never keep the final item
+-- with Q6. Preserve all existing inlines and numbering.
+local function keep_q5_context(div)
+  if #div.content ~= 2 or div.content[1].t ~= "Header" or div.content[1].level ~= 3 then return div end
+  local answer = div.content[2]
+  if answer.t ~= "Div" or not answer.classes:includes("answer") or not answer.classes:includes("q5-short-context") or #answer.content ~= 2 then return div end
+  local policy, limits = answer.content[1], answer.content[2]
+  if policy.t ~= "Div" or not policy.classes:includes("workspace-policy") or #policy.content ~= 1 or policy.content[1].t ~= "Para" then return div end
+  if limits.t ~= "Div" or not limits.classes:includes("storage-detail-limits") or #limits.content ~= 2 or limits.content[1].t ~= "Para" or limits.content[2].t ~= "BulletList" or #limits.content[2].content ~= 2 then return div end
+  local paragraphs = {policy.content[1], limits.content[1]}
+  for _, item in ipairs(limits.content[2].content) do
+    if #item ~= 1 then return div end
+    local block = item[1]
+    if block.t == "Div" and block.identifier == "" and #block.classes == 0 and #block.attributes == 1 and block.attributes["custom-style"] == "Pilot List Lead" and #block.content == 1 then block = block.content[1] end
+    if block.t ~= "Plain" and block.t ~= "Para" then return div end
+    table.insert(paragraphs, block)
+  end
+  local units = 0
+  for index, paragraph in ipairs(paragraphs) do
+    if #paragraph.content == 0 then return div end
+    for _, inline in ipairs(paragraph.content) do
+      if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return div end
+    end
+    if index > 1 then units = units + 1 end
+    for _, code in utf8.codes(pandoc.utils.stringify(paragraph)) do units = units + (code >= 0x2E80 and 2 or 1) end
+  end
+  if units > 900 then return div end
+  policy.content[1] = pandoc.Div({paragraphs[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+  limits.content[1] = pandoc.Div({paragraphs[2]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+  limits.content[2].content[1][1] = pandoc.Div({pandoc.Para(paragraphs[3].content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot List Lead"}))
+  return div
+end
+-- END short Q5 context
+
 function Div(div)
+  if div.identifier == "q-store-backup" then return keep_q5_context(div) end
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
