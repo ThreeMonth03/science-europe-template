@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.32 [storage capacity experiment](docs/storage-capacity-gaps.md) makes a
+selected but blank Q3 capacity follow-up visible without hiding other answers.
+Zero, original quantities and authored paragraphs are retained. Shared styles
+are unchanged; native output checks remain a separate gate.
+
 The 0.3.31 [format reading experiment](docs/format-reading.md) combines complete
 Q2 facts into fewer sentences while retaining independent partial answers and
 all quantities. Styles and authored text are unchanged; native checks are separate.
