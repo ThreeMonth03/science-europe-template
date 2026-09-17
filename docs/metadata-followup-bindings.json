@@ -1,0 +1,294 @@
+{
+  "scope": "Selected public Common KM 2.7.0 bindings, not Science Europe coverage acceptance",
+  "inventory_sha256": "2fb03c15670bec6ffa7ab6cca64eb7303a8a2cc7c48456bb5543a9f207c3d05d",
+  "knowledge_models": {
+    "en": {
+      "km_sha256": "aabca6f7de8ad41cf9989afd25d4827f3de134fb8f0d965fcc6c336cfeb3e965",
+      "questions": [
+        {
+          "uuid": "8c962e6f-17ee-4b22-8ebb-9f06f779e3b3",
+          "path": [
+            "b1df3c74-0b1f-4574-81c4-4cc2d780c1af",
+            "8c962e6f-17ee-4b22-8ebb-9f06f779e3b3"
+          ],
+          "type": "OptionsQuestion",
+          "title": "How will you be collecting and keeping your metadata?",
+          "choices": [
+            {
+              "uuid": "6d18bfff-0f53-469b-934e-9806dda9d4fb",
+              "label": "Explore",
+              "follow_up_uuids": [
+                "1440afd6-d516-44f6-9c02-6abb13900b66",
+                "434b28c1-dbc0-4dd0-bb53-6d6ad51b86f4",
+                "6226d7f2-565f-4991-94b3-c00be6aca20e",
+                "ed872b74-6bf7-4cba-8f36-4da4509e4a4f",
+                "15573266-7ddf-4c6b-962e-45691d34cf61",
+                "ae28a862-5020-44c2-8c78-3abc185b190f",
+                "de1b1a0f-58ea-4859-91b0-aa2b52090395",
+                "948b5fd8-c1bd-457d-8f81-ea2fd093f541",
+                "106df534-f590-416b-8e4a-846edbdc4325",
+                "91a7c75c-6f0e-4bae-b3f3-1890feaae9b2"
+              ]
+            }
+          ]
+        },
+        {
+          "uuid": "434b28c1-dbc0-4dd0-bb53-6d6ad51b86f4",
+          "path": [
+            "b1df3c74-0b1f-4574-81c4-4cc2d780c1af",
+            "8c962e6f-17ee-4b22-8ebb-9f06f779e3b3",
+            "6d18bfff-0f53-469b-934e-9806dda9d4fb",
+            "434b28c1-dbc0-4dd0-bb53-6d6ad51b86f4"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Will you be creating a data/variable dictionary?",
+          "choices": [
+            {
+              "uuid": "93d19bdb-a977-42d6-9ecd-edfaed543281",
+              "label": "No",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c6efc94b-68e0-4d1c-a8c9-f02bd736623c",
+              "label": "Yes",
+              "follow_up_uuids": []
+            }
+          ]
+        },
+        {
+          "uuid": "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Will metadata be available openly?",
+          "choices": [
+            {
+              "uuid": "1dc216a6-77df-4f75-8bab-8e4f082fdab2",
+              "label": "No",
+              "follow_up_uuids": [
+                "6b5a6334-fbb3-4c88-995a-6d899e30da1e"
+              ]
+            },
+            {
+              "uuid": "cb148cc8-f15f-494f-a197-f01e3111ec60",
+              "label": "Yes",
+              "follow_up_uuids": [
+                "26b2afa6-99e8-4337-b380-5642bc807ad8",
+                "1270ea5a-92a2-46ce-b658-9bf2862b9b57"
+              ]
+            }
+          ]
+        },
+        {
+          "uuid": "6b5a6334-fbb3-4c88-995a-6d899e30da1e",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+            "1dc216a6-77df-4f75-8bab-8e4f082fdab2",
+            "6b5a6334-fbb3-4c88-995a-6d899e30da1e"
+          ],
+          "type": "ValueQuestion",
+          "title": "Please explain why the metadata will not be openly available",
+          "choices": []
+        },
+        {
+          "uuid": "26b2afa6-99e8-4337-b380-5642bc807ad8",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+            "cb148cc8-f15f-494f-a197-f01e3111ec60",
+            "26b2afa6-99e8-4337-b380-5642bc807ad8"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Will metadata contain instructions how to get access to the data?",
+          "choices": [
+            {
+              "uuid": "0e1f21d5-68fc-4f42-a7c6-eb6e01a8e034",
+              "label": "No",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "a7aaba0a-2e27-4051-b3a2-03474efa0cd9",
+              "label": "Yes",
+              "follow_up_uuids": []
+            }
+          ]
+        },
+        {
+          "uuid": "1270ea5a-92a2-46ce-b658-9bf2862b9b57",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+            "cb148cc8-f15f-494f-a197-f01e3111ec60",
+            "1270ea5a-92a2-46ce-b658-9bf2862b9b57"
+          ],
+          "type": "OptionsQuestion",
+          "title": "Will the metadata be available in a form that can be harvested and indexed?",
+          "choices": [
+            {
+              "uuid": "e3f7a89a-2d34-4b44-81bf-773b1d8cd2e3",
+              "label": "No",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "6833a1fa-62fe-46b1-bb81-a3e42ff9626d",
+              "label": "Yes, by the repository / repositories",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "90bd5ae9-087f-429d-8e2a-d322078f1d20",
+              "label": "Yes, we will take care of that",
+              "follow_up_uuids": []
+            }
+          ]
+        }
+      ]
+    },
+    "zh-Hant": {
+      "km_sha256": "a3030cb9048a8842fe43ebac9ece00011e26936111789443d85422473c4cae47",
+      "questions": [
+        {
+          "uuid": "8c962e6f-17ee-4b22-8ebb-9f06f779e3b3",
+          "path": [
+            "b1df3c74-0b1f-4574-81c4-4cc2d780c1af",
+            "8c962e6f-17ee-4b22-8ebb-9f06f779e3b3"
+          ],
+          "type": "OptionsQuestion",
+          "title": "您將如何蒐集並保存後設資料？",
+          "choices": [
+            {
+              "uuid": "6d18bfff-0f53-469b-934e-9806dda9d4fb",
+              "label": "探索",
+              "follow_up_uuids": [
+                "1440afd6-d516-44f6-9c02-6abb13900b66",
+                "434b28c1-dbc0-4dd0-bb53-6d6ad51b86f4",
+                "6226d7f2-565f-4991-94b3-c00be6aca20e",
+                "ed872b74-6bf7-4cba-8f36-4da4509e4a4f",
+                "15573266-7ddf-4c6b-962e-45691d34cf61",
+                "ae28a862-5020-44c2-8c78-3abc185b190f",
+                "de1b1a0f-58ea-4859-91b0-aa2b52090395",
+                "948b5fd8-c1bd-457d-8f81-ea2fd093f541",
+                "106df534-f590-416b-8e4a-846edbdc4325",
+                "91a7c75c-6f0e-4bae-b3f3-1890feaae9b2"
+              ]
+            }
+          ]
+        },
+        {
+          "uuid": "434b28c1-dbc0-4dd0-bb53-6d6ad51b86f4",
+          "path": [
+            "b1df3c74-0b1f-4574-81c4-4cc2d780c1af",
+            "8c962e6f-17ee-4b22-8ebb-9f06f779e3b3",
+            "6d18bfff-0f53-469b-934e-9806dda9d4fb",
+            "434b28c1-dbc0-4dd0-bb53-6d6ad51b86f4"
+          ],
+          "type": "OptionsQuestion",
+          "title": "您是否會建立資料字典或變項定義表？",
+          "choices": [
+            {
+              "uuid": "93d19bdb-a977-42d6-9ecd-edfaed543281",
+              "label": "否",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "c6efc94b-68e0-4d1c-a8c9-f02bd736623c",
+              "label": "是",
+              "follow_up_uuids": []
+            }
+          ]
+        },
+        {
+          "uuid": "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a"
+          ],
+          "type": "OptionsQuestion",
+          "title": "後設資料是否會公開提供？",
+          "choices": [
+            {
+              "uuid": "1dc216a6-77df-4f75-8bab-8e4f082fdab2",
+              "label": "否",
+              "follow_up_uuids": [
+                "6b5a6334-fbb3-4c88-995a-6d899e30da1e"
+              ]
+            },
+            {
+              "uuid": "cb148cc8-f15f-494f-a197-f01e3111ec60",
+              "label": "是",
+              "follow_up_uuids": [
+                "26b2afa6-99e8-4337-b380-5642bc807ad8",
+                "1270ea5a-92a2-46ce-b658-9bf2862b9b57"
+              ]
+            }
+          ]
+        },
+        {
+          "uuid": "6b5a6334-fbb3-4c88-995a-6d899e30da1e",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+            "1dc216a6-77df-4f75-8bab-8e4f082fdab2",
+            "6b5a6334-fbb3-4c88-995a-6d899e30da1e"
+          ],
+          "type": "ValueQuestion",
+          "title": "請說明後設資料不會公開提供的原因",
+          "choices": []
+        },
+        {
+          "uuid": "26b2afa6-99e8-4337-b380-5642bc807ad8",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+            "cb148cc8-f15f-494f-a197-f01e3111ec60",
+            "26b2afa6-99e8-4337-b380-5642bc807ad8"
+          ],
+          "type": "OptionsQuestion",
+          "title": "後設資料是否會包含如何取得資料的說明？",
+          "choices": [
+            {
+              "uuid": "0e1f21d5-68fc-4f42-a7c6-eb6e01a8e034",
+              "label": "否",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "a7aaba0a-2e27-4051-b3a2-03474efa0cd9",
+              "label": "是",
+              "follow_up_uuids": []
+            }
+          ]
+        },
+        {
+          "uuid": "1270ea5a-92a2-46ce-b658-9bf2862b9b57",
+          "path": [
+            "6be88f7c-f868-460f-bba7-91e1c659adfd",
+            "12baa8af-db59-43a5-8ec7-0941c58ff89a",
+            "cb148cc8-f15f-494f-a197-f01e3111ec60",
+            "1270ea5a-92a2-46ce-b658-9bf2862b9b57"
+          ],
+          "type": "OptionsQuestion",
+          "title": "後設資料是否可供自動擷取並建立索引？",
+          "choices": [
+            {
+              "uuid": "e3f7a89a-2d34-4b44-81bf-773b1d8cd2e3",
+              "label": "否",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "6833a1fa-62fe-46b1-bb81-a3e42ff9626d",
+              "label": "是，由資料儲存庫提供",
+              "follow_up_uuids": []
+            },
+            {
+              "uuid": "90bd5ae9-087f-429d-8e2a-d322078f1d20",
+              "label": "是，我們會負責讓後設資料可被自動擷取並建立索引",
+              "follow_up_uuids": []
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.33 [metadata follow-up experiment](docs/metadata-followups.md) preserves
+dictionary Yes/No and makes missing metadata-policy follow-ups visible.
+Authored reasons, existing standards, capacity and shared styles are retained.
+Native bilingual output checks are a separate gate; this is not a release.
+
 The 0.3.32 [storage capacity experiment](docs/storage-capacity-gaps.md) makes a
 selected but blank Q3 capacity follow-up visible without hiding other answers.
 Zero, original quantities and authored paragraphs are retained. Shared styles

@@ -1,0 +1,8 @@
+{
+  "name": "Science Europe metadata follow-up experiment",
+  "events_file": "metadata-private.events.json",
+  "knowledge_model_package_id": "../../knowledge-models/root-2.7.0.km",
+  "question_tag_uuids": [],
+  "visibility": "PrivateProjectVisibility",
+  "sharing": "RestrictedProjectSharing"
+}

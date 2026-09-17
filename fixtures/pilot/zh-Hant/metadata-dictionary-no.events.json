@@ -1,0 +1,20 @@
+[
+  {
+    "type": "SetReplyEvent",
+    "uuid": "a5521ed5-21f3-5f21-ba92-558eead537c8",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.8c962e6f-17ee-4b22-8ebb-9f06f779e3b3",
+    "value": {
+      "type": "AnswerReply",
+      "value": "6d18bfff-0f53-469b-934e-9806dda9d4fb"
+    }
+  },
+  {
+    "type": "SetReplyEvent",
+    "uuid": "6919ae1a-d1d6-505e-ae5a-97c39808c2bb",
+    "path": "b1df3c74-0b1f-4574-81c4-4cc2d780c1af.8c962e6f-17ee-4b22-8ebb-9f06f779e3b3.6d18bfff-0f53-469b-934e-9806dda9d4fb.434b28c1-dbc0-4dd0-bb53-6d6ad51b86f4",
+    "value": {
+      "type": "AnswerReply",
+      "value": "93d19bdb-a977-42d6-9ecd-edfaed543281"
+    }
+  }
+]

@@ -72,7 +72,7 @@ def scenarios():
     yield {}
 
 
-def check_roots(root, frozen, language):
+def check_roots(root, frozen, language, following_projection=None):
     from jinja2 import Environment, FileSystemLoader, ChoiceLoader, DictLoader
     import test_science_europe_contract as adapter
     wrapper = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include '"+QUESTION+"' %}"
@@ -88,7 +88,10 @@ def check_roots(root, frozen, language):
             if active(data) and data.get(AMOUNT): prior[AMOUNT] = sentinel
             before = BeautifulSoup(old_template.render(repliesMap=prior), 'html.parser')
             after = BeautifulSoup(new_template.render(repliesMap=data), 'html.parser')
-            compare(before, after, data, language, sentinel)
+            projected = expected(before, data, language, sentinel)
+            if following_projection is not None:
+                projected = following_projection(projected, data, language)
+            assert dom(projected) == dom(after), 'Unexpected capacity or follow-up projection delta'
             gaps = after.select('[data-fact-id="storage-capacity"][data-status="missing"]')
             assert len(gaps) == int(active(data) and not data.get(AMOUNT, '').strip())
             assert not after.select('p p, p div, p ul, script')

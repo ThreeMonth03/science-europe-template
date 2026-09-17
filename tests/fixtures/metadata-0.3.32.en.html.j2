@@ -56,21 +56,6 @@
       {%- if metadataSentences|length > 0 -%}
         <p>{{ metadataSentences|join(" ") }}</p>
       {%- endif -%}
-      {# This answer is independent of standards and metadata publication. #}
-      {%- set dictionary = repliesMap[[metadataPath, uuids.metadataExploreAUuid, uuids.metadataDictionaryQUuid]|reply_path]|reply_str_value -%}
-      {%- if dictionary == uuids.metadataDictionaryYesAUuid -%}
-        <p data-fact-id="metadata-dictionary" data-status="complete">We will create a data/variable dictionary.</p>
-      {%- elif dictionary == uuids.metadataDictionaryNoAUuid -%}
-        <p data-fact-id="metadata-dictionary" data-status="explicit-no">We will not create a data/variable dictionary.</p>
-      {%- else -%}
-        <div class="reading-gap">
-          {%- if dictionary|trim -%}
-          <p class="data-gap" data-fact-id="metadata-dictionary" data-status="needs-review">The selected data-dictionary option cannot be represented by this template; please review it.</p>
-          {%- else -%}
-          <p class="data-gap" data-fact-id="metadata-dictionary" data-status="missing">Information not provided: whether a data/variable dictionary will be created.</p>
-          {%- endif -%}
-        </div>
-      {%- endif -%}
     {%- endif -%}
 
     {# Publishing metadata #}
@@ -79,10 +64,8 @@
     {%- if metadataOpenAUuid == uuids.metadataOpenNoAUuid %}
       {%- set explanation = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenNoExplainQUuid]|reply_path]|reply_str_value -%}
       <p>Metadata will not be available openly.</p>
-      {%- if explanation|trim -%}
+      {%- if explanation -%}
         <div class="answer-detail" data-fact-id="metadata-access-explanation">{{ explanation|markdown }}</div>
-      {%- else -%}
-        <div class="reading-gap"><p class="data-gap" data-fact-id="metadata-access-explanation" data-status="missing">Information not provided: why the metadata will not be openly available.</p></div>
       {%- endif -%}
     {%- elif metadataOpenAUuid == uuids.metadataOpenYesAUuid -%}
       {%- set metadataOpenInstrAUuid = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenInstrQUuid]|reply_path]|reply_str_value -%}
@@ -103,26 +86,6 @@
         Metadata will be available in a form that can be harvested and indexed.
       {%- endif %}
       </p>
-      {%- set instructionKnown = metadataOpenInstrAUuid in [uuids.metadataOpenInstrYesAUuid, uuids.metadataOpenInstrNoAUuid] -%}
-      {%- set formKnown = metadataOpenFormAUuid in [uuids.metadataOpenFormNoAUuid, uuids.metadataOpenFormYesRepoAUuid, uuids.metadataOpenFormYesCareAUuid] -%}
-      {%- if not instructionKnown or not formKnown -%}
-      <div class="reading-gap">
-        {%- if not instructionKnown -%}
-          {%- if metadataOpenInstrAUuid|trim -%}
-          <p class="data-gap" data-fact-id="metadata-access-instructions" data-status="needs-review">The selected metadata access-instructions option cannot be represented by this template; please review it.</p>
-          {%- else -%}
-          <p class="data-gap" data-fact-id="metadata-access-instructions" data-status="missing">Information not provided: whether the metadata will include instructions for accessing the data.</p>
-          {%- endif -%}
-        {%- endif -%}
-        {%- if not formKnown -%}
-          {%- if metadataOpenFormAUuid|trim -%}
-          <p class="data-gap" data-fact-id="metadata-harvestable" data-status="needs-review">The selected metadata harvesting and indexing option cannot be represented by this template; please review it.</p>
-          {%- else -%}
-          <p class="data-gap" data-fact-id="metadata-harvestable" data-status="missing">Information not provided: whether the metadata will be available in a form that can be harvested and indexed.</p>
-          {%- endif -%}
-        {%- endif -%}
-      </div>
-      {%- endif -%}
     {%- endif -%}
     </div>
 
