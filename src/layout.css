@@ -159,3 +159,10 @@ html body #q-data-preservation .post-project-archive[data-scope="project"] > .da
 html body #q-data-preservation .post-project-archive[data-scope="project"] > .dataset-policy > .reading-gap:has(> p.data-gap[data-fact-id="archive-format-migration"][data-status="missing"]:only-child:not(:has(*))) + .reading-gap:has(> p.data-gap[data-fact-id="archive-media-migration"][data-status="missing"]:only-child:not(:has(*))) > p.data-gap { border-top-width: 0; padding-top: .2em; }
 }
 /* END archive gap pairs */
+/* BEGIN metadata gap panel: only the two unanswered publication follow-ups. */
+@media print {
+html body #q-docs-metadata > .answer > .metadata-policy > .reading-gap:has(> p.data-gap[data-fact-id="metadata-access-instructions"][data-status="missing"]:first-child:not(:has(*))):has(> p.data-gap[data-fact-id="metadata-harvestable"][data-status="missing"]:nth-child(2):last-child:not(:has(*))) { border: 1px solid #8a6d3b; border-left: 3px solid #95651b; background: #fff8e8; padding: .45em .65em; break-inside: avoid; }
+html body #q-docs-metadata > .answer > .metadata-policy > .reading-gap:has(> p.data-gap[data-fact-id="metadata-access-instructions"][data-status="missing"]:first-child:not(:has(*))):has(> p.data-gap[data-fact-id="metadata-harvestable"][data-status="missing"]:nth-child(2):last-child:not(:has(*))) > p.data-gap { border: 0; padding: 0; background: transparent; }
+html body #q-docs-metadata > .answer > .metadata-policy > .reading-gap:has(> p.data-gap[data-fact-id="metadata-access-instructions"][data-status="missing"]:first-child:not(:has(*))):has(> p.data-gap[data-fact-id="metadata-harvestable"][data-status="missing"]:nth-child(2):last-child:not(:has(*))) > p.data-gap:first-child { margin-bottom: .25em; }
+}
+/* END metadata gap panel */

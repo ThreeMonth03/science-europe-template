@@ -13,6 +13,9 @@ FACTS = {'working-storage-arrangement', 'backup-reliability', 'workspace-managem
 def without_reviewed_context(source,kind):
     import hashlib
     from probe_storage_context import strip
+    if kind == 'css' and '/* BEGIN metadata gap panel:' in source:
+        from metadata_gap_panel_contract import prior_css
+        source = prior_css(source)
     if kind == 'lua' and '-- BEGIN joined Q5 Word lead' in source:
         from q5_word_join_contract import prior_lua
         source = prior_lua(source)
