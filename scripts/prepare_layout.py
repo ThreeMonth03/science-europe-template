@@ -102,6 +102,12 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         item.base_style = document.styles["Compact"]
         item.paragraph_format.keep_with_next = keep_next
         item.paragraph_format.keep_together = True
+    # BEGIN bounded preservation label style
+    preservation = document.styles.add_style("Pilot Preservation Summary", WD_STYLE_TYPE.PARAGRAPH)
+    preservation.base_style = document.styles["Body Text"]
+    preservation.paragraph_format.keep_with_next = False
+    preservation.paragraph_format.keep_together = True
+    # END bounded preservation label style
     table_lead = document.styles.add_style("Pilot Table Lead", WD_STYLE_TYPE.PARAGRAPH)
     table_lead.base_style = document.styles["Compact"]
     table_lead.paragraph_format.keep_with_next = True

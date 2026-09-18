@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.39 [bounded Q11 Word reading unit](docs/preservation-reading.md) keeps
+short dataset names and fixed preservation summaries together. Long, missing
+or authored content retains its existing structure. PDF/Jinja and translations
+are unchanged; native bilingual and Microsoft Word acceptance are separate.
+
 The 0.3.38 [output profiles pilot](docs/output-profiles.md) adds separately named
 review/submission-preview HTML, PDF and Word formats from the same Jinja source.
 Only the explicitly listed notices are optional so far: this is **not** a clean,

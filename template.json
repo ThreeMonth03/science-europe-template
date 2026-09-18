@@ -1,7 +1,7 @@
 {
   "organizationId": "threemonth03",
   "templateId": "science-europe-enhanced",
-  "version": "0.3.38",
+  "version": "0.3.39",
   "name": "Science Europe DMP — Output Profiles Pilot",
   "description": "Experimental derivative of dsw:science-europe:1.30.1 with completeness handling and shared PDF/Word reading structure",
   "license": "Apache-2.0",
@@ -95,7 +95,7 @@
                     "options": {
                         "from": "html",
                         "to": "docx",
-                        "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --reference-doc=src/word/reference.docx"
+                        "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx"
                     }
                 }
             ]
@@ -123,7 +123,7 @@
       "icon": "far fa-file-word",
       "steps": [
         {"name": "jinja", "options": {"template": "src/submission/word.html.j2", "content-type": "text/html", "extension": "html"}},
-        {"name": "pandoc", "options": {"from": "html", "to": "docx", "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --reference-doc=src/word/reference.docx"}}
+        {"name": "pandoc", "options": {"from": "html", "to": "docx", "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx"}}
       ]
     },
     {

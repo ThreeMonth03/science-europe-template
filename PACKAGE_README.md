@@ -15,6 +15,11 @@ This is NOT an approved, comprehensive or ready-to-submit output. Selecting a
 profile does not complete answers or approve the DMP. Existing format UUIDs are
 retained; the new submission formats share the same questionnaire logic.
 
+Version 0.3.39 adds a bounded Word-only Q11 reading unit: a short dataset name
+becomes a bold lead joined to its short fixed preservation summary. Question
+headings and link anchors are retained. Long, missing or authored summaries
+keep their existing structure. PDF and the scope of optional notices do not change.
+
 Build reviewed bilingual packages through the companion Chinese repository.
 The bare upstream packaging command does not prepare the reviewed bilingual fonts
 and Word reference styles. Compatibility and release status must be checked
