@@ -6,6 +6,10 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.40 [bounded Q15 PDF reading unit](docs/short-resources.md) keeps a short,
+simple resource overview and its small budget together. It changes only the PDF
+entry; questionnaire prose, translations, CSS and Word remain unchanged.
+
 The 0.3.39 [bounded Q11 Word reading unit](docs/preservation-reading.md) keeps
 short dataset names and fixed preservation summaries together. Long, missing
 or authored content retains its existing structure. PDF/Jinja and translations

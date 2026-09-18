@@ -20,6 +20,10 @@ becomes a bold lead joined to its short fixed preservation summary. Question
 headings and link anchors are retained. Long, missing or authored summaries
 keep their existing structure. PDF and the scope of optional notices do not change.
 
+Version 0.3.40 adds a PDF-entry-only keep hint for a single, short resource plan
+with one or two simple budget rows. Long, missing, complex and unknown structures
+retain their existing pagination. This changes no answers or optional notices.
+
 Build reviewed bilingual packages through the companion Chinese repository.
 The bare upstream packaging command does not prepare the reviewed bilingual fonts
 and Word reference styles. Compatibility and release status must be checked

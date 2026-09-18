@@ -1,0 +1,99 @@
+{# PDF-entry presentation only. Preserve every input byte except the unique
+   owned Q15 opening tag. Conservative grammar/size rejection is intentional. #}
+{%- macro measure(value, result, limit) -%}
+  {%- set visible = (value|striptags).split()|join(' ') -%}
+  {%- set result.width = 0 -%}
+  {%- for character in visible -%}{%- set result.width = result.width + (2 if character >= '⺀' else 1) -%}{%- endfor -%}
+  {%- if not visible or result.width > limit -%}{%- set result.ok = false -%}{%- endif -%}
+{%- endmacro -%}
+
+{%- macro document(original) -%}
+  {%- set opening = '<div id="q-required-resources" class="question" data-requirement-id="SE-6b">' -%}
+  {%- set hint = '<div id="q-required-resources" class="question pdf-short-resources" style="break-inside: avoid" data-requirement-id="SE-6b">' -%}
+  {%- set selection = namespace(ok=false, width=0) -%}
+  {%- if original.count(opening) == 1 -%}
+    {%- set tail = original.split(opening, 1)[1] -%}
+    {%- if tail.count('</section>') == 1 -%}
+      {%- set question = (opening|safe) + (tail.split('</section>', 1)[0]|safe) -%}
+      {%- set selection.ok = question|length <= 16000 and question.count('<div class="project-resources" ') == 1 and question.count('<table ') == 1 and question.count('<h3>') == 1 and question.count('<h4>') == 1 and question.count('<thead>') == 1 and question.count('<tbody>') == 1 and question.count('<th ') == 3 and 1 <= question.count('<tr data-item-id=') <= 2 and question.count('<ul>') <= 1 and question.count('<li>') <= 2 and question.count('<p') <= 16 -%}
+      {%- if selection.ok -%}
+      {%- if question.count('<div class="answer">') != 1 or not question[opening|length:].lstrip().startswith('<h3>') or question.split('</table>', 1)[-1]|replace('</div>', '')|trim -%}{%- set selection.ok = false -%}{%- endif -%}
+      {%- if question.count('<colgroup>') != 1 or not question.find('<colgroup>') < question.find('<thead>') < question.find('<tbody>') -%}{%- set selection.ok = false -%}{%- endif -%}
+      {%- for column in ['resource-purpose', 'resource-budget', 'resource-funding'] -%}{%- if question.count('<col class="' + column + '">') != 1 -%}{%- set selection.ok = false -%}{%- endif -%}{%- endfor -%}
+      {%- if not question.find('<col class="resource-purpose">') < question.find('<col class="resource-budget">') < question.find('<col class="resource-funding">') -%}{%- set selection.ok = false -%}{%- endif -%}
+      {{- measure(question, selection, 1200) -}}
+      {%- set stack = [] -%}
+      {%- set plain = ['p', 'strong', 'em', 'code', 'ul', 'li', 'h3', 'h4', 'colgroup', 'thead', 'tbody', 'tr', 'td'] -%}
+      {%- set fixed = [
+        opening[1:-1], 'div class="answer"', 'div class="answer-lead"',
+        'div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete"',
+        'div class="answer-detail" data-fact-id="resource-justification" data-status="complete"',
+        'div class="answer-detail"',
+        'p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="complete"',
+        'p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="explicit-no"',
+        'p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no"',
+        'table class="resource-table"', 'th scope="col"',
+        'col class="resource-purpose"', 'col class="resource-budget"', 'col class="resource-funding"'
+      ] -%}
+      {%- for fragment in question.split('<')[1:] -%}
+        {%- set tag = fragment.split('>', 1)[0] -%}
+        {%- set content = fragment.split('>', 1)[-1] -%}
+        {%- set name = tag.split(' ', 1)[0] -%}
+        {%- if tag.startswith('/') -%}
+          {%- if stack and stack[-1].split(' ', 1)[0] == tag[1:] -%}{%- do stack.pop() -%}
+          {%- else -%}{%- set selection.ok = false -%}{%- endif -%}
+        {%- else -%}
+          {%- set dynamic = namespace(ok=false) -%}
+          {%- for prefix in ['div class="project-resources" data-item-id="', 'tr data-item-id="'] -%}
+            {%- if tag.startswith(prefix) and tag.endswith('"') -%}
+              {%- set identity = tag[prefix|length:-1] -%}
+              {%- set dynamic.ok = identity|length > 0 -%}
+              {%- for character in identity -%}{%- if character not in '0123456789abcdef-.' -%}{%- set dynamic.ok = false -%}{%- endif -%}{%- endfor -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if tag not in plain and tag not in fixed and not dynamic.ok -%}{%- set selection.ok = false -%}{%- endif -%}
+          {%- set parent = stack[-1] if stack else '' -%}
+          {%- set parentName = parent.split(' ', 1)[0] -%}
+          {%- set legal = namespace(ok=false) -%}
+          {%- if tag == opening[1:-1] -%}{%- set legal.ok = not stack -%}
+          {%- elif tag == 'div class="answer"' or name == 'h3' -%}{%- set legal.ok = parent == opening[1:-1] -%}
+          {%- elif name == 'div' -%}
+            {%- set legal.ok = (parent == 'div class="answer"' and (dynamic.ok or tag in [fixed[2], fixed[3]])) or (parent == 'td' and tag in [fixed[4], fixed[5]]) -%}
+          {%- elif name == 'h4' -%}{%- set legal.ok = parent == 'div class="answer"' -%}
+          {%- elif name == 'table' -%}{%- set legal.ok = parent.startswith('div class="project-resources" data-item-id="') -%}
+          {%- elif name in ['colgroup', 'thead', 'tbody'] -%}{%- set legal.ok = parent == 'table class="resource-table"' -%}
+          {%- elif name == 'col' -%}{%- set legal.ok = parent == 'colgroup' -%}
+          {%- elif name == 'tr' -%}{%- set legal.ok = (tag == 'tr' and parent == 'thead') or (dynamic.ok and parent == 'tbody') -%}
+          {%- elif name == 'th' -%}{%- set legal.ok = parent == 'tr' -%}
+          {%- elif name == 'td' -%}{%- set legal.ok = parent.startswith('tr data-item-id="') -%}
+          {%- elif name == 'p' -%}{%- set legal.ok = parentName == 'div' and parent != opening[1:-1] and not parent.startswith('div class="project-resources"') or parent == 'td' -%}
+          {%- elif name in ['strong', 'em', 'code'] -%}{%- set legal.ok = parentName in ['p', 'li'] -%}
+          {%- elif name == 'ul' -%}{%- set legal.ok = parent == fixed[3] -%}
+          {%- elif name == 'li' -%}{%- set legal.ok = parent == 'ul' -%}
+          {%- endif -%}
+          {%- if not legal.ok -%}{%- set selection.ok = false -%}{%- endif -%}
+          {%- if name != 'col' -%}{%- do stack.append(tag) -%}{%- endif -%}
+        {%- endif -%}
+        {%- if content|trim and (not stack or stack[-1].split(' ', 1)[0] not in ['p', 'strong', 'em', 'code', 'li', 'h3', 'h4', 'th']) -%}{%- set selection.ok = false -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if stack -%}{%- set selection.ok = false -%}{%- endif -%}
+      {%- for paragraph in question.split('<p')[1:] -%}{{- measure(paragraph.split('>', 1)[-1].split('</p>', 1)[0], selection, 160) -}}{%- endfor -%}
+      {%- for item in question.split('<li>')[1:] -%}{{- measure(item.split('</li>', 1)[0], selection, 80) -}}{%- endfor -%}
+      {%- for tag, limit in [('h3', 360), ('h4', 80), ('th scope="col"', 40)] -%}
+        {%- for value in question.split('<' + tag + '>')[1:] -%}{{- measure(value.split('</' + tag.split(' ', 1)[0] + '>', 1)[0], selection, limit) -}}{%- endfor -%}
+      {%- endfor -%}
+      {%- for row in question.split('<tr data-item-id=')[1:] -%}{%- if row.split('</tr>', 1)[0].count('<td>') != 3 -%}{%- set selection.ok = false -%}{%- endif -%}{%- endfor -%}
+      {%- for cell in question.split('<td>')[1:] -%}
+        {%- set value = cell.split('</td>', 1)[0] -%}
+        {%- set column = loop.index0 % 3 -%}
+        {{- measure(value, selection, [300, 40, 80][column]) -}}
+        {%- if value.count('<p') != [3, 1, 1][column] -%}{%- set selection.ok = false -%}{%- endif -%}
+      {%- endfor -%}
+      {%- if question.count('<td>') != 3 * question.count('<tr data-item-id=') -%}{%- set selection.ok = false -%}{%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if selection.ok -%}
+    {{- original|replace(opening, hint|safe, 1) -}}
+  {%- else -%}{{- original -}}{%- endif -%}
+{%- endmacro -%}

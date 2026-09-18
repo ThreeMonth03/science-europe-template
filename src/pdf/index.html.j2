@@ -1,3 +1,5 @@
 {# PDF-only presentation, shared facts and translated fragments stay in Q15. #}
 {%- set pdf_budget_reading = true -%}
-{%- include 'src/index.html.j2' -%}
+{%- set pdfDocument -%}{%- include 'src/index.html.j2' -%}{%- endset -%}
+{%- import 'src/pdf/short-resources.html.j2' as shortResources -%}
+{{- shortResources.document(pdfDocument) -}}

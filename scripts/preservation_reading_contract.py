@@ -29,10 +29,16 @@ def historic(path): return subprocess.check_output(['git', '-C', str(ROOT), 'sho
 
 def source_delta():
     old = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()
-    current = {str(p.relative_to(ROOT)) for p in (ROOT/'src').rglob('*') if p.is_file()}
+    sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+    after = json.loads((ROOT/'template.json').read_text())
+    if after['version'] == '0.3.40':
+        # The following PDF-only slice must prove its exact delta first.
+        from short_resources_contract import project_source
+        sources, after = project_source()
+    current = set(sources)
     assert current-set(old) == {FILTER} and not set(old)-current
-    for name in old: assert (ROOT/name).read_bytes() == historic(name), name
-    before = json.loads(historic('template.json')); after = json.loads((ROOT/'template.json').read_text())
+    for name in old: assert sources[name] == historic(name), name
+    before = json.loads(historic('template.json'))
     assert before['version'] == '0.3.38'; before['version'] = '0.3.39'
     selected = 0
     for fmt in before['formats']:
