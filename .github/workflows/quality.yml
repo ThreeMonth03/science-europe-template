@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
       - run: make check
+      - name: Check bounded many-budget PDF rows without changing cell text
+        run: python scripts/probe_short_resource_rows.py --engine --output outputs/short-resource-rows-engine.json
       - name: Check bounded Q15 PDF entry and unchanged fallbacks
         run: python scripts/probe_short_resources.py --engine --output outputs/short-resources-engine.json
       - name: Check Q11 bounded preservation labels with pinned Pandoc

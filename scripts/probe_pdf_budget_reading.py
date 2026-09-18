@@ -130,6 +130,8 @@ def check(root, prior=None):
     results = []
     for name, replies, eligible in matrix():
         original = render(root, replies); pdf = render(root, replies, True)
+        from short_resource_rows_contract import project_hints
+        pdf = project_hints(pdf)
         if prior is not None:
             before = render(root, replies, question=prior)
             historic_original = original

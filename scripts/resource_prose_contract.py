@@ -45,13 +45,16 @@ def prior_pdf(source):
 
 def project_source():
     sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+    metadata = json.loads((ROOT/'template.json').read_text())
+    if metadata['version'] == '0.3.42':
+        from short_resource_rows_contract import project_source as project_rows
+        sources, metadata = project_rows()
     old = subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-r','--name-only',BASELINE,'src'],text=True).splitlines()
     assert set(sources)-set(old) == {HELPER} and not set(old)-set(sources)
     sources.pop(HELPER)
     sources[QUESTION] = prior_question(sources[QUESTION].decode()).encode()
     sources[PDF_HELPER] = prior_pdf(sources[PDF_HELPER].decode()).encode()
     for name in old: assert sources[name] == historical(name), name
-    metadata = json.loads((ROOT/'template.json').read_text())
     assert metadata['version'] == '0.3.41'
     metadata['version'] = '0.3.40'
     assert metadata == json.loads(historical('template.json'))

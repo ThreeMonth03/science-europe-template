@@ -82,7 +82,10 @@
     {%- do selection.eligible.append(result.long) -%}
     {%- set selection.any = selection.any or result.long -%}
   {%- endfor -%}
-  {%- if not selection.any -%}{{ short_table(original, rows) }}{%- else -%}
+  {%- if not selection.any -%}
+    {%- import 'src/pdf/short-resource-rows.html.j2' as shortRows -%}
+    {{- short_table(shortRows.table(original, rows), rows) -}}
+  {%- else -%}
     {%- set pending = [] -%}
     {%- for row in rows -%}
       {%- if selection.eligible[loop.index0] -%}
