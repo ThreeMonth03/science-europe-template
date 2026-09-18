@@ -33,6 +33,7 @@
         'p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="explicit-no"',
         'p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no"',
         'table class="resource-table"', 'th scope="col"',
+        'span data-fact-id="repository-charges" data-status="complete"',
         'col class="resource-purpose"', 'col class="resource-budget"', 'col class="resource-funding"'
       ] -%}
       {%- for fragment in question.split('<')[1:] -%}
@@ -67,6 +68,7 @@
           {%- elif name == 'th' -%}{%- set legal.ok = parent == 'tr' -%}
           {%- elif name == 'td' -%}{%- set legal.ok = parent.startswith('tr data-item-id="') -%}
           {%- elif name == 'p' -%}{%- set legal.ok = parentName == 'div' and parent != opening[1:-1] and not parent.startswith('div class="project-resources"') or parent == 'td' -%}
+          {%- elif name == 'span' -%}{%- set legal.ok = parent == 'p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no"' and question.count('<span ') == 1 -%}
           {%- elif name in ['strong', 'em', 'code'] -%}{%- set legal.ok = parentName in ['p', 'li'] -%}
           {%- elif name == 'ul' -%}{%- set legal.ok = parent == fixed[3] -%}
           {%- elif name == 'li' -%}{%- set legal.ok = parent == 'ul' -%}
@@ -74,7 +76,7 @@
           {%- if not legal.ok -%}{%- set selection.ok = false -%}{%- endif -%}
           {%- if name != 'col' -%}{%- do stack.append(tag) -%}{%- endif -%}
         {%- endif -%}
-        {%- if content|trim and (not stack or stack[-1].split(' ', 1)[0] not in ['p', 'strong', 'em', 'code', 'li', 'h3', 'h4', 'th']) -%}{%- set selection.ok = false -%}{%- endif -%}
+        {%- if content|trim and (not stack or stack[-1].split(' ', 1)[0] not in ['p', 'span', 'strong', 'em', 'code', 'li', 'h3', 'h4', 'th']) -%}{%- set selection.ok = false -%}{%- endif -%}
       {%- endfor -%}
       {%- if stack -%}{%- set selection.ok = false -%}{%- endif -%}
       {%- for paragraph in question.split('<p')[1:] -%}{{- measure(paragraph.split('>', 1)[-1].split('</p>', 1)[0], selection, 160) -}}{%- endfor -%}

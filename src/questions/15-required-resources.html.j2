@@ -37,6 +37,8 @@
     {%- else -%}
       <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="missing"><strong>Information not provided:</strong> whether additional specialist expertise is required.</p>
     {%- endif -%}
+    {%- set resourceOverview = namespace(original='', explicitPair=false) -%}
+    {%- set resourceOverview.original -%}
     {# additional hw/sw #}
     {%- set additionalHWSWPath = [uuids.adminDetailsCUuid, uuids.additionalHWSWQUuid]|reply_path -%}
     {%- set additionalHWSWAUuid = repliesMap[additionalHWSWPath]|reply_str_value -%}
@@ -67,6 +69,10 @@
     {%- else %}
       <p class="data-gap" data-fact-id="repository-charges" data-status="missing"><strong>Information not provided:</strong> whether repository service charges will be incurred.</p>
     {%- endif %}
+    {% set resourceOverview.explicitPair = additionalHWSWAUuid == uuids.additionalHWSWNoAUuid and repoCharges in [uuids.repoChargesNoAUuid, uuids.repoChargesYesAUuid] -%}
+    {%- endset -%}
+    {%- import 'src/resource-prose.html.j2' as resourceProse -%}
+    {{- resourceProse.render(resourceOverview.original, resourceOverview.explicitPair) -}}
     {# costs #}
     {%- set projectPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
     {%- set projectItems = repliesMap[projectPath]|reply_items -%}

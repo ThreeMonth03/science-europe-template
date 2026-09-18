@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.41 [owned Q15 prose pair](docs/resource-prose.md) joins two explicitly
+answered fixed sentences without changing their words or existing translations.
+Missing/unknown and authored answers retain their exact output. Native bilingual
+PDF/Word validation is tracked separately in the companion translation repo.
+
 The 0.3.40 [bounded Q15 PDF reading unit](docs/short-resources.md) keeps a short,
 simple resource overview and its small budget together. It changes only the PDF
 entry; questionnaire prose, translations, CSS and Word remain unchanged.

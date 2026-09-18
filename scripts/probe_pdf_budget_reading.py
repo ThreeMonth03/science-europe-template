@@ -132,7 +132,15 @@ def check(root, prior=None):
         original = render(root, replies); pdf = render(root, replies, True)
         if prior is not None:
             before = render(root, replies, question=prior)
-            assert original == before or dom(BeautifulSoup(normalize_owned_allocation_indent(original), 'html.parser')) == dom(BeautifulSoup(normalize_owned_allocation_indent(before), 'html.parser')), (name, 'Non-PDF output differs from 0.3.18')
+            historic_original = original
+            question = (root/QUESTION).read_text()
+            if 'resourceOverview.original' in question:
+                # Prove the old table contract on the precisely unwrapped
+                # question; keep the live joined original/pdf below. The new
+                # pair has its own byte-exact bilingual/native gates.
+                from resource_prose_contract import prior_question
+                historic_original = render(root, replies, question=prior_question(question))
+            assert historic_original == before or dom(BeautifulSoup(normalize_owned_allocation_indent(historic_original), 'html.parser')) == dom(BeautifulSoup(normalize_owned_allocation_indent(before), 'html.parser')), (name, 'Non-PDF output differs from 0.3.18 after exact owned-pair projection')
         if not eligible: assert pdf == original, (name, 'Fallback/control changed')
         assert dom(BeautifulSoup(pdf, 'html.parser')) == dom(expected(original, eligible)), (name, 'Unexpected structural/content change')
         results.append({'case': name, 'expanded_rows': len(eligible), 'passed': True})

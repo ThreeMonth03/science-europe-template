@@ -1,0 +1,27 @@
+{# Join only the two template-owned, explicitly answered Q15 facts. The caller
+   excludes authored hardware details and missing/unknown choices. No text or
+   punctuation is rewritten. Other languages/longer translations fail closed. #}
+{%- macro render(original, explicitPair) -%}
+  {%- set opening = '<p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no">' -%}
+  {%- set block = original|trim -%}
+  {%- set selected = namespace(ok=false, width=0) -%}
+  {%- if explicitPair and block.startswith(opening) and block.endswith('</p>') and block.count('</p>') == 2 -%}
+    {%- set first = block[opening|length:].split('</p>', 1)[0] -%}
+    {%- set rest = block.split('</p>', 1)[1]|trim -%}
+    {%- if rest.startswith('<p>') -%}
+      {%- set second = rest[3:-4] -%}
+      {%- set selected.ok = first|length > 0 and second|length > 0 and '<' not in first and '<' not in second and '>' not in first and '>' not in second -%}
+      {# These owned sentences end in an English stop or a Chinese full stop.
+         A full-width stop needs no added inter-sentence ASCII space. #}
+      {%- set selected.ok = selected.ok and ((first.endswith('.') and second.endswith('.')) or (first.endswith('。') and second.endswith('。'))) -%}
+      {%- set separator = '' if first.endswith('。') else ' ' -%}
+      {%- for character in first + separator + second -%}{%- set selected.width = selected.width + (2 if character >= '⺀' else 1) -%}{%- endfor -%}
+      {%- set selected.ok = selected.ok and selected.width <= 160 -%}
+      {%- if selected.ok -%}
+        {%- set joined = (opening|safe) + (first|safe) + separator + ('<span data-fact-id="repository-charges" data-status="complete">'|safe) + (second|safe) + ('</span></p>'|safe) -%}
+        {{- original|replace(block, joined, 1) -}}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if not selected.ok -%}{{- original -}}{%- endif -%}
+{%- endmacro -%}

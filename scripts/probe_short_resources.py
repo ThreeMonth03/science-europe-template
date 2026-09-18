@@ -71,6 +71,18 @@ def cases():
     for n in (needed,needed+1):
         source = large.replace('Training details.','v'*n)
         rows.append(('whole-'+str(1200+n-needed),source,n==needed))
+    span = '<span data-fact-id="repository-charges" data-status="complete">Charges.</span>'
+    joined = base.replace('No equipment.</p><p>Charges.', 'No equipment. '+span)
+    rows.append(('joined-fixed-pair',joined,True))
+    rows.append(('joined-cjk',joined.replace('No equipment. '+span,'不需要其他硬體或軟體。'+span.replace('Charges.','不收取服務費。')),True))
+    for name, source in [
+        ('joined-unknown-attribute',joined.replace('<span ', '<span title="unknown" ')),
+        ('joined-missing',joined.replace('repository-charges" data-status="complete','repository-charges" data-status="missing')),
+        ('joined-nested-emphasis',joined.replace('Charges.', '<strong>Charges.</strong>')),
+        ('joined-duplicate-span',joined.replace(span,span+span)),
+        ('joined-wrong-parent',base.replace('Purpose.',span)),
+        ('joined-long',joined.replace('Charges.','x'*160)),
+    ]: rows.append((name,source,False))
     return rows
 
 

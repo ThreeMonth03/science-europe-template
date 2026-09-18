@@ -21,12 +21,16 @@ def project_source():
     """Validate every current source byte, then expose the exact 0.3.39 input."""
     old = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()
     current = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+    metadata = json.loads((ROOT/'template.json').read_text())
+    if metadata['version'] == '0.3.41':
+        from resource_prose_contract import project_source as project_prose
+        current, metadata = project_prose()
     assert set(current)-set(old) == {HELPER} and not set(old)-set(current)
     original = historical(ENTRY)
     assert current[ENTRY] == original.replace(b"{%- include 'src/index.html.j2' -%}\n", HOOK.encode())
     current.pop(HELPER); current[ENTRY] = original
     for name in old: assert current[name] == historical(name), name
-    metadata = json.loads((ROOT/'template.json').read_text()); before = json.loads(historical('template.json'))
+    before = json.loads(historical('template.json'))
     assert metadata['version'] == '0.3.40' and before['version'] == '0.3.39'
     metadata['version'] = '0.3.39'; assert metadata == before
     assert (ROOT/'scripts/prepare_layout.py').read_bytes() == historical('scripts/prepare_layout.py')
@@ -41,7 +45,11 @@ def project_prepared(root, hashes):
     assert (root/HELPER).read_bytes() == (ROOT/HELPER).read_bytes(), 'Presentation helper must not be translated'
     assert (root/ENTRY).read_bytes() == (ROOT/ENTRY).read_bytes(), 'PDF entry must remain identical'
     projected = dict(hashes)
-    assert projected.pop(HELPER) == hashlib.sha256((ROOT/HELPER).read_bytes()).hexdigest()
+    helper = (ROOT/HELPER).read_text()
+    if json.loads((ROOT/'template.json').read_text())['version'] == '0.3.41':
+        from resource_prose_contract import prior_pdf
+        helper = prior_pdf(helper)
+    assert projected.pop(HELPER) == hashlib.sha256(helper.encode()).hexdigest()
     projected[ENTRY] = hashlib.sha256(historical(ENTRY)).hexdigest()
     return projected
 
@@ -84,7 +92,7 @@ def eligible(question):
     for node in question.descendants:
         if isinstance(node, Comment): return False
         if isinstance(node, NavigableString):
-            if node.strip() and node.parent.name not in ['p','strong','em','code','li','h3','h4','th']: return False
+            if node.strip() and node.parent.name not in ['p','span','strong','em','code','li','h3','h4','th']: return False
             continue
         parent = node.parent
         if node.name == 'div':
@@ -104,6 +112,9 @@ def eligible(question):
             elif node.name in ['strong','em','code'] and parent.name not in ['p','li']: return False
             elif node.name == 'ul' and parent.attrs != details[1]: return False
             elif node.name == 'li' and parent.name != 'ul': return False
+        elif node.name == 'span':
+            if node.attrs != {'data-fact-id':'repository-charges','data-status':'complete'}: return False
+            if parent.name != 'p' or parent.attrs != facts[2] or len(question.find_all('span')) != 1: return False
         elif node.name == 'table':
             if node is not table: return False
         elif node.name in ['colgroup','thead','tbody']:
