@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.38 [output profiles pilot](docs/output-profiles.md) adds separately named
+review/submission-preview HTML, PDF and Word formats from the same Jinja source.
+Only the explicitly listed notices are optional so far: this is **not** a clean,
+submission-ready template for arbitrary projects. Review remains the default.
+
 The 0.3.37 [concise missing metadata experiment](docs/metadata-gap-prose.md)
 joins only two simultaneously absent Q3 follow-ups into one paragraph, retaining
 independent fact markers. It retires the 0.3.36 special CSS panel; no Lua,

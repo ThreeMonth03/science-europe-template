@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "0730b11c4027fcc020c441a3c36264d85649321c",
+  "baseline_version": "0.3.37",
+  "version": "0.3.38",
+  "status": "partial-pilot-not-submission-acceptance",
+  "default_profile": "review",
+  "formats": {
+    "review": {
+      "html": "a9293d08-59a4-4e6b-ae62-7a6a570b031c",
+      "pdf": "68c26e34-5e77-4e15-9bf7-06ff92582257",
+      "docx": "f4bd941a-dfbe-4226-a1fc-200fb5269311"
+    },
+    "submission": {
+      "html": "499d9300-0183-5157-b6f4-38e6c2b91600",
+      "pdf": "9fd0a115-4b8b-5013-a084-eaf2890ec940",
+      "docx": "98081811-41ff-5438-b98a-0472607527c6"
+    }
+  },
+  "changed_source_files": [
+    "src/projects.html.j2",
+    "src/quality-control.html.j2",
+    "src/questions/03-docs-metadata.html.j2",
+    "src/questions/05-store-backup.html.j2",
+    "src/questions/11-data-preservation.html.j2"
+  ],
+  "new_source_files": [
+    "src/submission/index.html.j2",
+    "src/submission/pdf.html.j2",
+    "src/submission/word.html.j2"
+  ],
+  "optional_notices": [
+    "Q3 metadata dictionary, publication follow-ups, nonpublication explanation, storage capacity and whole-question fallback",
+    "Q5 template mapping limits for exact locations and backup schedule (not other Q5 gaps)",
+    "Q11 preservation-selection review notice (not other Q11 gaps)",
+    "Missing funding row in project overview",
+    "Quality control planned but no methods specified: retain the plan as a partial fact"
+  ],
+  "not_yet_supported": [
+    "Other Q1/Q2/Q4/Q5/Q6/Q7/Q8/Q9/Q10/Q11/Q12/Q13/Q14/Q15 notices and unmarked placeholders",
+    "Additional quality-control method selected but unspecified",
+    "Missing project names, dates, numbers, funding details and contributor placeholders",
+    "A complete user-facing checklist for every missing or unsupported answer",
+    "Automatic submission approval, blocking, or a DSW UI checkbox"
+  ],
+  "release_acceptance": false
+}

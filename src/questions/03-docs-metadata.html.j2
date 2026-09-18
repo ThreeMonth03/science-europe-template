@@ -62,7 +62,7 @@
         <p data-fact-id="metadata-dictionary" data-status="complete">We will create a data/variable dictionary.</p>
       {%- elif dictionary == uuids.metadataDictionaryNoAUuid -%}
         <p data-fact-id="metadata-dictionary" data-status="explicit-no">We will not create a data/variable dictionary.</p>
-      {%- else -%}
+      {%- elif output_profile|default('review') != 'submission' -%}
         <div class="reading-gap">
           {%- if dictionary|trim -%}
           <p class="data-gap" data-fact-id="metadata-dictionary" data-status="needs-review">The selected data-dictionary option cannot be represented by this template; please review it.</p>
@@ -81,7 +81,7 @@
       <p>Metadata will not be available openly.</p>
       {%- if explanation|trim -%}
         <div class="answer-detail" data-fact-id="metadata-access-explanation">{{ explanation|markdown }}</div>
-      {%- else -%}
+      {%- elif output_profile|default('review') != 'submission' -%}
         <div class="reading-gap"><p class="data-gap" data-fact-id="metadata-access-explanation" data-status="missing">Information not provided: why the metadata will not be openly available.</p></div>
       {%- endif -%}
     {%- elif metadataOpenAUuid == uuids.metadataOpenYesAUuid -%}
@@ -105,7 +105,7 @@
       </p>
       {%- set instructionKnown = metadataOpenInstrAUuid in [uuids.metadataOpenInstrYesAUuid, uuids.metadataOpenInstrNoAUuid] -%}
       {%- set formKnown = metadataOpenFormAUuid in [uuids.metadataOpenFormNoAUuid, uuids.metadataOpenFormYesRepoAUuid, uuids.metadataOpenFormYesCareAUuid] -%}
-      {%- if not instructionKnown or not formKnown -%}
+      {%- if (not instructionKnown or not formKnown) and output_profile|default('review') != 'submission' -%}
       <div class="reading-gap">
         {%- if not metadataOpenInstrAUuid|trim and not metadataOpenFormAUuid|trim -%}
           {%- set metadataInstructionsGap -%}<span data-fact-id="metadata-access-instructions" data-status="missing">whether the metadata will include instructions for accessing the data</span>{%- endset -%}
@@ -147,7 +147,7 @@
     {%- set storageConvRelDbAUuid = repliesMap[storageConvRelDbPath]|reply_str_value -%}
     {# Capacity is an independent answer, not conditional on a storage technology. #}
     {%- if storageSpaceAUuid or storageConvFSysAUuid or storageConvObjStoreAUuid or storageConvRelDbAUuid -%}
-      <h4>Data storage and file conventions</h4>
+      {% set storageContent %}
       <div class="dataset-policy storage-conventions-policy">
       {# Storage space #}
       {%- if storageSpaceAUuid == uuids.storageSpaceLittleAUuid -%}
@@ -156,7 +156,7 @@
         {%- set size = repliesMap[[storageSpacePath, storageSpaceAUuid, uuids.storageSpaceSpecifyQUuid]|reply_path]|reply_str_value -%}
         {%- if size|trim -%}
         <p>We estimate the storage space that the project will require for all data and software (including temporary storage) to be {{ size|e }} gigabytes.</p>
-        {%- else -%}
+        {%- elif output_profile|default('review') != 'submission' -%}
         <div class="reading-gap">
           <p class="data-gap" data-fact-id="storage-capacity" data-status="missing">Information not provided: the estimated storage space for all project data and software, including temporary storage (GB).</p>
         </div>
@@ -254,13 +254,18 @@
         </p>
       {%- endif -%}
       </div>
+      {% endset %}
+      {% if output_profile|default('review') != 'submission' or storageContent|striptags|trim or '<img' in storageContent or '<table' in storageContent %}
+      <h4>Data storage and file conventions</h4>
+      {{ storageContent }}
+      {% endif %}
     {%- endif -%}
   {%- endif -%}
 
   {% endset %}
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
-  {% else %}
+  {% elif output_profile|default('review') != 'submission' %}
     <p class="data-gap" data-requirement-id="SE-2a" data-status="missing-output">This document does not yet contain an answer about metadata and documentation.</p>
   {% endif %}
   </div>

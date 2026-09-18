@@ -22,4 +22,4 @@ class PdfBudgetReadingTests(unittest.TestCase):
         formats = json.loads((ROOT/'template.json').read_text())['formats']
         for fmt in formats:
             template = fmt['steps'][0]['options']['template']
-            self.assertEqual(template == 'src/pdf/index.html.j2', fmt['name'] == 'PDF Document')
+            self.assertEqual(template == 'src/pdf/index.html.j2', fmt['uuid'] == '68c26e34-5e77-4e15-9bf7-06ff92582257')

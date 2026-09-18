@@ -40,7 +40,11 @@
   {% if qualityMethods %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">Quality control measures for <strong>{{ qualityName }}</strong>: {{ qualityMethods|join(", ") }}.</p>
   {% elif not otherText %}
+    {% if output_profile|default('review') == 'submission' %}
+    <p class="quality-summary" data-fact-id="quality-methods" data-status="partial">Quality control is planned for <strong>{{ qualityName }}</strong>.</p>
+    {% else %}
     <p class="data-gap" data-fact-id="quality-methods" data-status="missing">Quality control is planned for <strong>{{ qualityName }}</strong>, but the methods have not been specified.</p>
+    {% endif %}
   {% endif %}
   {% if otherText %}
     <div class="answer-lead"><p>Additional quality control details for <strong>{{ qualityName }}</strong>:</p></div>
