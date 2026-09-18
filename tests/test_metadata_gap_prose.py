@@ -35,6 +35,27 @@ class MetadataGapProseTests(unittest.TestCase):
             with self.assertRaises(AssertionError):
                 check_word(before, after[:-1], language)
 
+    def test_only_standalone_cjk_full_stop_may_omit_original_east_asia_hint(self):
+        from xml.etree import ElementTree as E
+        from metadata_gap_prose_contract import OLD, WORDS
+        def paragraph(runs):
+            root = E.Element('{' + NS['w'] + '}p')
+            props = E.SubElement(root, '{' + NS['w'] + '}pPr')
+            E.SubElement(props, '{' + NS['w'] + '}pStyle', {'{' + NS['w'] + '}val': 'BodyText'})
+            for text, hint in runs:
+                run = E.SubElement(root, '{' + NS['w'] + '}r')
+                if hint:
+                    rp = E.SubElement(run, '{' + NS['w'] + '}rPr')
+                    E.SubElement(rp, '{' + NS['w'] + '}rFonts', {'{' + NS['w'] + '}hint': hint})
+                E.SubElement(run, '{' + NS['w'] + '}t').text = text
+            return E.tostring(root, encoding='unicode')
+        before = [paragraph([(t, 'eastAsia')]) for t in OLD['chinese']]
+        runs = [(t, 'eastAsia' if t != '。' else None) for t in WORDS['chinese']]
+        self.assertEqual(check_word(before, [paragraph(runs)], 'chinese'), 1)
+        for changed in [[(t, None) for t, hint in runs], [(t, 'ascii') for t, hint in runs]]:
+            with self.assertRaises(AssertionError):
+                check_word(before, [paragraph(changed)], 'chinese')
+
     def test_full_q3_missing_unknown_no_and_authored_content(self):
         result = check_roots(ROOT, ROOT / 'tests/fixtures/metadata-0.3.36.en.html.j2', 'english')
         self.assertEqual(result['comparisons'], 1726)

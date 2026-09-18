@@ -39,8 +39,22 @@ def check_word(before, after, language):
         # No links, tables, authored emphasis or controls may hide in the new paragraph.
         allowed = {'pPr', 'r'}
         assert all(n.tag.rsplit('}', 1)[-1] in allowed for n in nodes[2])
+        def properties(run):
+            props = run.find('w:rPr', NS)
+            return E.tostring(props) if props is not None else None
+        original = {properties(run) for node in nodes[:2] for run in node.findall('w:r', NS)}
+        assert len(original) == 1, 'Original warning runs are not uniformly styled'
+        # Pandoc gives Chinese text the original eastAsia hint, but omits the
+        # hint on the final standalone full stop after an inline span. Admit
+        # that exact generated-punctuation shape, never arbitrary font changes.
         for run in nodes[2].findall('w:r', NS):
-            assert all(c.tag == '{' + NS['w'] + '}t' for c in run), 'Unexpected joined run formatting'
+            assert all(c.tag in {'{' + NS['w'] + '}t', '{' + NS['w'] + '}rPr'} for c in run)
+            text = ''.join(t.text or '' for t in run.findall('w:t', NS))
+            if properties(run) not in original:
+                assert language == 'chinese' and text == '。' and properties(run) is None, 'Unexpected joined run formatting'
+                expected = E.Element('{' + NS['w'] + '}rPr')
+                E.SubElement(expected, '{' + NS['w'] + '}rFonts', {'{' + NS['w'] + '}hint': 'eastAsia'})
+                assert original == {E.tostring(expected)}
         result[i:i + 2] = [replacement]
         count += 1
     assert result == after, 'Word content/format outside the exact warning pair changed'
@@ -121,6 +135,7 @@ def main():
         css = prepared_css(a.source_dir); base = (a.source_dir / 'src/style.css').read_text()
         pdf = run(PDF_RUNNER, dict(cases=matrix, before_css=base + historical_css(css), after_css=base + css,
             facts=['metadata-access-instructions', 'metadata-harvestable'], old=OLD[a.language], joined=joined(a.language).get_text()))
+        report.update(pdf)
         words = []
         for variant in [1, 2]:
             html = ''.join('<h2>CASE: ' + row[0] + '</h2>' + row[variant] for row in matrix)
