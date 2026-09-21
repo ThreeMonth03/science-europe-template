@@ -24,7 +24,7 @@ class ShortResourceRowsTests(unittest.TestCase):
             if name not in ['short','rows-8','rows-32','rows-33','long']:continue
             for escaped in [False,True]:
                 pdf=BeautifulSoup(render(ROOT,replies,True,autoescape=escaped),'html.parser')
-                self.assertEqual(len(pdf.select('.pdf-short-resource-row')),8 if name=='rows-8' else 0,name)
+                self.assertEqual(len(pdf.select('.pdf-short-resource-row')),{'rows-8':8,'rows-32':31,'rows-33':32}.get(name,0),name)
                 for word in [False,True]:
                     other=render(ROOT,replies,autoescape=escaped,word=word)
                     self.assertNotIn('pdf-short-resource-row',other)

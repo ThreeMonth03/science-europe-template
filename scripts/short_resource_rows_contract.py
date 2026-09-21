@@ -24,18 +24,23 @@ def historical(path):
 
 
 def prior_entry(source):
+    from budget_grouping_contract import BATCHED, prior_budget
+    if BATCHED in source: source = prior_budget(source)
     assert source.count(NEW) == 1, 'Short-row hook drift'
     return source.replace(NEW, OLD, 1)
 
 
 def project_source():
     current = {str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+    metadata = json.loads((ROOT/'template.json').read_text())
+    if metadata['version'] == '0.3.43':
+        from budget_grouping_contract import project_source as project_grouping
+        current, metadata = project_grouping()
     old = subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-r','--name-only',BASELINE,'src'],text=True).splitlines()
     assert set(current)-set(old) == {HELPER} and not set(old)-set(current)
     current.pop(HELPER)
     current[ENTRY] = prior_entry(current[ENTRY].decode()).encode()
     for name in old: assert current[name] == historical(name), name
-    metadata = json.loads((ROOT/'template.json').read_text())
     assert metadata['version'] == '0.3.42'
     metadata['version'] = '0.3.41'
     assert metadata == json.loads(historical('template.json'))

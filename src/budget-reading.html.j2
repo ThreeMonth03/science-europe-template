@@ -71,14 +71,20 @@
 {%- endmacro -%}
 
 {%- macro ordinary(header, rows) -%}
-<table class="resource-table"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody>{% for row in rows %}{{ row.original }}{% endfor %}</tbody></table>
+{%- if rows|length > 32 -%}
+  {%- for group in rows|batch(32) -%}{{ ordinary(header, group) }}{%- endfor -%}
+{%- else -%}
+{%- set original -%}<table class="resource-table"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody>{% for row in rows %}{{ row.original }}{% endfor %}</tbody></table>{%- endset -%}
+{%- import 'src/pdf/short-resource-rows.html.j2' as shortRows -%}
+{{- shortRows.table(original, rows) -}}
+{%- endif -%}
 {%- endmacro -%}
 
 {%- macro render(original, header, rows) -%}
   {%- set selection = namespace(any=false, eligible=[]) -%}
   {%- for row in rows -%}
     {%- set result = namespace(long=false) -%}
-    {%- if rows|length <= 32 -%}{{ classify(row, result) }}{%- endif -%}
+    {{ classify(row, result) }}
     {%- do selection.eligible.append(result.long) -%}
     {%- set selection.any = selection.any or result.long -%}
   {%- endfor -%}
@@ -90,7 +96,7 @@
     {%- for row in rows -%}
       {%- if selection.eligible[loop.index0] -%}
         {%- if pending -%}{{ ordinary(header, pending) }}{%- do pending.clear() -%}{%- endif -%}
-        <table class="resource-table pdf-resource-reading" data-item-id="{{ row.id }}"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}<tr><td>{{ row.title }}</td><td>{{ row.budget }}</td><td>{{ row.funding }}</td></tr></thead><tbody><tr><td colspan="3">{{ row.purpose }}</td></tr></tbody></table>
+        <table class="resource-table pdf-resource-reading" data-item-id="{{ row.id }}"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}<tr><td>{{ row.title }}</td><td>{{ row.budget }}</td><td>{{ row.funding }}</td></tr></thead><tbody style="break-inside: avoid"><tr><td colspan="3">{{ row.purpose }}</td></tr></tbody></table>
       {%- else -%}{%- do pending.append(row) -%}{%- endif -%}
     {%- endfor -%}
     {%- if pending -%}{{ ordinary(header, pending) }}{%- endif -%}

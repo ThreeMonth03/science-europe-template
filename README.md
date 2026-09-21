@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.43 [mixed/large budget grouping](docs/budget-grouping.md) integrates the
+tested PDF continuation headers and row-safe PDF/Word grouping into shared source.
+Existing row guards remain; exact projections retain every earlier source gate.
+This is not deployment, full Word pagination acceptance or global notice suppression.
+
 The 0.3.41 [owned Q15 prose pair](docs/resource-prose.md) joins two explicitly
 answered fixed sentences without changing their words or existing translations.
 Missing/unknown and authored answers retain their exact output. Native bilingual

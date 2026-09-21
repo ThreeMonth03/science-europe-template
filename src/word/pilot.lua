@@ -312,7 +312,7 @@ local function expand_long_budget_tables(div)
     if not tbl.classes:includes("resource-table") or #tbl.colspecs ~= 3 or #tbl.head.rows ~= 1 or
        #tbl.bodies ~= 1 or #tbl.bodies[1].head ~= 0 or #tbl.foot.rows ~= 0 or #tbl.caption.long ~= 0 then return tbl end
     local rows = tbl.bodies[1].body
-    if #rows == 0 or #rows > 32 then return tbl end
+    if #rows == 0 then return tbl end
     local plans, any_long = {}, false
     for _, row in ipairs(tbl.head.rows) do
       if #row.cells ~= 3 then return tbl end
@@ -348,7 +348,9 @@ local function expand_long_budget_tables(div)
       end
     end
     for index, row in ipairs(rows) do
-      if not plans[index].long then pending:insert(row:clone())
+      if not plans[index].long then
+        if #pending == 32 then flush() end
+        pending:insert(row:clone())
       else
         flush()
         local expanded = tbl:clone()

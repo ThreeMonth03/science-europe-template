@@ -22,7 +22,7 @@ def project_source():
     old = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()
     current = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
     metadata = json.loads((ROOT/'template.json').read_text())
-    if metadata['version'] in ['0.3.41','0.3.42']:
+    if metadata['version'] in ['0.3.41','0.3.42','0.3.43']:
         from resource_prose_contract import project_source as project_prose
         current, metadata = project_prose()
     assert set(current)-set(old) == {HELPER} and not set(old)-set(current)
@@ -46,7 +46,7 @@ def project_prepared(root, hashes):
     assert (root/ENTRY).read_bytes() == (ROOT/ENTRY).read_bytes(), 'PDF entry must remain identical'
     projected = dict(hashes)
     helper = (ROOT/HELPER).read_text()
-    if json.loads((ROOT/'template.json').read_text())['version'] in ['0.3.41','0.3.42']:
+    if json.loads((ROOT/'template.json').read_text())['version'] in ['0.3.41','0.3.42','0.3.43']:
         from resource_prose_contract import prior_pdf
         helper = prior_pdf(helper)
     assert projected.pop(HELPER) == hashlib.sha256(helper.encode()).hexdigest()

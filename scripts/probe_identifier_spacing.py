@@ -48,6 +48,8 @@ def without_reviewed_archive_panels(source):
 def frozen_prepared_css(source):
     """Strip exact later additions, retaining the original prepared Q13 hash."""
     from metadata_gap_panel_contract import prior_css
+    from budget_grouping_contract import without_grouping
+    source = without_grouping(source, 'css')
     from probe_storage_context import strip
     prepared, block = strip(prior_css(source) if '/* BEGIN metadata gap panel:' in source else source, 'css')
     delta = json.loads((ROOT / 'docs/storage-context-style-delta.json').read_text())

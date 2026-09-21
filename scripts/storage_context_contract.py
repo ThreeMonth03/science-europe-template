@@ -12,6 +12,8 @@ FACTS = {'working-storage-arrangement', 'backup-reliability', 'workspace-managem
 
 def without_reviewed_context(source,kind):
     import hashlib
+    from budget_grouping_contract import without_grouping
+    source = without_grouping(source, kind)
     from probe_storage_context import strip
     if kind == 'css' and '/* BEGIN metadata gap panel:' in source:
         from metadata_gap_panel_contract import prior_css

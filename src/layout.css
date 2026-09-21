@@ -159,3 +159,6 @@ html body #q-data-preservation .post-project-archive[data-scope="project"] > .da
 html body #q-data-preservation .post-project-archive[data-scope="project"] > .dataset-policy > .reading-gap:has(> p.data-gap[data-fact-id="archive-format-migration"][data-status="missing"]:only-child:not(:has(*))) + .reading-gap:has(> p.data-gap[data-fact-id="archive-media-migration"][data-status="missing"]:only-child:not(:has(*))) > p.data-gap { border-top-width: 0; padding-top: .2em; }
 }
 /* END archive gap pairs */
+
+/* Local prototype: keep the final purpose fragment with its allocation. */
+html body .pdf-resource-reading tbody > tr > td > .answer-detail[data-fact-id="resource-justification"] { break-after: avoid; }

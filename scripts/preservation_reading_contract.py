@@ -31,7 +31,7 @@ def source_delta():
     old = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()
     sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
     after = json.loads((ROOT/'template.json').read_text())
-    if after['version'] in ['0.3.40', '0.3.41', '0.3.42']:
+    if after['version'] in ['0.3.40', '0.3.41', '0.3.42', '0.3.43']:
         # The following PDF-only slice must prove its exact delta first.
         from short_resources_contract import project_source
         sources, after = project_source()

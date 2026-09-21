@@ -19,7 +19,7 @@ from test_science_europe_contract import reply_path, reply_items, reply_str_valu
 QUESTION = 'src/questions/15-required-resources.html.j2'
 
 
-def matrix():
+def matrix(grouped=False):
     raw = preservation_cases('en')['preservation-complete']
     base = {p: ({'value': {'value': v['value']}} if v['type'] == 'IntegrationReply' else v['value']) for p, v in raw.items()}
     costs = next(p for p in base if p.endswith(IDS['costQUuid'])); first = costs + '.' + base[costs][0]; second = costs + '.' + base[costs][1]
@@ -67,7 +67,7 @@ def matrix():
             for path, value in base.items():
                 if path.startswith(first+'.'): row[costs+'.'+item+path[len(first):]] = copy.deepcopy(value)
         if count != 8: row[first+desc] = long
-        cases.append((f'rows-{count}', row, [0] if count == 32 else []))
+        cases.append((f'rows-{count}', row, [0] if count == 32 or (grouped and count == 33) else []))
     projects = next(p for p in base if p.endswith(IDS['projectsQUuid'])); project = projects+'.'+base[projects][0]
     row = copy.deepcopy(base); row[first+desc] = long; row[projects].append('second-project')
     for path, value in list(row.items()):
@@ -100,7 +100,7 @@ def normalize_owned_allocation_indent(source):
     return str(soup)
 
 
-def expected(original, eligible):
+def expected(original, eligible, grouped=False):
     soup = BeautifulSoup(original, 'html.parser'); index = 0
     for table in list(soup.select('.resource-table')):
         rows = table.tbody.find_all('tr', recursive=False); changes = [index+i in eligible for i in range(len(rows))]; index += len(rows)
@@ -112,11 +112,14 @@ def expected(original, eligible):
             for row in pending: ordinary.tbody.append(copy.deepcopy(row))
             replacement.append(ordinary); pending.clear()
         for row, change in zip(rows, changes):
-            if not change: pending.append(row); continue
+            if not change:
+                if grouped and len(pending) == 32: flush()
+                pending.append(row); continue
             flush(); reading = copy.deepcopy(table); reading['class'].append('pdf-resource-reading'); reading['data-item-id'] = row['data-item-id']
             identity = copy.deepcopy(row); del identity['data-item-id']
             cell = identity.find('td'); title = copy.deepcopy(cell.find('p', recursive=False)); cell.clear(); cell.append(title)
             reading.thead.append(identity); reading.tbody.clear()
+            if grouped: reading.tbody['style'] = 'break-inside: avoid'
             body = soup.new_tag('tr'); purpose = soup.new_tag('td', colspan='3'); original_cell = copy.deepcopy(row.find('td')); original_cell.find('p', recursive=False).extract()
             for child in list(original_cell.contents): purpose.append(child.extract())
             body.append(purpose); reading.tbody.append(body); replacement.append(reading)
@@ -128,7 +131,9 @@ def expected(original, eligible):
 
 def check(root, prior=None):
     results = []
-    for name, replies, eligible in matrix():
+    from budget_grouping_contract import BATCHED
+    grouped = BATCHED in (root/'src/budget-reading.html.j2').read_text()
+    for name, replies, eligible in matrix(grouped=grouped):
         original = render(root, replies); pdf = render(root, replies, True)
         from short_resource_rows_contract import project_hints
         pdf = project_hints(pdf)
@@ -144,7 +149,7 @@ def check(root, prior=None):
                 historic_original = render(root, replies, question=prior_question(question))
             assert historic_original == before or dom(BeautifulSoup(normalize_owned_allocation_indent(historic_original), 'html.parser')) == dom(BeautifulSoup(normalize_owned_allocation_indent(before), 'html.parser')), (name, 'Non-PDF output differs from 0.3.18 after exact owned-pair projection')
         if not eligible: assert pdf == original, (name, 'Fallback/control changed')
-        assert dom(BeautifulSoup(pdf, 'html.parser')) == dom(expected(original, eligible)), (name, 'Unexpected structural/content change')
+        assert dom(BeautifulSoup(pdf, 'html.parser')) == dom(expected(original, eligible, grouped)), (name, 'Unexpected structural/content change')
         results.append({'case': name, 'expanded_rows': len(eligible), 'passed': True})
     return results
 
