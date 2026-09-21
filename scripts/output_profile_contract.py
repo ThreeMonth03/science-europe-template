@@ -77,14 +77,15 @@ def compare(review, submission, language):
     assert not submission.select('p p, p div, p ul, p table')
 
 
-def check(root, fixture_folder, language, baseline=False):
+def check(root, fixture_folder, language, baseline=False, source_overrides=None):
     overrides = None
     if baseline:
-        overrides = {name: subprocess.check_output(['git', '-C', str(ROOT), 'show',
+        overrides = {**(source_overrides or {}), **{name: subprocess.check_output(['git', '-C', str(ROOT), 'show',
             CONTRACT['baseline_commit']+':'+name], text=True) for name in CONTRACT['changed_source_files']}
+        }
     rows = []
     for escape in (False, True):
-        template = environment(root, escape).from_string(WRAPPER)
+        template = environment(root, escape, source_overrides).from_string(WRAPPER)
         prior = environment(root, escape, overrides).from_string(WRAPPER) if overrides else None
         for filename in sorted(fixture_folder.glob('*.events.json')):
             replies = {e['path']: ({'value': {'value': e['value']['value']}}

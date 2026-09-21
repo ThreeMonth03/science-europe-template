@@ -61,12 +61,15 @@ def historical(name): return subprocess.check_output(['git', '-C', str(ROOT), 's
 
 def project_source():
     sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+    metadata = json.loads((ROOT / 'template.json').read_text())
+    if metadata['version'] == '0.3.44':
+        from submission_preview_contract import project_source as project_submission
+        sources, metadata = project_submission(sources, metadata)
     previous = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()
     assert set(sources) == set(previous)
     for name, project in [(ENTRY, prior_budget), (LUA, prior_lua), (CSS, prior_css)]:
         sources[name] = project(sources[name].decode()).encode()
     for name in previous: assert sources[name] == historical(name), name
-    metadata = json.loads((ROOT / 'template.json').read_text())
     assert metadata['version'] == '0.3.43'; metadata['version'] = '0.3.42'
     assert metadata == json.loads(historical('template.json'))
     assert (ROOT / 'scripts/prepare_layout.py').read_bytes() == historical('scripts/prepare_layout.py')

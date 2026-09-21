@@ -131,3 +131,10 @@
 {%- macro integrationValue(reply) -%}
     {{ reply.value.value.value }}
 {%- endmacro -%}
+
+{%- set DATASET_INSTRUMENT = "instrument" -%}
+{%- set DATASET_REFERENCE = "reference" -%}
+{%- set DATASET_NON_REFERENCE = "non-reference" -%}
+{%- set DATASET_NON_EQUIPMENT = "non-equipment" -%}
+{%- set DATASET_PRODUCED = "produced" -%}
+{%- macro datasetLabel(kind, index) -%}<span class="dataset-label" data-list-kind="{{ kind }}" data-list-index="{{ index }}">{%- if kind == "instrument" -%}Instrument dataset{%- elif kind == "reference" -%}Reference dataset{%- elif kind == "non-reference" -%}Non-reference dataset{%- elif kind == "non-equipment" -%}Non-equipment dataset{%- elif kind == "produced" -%}Produced dataset{%- endif %} {{ index }}</span>{%- endmacro -%}

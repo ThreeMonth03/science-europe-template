@@ -33,7 +33,7 @@ def prior_entry(source):
 def project_source():
     current = {str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
     metadata = json.loads((ROOT/'template.json').read_text())
-    if metadata['version'] == '0.3.43':
+    if metadata['version'] in ['0.3.43', '0.3.44']:
         from budget_grouping_contract import project_source as project_grouping
         current, metadata = project_grouping()
     old = subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-r','--name-only',BASELINE,'src'],text=True).splitlines()

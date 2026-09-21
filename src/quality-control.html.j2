@@ -6,7 +6,7 @@
 {% if measuredDataName %}
   {% set qualityName = measuredDataName|e %}
 {% else %}
-  {% set qualityName %}<span>(no name given)</span>{% endset %}
+  {% set qualityName %}{% if output_profile|default('review') == 'submission' %}<span>{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}</span>{% else %}<span>(no name given)</span>{% endif %}{% endset %}
 {% endif %}
 {% if qualityAnswer == uuids.measuredDataQualityNoAUuid %}
   <p class="quality-summary" data-fact-id="quality-control" data-status="explicit-no">No quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>
@@ -37,21 +37,21 @@
   {% set otherPath = [mdqPrefix, uuids.mdQualityOtherQUuid]|reply_path %}
   {% set otherAnswer = repliesMap[otherPath]|reply_str_value %}
   {% set otherText = repliesMap[[otherPath, uuids.mdQualityOtherYesAUuid, uuids.mdQualityOtherWhatQUuid]|reply_path]|reply_str_value if otherAnswer == uuids.mdQualityOtherYesAUuid else '' %}
-  {% if qualityMethods %}
+{% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}Quality control measures planned for <strong>{{ qualityName }}</strong>: <span data-fact-id="quality-methods" data-status="complete">{{ qualityMethods|join(", ") }}</span> and other quality control methods.{% else %}Other quality control methods are planned for <strong>{{ qualityName }}</strong>.{% endif %}</p>{% else %}  {% if qualityMethods %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">Quality control measures for <strong>{{ qualityName }}</strong>: {{ qualityMethods|join(", ") }}.</p>
   {% elif not otherText %}
     {% if output_profile|default('review') == 'submission' %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="partial">Quality control is planned for <strong>{{ qualityName }}</strong>.</p>
     {% else %}
-    <p class="data-gap" data-fact-id="quality-methods" data-status="missing">Quality control is planned for <strong>{{ qualityName }}</strong>, but the methods have not been specified.</p>
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-methods" data-status="missing">Quality control is planned for <strong>{{ qualityName }}</strong>, but the methods have not been specified.</p>{% endif %}
     {% endif %}
   {% endif %}
   {% if otherText %}
     <div class="answer-lead"><p>Additional quality control details for <strong>{{ qualityName }}</strong>:</p></div>
     <div class="answer-detail" data-fact-id="quality-other" data-status="complete">{{ otherText|markdown }}</div>
   {% elif otherAnswer == uuids.mdQualityOtherYesAUuid %}
-    <p class="data-gap" data-fact-id="quality-other" data-status="missing">Other quality control methods were selected for <strong>{{ qualityName }}</strong>, but the details have not been provided.</p>
-  {% endif %}
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">Other quality control methods were selected for <strong>{{ qualityName }}</strong>, but the details have not been provided.</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">Other quality control methods are planned for <strong>{{ qualityName }}</strong>.</p>{% endif %}
+  {% endif %}{% endif %}
 {% else %}
-  <p class="data-gap" data-fact-id="quality-control" data-status="missing">It has not been specified whether quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>
+  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-control" data-status="missing">It has not been specified whether quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>{% else %}<p class="quality-context"><strong>{{ qualityName }}</strong></p>{% endif %}
 {% endif %}

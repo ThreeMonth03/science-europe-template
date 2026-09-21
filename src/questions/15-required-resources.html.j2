@@ -19,7 +19,7 @@
         </div>
       {% endif %}
       {%- if not expertiseTrainText -%}
-        <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise-detail" data-status="missing"><strong>Information not provided:</strong> the training that existing staff will receive.</p>
+        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise-detail" data-status="missing"><strong>Information not provided:</strong> the training that existing staff will receive.</p>{% endif %}
       {%- endif -%}
     {%- elif expertiseAUuid == uuids.additionalExpertiseYesHireAUuid -%}
       {%- set expertiseHirePath = [expertisePath, uuids.additionalExpertiseYesHireAUuid, uuids.additionalExpertiseYesHireExpertiseQUuid]|reply_path -%}
@@ -32,10 +32,10 @@
         </div>
       {% endif %}
       {%- if not expertiseHireText -%}
-        <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise-detail" data-status="missing"><strong>Information not provided:</strong> the expertise for which new staff will be hired.</p>
+        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise-detail" data-status="missing"><strong>Information not provided:</strong> the expertise for which new staff will be hired.</p>{% endif %}
       {%- endif -%}
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="missing"><strong>Information not provided:</strong> whether additional specialist expertise is required.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="missing"><strong>Information not provided:</strong> whether additional specialist expertise is required.</p>{% endif %}
     {%- endif -%}
     {%- set resourceOverview = namespace(original='', explicitPair=false) -%}
     {%- set resourceOverview.original -%}
@@ -54,10 +54,10 @@
         </div>
       {%- else -%}
         <p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="partial">We require hardware or software in addition to what is usually available in the institute.</p>
-        <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="hardware-software-detail" data-status="missing"><strong>Information not provided:</strong> the additional hardware or software required.</p>
+        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="hardware-software-detail" data-status="missing"><strong>Information not provided:</strong> the additional hardware or software required.</p>{% endif %}
       {%- endif -%}
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="missing"><strong>Information not provided:</strong> whether additional hardware or software is required.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="missing"><strong>Information not provided:</strong> whether additional hardware or software is required.</p>{% endif %}
     {%- endif -%}
     {# charges #}
     {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}
@@ -67,7 +67,7 @@
     {%- elif repoCharges == uuids.repoChargesYesAUuid %}
       <p>The selected repositories charge for their services.</p>
     {%- else %}
-      <p class="data-gap" data-fact-id="repository-charges" data-status="missing"><strong>Information not provided:</strong> whether repository service charges will be incurred.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="repository-charges" data-status="missing"><strong>Information not provided:</strong> whether repository service charges will be incurred.</p>{% endif %}
     {%- endif %}
     {% set resourceOverview.explicitPair = additionalHWSWAUuid == uuids.additionalHWSWNoAUuid and repoCharges in [uuids.repoChargesNoAUuid, uuids.repoChargesYesAUuid] -%}
     {%- endset -%}
@@ -114,7 +114,7 @@
                         {%- if projectCostItemDescriptionReply -%}
                           <div class="answer-detail" data-fact-id="resource-justification" data-status="complete">{{ projectCostItemDescriptionReply|markdown }}</div>
                         {%- else -%}
-                          <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-justification" data-status="missing"><strong>Information not provided:</strong> why this resource is needed to deliver FAIR data.</p>
+                          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-justification" data-status="missing"><strong>Information not provided:</strong> why this resource is needed to deliver FAIR data.</p>{% endif %}
                         {%- endif -%}
 
                         {%- set projectCostItemCurrencyQUuid = [projectCostItem, uuids.costCurrencyQUuid]|reply_path  -%}
@@ -134,7 +134,7 @@
                             {% if projectCostItemCurrencyReply %}
                               <p data-fact-id="resource-currency" data-status="complete">Currency: {{ macros.integrationCurrency(projectCostItemCurrencyReply) }}.</p>
                             {% endif %}
-                            <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing"><strong>Information not provided:</strong> {% if projectCostItemAmountReply %}currency.{% elif projectCostItemCurrencyReply %}budgeted amount.{% else %}budgeted amount and currency.{% endif %}</p>
+                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing"><strong>Information not provided:</strong> {% if projectCostItemAmountReply %}currency.{% elif projectCostItemCurrencyReply %}budgeted amount.{% else %}budgeted amount and currency.{% endif %}</p>{% endif %}
                         {%- endif -%}
                         {%- endset -%}
 
@@ -171,7 +171,7 @@
                             {%- endif %}
                           </p>
                         {%- else -%}
-                          <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-allocation" data-status="missing"><strong>Information not provided:</strong> which FAIR or data-management activities this resource supports.</p>
+                          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-allocation" data-status="missing"><strong>Information not provided:</strong> which FAIR or data-management activities this resource supports.</p>{% endif %}
                         {%- endif -%}
                        
  
@@ -187,7 +187,7 @@
                           {% if costCoverGrantIdReply %}
                             <p>Grant number: {{ costCoverGrantIdReply }}.</p>
                           {% else %}
-                            <p class="data-gap" data-fact-id="grant-number" data-status="missing"><strong>Information not provided:</strong> the grant number.</p>
+                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="grant-number" data-status="missing"><strong>Information not provided:</strong> the grant number.</p>{% endif %}
                           {% endif %}
                         {%- elif projectCostItemCoverReply == uuids.costCoverOtherAUuid -%}
                           {%- set costCoverOtherHowQUuid = [projectCostItemCoverQUuid,uuids.costCoverOtherAUuid, uuids.costCoverOtherHowQUuid]|reply_path  -%}
@@ -195,10 +195,10 @@
                           {%- if costCoverOtherHowReply -%}
                             <div class="answer-detail">{{costCoverOtherHowReply|markdown}}</div>
                           {%- else -%}
-                            <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>
+                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>{% endif %}
                           {%- endif -%}
                         {%- else -%}
-                          <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>
+                          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>{% endif %}
                         {%- endif -%}
 
 
@@ -217,14 +217,14 @@
                       {{ budgetReading.short_table(originalBudgetTable, budgetLayout.rows, true) }}
                     {%- else -%}{{ originalBudgetTable }}{%- endif -%}
                 {%- else -%}
-                    <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project.</p>
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project.</p>{% endif %}
                 {%- endif -%}
 
             </div>
 
         {%- endfor -%}
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> the financial and time resources budgeted for data management and FAIR data.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> the financial and time resources budgeted for data management and FAIR data.</p>{% endif %}
     {%- endif -%}
   </div>
 </div>

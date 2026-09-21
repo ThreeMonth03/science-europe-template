@@ -14,7 +14,7 @@
         </div>
       {% endfor %}
     {% else %}
-      <p class="data-gap" data-requirement-id="SE-2b" data-status="missing-output">This document does not yet describe data quality checks. Re-used data also need appropriate quality control.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-2b" data-status="missing-output">This document does not yet describe data quality checks. Re-used data also need appropriate quality control.</p>{% endif %}
     {% endif %}
   </div>
 </div>

@@ -13,7 +13,7 @@
             {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
             {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
             <div class="dataset-section" data-item-id="{{ i }}">
-                <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
+                <h5>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName else "(no name given)" }}{% endif %}</h5>
             {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
                 {# Where the data will be distributed #}
                 {%- set publishedDistrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
@@ -94,30 +94,30 @@
                             {% endif %}
                             {% if identifierMissing or identifierReview %}
                               <div class="identifier-followups reading-gap">
-                                {% if identifierMissing %}<p class="data-gap" data-requirement-id="SE-5d">Information still needed: {{ identifierMissing|join(", ") }}.</p>{% endif %}
-                                {% if identifierReview %}<p class="data-gap" data-requirement-id="SE-5d">This template cannot interpret the selected answers for: {{ identifierReview|join(", ") }}.</p>{% endif %}
+                                {% if identifierMissing %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d">Information still needed: {{ identifierMissing|join(", ") }}.</p>{% endif %}{% endif %}
+                                {% if identifierReview %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d">This template cannot interpret the selected answers for: {{ identifierReview|join(", ") }}.</p>{% endif %}{% endif %}
                               </div>
                             {% endif %}
                             </div>
                             {%- elif publishedDataIdentifierAUuid == uuids.publishedDataIdentifierNoAUuid -%}
                               <p>Within this repository, unique and persistent identifiers will not be applied.</p>
                             {%- else -%}
-                              <p class="data-gap" data-status="missing-output">The persistent identifier arrangement is not yet described.</p>
+                              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">The persistent identifier arrangement is not yet described.</p>{% endif %}
                             {%- endif -%}
                             </div>
                         {%- endfor -%}
                     {% else %}
-                        <p class="data-gap" data-fact-id="identifier-distributions" data-status="missing">The publication locations have not been listed.</p>
+                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="identifier-distributions" data-status="missing">The publication locations have not been listed.</p>{% endif %}
                     {%- endif -%}
             {% elif isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
                 <p>This dataset will not be published.</p>
             {% else %}
-                <p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>
+                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}
             {%- endif -%}
             </div>
         {%- endfor -%}
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.</p>{% endif %}
     {%- endif -%}
 
     {# Explain how the data might be re-used in other contexts. #}
@@ -136,7 +136,7 @@
             {%- set measuredDataNameQUuid = [measuredDataItem, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataNameReply = repliesMap[measuredDataNameQUuid]|reply_str_value -%}
             <li>
-            <strong>{{ measuredDataNameReply if measuredDataNameReply else "(no name given)" }}</strong>
+            <strong>{% if output_profile|default('review') == 'submission' and not measuredDataNameReply %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply if measuredDataNameReply else "(no name given)" }}{% endif %}</strong>
             {%- set measuredDataReuseQUuid = [measuredDataItem, uuids.measuredDataReuseQUuid]|reply_path -%}
             {%- set measuredDataReuseAUuid = repliesMap[measuredDataReuseQUuid]|reply_str_value -%}
 

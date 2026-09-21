@@ -18,7 +18,7 @@
   {% elif payer == uuids.archivedAfterPayerInstituteAUuid %}
     <p data-fact-id="archive-payer" data-status="complete">One or more participating institutes have budgeted for this long-term storage service.</p>
   {% else %}
-    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-payer" data-status="missing">The payer for post-project cold storage has not been specified.</p></div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-payer" data-status="missing">The payer for post-project cold storage has not been specified.</p>{% endif %}</div>
   {% endif %}
   {% set periodPath = [archivePrefix, uuids.archivedAfterPeriodQUuid]|reply_path %}
   {% set period = repliesMap[periodPath]|reply_str_value %}
@@ -38,10 +38,10 @@
     {% if arrangement|trim %}
       <div class="answer-detail" data-fact-id="archive-minimum-period" data-status="complete">{{ arrangement|markdown }}</div>
     {% else %}
-      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The other arrangements for the archive's minimum lifetime have not been described.</p></div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The other arrangements for the archive's minimum lifetime have not been described.</p>{% endif %}</div>
     {% endif %}
   {% else %}
-    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The archive's minimum lifetime has not been provided.</p></div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The archive's minimum lifetime has not been provided.</p>{% endif %}</div>
   {% endif %}
   {% set extensionPath = [archivePrefix, uuids.archivedAfterExtendQUuid]|reply_path %}
   {% set extension = repliesMap[extensionPath]|reply_str_value %}
@@ -53,7 +53,7 @@
     {% elif limit == uuids.archivedAfterExtendNoBudgetAUuid %}
       <p data-fact-id="archive-extension-limit" data-status="complete">The archival period is limited by the budget.</p>
     {% else %}
-      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-limit" data-status="missing">The reason the archival period cannot be extended has not been specified.</p></div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-limit" data-status="missing">The reason the archival period cannot be extended has not been specified.</p>{% endif %}</div>
     {% endif %}
   {% elif extension == uuids.archivedAfterExtendYesAUuid %}
     <p data-fact-id="archive-extension" data-status="complete">The archival period can be extended.</p>
@@ -63,7 +63,7 @@
     {% elif authority == uuids.archivedAfterExtendWhoArchiveAUuid %}
       <p data-fact-id="archive-extension-authority" data-status="complete">Library or archive staff will decide on an extension.</p>
     {% else %}
-      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-authority" data-status="missing">The person or team responsible for deciding on an extension has not been specified.</p></div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-authority" data-status="missing">The person or team responsible for deciding on an extension has not been specified.</p>{% endif %}</div>
     {% endif %}
     {% set basis = repliesMap[[extensionPath, uuids.archivedAfterExtendYesAUuid, uuids.archivedAfterExtendBasisQUuid]|reply_path]|reply_items %}
     {# Only the three fixed choices form a sentence; no authored blocks join it.
@@ -86,12 +86,12 @@
       <div class="archive-extension-basis-summary"><p>Basis for extending the archival period: {{ basisItems|join(", ") }}.</p></div>
     {% endif %}
     {% if not basis %}
-      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-basis" data-status="missing">The basis for deciding on an extension has not been specified.</p></div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-basis" data-status="missing">The basis for deciding on an extension has not been specified.</p>{% endif %}</div>
     {% elif basis|reject("in", basisChoices)|list %}
-      <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension-basis" data-status="needs-review">Some selected reasons for extending the archival period cannot be interpreted by this template. Please review the answer.</p></div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-basis" data-status="needs-review">Some selected reasons for extending the archival period cannot be interpreted by this template. Please review the answer.</p>{% endif %}</div>
     {% endif %}
   {% else %}
-    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-extension" data-status="missing">It has not been specified whether the archival period can be extended.</p></div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension" data-status="missing">It has not been specified whether the archival period can be extended.</p>{% endif %}</div>
   {% endif %}
   {% set formats = repliesMap[[archivePrefix, uuids.archivedAfterFormatsQUuid]|reply_path]|reply_str_value %}
   {% if formats == uuids.archivedAfterFormatsYesAUuid %}
@@ -99,7 +99,7 @@
   {% elif formats == uuids.archivedAfterFormatsNoAUuid %}
     <p data-fact-id="archive-format-migration" data-status="explicit-no">Obsolete data formats in cold storage will not be upgraded.</p>
   {% else %}
-    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-format-migration" data-status="missing">The arrangement for obsolete data formats in cold storage has not been specified.</p></div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-format-migration" data-status="missing">The arrangement for obsolete data formats in cold storage has not been specified.</p>{% endif %}</div>
   {% endif %}
   {% set media = repliesMap[[archivePrefix, uuids.archivedAfterMediaQUuid]|reply_path]|reply_str_value %}
   {% if media == uuids.archivedAfterMediaYesAUuid %}
@@ -107,7 +107,7 @@
   {% elif media == uuids.archivedAfterMediaNoAUuid %}
     <p data-fact-id="archive-media-migration" data-status="explicit-no">Archived data will not be migrated regularly to more modern storage media.</p>
   {% else %}
-    <div class="reading-gap"><p class="data-gap" data-fact-id="archive-media-migration" data-status="missing">The arrangement for migration to more modern storage media has not been specified.</p></div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-media-migration" data-status="missing">The arrangement for migration to more modern storage media has not been specified.</p>{% endif %}</div>
   {% endif %}
 {% endif %}
 </div>

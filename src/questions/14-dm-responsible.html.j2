@@ -47,7 +47,7 @@
     {% if responsibilitiesContent|striptags|trim %}
       <div class="responsibilities-block{{ ' short-reading-unit' if responsibilitiesContent|striptags|length <= 500 else '' }}">{{ responsibilitiesContent }}</div>
     {% else %}
-      <p class="data-gap" data-requirement-id="SE-6a" data-status="missing-output">This document does not yet identify a named person or team with a data management responsibility. Please check the contributor names and roles.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6a" data-status="missing-output">This document does not yet identify a named person or team with a data management responsibility. Please check the contributor names and roles.</p>{% endif %}
     {% endif %}
   </div>
 </div>

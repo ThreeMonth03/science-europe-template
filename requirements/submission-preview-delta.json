@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "source_adapter": "Dataset classification literals are replaced by exported constants of identical value, never translated. The after hashes identify the prototype before this exact reversible adaptation.",
+  "baseline_commit": "5a0c4545fc5f0d9dac09c2c92831d002b65e8f27",
+  "baseline_version": "0.3.43",
+  "version": "0.3.44",
+  "prototype_repository": "ThreeMonth03/science-europe-template-zhtw",
+  "prototype_commit": "408bbbd1f7d162f6c0c3e31a00456130298618c9",
+  "prototype_archive": "reviews/2026-09-21-dataset-labels",
+  "prototype_seal_sha256": "c81445f317934ec5c3902d71a293f89034e4aa6980cc9104759973da976cd45a",
+  "files": {
+    "src/contributors.html.j2": {
+      "before_sha256": "90f90fba14cfc678a05cbb4ba6c6493b15bdf6cd2c04805118736b476dc53007",
+      "after_sha256": "75aff4806ae1ba892cc8f244b88e767e1ba627cef5fa552a0865cf3a2d0889d1"
+    },
+    "src/macros.html.j2": {
+      "before_sha256": "d75cb2d6433208af2ea07004c0faede5df7eb31f6a3ee50ed5d8835e948c4413",
+      "after_sha256": "a69b7ec744161700ab7c511ae5a2b0203512b1f3a01c417ff24a6a02eecfc8c7"
+    },
+    "src/post-project-archive.html.j2": {
+      "before_sha256": "df5b65feb03ac196c20134288cd4c826622ff2db97df4def0e3fb6b06277f336",
+      "after_sha256": "0520d1de8b777d31a3ca23c23dd8ac86082e698e1eac7e8524f81f788da2541c"
+    },
+    "src/preservation-publication-reason.html.j2": {
+      "before_sha256": "fd5550757afbe0cd10c80cad37a6ee8f6dbdca47fee6e6c3ec4a31858ba07bfa",
+      "after_sha256": "7f1925ced843f30703821a72fc2140b718f3fe332f7d6e863742b0068f0b1e65"
+    },
+    "src/projects.html.j2": {
+      "before_sha256": "680f6bc9bcf6ffab65d4f4a6a9ab12e2b4c32ad36eca72e8f3456cc694008e3b",
+      "after_sha256": "979e18450f4059778fccafc83357bd100de01e52f43ff9d7d286181e0fbfff76"
+    },
+    "src/quality-control.html.j2": {
+      "before_sha256": "78320c28918131da0afdc5f110ca44d5be6c3f6559f3459b72cd45ef7fb38a4f",
+      "after_sha256": "fa4b794bdafb698228ac6fead207b5c79cc488e575bebef7d17fb4281910179d"
+    },
+    "src/questions/01-how-data.html.j2": {
+      "before_sha256": "66dc404732f54554ab8d44caf3f00f75c4356a30961d9d8be3b96005571cf3fc",
+      "after_sha256": "0e702fabdf5aca76775e68a568a6933ecfd3f7ae4c84a701168da1187e4940b3"
+    },
+    "src/questions/02-what-data.html.j2": {
+      "before_sha256": "a715270e123827dd401b093a0a370e5c09be349f6985631e3470eb30dd34b432",
+      "after_sha256": "dd61a97368bf6f601e41814919ec4e1b9a4416a592aff663d326ec65f0651f4a"
+    },
+    "src/questions/03-docs-metadata.html.j2": {
+      "before_sha256": "00a167aede73b0b5ebc87387c1a00c1f9cb4deb5001271a1a04b9f7338f524ee",
+      "after_sha256": "72b5a9560c1801e2c1b6dc9f96c195ebb66b978be10db4c9355b8945ec4b2ad1"
+    },
+    "src/questions/04-quality-control.html.j2": {
+      "before_sha256": "8bfdddafb16588e21c511e73e6fe06ace8df22f04b96d36160b43eeace4c078e",
+      "after_sha256": "58eb850370637b2ea912f34752fe0d0ad11a4abd788f72f61e0134610cfd130c"
+    },
+    "src/questions/05-store-backup.html.j2": {
+      "before_sha256": "de99282ac4f785cbb8f7e9b89920f2c0034e0e4ccbe189e9538e2d7d8bde8544",
+      "after_sha256": "3899bc0a7d8cfd68009ce857ba12da3bbc8f01cf93a0c9f096ae63102ec08206"
+    },
+    "src/questions/06-access-security.html.j2": {
+      "before_sha256": "c451d0f629f323923c7ce331e82f10a0fd4dc3521acee450360395a16ece8467",
+      "after_sha256": "dc9d071be143ae802bbea9e5f89cf33cabe1812645fc964e27ae43162a586714"
+    },
+    "src/questions/07-personal-data.html.j2": {
+      "before_sha256": "bc611942931d28539ea5bf770ed947352469a1d5ffd290c237746f9ba5cc3d0e",
+      "after_sha256": "23a526c6f45ef7107a692d4226817483a2a00542ebe17c99e353330c5b563e80"
+    },
+    "src/questions/08-copyright-ipr.html.j2": {
+      "before_sha256": "1ab4215ca7e31d1c8726cdeae0b06c0c4461507efb196ae1a4adfcb1113ba9ca",
+      "after_sha256": "7c4ea5b7d216b4a291333becd66cbdc7725bece4f212065d83feec26a76ef013"
+    },
+    "src/questions/09-ethical-issues.html.j2": {
+      "before_sha256": "042fbf953fed98f3280f259f099fd4bcb8f279109c91dc82bb25105d54d17e2b",
+      "after_sha256": "94dcdb8b386a46c3a88c58f88bac0aa956f0a7686a173beaea8842329717d05b"
+    },
+    "src/questions/10-share-restrictions.html.j2": {
+      "before_sha256": "45870f1702641b49477d791158a30ec6e964e492f418f8abacc474902c51defa",
+      "after_sha256": "7b7c659e7c8683cef1d77dac4abc83f95bd1e5667d0476933d453177087bf99e"
+    },
+    "src/questions/11-data-preservation.html.j2": {
+      "before_sha256": "c0ef443fc7899dac0fecfd432d52972f400897bc69f2b84178170e1867c925bf",
+      "after_sha256": "70ff4841b642d08f11332994aee98d80f244f2d9605bed56486b4314625272e2"
+    },
+    "src/questions/12-access-data.html.j2": {
+      "before_sha256": "4b57404c39b6e1a4447d438477920206e90c76f8b4fa5ceb14a417fd50a6c7da",
+      "after_sha256": "e9c87fc1be96fea9fdd6b2344d0f540503f9c92491fc8a003ed8da3c3614b5df"
+    },
+    "src/questions/13-persistent-identifier.html.j2": {
+      "before_sha256": "69ed077e6cce6e0b1da65acd13db5d39ae4078247bbe5a4e885ff114408edd96",
+      "after_sha256": "886ac7dfa5b795dfc5edd7924f95c81ba07e3c248fee4489fb13443a6498133d"
+    },
+    "src/questions/14-dm-responsible.html.j2": {
+      "before_sha256": "eb6d7464ed0710adf3d15224f452064ae23e8b065f3170053c8a7924ec1f4f23",
+      "after_sha256": "86635a662c5f138751a495e22153473d24cdf39ca5c5e7d48e134769d6f21d30"
+    },
+    "src/questions/15-required-resources.html.j2": {
+      "before_sha256": "bbd68d4bd464b7cb331e16f039cb8c648f486324b8f06851a40370f31e875405",
+      "after_sha256": "e171ca660e32b74f30585c6c28451789ee6e02df14609ef90a02b293957fd30d"
+    }
+  }
+}

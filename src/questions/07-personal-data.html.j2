@@ -16,9 +16,9 @@
                 {%- set personalDataLegalBasisOtherQUuid = [personalDataLegalBasisQUuid, uuids.cpersGdprLegalBasisOtherAUuid, uuids.cpersGdprLegalBasisOtherWhichQUuid]|reply_path -%}
                 {%- set personalDataLegalBasisOtherReply = repliesMap[personalDataLegalBasisOtherQUuid]|reply_str_value -%}
                 {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid and not personalDataLegalBasisOtherReply -%}
-                    <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-other-legal-basis" data-status="missing"><strong>Information not provided:</strong> the alternative legal basis selected for collecting and processing personal data.</p>
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-other-legal-basis" data-status="missing"><strong>Information not provided:</strong> the alternative legal basis selected for collecting and processing personal data.</p>{% endif %}
                 {%- elif not personalDataLegalBasisReply -%}
-                    <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-legal-basis" data-status="missing"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-legal-basis" data-status="missing"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>{% endif %}
                 {%- else -%}
                     <h4>Legal basis for collecting and processing personal data</h4>
                     <p> We are collecting and processing personal data{{+" "}}
@@ -58,7 +58,7 @@
                     {%- elif personalDataSafeguardLvlIdentifReply == uuids.cpersGdprSafeguardsIdentifIdentifiableAUuid -%}
                         <p>The stored data are identifiable.</p>
                     {%- elif not personalDataSafeguardLvlIdentifReply -%}
-                        <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-identifiability" data-status="missing"><strong>Information not provided:</strong> whether the stored data are anonymized, pseudonymized, or identifiable.</p>
+                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-identifiability" data-status="missing"><strong>Information not provided:</strong> whether the stored data are anonymized, pseudonymized, or identifiable.</p>{% endif %}
                     {%- endif -%}
 
                     {%- set personalDataSafeguardElaborateQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardElaborateQUuid ]|reply_path  -%}
@@ -67,7 +67,7 @@
                         <p class="answer-lead">Other technical and procedural safeguards:</p>
                         <div class="answer-detail" data-fact-id="personal-data-additional-safeguards" data-status="complete">{{personalDataSafeguardElaborateReply|markdown}}</div>
                     {%- else -%}
-                        <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-additional-safeguards" data-status="missing"><strong>Information not provided:</strong> details of any other technical and procedural safeguards.</p>
+                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-additional-safeguards" data-status="missing"><strong>Information not provided:</strong> details of any other technical and procedural safeguards.</p>{% endif %}
                     {%- endif -%}
 
                     {%- set personalDataSafeguardTransferQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardsTransferQUuid]|reply_path -%}
@@ -81,15 +81,15 @@
                             <div class="answer-detail" data-fact-id="personal-data-transfer-measures" data-status="complete">{{personalDataSafeguardTransferMeasuresReply|markdown}}</div>
                         {%- else -%}
                             <p>We plan to transfer data outside the EU/EEA.</p>
-                            <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer-measures" data-status="missing"><strong>Information not provided:</strong> the measures for protecting data transferred outside the EU/EEA.</p>
+                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer-measures" data-status="missing"><strong>Information not provided:</strong> the measures for protecting data transferred outside the EU/EEA.</p>{% endif %}
                         {%- endif -%}
                     {%- elif personalDataSafeguardTransferReply == uuids.cpersGdprSafeguardsTransferNoAUuid -%}
                         <p>We do not plan to transfer data outside the EU/EEA.</p>
                     {%- elif not personalDataSafeguardTransferReply -%}
-                        <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer" data-status="missing"><strong>Information not provided:</strong> whether data will be transferred outside the EU/EEA.</p>
+                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer" data-status="missing"><strong>Information not provided:</strong> whether data will be transferred outside the EU/EEA.</p>{% endif %}
                     {%- endif -%}
                 {%- elif not personalDataSafeguardReply -%}
-                    <p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-safeguards" data-status="missing"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-safeguards" data-status="missing"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>{% endif %}
                 {%- endif -%}
             {%- endif -%}
         {%- elif personalDataReply == uuids.collectPersonalNoAUuid -%}
@@ -119,7 +119,7 @@
     {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
       {{ answerContent }}
     {% else %}
-      <p class="data-gap" data-requirement-id="SE-4a" data-status="missing-output">This document does not yet contain an answer about personal-data protection and compliance.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-status="missing-output">This document does not yet contain an answer about personal-data protection and compliance.</p>{% endif %}
     {% endif %}
     </div>
 </div>

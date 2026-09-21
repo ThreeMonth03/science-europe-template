@@ -13,7 +13,7 @@
             {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
             {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
             <div class="dataset-section" data-item-id="{{ i }}">
-            <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
+            <h5>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName else "(no name given)" }}{% endif %}</h5>
             {# If will be published #}
             {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
             {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
@@ -68,7 +68,7 @@
                             {%- elif distroShareAUuid == uuids.publishedDistroShareClosedAUuid %}
                                 <p data-fact-id="distribution-access" data-status="explicit-no">This distribution is not intended for sharing.</p>
                             {% else %}
-                                <div class="reading-gap"><p class="data-gap" data-fact-id="distribution-access" data-status="missing">The access arrangement for this distribution has not been provided.</p></div>
+                                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-access" data-status="missing">The access arrangement for this distribution has not been provided.</p>{% endif %}</div>
                             {%- endif %}
                             <div class="repository-arrangement{{ ' joined-policy' if distroRepositoryKindAUuid in [uuids.publishedDataRepositoryNationalAUuid, uuids.publishedDataRepositoryInstitutionalAUuid, uuids.publishedDataRepositorySpecialAUuid] else '' }}">
                             {% if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
@@ -106,7 +106,7 @@
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid %}
                                 <p>This distribution will be deposited in a special-purpose repository for the project.</p>
                             {% else %}
-                                <p class="data-gap" data-fact-id="distribution-repository" data-status="missing">The repository for this distribution has not been provided.</p>
+                                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-repository" data-status="missing">The repository for this distribution has not been provided.</p>{% endif %}
                             {%- endif -%}
                             </div>
                         {# Licenses #}
@@ -151,7 +151,7 @@
                                     {% if licenseRestrictConditions %}
                                       <div class="answer-detail">{{ licenseRestrictConditions|markdown }}</div>
                                     {% else %}
-                                      <p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">The conditions of restricted access have not been provided.</p>
+                                      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">The conditions of restricted access have not been provided.</p>{% endif %}
                                     {% endif %}
                                     <div class="restriction-process dataset-policy">
                                     {%- if licenseRestrictAccessAUuid == uuids.licenseRestrictAccessRequestAUuid %}
@@ -165,17 +165,17 @@
                                     {% if licenseRestrictAccessAnother %}
                                       <div class="answer-detail" data-fact-id="restriction-custom-process" data-status="complete">{{ licenseRestrictAccessAnother|markdown }}</div>
                                     {% else %}
-                                      <div class="reading-gap"><p class="data-gap" data-fact-id="restriction-custom-process" data-status="missing">The specialized access process has not been described.</p></div>
+                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-custom-process" data-status="missing">The specialized access process has not been described.</p>{% endif %}</div>
                                     {% endif %}
                                     {% else %}
-                                      <div class="reading-gap"><p class="data-gap" data-fact-id="restriction-access-process" data-status="missing">How to request restricted access has not been specified.</p></div>
+                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-access-process" data-status="missing">How to request restricted access has not been specified.</p>{% endif %}</div>
                                     {%- endif -%}
                                     {%- if licenseRestrictMetadataAUuid == uuids.licenseRestrictMetadataYesAUuid %}
                                     <p>The conditions will be published as part of open metadata.</p>
                                     {% elif licenseRestrictMetadataAUuid == uuids.licenseRestrictMetadataNoAUuid %}
                                     <p>The conditions will not be published as part of open metadata.</p>
                                     {% else %}
-                                      <div class="reading-gap"><p class="data-gap" data-fact-id="restriction-metadata-publication" data-status="missing">It has not been specified whether the access conditions will be included in open metadata.</p></div>
+                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-metadata-publication" data-status="missing">It has not been specified whether the access conditions will be included in open metadata.</p>{% endif %}</div>
                                     {%- endif -%}
                                     {% if licenseRestrictLink %}
                                     {% set restrictionLink %}<a href="{{ licenseRestrictLink|e }}" target="_blank">{{ licenseRestrictLink|e }}</a>{% endset %}
@@ -183,22 +183,22 @@
                                     {% endif %}
                                     </div>
                                 {% else %}
-                                    <p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>
+                                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>{% endif %}
                                 {%- endif -%}
                                 </div>
                             {%- endfor -%}
                         {% else %}
-                            <div class="reading-gap"><p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p></div>
+                            <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>{% endif %}</div>
                         {%- endif -%}
                         {% endset %}
                         <div class="distribution-reading-unit{{ ' short-reading-unit' if distributionContent|striptags|trim|length <= 500 and 'answer-detail' not in distributionContent else '' }}">{{ distributionContent }}</div>
                         </div>
                     {%- endfor -%}
                 {% else %}
-                    <p class="data-gap" data-fact-id="publication-distributions" data-status="missing">The publication locations have not been listed.</p>
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-distributions" data-status="missing">The publication locations have not been listed.</p>{% endif %}
                 {%- endif -%}
             {% else %}
-                <p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>
+                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}
             {%- endif -%}
             {# Catalogue #}
             {%- set publishedDataCataloguePath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid]|reply_path -%}
@@ -318,7 +318,7 @@
     {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
       {{ answerContent }}
     {% else %}
-      <p class="data-gap" data-requirement-id="SE-5a" data-status="missing-output">This document does not yet describe how and when data will be shared, or any restrictions.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5a" data-status="missing-output">This document does not yet describe how and when data will be shared, or any restrictions.</p>{% endif %}
     {% endif %}
   </div>
 </div>

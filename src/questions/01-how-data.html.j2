@@ -18,7 +18,7 @@
           <li data-item-id="{{ pathPrefix }}">
             {%- set measuredDataNamePath = [pathPrefix, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataName = repliesMap[measuredDataNamePath]|reply_str_value -%}
-            <h5>{{ measuredDataName if measuredDataName else "(no name given)" }}</h5>
+            <h5>{% if output_profile|default('review') == 'submission' and not measuredDataName %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}{% else %}{{ measuredDataName if measuredDataName else "(no name given)" }}{% endif %}</h5>
             {# Instruments #}
             {%- set measuredDataInstrPath = [pathPrefix, uuids.measuredDataInstrQUuid]|reply_path -%}
             {%- set measuredDataInstrItems = repliesMap[measuredDataInstrPath]|reply_items -%}
@@ -39,19 +39,19 @@
                 {%- endfor -%}
               </ul>
             {%- else -%}
-              <p>No instruments for this dataset have been specified.</p>
+              {% if output_profile|default('review') != 'submission' %}<p>No instruments for this dataset have been specified.</p>{% endif %}
             {%- endif -%}
             {% include "src/quality-control.html.j2" with context %}
           </li>
         {%- endfor -%}
       </ul>
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="collection-methods" data-status="missing"><strong>Information not provided:</strong> the datasets to be collected or produced and the methods, instruments, or software that will be used.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="collection-methods" data-status="missing"><strong>Information not provided:</strong> the datasets to be collected or produced and the methods, instruments, or software that will be used.</p>{% endif %}
     {%- endif -%}
   {%- elif measuredAUuid == uuids.measuredNoAUuid -%}
     <p data-requirement-id="SE-1a" data-fact-id="new-data" data-status="explicit-no">No new instrument datasets will be produced in this project.</p>
   {%- else -%}
-    <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="new-data" data-status="missing"><strong>Information not provided:</strong> whether the project will collect or produce new instrument data.</p>
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="new-data" data-status="missing"><strong>Information not provided:</strong> whether the project will collect or produce new instrument data.</p>{% endif %}
   {%- endif -%}
 
  {# Existing datasets #}
@@ -100,7 +100,7 @@
           {%- if refDataNameReply -%}
             <h5>{{ refDataNameReply }}</h5>
           {%- else -%}
-            <strong>(no name given)</strong>
+            {% if output_profile|default('review') == 'submission' %}<strong>{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(refDataItem) + 1) }}</strong>{% else %}<strong>(no name given)</strong>{% endif %}
           {%- endif -%}
           
           {# Reference data set will be used #}
@@ -115,7 +115,7 @@
               <p data-fact-id="dataset-source" data-status="complete">Source: {{ refDataWhere }}</p>
             {% endif %}
             {% else %}
-              <p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>{% endif %}
             {% endif %}
             {%- set refDataUsageQ = [refDataUsedPrefix, uuids.refDataUsageQUuid]|reply_path -%}
             {%- set refDataUsageReply = repliesMap[refDataUsageQ]|reply_str_value -%}
@@ -124,7 +124,7 @@
                 {{ refDataUsageReply|markdown }}
               </div>
             {% else %}
-              <p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
             {% endif %}
 
             {# version #}
@@ -140,7 +140,7 @@
                   <tbody><tr><th scope="row">Version</th><td>{{ refDataVersionedWhich|markdown }}</td></tr></tbody>
                 </table>
               {% else %}
-                <p class="data-gap" data-fact-id="dataset-version" data-status="missing"><strong>Information not provided:</strong> which version of this dataset will be used.</p>
+                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-version" data-status="missing"><strong>Information not provided:</strong> which version of this dataset will be used.</p>{% endif %}
               {% endif %}
               {% if refDataVersionedChangeAUuid == uuids.refDataVersionedChangeStayAUuid %}
                 <p>If a new version becomes available during the project, the current version will continue to be used.</p>
@@ -149,7 +149,7 @@
               {% elif refDataVersionedChangeAUuid == uuids.refDataVersionedChangeAllAUuid %}
                 <p>If a new version becomes available during the project, all analyses will be repeated using it.</p>
               {% else %}
-                <p class="data-gap" data-fact-id="dataset-version-policy" data-status="missing"><strong>Information not provided:</strong> how new dataset versions will be handled.</p>
+                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-version-policy" data-status="missing"><strong>Information not provided:</strong> how new dataset versions will be handled.</p>{% endif %}
               {% endif %}
             {%- endif -%}
 
@@ -182,7 +182,7 @@
                   {%- if refDataConditionsOtherReply -%}
                     <div class="answer-detail"><p><strong>Conditions of use</strong></p>{{refDataConditionsOtherReply|markdown}}</div>
                   {%- else -%}
-                    <p class="data-gap" data-status="missing-output">Restrictions apply, but the conditions of use are not yet described.</p>
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">Restrictions apply, but the conditions of use are not yet described.</p>{% else %}<p data-fact-id="reuse-restrictions" data-status="partial">Restrictions apply to this dataset.</p>{% endif %}
                   {%- endif -%}
               {%- endif -%}
             {%- endif -%}
@@ -269,7 +269,7 @@
         {%- if nrefDataNameReply -%}
           <h5>{{ nrefDataNameReply }}</h5>
         {%- else -%}
-          <strong>(no name given)</strong>
+          {% if output_profile|default('review') == 'submission' %}<strong>{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(nrefDataItem) + 1) }}</strong>{% else %}<strong>(no name given)</strong>{% endif %}
         {%- endif -%}
         
         {# Non-reference data set will be used #}
@@ -284,7 +284,7 @@
               <p data-fact-id="dataset-source" data-status="complete">Source: {{ nrefDataWhere }}</p>
             {% endif %}
           {% else %}
-            <p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>
+            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>{% endif %}
           {% endif %}
           {%- set nrefDataUsageQ = [nrefDataUsedPrefix, uuids.nrefDataUsageQUuid]|reply_path -%}
           {%- set nrefDataUsageReply = repliesMap[nrefDataUsageQ]|reply_str_value -%}
@@ -294,7 +294,7 @@
               {{ nrefDataUsageReply|markdown }}
             </div>
           {% else %}
-            <p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>
+            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
           {% endif %}
 
           {# Which part of the non-reference data we will use #}
@@ -437,17 +437,17 @@
           {% elif nrefDataUseNoReply == uuids.nrefDataUseNoReasonAUuid and nrefDataUseNoOtherReasonReply %}
             <div class="answer-detail"><p><strong>Reason for not re-using this dataset</strong></p>{{ nrefDataUseNoOtherReasonReply|markdown }}</div>
           {% else %}
-            <p class="data-gap" data-fact-id="nonreuse-reason" data-status="missing"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>
+            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="nonreuse-reason" data-status="missing"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>{% endif %}
           {% endif %}
         {% else %}
-          <p class="data-gap" data-fact-id="reuse-decision" data-status="missing"><strong>Information not provided:</strong> whether this dataset will be re-used.</p>
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-decision" data-status="missing"><strong>Information not provided:</strong> whether this dataset will be re-used.</p>{% endif %}
         {%- endif -%}
       </li>
       {%- endfor -%}
       </ul>
       </div>
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> the existing datasets considered for re-use, including any sources that were considered but discarded.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> the existing datasets considered for re-use, including any sources that were considered but discarded.</p>{% endif %}
     {%- endif -%}
 
     {# Constrains - Data Harmonization #}
@@ -512,7 +512,7 @@
   {%- elif preexistingAUuid == uuids.preexistingNoAUuid -%}
     <p data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="explicit-no">No existing datasets will be re-used.</p>
   {%- else -%}
-    <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> whether existing data will be re-used, including constraints or reasons for discarding candidate sources.</p>
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> whether existing data will be re-used, including constraints or reasons for discarding candidate sources.</p>{% endif %}
   {%- endif -%}
 
   {# Provenance (lab notebooks)#}
@@ -537,14 +537,14 @@
               {{ macros.provenanceReading(provenanceOther) }}
             </div>
           {%- else -%}
-            <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance-detail" data-status="missing"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>
+            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance-detail" data-status="missing"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>{% endif %}
           {%- endif -%}
         {%- endif -%}
       {%- else -%}
-        <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>
+        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>{% endif %}
       {%- endif -%}
     {%- else -%}
-      <p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>{% endif %}
     {%- endif -%}
   </div>
 </div>

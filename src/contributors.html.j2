@@ -1,6 +1,6 @@
 {%- set contributorsPath = [uuids.adminDetailsCUuid, uuids.contributorsQUuid]|join(".") -%}
 {%- set contributorsItems = repliesMap[contributorsPath]|reply_items -%}
-<div id="dmp-contributors">
+{% if contributorsItems or dc.project.created_by or output_profile|default('review') != 'submission' %}<div id="dmp-contributors">
   <h2>People and responsibilities</h2>
 
   {% set contributors = [] %}
@@ -62,4 +62,4 @@
   {%- else -%}
   <div style="font-style:italic;">There are no contributors described for this DMP.</div>
   {%- endif -%}
-</div>
+</div>{% endif %}

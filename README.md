@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.44 [shared-source submission preview](docs/submission-preview.md) integrates
+owned-notice suppression, overview/prose rules and stable numbered dataset labels.
+Review stays the default; Chinese is generated from this source. The complete
+submission switch and native integrated PDF/Word acceptance remain separate gates.
+
 The 0.3.43 [mixed/large budget grouping](docs/budget-grouping.md) integrates the
 tested PDF continuation headers and row-safe PDF/Word grouping into shared source.
 Existing row guards remain; exact projections retain every earlier source gate.

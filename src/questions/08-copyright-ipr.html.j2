@@ -192,7 +192,7 @@
                 {%- if refDataNameReply -%}
                   <div>{{ refDataNameReply }}</div>
                 {%- else -%}
-                  <div>(no name given)</div>
+                  {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(i) + 1) }}</div>{% else %}<div>(no name given)</div>{% endif %}
                 {%- endif -%}
                 
                 {% if refDataConditionsAUuid == uuids.refDataConditionsCC0AUuid -%}
@@ -219,7 +219,7 @@
                 {%- if nrefDataNameReply -%}
                   <div>{{ nrefDataNameReply }}</div>
                 {%- else -%}
-                  <div>(no name given)</div>
+                  {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(i) + 1) }}</div>{% else %}<div>(no name given)</div>{% endif %}
                 {%- endif -%}
                 {% if nrefDataConditionsAUuid == uuids.nrefDataConditionsCC0AUuid -%}
                   It is freely available for any use (public domain or CC0).
@@ -240,7 +240,7 @@
     {% if legalContent|striptags|trim %}
       {{ legalContent }}
     {% else %}
-      <p class="data-gap" data-requirement-id="SE-4b" data-status="missing-output">This document does not yet describe arrangements for data ownership, intellectual property rights, or applicable legislation. Please review and complete this section.</p>
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4b" data-status="missing-output">This document does not yet describe arrangements for data ownership, intellectual property rights, or applicable legislation. Please review and complete this section.</p>{% endif %}
     {% endif %}
   </div>
 </div>

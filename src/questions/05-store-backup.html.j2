@@ -16,7 +16,7 @@
       {%- elif notSharedBackupAUuid == uuids.notSharedBackupNoAUuid -%}
         <p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="explicit-no">Data stored by individual project members are not yet adequately backed up and traceable.</p>
       {%- else -%}
-        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="missing"><strong>Information not provided:</strong> whether data stored by individual project members are adequately backed up and traceable.</p></div>
+        <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="missing"><strong>Information not provided:</strong> whether data stored by individual project members are adequately backed up and traceable.</p>{% endif %}</div>
       {%- endif -%}
     {%- elif sharedWorkspaceAUuid == uuids.sharedWorkspaceYesAUuid -%}
       <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">There is a shared workspace used during the project for working with data.</p>
@@ -40,10 +40,10 @@
         {%- elif sharedHowChangeAUuid == uuids.sharedHowChangeMiddleAUuid -%}
           <p data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="complete">Storage needs are largest in the middle of the project.</p>
         {%- else -%}
-          <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p></div>
+          <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p>{% endif %}</div>
         {%- endif -%}
       {%- else -%}
-        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p></div>
+        <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="storage-capacity" data-status="missing"><strong>Information not provided:</strong> how storage capacity needs will change during the project.</p>{% endif %}</div>
       {%- endif -%}
       {%- set sharedReliablePath = [sharedWorkspacePath, uuids.sharedWorkspaceYesAUuid, uuids.sharedReliableQUuid]|reply_path -%}
       {%- set sharedReliableAUuid = repliesMap[sharedReliablePath]|reply_str_value -%}
@@ -57,7 +57,7 @@
         {%- elif sharedReliablePreventLossAUuid == uuids.sharedReliablePreventLossStoredAUuid %}
           <p data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="complete">All essential data will also be stored elsewhere to prevent a total loss of data.</p>
         {%- else -%}
-          <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p></div>
+          <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p>{% endif %}</div>
         {%- endif -%}
         {%- if sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyLeftAUuid %}
           <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">Project participants are responsible for backing up project data stored outside the workspace.</p>
@@ -68,15 +68,15 @@
         {%- elif sharedReliableBackupAUuid == uuids.sharedReliableBackupCopyBackupsAUuid %}
           <p data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="complete">We will make automated backups of all data stored outside the workspace.</p>
         {%- else -%}
-          <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p></div>
+          <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p>{% endif %}</div>
         {%- endif -%}
       {%- else -%}
-        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p></div>
-        <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p></div>
+        <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="loss-prevention" data-status="missing"><strong>Information not provided:</strong> how a total loss of data will be prevented.</p>{% endif %}</div>
+        <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up.</p>{% endif %}</div>
       {%- endif -%}
     {%- else -%}
-      <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="missing"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p></div>
-      <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p></div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="missing"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p>{% endif %}</div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p>{% endif %}</div>
     {%- endif -%}
     </div>
     {# Cold archival DURING research is independent of the shared workspace. #}

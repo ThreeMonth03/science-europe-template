@@ -12,7 +12,11 @@ from generate_pilot_fixtures import IDS, path
 
 class OutputProfilesTests(unittest.TestCase):
     def test_fixtures_review_unchanged_and_only_declared_submission_delta(self):
-        rows = check(ROOT, ROOT/'fixtures/pilot/en', 'english', baseline=True)
+        # Keep the historical partial-profile oracle, on verified 0.3.43 bytes.
+        # Current 0.3.44 behavior is covered by test_submission_preview.py.
+        from submission_preview_contract import historical_overrides
+        rows = check(ROOT, ROOT/'fixtures/pilot/en', 'english', baseline=True,
+                     source_overrides=historical_overrides())
         self.assertEqual(len(rows), 2*len(list((ROOT/'fixtures/pilot/en').glob('*.events.json'))))
         self.assertTrue(any(r['remaining_diagnostic_nodes'] for r in rows))  # Deliberately partial.
 

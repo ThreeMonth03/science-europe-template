@@ -52,18 +52,18 @@
                 {% elif authority.status == uuids.projEthicalApprovalAuthStatusRejectAUuid %}
                   <p>Approval has been rejected.</p>
                 {% else %}
-                  <p class="data-gap" data-status="missing-output">Approval status has not been provided.</p>
+                  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">Approval status has not been provided.</p>{% endif %}
                 {% endif %}
                 {% if authority.case %}
                   <p>Case number: {{ authority.case|e }}</p>
                 {% else %}
-                  <p class="data-gap" data-status="missing-output">A case number has not been provided.</p>
+                  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">A case number has not been provided.</p>{% endif %}
                 {% endif %}
               </li>
             {% endfor %}
           </ul>
           {% else %}
-            <p class="data-gap" data-status="missing-output">Ethical approval records have not been provided.</p>
+            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">Ethical approval records have not been provided.</p>{% endif %}
           {% endif %}
           {% endif %}
         </li>
@@ -84,7 +84,7 @@
         {%- set containPersonal = repliesMap[[pathPrefix, uuids.containPersonalQUuid]|reply_path]|reply_str_value -%}
         {%- set containSensitive = repliesMap[[pathPrefix, uuids.containSensitiveQUuid]|reply_path]|reply_str_value -%}
         <li>
-          <strong>{{ producedDataName if producedDataName else "(no name given)" }}</strong>
+          <strong>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName if producedDataName else "(no name given)" }}{% endif %}</strong>
           {%- if containPersonal or containSensitive -%}
             <ul class="ethical-data-flags">
             {%- if containPersonal == uuids.containPersonalNoAUuid -%}
@@ -230,7 +230,7 @@
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
   {% else %}
-    <p class="data-gap" data-requirement-id="SE-4c" data-status="missing-output">This document does not yet contain an answer about ethical issues and codes of conduct.</p>
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4c" data-status="missing-output">This document does not yet contain an answer about ethical issues and codes of conduct.</p>{% endif %}
   {% endif %}
   </div>
 </div>

@@ -20,7 +20,7 @@
             {%- set measuredDataWhoAUuid = repliesMap[measuredDataWhoPath]|reply_str_value -%}
             {%- set measuredDataEquipPath = [pathPrefix, uuids.measuredDataEquipQUuid]|reply_path -%}
             {%- set measuredDataEquipAUuid = repliesMap[measuredDataEquipPath]|reply_str_value -%}
-            {%- set collectionName -%}{% if measuredDataName %}{{ measuredDataName|e }}{% else %}<span>(no name given)</span>{% endif %}{%- endset -%}
+            {%- set collectionName -%}{% if measuredDataName %}{{ measuredDataName|e }}{% else %}{% if output_profile|default('review') == 'submission' %}<span>{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}</span>{% else %}<span>(no name given)</span>{% endif %}{% endif %}{%- endset -%}
             {%- set collectionSentences = [] -%}
             {%- set ownershipOther = "" -%}
             {%- set ownershipMissing = false -%}
@@ -55,13 +55,13 @@
             {% if collectionSentences %}
               <p class="collection-summary">Data collection for <strong>{{ collectionName }}</strong>: {{ collectionSentences|join(" ") }}</p>
             {% else %}
-              <p class="collection-summary">Data collection for <strong>{{ collectionName }}</strong> has not yet been described.</p>
+              {% if output_profile|default('review') != 'submission' %}<p class="collection-summary">Data collection for <strong>{{ collectionName }}</strong> has not yet been described.</p>{% else %}<p class="collection-context"><strong>{{ collectionName }}</strong></p>{% endif %}
             {% endif %}
             {% if measuredDataWhoAUuid not in [uuids.measuredDataWhoExpertsOwnAUuid, uuids.measuredDataWhoExpertsOutAUuid, uuids.measuredDataWhoExternalAUuid] %}
-              <p class="data-gap" data-requirement-id="SE-1b" data-fact-id="data-collector" data-status="missing">Information not provided: who will collect this dataset.</p>
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="data-collector" data-status="missing">Information not provided: who will collect this dataset.</p>{% endif %}
             {% endif %}
             {% if measuredDataEquipAUuid not in [uuids.measuredDataEquipDescribedAUuid, uuids.measuredDataEquipCareAUuid] %}
-              <p class="data-gap" data-requirement-id="SE-1b" data-fact-id="equipment-documentation" data-status="missing">Information not provided: whether the equipment is adequately documented or needs additional process documentation.</p>
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="equipment-documentation" data-status="missing">Information not provided: whether the equipment is adequately documented or needs additional process documentation.</p>{% endif %}
             {% endif %}
             {% if ownershipOther %}
               <div class="answer-detail" data-fact-id="external-ownership" data-status="complete">
@@ -69,7 +69,7 @@
                 {{ ownershipOther|markdown }}
               </div>
             {% elif ownershipMissing %}
-              <p class="data-gap" data-requirement-id="SE-1b" data-fact-id="external-ownership" data-status="missing">Information not provided: ownership arrangements for data collected by the external party.</p>
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="external-ownership" data-status="missing">Information not provided: ownership arrangements for data collected by the external party.</p>{% endif %}
             {% endif %}
           </div>
         {%- endfor -%}
@@ -124,7 +124,7 @@
             {%- set neqDataSetsName = repliesMap[[pathPrefix, uuids.neqDataSetsNameQUuid]|reply_path]|reply_str_value -%}
             {%- set neqDataSetsDesc = repliesMap[[pathPrefix, uuids.neqDataSetsDescQUuid]|reply_path]|reply_str_value -%}
             <li>
-              <strong>{{ neqDataSetsName if neqDataSetsName else "(no name given)" }}</strong>
+              <strong>{% if output_profile|default('review') == 'submission' and not neqDataSetsName %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ neqDataSetsName if neqDataSetsName else "(no name given)" }}{% endif %}</strong>
               {% if neqDataSetsDesc -%}<div class="answer-detail">{{ neqDataSetsDesc|markdown }}</div>{%- endif -%}
             </li>
           {%- endfor -%}
@@ -150,7 +150,7 @@
   {%- set formatsPath = [uuids.creatingCUuid, uuids.formatsQUuid]|reply_path -%}
   {%- set formatsItems = repliesMap[formatsPath]|reply_items -%}
   {% if not formatsItems %}
-    <p class="data-gap" data-requirement-id="SE-1b" data-status="missing-output">This document does not yet list the data types, formats and estimated volumes.</p>
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-status="missing-output">This document does not yet list the data types, formats and estimated volumes.</p>{% endif %}
   {% endif %}
   {%- if formatsItems|length > 0 -%}
     <h4>Data formats and types</h4>
@@ -255,7 +255,7 @@
             {% elif formatsVolumeAUuid != uuids.formatsVolumeSmallAUuid %}
               {% set fieldGap %}<span data-fact-id="format-volume" data-status="missing">estimated data volume</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% endif %}
-          {% if formatGaps %}<p class="data-gap" data-requirement-id="SE-1b">Information still needed: {{ formatGaps|join(", ") }}.</p>{% endif %}
+          {% if formatGaps %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b">Information still needed: {{ formatGaps|join(", ") }}.</p>{% endif %}{% endif %}
         </div>
       {%- endfor -%}
     </div>

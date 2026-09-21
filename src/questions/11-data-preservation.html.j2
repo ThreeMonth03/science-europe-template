@@ -12,7 +12,7 @@
         {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
         <div class="dataset-section" data-item-id="{{ i }}">
-          <h5>{{ producedDataName|e if producedDataName else "(no name given)" }}</h5>
+          <h5>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName else "(no name given)" }}{% endif %}</h5>
           <div class="preservation-summary dataset-policy">
           {# One owned prose run for dataset context and preservation arrangements.
              Authored answer-detail and reading-gap blocks remain hard boundaries. #}
@@ -26,7 +26,7 @@
           {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
             <p>This dataset will be published.</p>
           {% else %}
-            <div class="reading-gap"><p class="data-gap" data-fact-id="preservation-publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p></div>
+            <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="preservation-publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}</div>
           {% endif -%}
           {# How long will be stored + Metadata FAIRness #}
           {%- set publishedDataHowLongPath = [pathPrefix, uuids.publishedDataHowLongQUuid]|reply_path -%}
@@ -47,12 +47,12 @@
                 <p>This data set will be kept available for a fixed period (prepaid).</p>
               {% endif %}
               {% if not publishedDataHowLongFixed %}
-                <div class="reading-gap"><p class="data-gap" data-fact-id="retention-period" data-status="missing-output">The retention period has not been provided.</p></div>
+                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="missing-output">The retention period has not been provided.</p>{% endif %}</div>
               {% elif (publishedDataHowLongFixed|string|trim).replace('.', '', 1).isdigit() %}
-                <div class="reading-gap"><p class="data-gap" data-fact-id="retention-period" data-status="needs-review">Please specify a time unit for the retention period.</p></div>
+                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="needs-review">Please specify a time unit for the retention period.</p>{% endif %}</div>
               {% endif %}
               {% if repliesMap[[uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path]|reply_str_value == uuids.repoChargesNoAUuid %}
-                <div class="reading-gap"><p class="data-gap" data-fact-id="retention-payment" data-status="needs-review">Please check how the prepaid retention period relates to the answer that repository services have no charges.</p></div>
+                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-payment" data-status="needs-review">Please check how the prepaid retention period relates to the answer that repository services have no charges.</p>{% endif %}</div>
               {% endif %}
             {%- endif -%}
             {%- if publishedDataMetadataPersistentAUuid == uuids.publishedDataMetadataPersistentYesAUuid %}
@@ -102,7 +102,7 @@
                           <div class="answer-lead"><p>Other repository contact arrangements:</p></div>
                           <div class="answer-detail" data-fact-id="repository-contact-arrangements" data-status="complete">{{ domainSpecificRepoContactBeforeOther|markdown }}</div>
                         {% else %}
-                          <p class="data-gap" data-fact-id="repository-contact-arrangements" data-status="missing">The other repository contact arrangements have not been described.</p>
+                          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="repository-contact-arrangements" data-status="missing">The other repository contact arrangements have not been described.</p>{% endif %}
                         {% endif %}
                       </div>
                     {%- endif -%}
@@ -214,10 +214,10 @@
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
     {%- if output_profile|default('review') != 'submission' -%}
-    <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-5b" data-fact-id="preservation-selection-review" data-status="needs-review">Preservation selection still requires review: publication decisions and archive renewal criteria do not by themselves explain which datasets and versions must be retained or destroyed.</p></div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5b" data-fact-id="preservation-selection-review" data-status="needs-review">Preservation selection still requires review: publication decisions and archive renewal criteria do not by themselves explain which datasets and versions must be retained or destroyed.</p>{% endif %}</div>
     {%- endif -%}
   {% else %}
-    <p class="data-gap" data-requirement-id="SE-5b" data-status="missing-output">This document does not yet contain an answer about data selection and long-term preservation.</p>
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5b" data-status="missing-output">This document does not yet contain an answer about data selection and long-term preservation.</p>{% endif %}
   {% endif %}
   </div>
 </div>

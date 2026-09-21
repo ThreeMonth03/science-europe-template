@@ -1,6 +1,6 @@
 {%- set projectsPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
 {%- set projectsItems = repliesMap[projectsPath]|reply_items -%}
-<div id="dmp-projects">
+{% if projectsItems or output_profile|default('review') != 'submission' %}<div id="dmp-projects">
   <h2>Research overview</h2>
 
   {% for projectsItem in projectsItems %}
@@ -21,10 +21,10 @@
     {%- set projectEnd = repliesMap[projectEndPath]|reply_str_value -%}
     {%- set fundersPath = [projectsPath, projectsItem, uuids.fundersQUuid]|reply_path -%}
     {%- set fundersItems = repliesMap[fundersPath]|reply_items -%}
-      <table class="project-details"><tbody>
-        <tr><th scope="row">Project Number</th><td>{{ projectNumber if projectNumber else "N/A" }}</td></tr>
-        <tr><th scope="row">Start date</th><td>{{ projectStart if projectStart else "N/A" }}</td></tr>
-        <tr><th scope="row">End date</th><td>{{ projectEnd if projectEnd else "N/A" }}</td></tr>
+      {% if projectNumber or projectStart or projectEnd or fundersItems or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
+        {% if projectNumber or output_profile|default('review') != 'submission' %}<tr><th scope="row">Project Number</th><td>{{ projectNumber if projectNumber else "N/A" }}</td></tr>{% endif %}
+        {% if projectStart or output_profile|default('review') != 'submission' %}<tr><th scope="row">Start date</th><td>{{ projectStart if projectStart else "N/A" }}</td></tr>{% endif %}
+        {% if projectEnd or output_profile|default('review') != 'submission' %}<tr><th scope="row">End date</th><td>{{ projectEnd if projectEnd else "N/A" }}</td></tr>{% endif %}
         {% if fundersItems or output_profile|default('review') != 'submission' %}<tr><th scope="row">Funding</th><td>
           {%- if fundersItems|length > 0 %}
             <ul>
@@ -35,14 +35,14 @@
               {%- set grantNumber = repliesMap[grantNumberPath]|reply_str_value -%}
               {%- set funderStatusPath = [fundersPath, fundersItem, uuids.funderStatusQUuid]|reply_path -%}
               {%- set funderStatus = repliesMap[funderStatusPath]|reply_str_value %}
-              <li>{{ macros.integrationCrossref(funderNameReply) }}: {{ grantNumber if grantNumber else "grant number not yet given" }} {% if funderStatus == uuids.funderStatusPlannedAUuid %}(planned){% elif funderStatus == uuids.funderStatusAppliedAUuid %}(applied){% elif funderStatus == uuids.funderStatusGrantedAUuid %}(granted){% elif funderStatus == uuids.funderStatusRejectedAUuid %}(rejected){% endif %}</li>
+              {% if output_profile|default('review') == 'submission' %}<li>{% set funderLabel = macros.integrationCrossref(funderNameReply) %}{{ funderLabel }}{% if grantNumber %}{% if funderLabel|trim %}: {% endif %}{{ grantNumber }}{% endif %} {% if funderStatus == uuids.funderStatusPlannedAUuid %}(planned){% elif funderStatus == uuids.funderStatusAppliedAUuid %}(applied){% elif funderStatus == uuids.funderStatusGrantedAUuid %}(granted){% elif funderStatus == uuids.funderStatusRejectedAUuid %}(rejected){% endif %}</li>{% else %}<li>{{ macros.integrationCrossref(funderNameReply) }}: {{ grantNumber if grantNumber else "grant number not yet given" }} {% if funderStatus == uuids.funderStatusPlannedAUuid %}(planned){% elif funderStatus == uuids.funderStatusAppliedAUuid %}(applied){% elif funderStatus == uuids.funderStatusGrantedAUuid %}(granted){% elif funderStatus == uuids.funderStatusRejectedAUuid %}(rejected){% endif %}</li>{% endif %}
             {%- endfor %}
             </ul>
           {%- else -%}
             Funding information has not been provided.
           {%- endif -%}
         </td></tr>{% endif %}
-      </tbody></table>
+      </tbody></table>{% endif %}
 
     {%- set projectAbstractPath = [projectsPath, projectsItem, uuids.projectAbstractQUuid]|reply_path -%}
     {%- set projectAbstract = repliesMap[projectAbstractPath]|reply_str_value -%}
@@ -55,4 +55,4 @@
   {% else %}
     <div style="font-style:italic;">There are no projects described for this DMP.</div>
   {% endfor %}
-</div>
+</div>{% endif %}

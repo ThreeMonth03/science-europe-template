@@ -189,7 +189,7 @@
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
   {% else %}
-    <p class="data-gap" data-requirement-id="SE-3b" data-status="missing-output">This document does not yet contain an answer about data security and protection of sensitive data.</p>
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3b" data-status="missing-output">This document does not yet contain an answer about data security and protection of sensitive data.</p>{% endif %}
   {% endif %}
   {# A cross-reference is not an answer to Q6; do not let it hide the gap above. #}
   {% if repliesMap[[uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path]|reply_str_value == uuids.archivedDuringYesAUuid %}

@@ -19,8 +19,8 @@
   {% if reasonText|trim %}
     <div class="answer-detail" data-fact-id="nonpublication-reason" data-status="complete">{{ reasonText|markdown }}</div>
   {% else %}
-    <div class="reading-gap"><p class="data-gap" data-fact-id="nonpublication-reason" data-status="missing">The other reasons for not publishing have not been described.</p></div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="nonpublication-reason" data-status="missing">The other reasons for not publishing have not been described.</p>{% endif %}</div>
   {% endif %}
 {% else %}
-  <div class="reading-gap"><p class="data-gap" data-fact-id="nonpublication-reason" data-status="missing">The reason for not publishing has not been provided.</p></div>
+  <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="nonpublication-reason" data-status="missing">The reason for not publishing has not been provided.</p>{% endif %}</div>
 {% endif %}
