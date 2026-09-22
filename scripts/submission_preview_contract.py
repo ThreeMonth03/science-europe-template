@@ -48,7 +48,7 @@ def project_source(sources=None, metadata=None):
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None:
         metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] in ['0.3.45', '0.3.46']:
+    if metadata['version'] in ['0.3.45', '0.3.46', '0.3.47']:
         from submission_reading_contract import project_source as project_reading
         sources, metadata = project_reading(sources, metadata)
     previous = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only',
@@ -74,4 +74,6 @@ def project_source(sources=None, metadata=None):
 
 def historical_overrides():
     sources, _ = project_source()
-    return {name: sources[name].decode() for name in CONTRACT['files']}
+    # Override the entire verified Jinja view: later Q1/content edits must not
+    # leak through the filesystem fallback into this historical profile oracle.
+    return {name: value.decode() for name, value in sources.items() if name.endswith('.j2')}

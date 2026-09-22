@@ -1,4 +1,4 @@
-"""The prototype is opt-in and must leave the production source untouched."""
+"""The immutable prototype remains reproducible through the verified old view."""
 import importlib.util
 from pathlib import Path
 import unittest
@@ -15,7 +15,8 @@ def load(name):
 class ReuseSummaryPrototypeTests(unittest.TestCase):
     def test_exact_overlay_and_branch_matrix(self):
         recipe = load('recipe'); before = recipe.baseline_sources()
-        current = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+        from submission_flow_contract import project_source
+        current, _ = project_source()
         self.assertEqual(before, current)
         rows = load('probe').check(ROOT, recipe.overlay(before))
         self.assertEqual(1600, sum(row['case'] == 'choices' for row in rows))

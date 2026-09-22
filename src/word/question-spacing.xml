@@ -1,0 +1,25 @@
+{# Preserve the existing short-table transformation before touching new markers. #}
+{%- set content -%}{%- include 'src/word/short-tables.xml' -%}{%- endset -%}
+{%- macro require(ok) -%}
+  {%- if not ok -%}{{ empty_question_xml_contract_mismatch.raise_error() }}{%- endif -%}
+{%- endmacro -%}
+{%- set begin = '<!--DSW:SE:empty-question:v1:begin-->\n    ' -%}
+{%- set end = '\n    <!--DSW:SE:empty-question:v1:end-->' -%}
+{%- set property = '<w:pPr><w:pStyle w:val="Heading3" /></w:pPr>' -%}
+{# The captured include is Markup with worker autoescaping. Only this fixed XML
+   constant is trusted; authored text remains escaped exactly as Pandoc wrote it. #}
+{%- set replacement = '<w:pPr><w:pStyle w:val="Heading3" /><w:keepNext w:val="0"/><w:spacing w:before="80" w:after="0"/></w:pPr>'|safe -%}
+{%- set pieces = content.split(begin) -%}
+{{- require(content.count('<!--DSW:SE:empty-question:v1:begin-->') == pieces|length - 1) -}}
+{{- require(content.count('<!--DSW:SE:empty-question:v1:end-->') == pieces|length - 1) -}}
+{{- require(end not in pieces[0]) -}}
+{{- pieces[0]|safe -}}
+{%- for piece in pieces[1:] -%}
+  {%- set parts = piece.split(end) -%}
+  {{- require(parts|length == 2) -}}
+  {%- set heading = parts[0] -%}
+  {{- require(heading.count('<w:p>') == 1 and heading.count('</w:p>') == 1 and heading.count(property) == 1) -}}
+  {{- require('<w:tbl' not in heading and '<w:drawing' not in heading and '<w:keepNext' not in heading) -}}
+  {{- heading.replace(property, replacement, 1)|safe -}}
+  {{- parts[1]|safe -}}
+{%- endfor -%}

@@ -22,7 +22,8 @@ class FullKmFollowupPrototypeTests(unittest.TestCase):
         self.assertEqual(set(current) - set(previous), {'src/full-km-followups.j2', *INSERTIONS.values()})
         self.assertEqual({n for n in previous if current[n] != previous[n]}, {*INSERTIONS, 'src/layout.css'})
         self.assertEqual(current['src/layout.css'], previous['src/layout.css'] + IDENTIFIER_CSS)
-        actual = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+        from submission_flow_contract import project_source
+        actual, _ = project_source()
         self.assertEqual(actual, current, 'Integrated source must match the approved prototype exactly')
         for name in ['src/layout.css', *INSERTIONS]:
             with self.assertRaises(AssertionError): overlay({**previous, name: previous[name] + b'!'})

@@ -20,9 +20,10 @@ class FullKmFollowupIntegrationTests(unittest.TestCase):
         with self.assertRaises(AssertionError): prior_css(delta.replace('inline', 'block'))
 
     def test_actual_sources_match_reviewed_prototype_and_keep_old_gate(self):
-        current = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+        from submission_flow_contract import project_source as before_flow
+        current, current_metadata = before_flow()
         self.assertEqual(current, overlay(baseline_sources()))
-        prior, metadata = project_source(current)
+        prior, metadata = project_source(current, current_metadata)
         self.assertEqual(metadata['version'], '0.3.45')
         from submission_reading_contract import project_source as older
         self.assertEqual(older(prior, metadata)[1]['version'], '0.3.44')
@@ -39,7 +40,7 @@ class FullKmFollowupIntegrationTests(unittest.TestCase):
         with self.assertRaises(AssertionError): project_source({**current, 'src/extra.j2': b''}, metadata)
         for field in ['version', 'format', 'uuid', 'compatibility']:
             bad = copy.deepcopy(metadata)
-            if field == 'version': bad['version'] = '0.3.47'
+            if field == 'version': bad['version'] = '0.3.48'
             elif field == 'format': bad['formats'][0]['name'] += '!'
             elif field == 'uuid': bad['formats'][0]['uuid'] = 'wrong'
             else: bad['allowedPackages'][0]['minVersion'] = '0.0.0'

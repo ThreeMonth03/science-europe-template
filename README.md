@@ -6,6 +6,12 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+Version 0.3.47 [consolidates Q1 summaries and empty-question spacing](docs/submission-flow.md)
+into shared source. Submission keeps the 15 original questions without new missing
+prompts, review stays unchanged, and Chinese uses the pinned translation pipeline.
+Full source/metadata proofs precede exact historical regression views. Native
+paired-package acceptance is tracked separately; this is not a deployment.
+
 The [empty-question spacing prototype](experiments/empty-question-spacing/README.md)
 keeps all 15 questions and tightens only empty submission headings. Its 28 native
 bilingual A/B pairs retain content and review layout, add no PDF pages and shorten

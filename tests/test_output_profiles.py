@@ -30,7 +30,10 @@ class OutputProfilesTests(unittest.TestCase):
         self.assertFalse(answer.get_text().strip()); self.assertFalse(answer.select('h4'))
 
     def test_stable_identities_and_same_conversion_engines(self):
-        metadata = json.loads((ROOT/'template.json').read_text())
+        # The old formats shared every conversion step; 0.3.47's scoped Word
+        # suffix is checked exactly by the new integration metadata contract.
+        from submission_flow_contract import project_source
+        _, metadata = project_source()
         formats = {v['uuid']: v for v in metadata['formats']}
         self.assertEqual(len(formats), len(metadata['formats']))
         for fmt in ('html', 'pdf', 'docx'):

@@ -37,6 +37,8 @@ def identifier_css():
 
 def prior_css(source):
     """Remove only the frozen identifier fix; older gates check all remaining bytes."""
+    from submission_flow_contract import prior_css as before_flow
+    source = before_flow(source)
     delta = identifier_css()
     if '/* Q10 identifiers:' not in source:
         return source
@@ -48,6 +50,9 @@ def project_source(sources=None, metadata=None):
     if sources is None:
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None: metadata = json.loads((ROOT / 'template.json').read_text())
+    if metadata['version'] == '0.3.47':
+        from submission_flow_contract import project_source as before_flow
+        sources, metadata = before_flow(sources, metadata)
     hashes = lambda values: {n: hashlib.sha256(v).hexdigest() for n, v in values.items()}
     assert hashes(sources) == CONTRACT['after'], 'Unreviewed 0.3.46 source or asset'
     assert metadata == CONTRACT['after_metadata'], 'Unreviewed 0.3.46 metadata or conversion change'

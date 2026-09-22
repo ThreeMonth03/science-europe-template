@@ -170,3 +170,10 @@ html body #q-share-restrictions > .answer > .dataset-section > ul > li > strong:
   display: inline;
   break-after: auto;
 }
+
+/* Empty submission questions: retain original headings and tighten spacing.
+   Only the conservative shared Jinja classifier can add this class.
+   Keep empty answer boxes: display:none regresses WeasyPrint pagination when
+   a preceding answer ends with an authored table. */
+html body #dmp-content > .dmp-section > .question.compact-empty-question { margin-top: .5em; }
+html body #dmp-content > .dmp-section > .question.compact-empty-question > h3 { margin: .4em 0 .15em; break-after: auto; }

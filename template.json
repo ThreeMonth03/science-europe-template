@@ -1,7 +1,7 @@
 {
   "organizationId": "threemonth03",
   "templateId": "science-europe-enhanced",
-  "version": "0.3.46",
+  "version": "0.3.47",
   "name": "Science Europe DMP — Output Profiles Pilot",
   "description": "Experimental derivative of dsw:science-europe:1.30.1 with completeness handling and shared PDF/Word reading structure",
   "license": "Apache-2.0",
@@ -156,7 +156,7 @@
         {
           "name": "pandoc",
           "options": {
-            "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx --lua-filter=src/word/short-tables.lua",
+            "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx --lua-filter=src/word/short-tables.lua --lua-filter=src/word/question-spacing.lua",
             "from": "html",
             "to": "docx"
           }
@@ -164,7 +164,7 @@
         {
           "name": "enrich-docx",
           "options": {
-            "rewrite:word/document.xml": "render:src/word/short-tables.xml"
+            "rewrite:word/document.xml": "render:src/word/question-spacing.xml"
           }
         }
       ]

@@ -297,64 +297,7 @@
             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
           {% endif %}
 
-          {# Which part of the non-reference data we will use #}
-          {%- set nrefDataComplete = [nrefDataUsedPrefix, uuids.nrefDataCompleteQUuid]|reply_path  -%}
-          {%- set nrefDataCompleteReply = repliesMap[nrefDataComplete]|reply_str_value -%}
-          {%- if nrefDataCompleteReply -%}
-            <p>We will use{{+" "}}
-            {%- if nrefDataCompleteReply == uuids.nrefDataCompleteUseAUuid -%}
-              the complete data set. 
-            {%- elif nrefDataCompleteReply == uuids.nrefDataCompleteDocumentAUuid -%}
-              only subset of data and we will select it by filtering and/or selection (which will be documented).
-            {%- elif nrefDataCompleteReply == uuids.nrefDataCompleteSubsetAUuid -%}
-              only selected subset of data, which will be available together with our results.
-            {%- endif -%}
-            </p>
-          {%- endif -%}
-
-          {# Format #}
-          {%- set nrefDataFormat = [nrefDataUsedPrefix, uuids.nrefDataFormatQUuid]|reply_path -%}
-          {%- set nrefDataFormatReply = repliesMap[nrefDataFormat]|reply_str_value -%}
-          {%- if nrefDataFormatReply == uuids.nrefDataFormatConvertAUuid %}
-            <p>The format of this data needs to be transformed before our using.</p>
-          {%- endif -%}
-
-          {# Versioning - will change in the future? #}
-          {%- set nrefDataFixed = [nrefDataUsedPrefix, uuids.nrefDataFixedQUuid]|reply_path -%}
-          {%- set nrefDataFixedReply = repliesMap[nrefDataFixed]|reply_str_value -%}
-          {%- if nrefDataFixedReply %}
-            <p>This data{{+" "}}
-            {%- if nrefDataFixedReply == uuids.nrefDataFixedFixedAUuid -%}
-              are fixed, therefore will not influence reproducibility of our results.
-            {%- elif nrefDataFixedReply == uuids.nrefDataFixedChangeAUuid -%}
-              may change in the future, which might influence reproducibility of our results.
-            {%- endif -%}
-            </p>
-          {%- endif -%}
-
-          {# Licence #}
-          {%- set nrefDataConditions = [nrefDataUsedPrefix, uuids.nrefDataConditionsQUuid]|reply_path -%}
-          {%- set nrefDataConditionsReply = repliesMap[nrefDataConditions]|reply_str_value -%}
-          {%- if nrefDataConditionsReply %}
-            <p>This data are{{+" "}}
-            {%- if nrefDataConditionsReply == uuids.nrefDataConditionsCC0AUuid -%}
-              freely available for any use.
-            {%- elif nrefDataConditionsReply == uuids.nrefDataConditionsCCBYAUuid -%}
-              freely available with obligation to quote the source.
-            {%- elif nrefDataConditionsReply == uuids.nrefDataConditionsOtherAUuid  -%}
-              {%- set nrefDataConditionsOther = [nrefDataConditions, uuids.nrefDataConditionsOtherAUuid, uuids.nrefDataConditionsOtherQUuid]|reply_path -%}
-              {%- set nrefDataConditionsOtherReply = repliesMap[nrefDataConditionsOther]|reply_str_value -%}
-              {%- if nrefDataConditionsOtherReply -%}
-                available with{{" "}}
-                  {%- if nrefDataConditionsOtherReply -%}
-                   following restrictions: {{nrefDataConditionsOtherReply|markdown}}
-                  {%- else -%}
-                    {{" "}}restrictions, that will be specified.
-                  {%- endif -%}
-              {%- endif -%}
-            {%- endif -%}
-            </p>
-          {%- endif -%}
+          {% include 'src/reuse-summary.html.j2' with context %}
 
           {# Personal Data #}
           {%- set nrefDataPersonal = [nrefDataUsedPrefix, uuids.nrefDataPersonalQUuid]|reply_path -%}
