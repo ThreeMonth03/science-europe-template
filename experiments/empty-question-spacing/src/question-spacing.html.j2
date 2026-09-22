@@ -1,0 +1,27 @@
+{# Classify only an exact owned, empty answer skeleton. striptags is deliberately
+   not used: an image, table, line break, empty authored block or unknown markup
+   must retain its normal layout. No text, question or answer is removed. #}
+{%- macro question(identifier) -%}
+  {%- set originalClass = 'class="question"'|safe -%}
+  {%- set compactClass = 'class="question compact-empty-question"'|safe -%}
+  {%- set rendered = caller() -%}
+  {%- set pieces = rendered.split('<div class="answer">') -%}
+  {%- set state = namespace(empty=false) -%}
+  {%- if output_profile|default('review') == 'submission'
+      and (rendered.lstrip().startswith('<div id="' + identifier + '" class="question">')
+        or rendered.lstrip().startswith('<div id="' + identifier + '" class="question" data-requirement-id="'))
+      and pieces|length == 2 and pieces[0].count('<h3>') == 1
+      and pieces[0].count('</h3>') == 1 and pieces[0].rstrip().endswith('</h3>') -%}
+    {%- set tail = pieces[1].split()|join('') -%}
+    {%- set state.empty = tail == '</div></div>' -%}
+    {# Q5's two known empty gap containers are generated even in submission. #}
+    {%- if identifier == 'q-store-backup' and tail == '<divclass="workspace-policydataset-policy"><divclass="reading-gap"></div><divclass="reading-gap"></div></div></div></div>' -%}
+      {%- set state.empty = true -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if state.empty -%}
+    {{- rendered|replace(originalClass, compactClass, 1) -}}
+  {%- else -%}
+    {{- rendered -}}
+  {%- endif -%}
+{%- endmacro -%}
