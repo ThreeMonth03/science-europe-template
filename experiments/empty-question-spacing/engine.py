@@ -12,7 +12,8 @@ from pathlib import Path
 from jinja2 import Environment,FileSystemLoader,UndefinedError
 from xml.etree import ElementTree as etree
 p=json.load(sys.stdin); root=Path('/template')
-env=Environment(loader=FileSystemLoader(root),extensions=['jinja2.ext.do'],autoescape=False)
+# Match the worker's autoescaped render path, including captured-include Markup.
+env=Environment(loader=FileSystemLoader(root),extensions=['jinja2.ext.do'],autoescape=True)
 old_xml=env.get_template('src/word/short-tables.xml'); new_xml=env.get_template('src/word/question-spacing.xml')
 base=['pandoc','-f','html','--lua-filter='+str(root/'src/word/pilot.lua'),'--lua-filter='+str(root/'src/word/preservation-reading.lua'),'--lua-filter='+str(root/'src/word/short-tables.lua')]
 extra='--lua-filter='+str(root/'src/word/question-spacing.lua')

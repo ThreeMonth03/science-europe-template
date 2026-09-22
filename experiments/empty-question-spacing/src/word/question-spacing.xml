@@ -6,7 +6,9 @@
 {%- set begin = '<!--DSW:SE:empty-question:v1:begin-->\n    ' -%}
 {%- set end = '\n    <!--DSW:SE:empty-question:v1:end-->' -%}
 {%- set property = '<w:pPr><w:pStyle w:val="Heading3" /></w:pPr>' -%}
-{%- set replacement = '<w:pPr><w:pStyle w:val="Heading3" /><w:keepNext w:val="0"/><w:spacing w:before="80" w:after="0"/></w:pPr>' -%}
+{# The captured include is Markup with worker autoescaping. Only this fixed XML
+   constant is trusted; authored text remains escaped exactly as Pandoc wrote it. #}
+{%- set replacement = '<w:pPr><w:pStyle w:val="Heading3" /><w:keepNext w:val="0"/><w:spacing w:before="80" w:after="0"/></w:pPr>'|safe -%}
 {%- set pieces = content.split(begin) -%}
 {{- require(content.count('<!--DSW:SE:empty-question:v1:begin-->') == pieces|length - 1) -}}
 {{- require(content.count('<!--DSW:SE:empty-question:v1:end-->') == pieces|length - 1) -}}
