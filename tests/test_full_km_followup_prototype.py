@@ -23,7 +23,7 @@ class FullKmFollowupPrototypeTests(unittest.TestCase):
         self.assertEqual({n for n in previous if current[n] != previous[n]}, {*INSERTIONS, 'src/layout.css'})
         self.assertEqual(current['src/layout.css'], previous['src/layout.css'] + IDENTIFIER_CSS)
         actual = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
-        self.assertEqual(actual, previous, 'Prototype must not silently become production')
+        self.assertEqual(actual, current, 'Integrated source must match the approved prototype exactly')
         for name in ['src/layout.css', *INSERTIONS]:
             with self.assertRaises(AssertionError): overlay({**previous, name: previous[name] + b'!'})
         with self.assertRaises(AssertionError): overlay({**previous, 'src/unreviewed.j2': b''})

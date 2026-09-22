@@ -162,3 +162,11 @@ html body #q-data-preservation .post-project-archive[data-scope="project"] > .da
 
 /* Local prototype: keep the final purpose fragment with its allocation. */
 html body .pdf-resource-reading tbody > tr > td > .answer-detail[data-fact-id="resource-justification"] { break-after: avoid; }
+
+/* Q10 identifiers: text before strong is not counted by :first-child.
+   Keep the identifier value inline with its type, not as a dataset heading.
+   Direct ancestry excludes authored lists and distribution policy blocks. */
+html body #q-share-restrictions > .answer > .dataset-section > ul > li > strong:first-child {
+  display: inline;
+  break-after: auto;
+}

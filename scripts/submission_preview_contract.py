@@ -48,7 +48,7 @@ def project_source(sources=None, metadata=None):
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None:
         metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] == '0.3.45':
+    if metadata['version'] in ['0.3.45', '0.3.46']:
         from submission_reading_contract import project_source as project_reading
         sources, metadata = project_reading(sources, metadata)
     previous = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only',

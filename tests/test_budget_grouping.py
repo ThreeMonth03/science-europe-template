@@ -26,7 +26,9 @@ class BudgetGroupingTests(unittest.TestCase):
         for name, digest in expected.items(): self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), digest)
         self.assertEqual(forward_budget(historical(ENTRY).decode()), (ROOT / ENTRY).read_text())
         self.assertEqual(forward_lua(historical(LUA).decode()), (ROOT / LUA).read_text())
-        self.assertEqual(historical(CSS).decode() + TAIL, (ROOT / CSS).read_text())
+        from full_km_followups_contract import project_source as before_followups
+        verified, _ = before_followups()
+        self.assertEqual(historical(CSS).decode() + TAIL, verified[CSS].decode())
 
     def test_malformed_or_duplicate_owned_deltas_are_rejected(self):
         for name, project, token in [(ENTRY, prior_budget, KEPT_BODY),

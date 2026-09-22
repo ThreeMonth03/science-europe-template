@@ -1,0 +1,13 @@
+{%- import 'src/full-km-followups.j2' as followups with context -%}
+{%- set followupPath = followups.active_path(followups.namingChapter, followups.namingBranch, followups.namingLeaf) -%}
+{%- if followupPath -%}
+  {%- set authored = repliesMap[followupPath]|reply_str_value -%}
+  {%- if authored|trim -%}
+    <div class="dataset-policy project-file-naming" data-requirement-id="SE-2a">
+      <div class="answer-lead"><p>File naming conventions:</p></div>
+      <div class="answer-detail" data-fact-id="project-file-naming">{{ authored|markdown }}</div>
+    </div>
+  {%- elif output_profile|default('review') != 'submission' -%}
+    <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-2a" data-fact-id="project-file-naming" data-status="missing">Information not provided: the agreed file naming conventions.</p></div>
+  {%- endif -%}
+{%- endif -%}

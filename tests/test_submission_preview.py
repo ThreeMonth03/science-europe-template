@@ -25,9 +25,14 @@ class SubmissionPreviewTests(unittest.TestCase):
 
     def test_review_and_unknown_mode_are_byte_identical_for_all_fixtures(self):
         overrides = historical_overrides()
+        # Keep the original byte oracle on its exact, verified historical scope.
+        # Actual 0.3.46 behavior is checked by test_full_km_followup_integration.
+        from full_km_followups_contract import project_source as before_followups
+        verified, _ = before_followups()
+        current_overrides = {n: v.decode() for n, v in verified.items() if n.endswith('.j2')}
         for escape in [False, True]:
             prior = environment(ROOT, escape, overrides).from_string(WRAPPER)
-            current = environment(ROOT, escape).from_string(WRAPPER)
+            current = environment(ROOT, escape, current_overrides).from_string(WRAPPER)
             for fixture in sorted((ROOT / 'fixtures/pilot/en').glob('*.events.json')):
                 replies = {e['path']: ({'value': {'value': e['value']['value']}}
                     if e['value']['type'] == 'IntegrationReply' else e['value']['value'])

@@ -1,0 +1,33 @@
+{# Only active, structurally reachable questions in the compiled KM are eligible.
+   Filtered-out questions and stale replies are not missing answers. #}
+{%- set namingChapter = 'b1df3c74-0b1f-4574-81c4-4cc2d780c1af' -%}
+{%- set namingBranch = [
+  ('8e886b55-3287-48e7-b353-daf6ab40f7d8', 'c05f27a2-30ac-44fd-9ac9-cd6f62b16d0c'),
+  ('d4fe0b55-4aee-4d05-88d4-a3f4cad2cfa9', '8b13234e-879b-4221-be12-4df24e6de00e')] -%}
+{%- set namingLeaf = '9ff389f0-2236-48cf-880c-040ea1bb0d2f' -%}
+{%- set referenceChapter = 'd5b27482-b598-4b8c-b534-417d4ad27394' -%}
+{%- set referenceBranch = [('588ad032-56ba-4d52-b29c-6a5b56aa6569', 'bdf55011-db06-4f4a-b26f-ebbbe029da04')] -%}
+{%- set publicationLeaf = '2679736a-800e-4eaa-a70f-818070540c48' -%}
+{%- set maintenanceLeaf = '27769a31-717b-4204-8468-175ac93b195a' -%}
+
+{%- macro active_path(chapter, branch, leaf) -%}
+  {%- if km is defined and chapter in km.chapterUuids and chapter in km.entities.chapters -%}
+    {%- set state = namespace(valid=branch[0][0] in km.entities.chapters[chapter].questionUuids, path=chapter) -%}
+    {%- for question, answer in branch -%}
+      {%- set state.path = [state.path, question]|reply_path -%}
+      {%- set child = leaf if loop.last else branch[loop.index][0] -%}
+      {%- if question not in km.entities.questions or answer not in km.entities.answers -%}
+        {%- set state.valid = false -%}
+      {%- elif km.entities.questions[question].questionType != 'OptionsQuestion'
+          or answer not in km.entities.questions[question].answerUuids
+          or child not in km.entities.answers[answer].followUpUuids
+          or repliesMap[state.path]|reply_str_value != answer -%}
+        {%- set state.valid = false -%}
+      {%- endif -%}
+      {%- set state.path = [state.path, answer]|reply_path -%}
+    {%- endfor -%}
+    {%- if state.valid and leaf in km.entities.questions and km.entities.questions[leaf].questionType == 'ValueQuestion' -%}
+      {{- [state.path, leaf]|reply_path -}}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}

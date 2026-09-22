@@ -18,6 +18,9 @@ def project_source(sources=None, metadata=None):
     if sources is None:
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None: metadata = json.loads((ROOT / 'template.json').read_text())
+    if metadata['version'] == '0.3.46':
+        from full_km_followups_contract import project_source as project_followups
+        sources, metadata = project_followups(sources, metadata)
     digest = lambda value: hashlib.sha256(value).hexdigest()
     assert {name: digest(value) for name, value in sources.items()} == CONTRACT['after'], 'Unreviewed 0.3.45 source or asset'
     assert metadata == CONTRACT['after_metadata'], 'Unreviewed format, version or conversion change'

@@ -1,0 +1,13 @@
+{%- import 'src/full-km-followups.j2' as followups with context -%}
+{%- set followupPath = followups.active_path(followups.referenceChapter, followups.referenceBranch, followups.publicationLeaf) -%}
+{%- if followupPath -%}
+  {%- set authored = repliesMap[followupPath]|reply_str_value -%}
+  {%- if authored|trim -%}
+    <div class="dataset-policy reference-publication-plan" data-requirement-id="SE-5a">
+      <div class="answer-lead"><p>Publication schedule for reference data created by the project:</p></div>
+      <div class="answer-detail" data-fact-id="reference-data-publication-schedule">{{ authored|markdown }}</div>
+    </div>
+  {%- elif output_profile|default('review') != 'submission' -%}
+    <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-5a" data-fact-id="reference-data-publication-schedule" data-status="missing">Information not provided: the publication schedule for reference data created by the project.</p></div>
+  {%- endif -%}
+{%- endif -%}

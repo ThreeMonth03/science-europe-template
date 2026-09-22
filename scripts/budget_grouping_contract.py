@@ -51,6 +51,9 @@ def prior_css(source): return replace_exact(source, [(TAIL, '')])
 
 def without_grouping(source, kind):
     """Only exact reviewed bytes are removable; old hash gates detect any drift."""
+    if kind == 'css':
+        from full_km_followups_contract import prior_css as before_followups
+        source = before_followups(source)
     if kind == 'lua' and WORD_BATCHED in source: return prior_lua(source)
     if kind == 'css' and '/* Local prototype: keep the final purpose fragment' in source: return prior_css(source)
     return source
@@ -62,7 +65,7 @@ def historical(name): return subprocess.check_output(['git', '-C', str(ROOT), 's
 def project_source():
     sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] in ['0.3.44', '0.3.45']:
+    if metadata['version'] in ['0.3.44', '0.3.45', '0.3.46']:
         from submission_preview_contract import project_source as project_submission
         sources, metadata = project_submission(sources, metadata)
     previous = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()

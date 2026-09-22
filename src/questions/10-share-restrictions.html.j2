@@ -3,6 +3,7 @@
 
   <div class="answer">
     {% set answerContent %}
+    {% include 'src/reference-publication-plan.html.j2' %}
     {# How data will be shared #}
     {# Produced datasets #}
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}

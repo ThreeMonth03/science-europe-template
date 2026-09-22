@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.46 [selected full-KM followups](docs/full-km-followups.md) integrates three
+previously verified answer mappings and the scoped identifier line-layout fix.
+Chinese still follows the pinned translation pipeline. Exact historical gates
+are retained separately from actual new-branch checks; this is not a release.
+
 The 0.3.45 [submission reading integration](docs/submission-reading.md) adds stable
 project/resource/software labels, bounded Q9/Q15 submission cleanup, and a shared
 Word short-table guard. Chinese still comes through the existing translator;
