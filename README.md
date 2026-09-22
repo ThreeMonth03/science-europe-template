@@ -6,6 +6,12 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+A separate [Q1 reuse-summary prototype](experiments/reuse-summary/README.md) groups
+four related reuse facts into one paragraph while preserving authored restrictions.
+Both actual language packages pass 1,844 branch checks and 28 offline native A/B
+pairs cover complete, missing and long answers. Production stays at 0.3.46; this
+prototype is not deployed and does not solve empty submission headings.
+
 The 0.3.46 [selected full-KM followups](docs/full-km-followups.md) integrates three
 previously verified answer mappings and the scoped identifier line-layout fix.
 Chinese still follows the pinned translation pipeline. Exact historical gates
