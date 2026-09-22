@@ -1,0 +1,106 @@
+{# Four related, explicitly selected facts form one paragraph per dataset.
+   Never concatenate authored Markdown or facts belonging to another dataset.
+   When a compiled KM is available, reject filtered or detached descendants. #}
+{%- set reachable = namespace(value=true) -%}
+{%- if km is defined -%}
+  {%- set e = km.entities -%}
+  {%- if uuids.reusingCUuid not in km.chapterUuids
+      or uuids.reusingCUuid not in e.chapters
+      or uuids.preexistingQUuid not in e.questions
+      or uuids.preexistingYesAUuid not in e.answers
+      or uuids.nrefDataQUuid not in e.questions
+      or uuids.nrefDataUseQUuid not in e.questions
+      or uuids.nrefDataUseYesAUuid not in e.answers -%}
+    {%- set reachable.value = false -%}
+  {%- elif uuids.preexistingQUuid not in e.chapters[uuids.reusingCUuid].questionUuids
+      or e.questions[uuids.preexistingQUuid].questionType != 'OptionsQuestion'
+      or uuids.preexistingYesAUuid not in e.questions[uuids.preexistingQUuid].answerUuids
+      or uuids.nrefDataQUuid not in e.answers[uuids.preexistingYesAUuid].followUpUuids
+      or e.questions[uuids.nrefDataQUuid].questionType != 'ListQuestion'
+      or uuids.nrefDataUseQUuid not in e.questions[uuids.nrefDataQUuid].itemTemplateQuestionUuids
+      or e.questions[uuids.nrefDataUseQUuid].questionType != 'OptionsQuestion'
+      or uuids.nrefDataUseYesAUuid not in e.questions[uuids.nrefDataUseQUuid].answerUuids -%}
+    {%- set reachable.value = false -%}
+  {%- endif -%}
+{%- endif -%}
+{%- macro selected(question) -%}
+  {%- set value = repliesMap[[nrefDataUsedPrefix, question]|reply_path]|reply_str_value -%}
+  {%- if reachable.value and value -%}
+    {%- if km is not defined -%}{{ value }}
+    {%- elif question in e.questions and value in e.answers
+        and question in e.answers[uuids.nrefDataUseYesAUuid].followUpUuids
+        and e.questions[question].questionType == 'OptionsQuestion'
+        and value in e.questions[question].answerUuids -%}{{ value }}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+{%- set scopeChoice = selected(uuids.nrefDataCompleteQUuid) -%}
+{%- set formatChoice = selected(uuids.nrefDataFormatQUuid) -%}
+{%- set stabilityChoice = selected(uuids.nrefDataFixedQUuid) -%}
+{%- set conditionsChoice = selected(uuids.nrefDataConditionsQUuid) -%}
+{%- set scopeSentence -%}
+  {%- if scopeChoice == uuids.nrefDataCompleteUseAUuid -%}
+    The project will reuse the complete dataset.
+  {%- elif scopeChoice == uuids.nrefDataCompleteDocumentAUuid -%}
+    The project will reuse a subset of the data and document the filtering or selection process.
+  {%- elif scopeChoice == uuids.nrefDataCompleteSubsetAUuid -%}
+    The project will reuse a selected subset of the data and make it available with the research results.
+  {%- endif -%}
+{%- endset -%}
+{%- set formatSentence -%}
+  {%- if formatChoice == uuids.nrefDataFormatConvertAUuid -%}
+    The data format needs to be converted before reuse.
+  {%- elif formatChoice == uuids.nrefDataFormatUseAUuid -%}
+    The data can be reused without format conversion.
+  {%- endif -%}
+{%- endset -%}
+{%- set stabilitySentence -%}
+  {%- if stabilityChoice == uuids.nrefDataFixedFixedAUuid -%}
+    The dataset is fixed, so changes to the source data will not affect the reproducibility of the research results.
+  {%- elif stabilityChoice == uuids.nrefDataFixedChangeAUuid -%}
+    The dataset may change, which could affect the reproducibility of the research results.
+  {%- endif -%}
+{%- endset -%}
+{%- set conditionsSentence -%}
+  {%- if conditionsChoice == uuids.nrefDataConditionsCC0AUuid -%}
+    The dataset is freely available for any use.
+  {%- elif conditionsChoice == uuids.nrefDataConditionsCCBYAUuid -%}
+    The dataset is freely available provided that the source is cited.
+  {%- elif conditionsChoice == uuids.nrefDataConditionsOtherAUuid -%}
+    Use of this dataset is subject to restrictions, which the project will observe.
+  {%- endif -%}
+{%- endset -%}
+{# Translation expansion may add surrounding indentation to captured literals.
+   Trim these four owned sentences only, never the authored answer below. #}
+{%- set scopeSentence = scopeSentence|trim -%}
+{%- set formatSentence = formatSentence|trim -%}
+{%- set stabilitySentence = stabilitySentence|trim -%}
+{%- set conditionsSentence = conditionsSentence|trim -%}
+{%- if scopeSentence or formatSentence or stabilitySentence or conditionsSentence -%}
+  <p class="reuse-summary">
+    {%- for fact, sentence in [('reuse-scope', scopeSentence), ('reuse-format', formatSentence),
+        ('reuse-stability', stabilitySentence), ('reuse-conditions', conditionsSentence)] if sentence -%}
+      <span data-fact-id="{{ fact }}" data-status="complete">{{ sentence }}</span>
+      {%- if not loop.last and not sentence.endswith('。') -%}{{ ' ' }}{%- endif -%}
+    {%- endfor -%}
+  </p>
+{%- endif -%}
+{%- if conditionsChoice == uuids.nrefDataConditionsOtherAUuid -%}
+  {%- set detailActive = km is not defined or (
+      uuids.nrefDataConditionsOtherQUuid in e.questions
+      and e.questions[uuids.nrefDataConditionsOtherQUuid].questionType == 'ValueQuestion'
+      and uuids.nrefDataConditionsOtherQUuid in e.answers[uuids.nrefDataConditionsOtherAUuid].followUpUuids) -%}
+  {%- if detailActive -%}
+    {%- set detailPath = [nrefDataUsedPrefix, uuids.nrefDataConditionsQUuid,
+        uuids.nrefDataConditionsOtherAUuid, uuids.nrefDataConditionsOtherQUuid]|reply_path -%}
+    {%- set authored = repliesMap[detailPath]|reply_str_value -%}
+    {%- if authored|trim -%}
+      <div class="answer-detail" data-fact-id="reuse-conditions-detail" data-status="complete">
+        <p><strong>Conditions of use</strong></p>
+        {{- authored|markdown -}}
+      </div>
+    {%- elif output_profile|default('review') != 'submission' -%}
+      <p class="data-gap" data-fact-id="reuse-conditions-detail" data-status="missing">Information not provided: the specific conditions of use.</p>
+    {%- endif -%}
+  {%- endif -%}
+{%- endif -%}
