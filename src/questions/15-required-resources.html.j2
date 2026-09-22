@@ -77,7 +77,7 @@
     {%- set projectPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
     {%- set projectItems = repliesMap[projectPath]|reply_items -%}
     {%- if projectItems|length > 0 -%}
-    <h4>Data-management budget</h4>
+    {%- set visibleBudget = namespace(any=false) -%}{%- for budgetProject in projectItems -%}{%- if repliesMap[[projectPath, budgetProject, uuids.costQUuid]|reply_path]|reply_items -%}{%- set visibleBudget.any = true -%}{%- endif -%}{%- endfor -%}{% if output_profile|default('review') != 'submission' or visibleBudget.any %}<h4>Data-management budget</h4>{% endif %}
         {%- for i in projectItems -%}
             {%- set projectItem = [projectPath, i]|reply_path -%}
             {%- set projectItemNameQUuid = [projectItem, uuids.projectNameQUuid]|reply_path -%}
@@ -85,8 +85,8 @@
 
             {%- set projectItemNumberQUuid = [projectItem, uuids.projectNumberQUuid]|reply_path -%}
             {%- set projectItemNumberReply = repliesMap[projectItemNumberQUuid]|reply_str_value -%}
-            <div class="project-resources" data-item-id="{{ projectItem }}">
-                {% if projectItems|length > 1 %}<p><strong>{{ projectItemNameReply if projectItemNameReply else "(no name given)" }}{{ " - " + projectItemNumberReply if projectItemNumberReply}} </strong></p>{% endif %}
+            {% if output_profile|default('review') != 'submission' or repliesMap[[projectItem, uuids.costQUuid]|reply_path]|reply_items %}<div class="project-resources" data-item-id="{{ projectItem }}">
+                {% if projectItems|length > 1 %}{% if output_profile|default('review') == 'submission' and not projectItemNameReply %}<p><strong>Project {{ projectItems.index(i) + 1 }}{{ " - " + projectItemNumberReply if projectItemNumberReply}} </strong></p>{% else %}<p><strong>{{ projectItemNameReply if projectItemNameReply else "(no name given)" }}{{ " - " + projectItemNumberReply if projectItemNumberReply}} </strong></p>{% endif %}{% endif %}
 
                 {%- set projectCostPath = [projectItem, uuids.costQUuid]|reply_path -%}
                 {%- set projectCostItems = repliesMap[projectCostPath]|reply_items -%}
@@ -105,7 +105,7 @@
                         {%- set budgetRow = namespace(id=projectCostItem, title='', purpose='', budget='', funding='', original='') -%}
                         {%- set budgetRow.original -%}
                         <tr data-item-id="{{ projectCostItem }}"><td>
-                        {% set budgetRow.title %}<p><strong>{{ projectCostItemTitleReply if projectCostItemTitleReply else "(no resource name given)" }}</strong></p>{% endset %}{{ budgetRow.title }}
+                        {% set budgetRow.title %}<p><strong>{% if output_profile|default('review') == 'submission' and not projectCostItemTitleReply %}{{ macros.resourceLabel(projectCostItems.index(j) + 1) }}{% else %}{{ projectCostItemTitleReply if projectCostItemTitleReply else "(no resource name given)" }}{% endif %}</strong></p>{% endset %}{{ budgetRow.title }}
                         {%- set budgetRow.purpose -%}
                         
                         {%- set projectCostItemDescriptionQUuid = [projectCostItem, uuids.costDescriptionQUuid]|reply_path -%}
@@ -220,7 +220,7 @@
                     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project.</p>{% endif %}
                 {%- endif -%}
 
-            </div>
+            </div>{% endif %}
 
         {%- endfor -%}
     {%- else -%}

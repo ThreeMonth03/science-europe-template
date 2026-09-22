@@ -29,7 +29,7 @@
                                 {%- set swNameReply = repliesMap[swNameUuid]|reply_str_value -%}
                                 {%- set swPIDUuid = [isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path -%}
                                 {%- set swPIDReply = repliesMap[swPIDUuid]|reply_str_value -%}
-                                <li><strong>{{ swNameReply if swNameReply else "(no name given)" }}</strong>
+                                <li><strong>{% if output_profile|default('review') == 'submission' and not swNameReply %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}{{ swNameReply if swNameReply else "(no name given)" }}{% endif %}</strong>
                                 {%- if swPIDReply -%}
                                 <div>Available at: {{swPIDReply|e}}</div>
                                 {%- else -%}

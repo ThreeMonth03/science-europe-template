@@ -10,7 +10,7 @@
     {%- if projectName and projectsItems|length > 1 -%}
       <h3>{{ projectName }}</h3>
     {%- elif not projectName -%}
-      <h3 class="empty-value">(project name not given)</h3>
+      {% if output_profile|default('review') == 'submission' %}<h3>{{ macros.projectLabel(projectsItems.index(projectsItem) + 1) }}</h3>{% else %}<h3 class="empty-value">(project name not given)</h3>{% endif %}
     {%- endif -%}
 
     {%- set projectNumberPath = [projectsPath, projectsItem, uuids.projectNumberQUuid]|reply_path -%}

@@ -25,7 +25,7 @@
 
           {%- do projAuth.append({'status': projAuthStatusAUuid, 'case': projAuthCase}) -%}
         {%- endfor -%}
-        {%- do projects.append({'name': projectName, 'approval': projEthicalApprovalAUuid, 'authorities': projAuth}) -%}
+        {%- do projects.append({'name': projectName, 'approval': projEthicalApprovalAUuid, 'authorities': projAuth, 'index': projectsItems.index(projectItem) + 1}) -%}
       {%- endif -%}
     {%- endfor -%}
     {%- if projects|length > 0 -%}
@@ -34,7 +34,7 @@
       <ul>
       {%- for project in projects -%}
         <li class="ethical-project">
-          <strong>{{ project.name|e if project.name else "(no name given)" }}</strong>
+          <strong>{% if output_profile|default('review') == 'submission' and not project.name %}{{ macros.projectLabel(project.index) }}{% else %}{{ project.name|e if project.name else "(no name given)" }}{% endif %}</strong>
           {% if project.approval == uuids.projEthicalApprovalNoAUuid %}
             <p>According to the questionnaire, this project does not require ethical approval.</p>
           {% else %}
@@ -84,7 +84,7 @@
         {%- set containPersonal = repliesMap[[pathPrefix, uuids.containPersonalQUuid]|reply_path]|reply_str_value -%}
         {%- set containSensitive = repliesMap[[pathPrefix, uuids.containSensitiveQUuid]|reply_path]|reply_str_value -%}
         <li>
-          <strong>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName if producedDataName else "(no name given)" }}{% endif %}</strong>
+          <strong{% if output_profile|default('review') == 'submission' and loop.last and not containPersonal and not containSensitive %} style="break-after: auto"{% endif %}>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName if producedDataName else "(no name given)" }}{% endif %}</strong>
           {%- if containPersonal or containSensitive -%}
             <ul class="ethical-data-flags">
             {%- if containPersonal == uuids.containPersonalNoAUuid -%}
@@ -99,7 +99,7 @@
             {%- endif -%}
             </ul>
           {%- else -%}
-          <span> - <em>no information on personal nor sensitive data.</em></span>
+          {% if output_profile|default('review') == 'submission' %}{% else %}<span> - <em>no information on personal nor sensitive data.</em></span>{% endif %}
           {%- endif -%}
         </li>
       {%- endfor -%}
@@ -117,7 +117,7 @@
       {%- if collectPersonalAUuid == uuids.collectPersonalNoAUuid %}
         <p>We will not collect any data related to individuals, i.e. "personal data".</p>
       {%- elif collectPersonalAUuid == uuids.collectPersonalYesAUuid %}
-        {%- set sentences = ['We will collect data related to individuals, i.e. "personal data".'] -%}
+        {%- set sentences = ['We will collect data related to individuals, i.e. "personal data".'] -%}{%- set ethicsLead = namespace(first=none) -%}
         {%- set cpersGdprPath = [collectPersonalPath, collectPersonalAUuid, uuids.cpersGdprQUuid]|reply_path -%}
         {%- set cpersGdprAUuid = repliesMap[cpersGdprPath]|reply_str_value -%}
         {%- if cpersGdprAUuid == uuids.cpersGdprExploreAUuid -%}
@@ -147,7 +147,7 @@
             {%- set cpersExplainInformed = repliesMap[cpersExplainInformedPath]|reply_str_value -%}
             {%- if cpersExplainInformed -%}
               {%- do sentences.append('The data subjects will be informed as follows:') -%}
-              {%- do sentences.append(cpersExplainInformed|markdown) -%}
+              {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersExplainInformed|markdown) -%}
             {%- endif -%}
 
             {%- set cpersReusersPath = [legalBasePath, legalBaseAUuid, uuids.cpersReusersQUuid]|reply_path -%}
@@ -162,7 +162,7 @@
             {%- set cpersDescribeProcedure = repliesMap[cpersDescribeProcedurePath]|reply_str_value -%}
             {%- if cpersDescribeProcedure -%}
               {%- do sentences.append('The procedure for obtaining consent from data subjects is set as follows:') -%}
-              {%- do sentences.append(cpersDescribeProcedure|markdown) -%}
+              {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersDescribeProcedure|markdown) -%}
             {%- endif -%}
 
           {%- elif legalBaseAUuid == uuids.cpersGdprLegalBasisOtherAUuid -%}
@@ -171,7 +171,7 @@
             {%- if cpersGdprLegalBasisOtherWhichAUuid -%}
               {%- do sentences.append('We use a different legal base for collection of personal data rather than public interest or consent-based: ') -%}
             {%- else -%}
-              {%- do sentences.append('An alternative legal basis was selected, but it has not been specified; see Question 7.') -%}
+              {%- if output_profile|default('review') == 'submission' -%}{%- do sentences.append('An alternative legal basis was selected.') -%}{%- else -%}{%- do sentences.append('An alternative legal basis was selected, but it has not been specified; see Question 7.') -%}{%- endif -%}
             {%- endif -%}
             {%- if cpersGdprLegalBasisOtherWhichAUuid == uuids.cpersGdprLegalBasisOtherWhichContractAUuid -%}
               {%- do sentences.append('to fulfil a contract.') -%}
@@ -190,7 +190,7 @@
           {%- set cpersGdprPurpose = repliesMap[cpersGdprPurposePath]|reply_str_value -%}
           {%- if cpersGdprPurpose -%}
             {%- do sentences.append('The purpose of processing the personal data can be described as follows:') -%}
-            {%- do sentences.append(cpersGdprPurpose|markdown) -%}
+            {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersGdprPurpose|markdown) -%}
           {%- endif -%}
 
           {# DPIA #}
@@ -201,7 +201,7 @@
           {%- endif -%}
         {%- endif -%}
 
-        <div class="answer-detail">{{ sentences|join(' ') }}</div>
+        {% if output_profile|default('review') == 'submission' and ethicsLead.first is not none %}{% set ethicsLeadSentences = sentences[:ethicsLead.first] %}{% set ethicsBodySentences = sentences[ethicsLead.first:] %}<div class="answer-detail"><p class="answer-lead" style="margin-bottom: 0">{{ ethicsLeadSentences|join(' ') }}</p>{{ ethicsBodySentences|join(' ') }}</div>{% else %}<div class="answer-detail">{{ sentences|join(' ') }}</div>{% endif %}
       {%- endif -%}
 
       {% if ethLegAUuid == uuids.ethLegNoAUuid %}

@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The 0.3.45 [submission reading integration](docs/submission-reading.md) adds stable
+project/resource/software labels, bounded Q9/Q15 submission cleanup, and a shared
+Word short-table guard. Chinese still comes through the existing translator;
+review remains the default. Native paired-package validation is a separate gate.
+
 The 0.3.44 [shared-source submission preview](docs/submission-preview.md) integrates
 owned-notice suppression, overview/prose rules and stable numbered dataset labels.
 Review stays the default; Chinese is generated from this source. The complete

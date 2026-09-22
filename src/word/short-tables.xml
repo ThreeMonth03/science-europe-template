@@ -1,0 +1,44 @@
+{# Consume only Lua-generated bounded-table markers in Pandoc 3.8.3 XML.
+   A changed serialization fails the render; never globally rewrite all rows.
+   User text is already XML-escaped by Pandoc. Never unescape or reinterpret it. #}
+{%- macro require(ok) -%}
+  {%- if not ok -%}{{ short_table_xml_contract_mismatch.raise_error() }}{%- endif -%}
+{%- endmacro -%}
+{%- set begin = '<!--DSW:SE:short-table:v1:begin-->\n    ' -%}
+{%- set end = '\n    <!--DSW:SE:short-table:v1:end-->' -%}
+{{- require(content is string) -}}
+{%- set pieces = content.split(begin) -%}
+{{- require(content.count('<!--DSW:SE:short-table:v1:begin-->') == pieces|length - 1) -}}
+{{- require(content.count('<!--DSW:SE:short-table:v1:end-->') == pieces|length - 1) -}}
+{{- require(end not in pieces[0]) -}}
+{{- pieces[0]|safe -}}
+{%- for piece in pieces[1:] -%}
+  {%- set parts = piece.split(end) -%}
+  {{- require(parts|length == 2) -}}
+  {%- set table = parts[0] -%}
+  {{- require(table.startswith('<w:tbl>') and table.endswith('</w:tbl>')) -}}
+  {{- require(table.count('<w:tbl>') == 1 and table.count('</w:tbl>') == 1) -}}
+  {{- require('<w:cantSplit' not in table and '<w:gridSpan' not in table and '<w:vMerge' not in table) -}}
+  {%- set rows = table.split('<w:tr>') -%}
+  {{- require(3 <= rows|length <= 5 and table.count('</w:tr>') == rows|length - 1) -}}
+  {{- rows[0]|safe -}}
+  {%- for row in rows[1:] -%}
+    {%- set cells = row.count('<w:tc>') -%}
+    {{- require(2 <= cells <= 4 and row.count('</w:tc>') == cells and row.count('<w:p>') == cells) -}}
+    {# Reject self-closing/attributed/additional paragraph variants as well. #}
+    {%- for paragraphToken in row.split('<w:p')[1:] -%}
+      {{- require(paragraphToken.startswith('>') or paragraphToken.startswith('Pr>') or paragraphToken.startswith('Style ')) -}}
+    {%- endfor -%}
+    {%- set style = 'Compact' if loop.last else 'PilotTableLead' -%}
+    {{- require(row.count('<w:pStyle w:val="' + style + '" />') == cells) -}}
+    <w:tr>
+    {%- if row.startswith('<w:trPr>') -%}
+      {{- require(row.count('<w:trPr>') == 1 and row.count('</w:trPr>') == 1) -}}
+      {{- row.replace('</w:trPr>', '<w:cantSplit/></w:trPr>', 1)|safe -}}
+    {%- else -%}
+      {{- require(row.startswith('<w:tc>') and '<w:trPr' not in row) -}}
+      <w:trPr><w:cantSplit/></w:trPr>{{- row|safe -}}
+    {%- endif -%}
+  {%- endfor -%}
+  {{- parts[1]|safe -}}
+{%- endfor -%}

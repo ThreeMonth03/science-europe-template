@@ -48,6 +48,9 @@ def project_source(sources=None, metadata=None):
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None:
         metadata = json.loads((ROOT / 'template.json').read_text())
+    if metadata['version'] == '0.3.45':
+        from submission_reading_contract import project_source as project_reading
+        sources, metadata = project_reading(sources, metadata)
     previous = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only',
         CONTRACT['baseline_commit'], 'src'], text=True).splitlines()
     assert set(sources) == set(previous), 'Source inventory changed outside approved delta'

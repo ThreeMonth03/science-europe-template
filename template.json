@@ -1,23 +1,23 @@
 {
   "organizationId": "threemonth03",
   "templateId": "science-europe-enhanced",
-  "version": "0.3.44",
+  "version": "0.3.45",
   "name": "Science Europe DMP — Output Profiles Pilot",
   "description": "Experimental derivative of dsw:science-europe:1.30.1 with completeness handling and shared PDF/Word reading structure",
   "license": "Apache-2.0",
   "metamodelVersion": "18.0",
   "allowedPackages": [
     {
-        "orgId": "dsw",
-        "kmId": "root",
-        "minVersion": "2.7.0",
-        "maxVersion": null
+      "orgId": "dsw",
+      "kmId": "root",
+      "minVersion": "2.7.0",
+      "maxVersion": null
     },
     {
-        "orgId": "dsw",
-        "kmId": "lifesciences",
-        "minVersion": "2.7.0",
-        "maxVersion": null
+      "orgId": "dsw",
+      "kmId": "lifesciences",
+      "minVersion": "2.7.0",
+      "maxVersion": null
     }
   ],
   "formats": [
@@ -82,30 +82,43 @@
       "name": "Word — Internal review",
       "icon": "far fa-file-word",
       "steps": [
-                {
-                    "name": "jinja",
-                    "options": {
-                        "template": "src/word/index.html.j2",
-                        "content-type": "text/html",
-                        "extension": "html"
-                    }
-                },
-                {
-                    "name": "pandoc",
-                    "options": {
-                        "from": "html",
-                        "to": "docx",
-                        "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx"
-                    }
-                }
-            ]
+        {
+          "name": "jinja",
+          "options": {
+            "content-type": "text/html",
+            "extension": "html",
+            "template": "src/word/index.html.j2"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx --lua-filter=src/word/short-tables.lua",
+            "from": "html",
+            "to": "docx"
+          }
+        },
+        {
+          "name": "enrich-docx",
+          "options": {
+            "rewrite:word/document.xml": "render:src/word/short-tables.xml"
+          }
+        }
+      ]
     },
     {
       "uuid": "499d9300-0183-5157-b6f4-38e6c2b91600",
       "name": "HTML — Submission preview (pilot)",
       "icon": "far fa-file-code",
       "steps": [
-        {"name": "jinja", "options": {"template": "src/submission/index.html.j2", "content-type": "text/html", "extension": "html"}}
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/submission/index.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        }
       ]
     },
     {
@@ -113,8 +126,18 @@
       "name": "PDF — Submission preview (pilot)",
       "icon": "far fa-file-pdf",
       "steps": [
-        {"name": "jinja", "options": {"template": "src/submission/pdf.html.j2", "content-type": "text/html", "extension": "html"}},
-        {"name": "weasyprint", "options": {}}
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/submission/pdf.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "weasyprint",
+          "options": {}
+        }
       ]
     },
     {
@@ -122,8 +145,28 @@
       "name": "Word — Submission preview (pilot)",
       "icon": "far fa-file-word",
       "steps": [
-        {"name": "jinja", "options": {"template": "src/submission/word.html.j2", "content-type": "text/html", "extension": "html"}},
-        {"name": "pandoc", "options": {"from": "html", "to": "docx", "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx"}}
+        {
+          "name": "jinja",
+          "options": {
+            "content-type": "text/html",
+            "extension": "html",
+            "template": "src/submission/word.html.j2"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx --lua-filter=src/word/short-tables.lua",
+            "from": "html",
+            "to": "docx"
+          }
+        },
+        {
+          "name": "enrich-docx",
+          "options": {
+            "rewrite:word/document.xml": "render:src/word/short-tables.xml"
+          }
+        }
       ]
     },
     {

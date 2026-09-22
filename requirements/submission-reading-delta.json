@@ -1,0 +1,336 @@
+{
+  "schema_version": 1,
+  "baseline_commit": "41bb0ac59e86f5591b641a001a04240375426545",
+  "baseline_version": "0.3.44",
+  "version": "0.3.45",
+  "prototype_repository": "ThreeMonth03/science-europe-template-zhtw",
+  "prototype_commit": "71ae7c33323b8b794c3add6f0537dfe86f4dcb7e",
+  "prototype_archive": "reviews/2026-09-21-word-asset",
+  "prototype_seal_sha256": "6b02a8089961f516ad4bada87dea2a382831a6b9a91a357d706844051211ed0d",
+  "before": {
+    "src/uuids.j2": "000a99264030c34edfd58efd2297ef84d13b8f5923be95b7c0c6415949ea3ae8",
+    "src/preservation-dataset.html.j2": "b4813bda1b5e43a4b3b0b509547e748ef8be05ea0d659fbff7772d8a369a271a",
+    "src/budget-reading.html.j2": "0f20b29a988e17519b16201882e5d0a06acb002b197a4873f48061c39d0f2e9d",
+    "src/document-provenance.html.j2": "916ab72e56730ce285506fbba61cee056ab5f44ba62041dc2afb903496193232",
+    "src/versions.html.j2": "ded0a143a9db03aa6f49e980758200d9cb7988b61ef8448548a14038dc3af171",
+    "src/index.html.j2": "393eea4438f24a0c551e64f255b5b1e49a857ae29bf1f87a2827098698396438",
+    "src/preservation-publication-reason.html.j2": "7f1925ced843f30703821a72fc2140b718f3fe332f7d6e863742b0068f0b1e65",
+    "src/style.css": "d37b42425ae6ca56054c54fe5f40ef9ca91febd0a5647959e81bef7073e8f627",
+    "src/contributors.html.j2": "75aff4806ae1ba892cc8f244b88e767e1ba627cef5fa552a0865cf3a2d0889d1",
+    "src/quality-control.html.j2": "6f2ee101302ff0c344203eea93631998cc329cd1faa2ac5484fb7d4917d42edb",
+    "src/macros.html.j2": "b378b8f7236423676e872c2beb948d3a99661d6c7e27096a1e9b2eb07e6efbcc",
+    "src/preservation-paper.html.j2": "ed812152bce7386c084909dfabd529ddb3ed1ccf350c7ace81d2be568df1327f",
+    "src/post-project-archive.html.j2": "0520d1de8b777d31a3ca23c23dd8ac86082e698e1eac7e8524f81f788da2541c",
+    "src/frontmatter.html.j2": "6ca4bd37d0cb79922671b72df8ea5639e224bc92d726fc6da79aa727e374b90b",
+    "src/projects.html.j2": "979e18450f4059778fccafc83357bd100de01e52f43ff9d7d286181e0fbfff76",
+    "src/globals.j2": "cad53b617cc77d7bdaa61187d47bb8526f8e1edd8eed42f6e9db46f3a1f2afc0",
+    "src/resource-prose.html.j2": "387f25c9e99016bab823715a4c5f920bb9b66e60031762a9a7c91c9a60ba116f",
+    "src/storage-reading.html.j2": "b20316505cc72a14c47746f264668385742f694280be528aba7edc63922109fd",
+    "src/header.html.j2": "57060cceee1193d4c1e0445a945ebb8e4289f8d27af81ab8cbf809734d0281b0",
+    "src/layout.css": "b950167ab3e33a45dfdf9197ca97f5806f18b34f3f16b6e30cd5f405a08cdbb2",
+    "src/content.html.j2": "a7208a6634f73b3f2a52c46675af36c32efdece2d0d315729fa8d541ac5c2d03",
+    "src/submission/index.html.j2": "14901df88f79d49d43bbd2eba6ff622b8358bc35cb2e9c5661463e538715a783",
+    "src/submission/word.html.j2": "89ae166e5a8e3a424a8c528c11608afc87b2a9c6b9c85b513287094b8957acba",
+    "src/submission/pdf.html.j2": "82cd8a175ebdf435cd09e082277e5b3a9eef95c05035ef52d0c190646ca15682",
+    "src/word/versions.html.j2": "dac94bd2a2b4bd1533f168eb9aebd1f2c257c2e22cb53b1e398ed543001a8dbc",
+    "src/word/index.html.j2": "34b38df76c10de8906f06dbb150c1d992cddcb4d29f7c5766be9bd10be3f00f7",
+    "src/word/reference.docx": "afdab49fd1fec07f035a1dfeeca5ab866c5c7d859e9ad9123370798a0b450bee",
+    "src/word/frontpage.html.j2": "c8fe6c9f4f9fb07f8c29f3702cada16c86bd2c55ceecb8ca674208c20c775710",
+    "src/word/preservation-reading.lua": "33e698d52863d300fb51fed2aa634eb8b238f2b46319d83d1a0725a053710e71",
+    "src/word/pilot.lua": "eb79e7cbb7a96972cc49e0e76bae462eeea66e0be911f049a259f48e8a7b0547",
+    "src/pdf/short-resources.html.j2": "38bc71799085308377b459d7bb68e9224027b9764509270742d3453b0018f6ad",
+    "src/pdf/index.html.j2": "6c4950c608e4401fa03eeab14b8d8208f8ce7e098e49ee8f6f2ab3460900e194",
+    "src/pdf/short-resource-rows.html.j2": "b15435defc8411135484872e3c36f579f94f821ef0df7201ee8d18c9ea06b542",
+    "src/questions/13-persistent-identifier.html.j2": "139a13589ca9a91e0c4325c8628e77d5b453a7d34fe5e68f4b4a138b68977246",
+    "src/questions/08-copyright-ipr.html.j2": "78febfe7110f7e74590c958fe6ca64b02ac83570b02f7af4ed67fab0008ad411",
+    "src/questions/14-dm-responsible.html.j2": "86635a662c5f138751a495e22153473d24cdf39ca5c5e7d48e134769d6f21d30",
+    "src/questions/09-ethical-issues.html.j2": "c9fffa14cee974a46d253f89ee98dd83a6977f2b74feb8fbf95caa3efb645e0f",
+    "src/questions/10-share-restrictions.html.j2": "2268e6989c752e6e99eea4de58de1c16bcbb9ddff3384f339d9140f3f0e2fd89",
+    "src/questions/03-docs-metadata.html.j2": "72b5a9560c1801e2c1b6dc9f96c195ebb66b978be10db4c9355b8945ec4b2ad1",
+    "src/questions/11-data-preservation.html.j2": "016e851fba197977c03cec600960e2428c09570982338afb06c192aa8d36c23a",
+    "src/questions/05-store-backup.html.j2": "3899bc0a7d8cfd68009ce857ba12da3bbc8f01cf93a0c9f096ae63102ec08206",
+    "src/questions/12-access-data.html.j2": "7c79a10d973ca26ccd7a994dac9fa5202ab03a1f9456163ba4f7a89661cacbae",
+    "src/questions/04-quality-control.html.j2": "58eb850370637b2ea912f34752fe0d0ad11a4abd788f72f61e0134610cfd130c",
+    "src/questions/15-required-resources.html.j2": "e171ca660e32b74f30585c6c28451789ee6e02df14609ef90a02b293957fd30d",
+    "src/questions/02-what-data.html.j2": "3903408adf95889eb72ee65fef6a189bcf8ef1ce9906d83de2eceaf5827c75c4",
+    "src/questions/06-access-security.html.j2": "dc9d071be143ae802bbea9e5f89cf33cabe1812645fc964e27ae43162a586714",
+    "src/questions/07-personal-data.html.j2": "23a526c6f45ef7107a692d4226817483a2a00542ebe17c99e353330c5b563e80",
+    "src/questions/01-how-data.html.j2": "afda4534a487107c82e8f2b87db89ac833ec7ba4f693fa607c008b798808f673"
+  },
+  "after": {
+    "src/uuids.j2": "000a99264030c34edfd58efd2297ef84d13b8f5923be95b7c0c6415949ea3ae8",
+    "src/preservation-dataset.html.j2": "b4813bda1b5e43a4b3b0b509547e748ef8be05ea0d659fbff7772d8a369a271a",
+    "src/budget-reading.html.j2": "0f20b29a988e17519b16201882e5d0a06acb002b197a4873f48061c39d0f2e9d",
+    "src/document-provenance.html.j2": "916ab72e56730ce285506fbba61cee056ab5f44ba62041dc2afb903496193232",
+    "src/versions.html.j2": "ded0a143a9db03aa6f49e980758200d9cb7988b61ef8448548a14038dc3af171",
+    "src/index.html.j2": "393eea4438f24a0c551e64f255b5b1e49a857ae29bf1f87a2827098698396438",
+    "src/preservation-publication-reason.html.j2": "7f1925ced843f30703821a72fc2140b718f3fe332f7d6e863742b0068f0b1e65",
+    "src/style.css": "d37b42425ae6ca56054c54fe5f40ef9ca91febd0a5647959e81bef7073e8f627",
+    "src/contributors.html.j2": "75aff4806ae1ba892cc8f244b88e767e1ba627cef5fa552a0865cf3a2d0889d1",
+    "src/quality-control.html.j2": "6f2ee101302ff0c344203eea93631998cc329cd1faa2ac5484fb7d4917d42edb",
+    "src/macros.html.j2": "b07eb162628bbbc835ad3fed45af038a327a55ba0f5a81c40f1bfbc88a72e43e",
+    "src/preservation-paper.html.j2": "ed812152bce7386c084909dfabd529ddb3ed1ccf350c7ace81d2be568df1327f",
+    "src/post-project-archive.html.j2": "0520d1de8b777d31a3ca23c23dd8ac86082e698e1eac7e8524f81f788da2541c",
+    "src/frontmatter.html.j2": "6ca4bd37d0cb79922671b72df8ea5639e224bc92d726fc6da79aa727e374b90b",
+    "src/projects.html.j2": "98dee0349b94b32e38c05bee75fe72181672ee7743e72a7b061c0692215ea285",
+    "src/globals.j2": "cad53b617cc77d7bdaa61187d47bb8526f8e1edd8eed42f6e9db46f3a1f2afc0",
+    "src/resource-prose.html.j2": "387f25c9e99016bab823715a4c5f920bb9b66e60031762a9a7c91c9a60ba116f",
+    "src/storage-reading.html.j2": "b20316505cc72a14c47746f264668385742f694280be528aba7edc63922109fd",
+    "src/header.html.j2": "57060cceee1193d4c1e0445a945ebb8e4289f8d27af81ab8cbf809734d0281b0",
+    "src/layout.css": "b950167ab3e33a45dfdf9197ca97f5806f18b34f3f16b6e30cd5f405a08cdbb2",
+    "src/content.html.j2": "a7208a6634f73b3f2a52c46675af36c32efdece2d0d315729fa8d541ac5c2d03",
+    "src/submission/index.html.j2": "14901df88f79d49d43bbd2eba6ff622b8358bc35cb2e9c5661463e538715a783",
+    "src/submission/word.html.j2": "89ae166e5a8e3a424a8c528c11608afc87b2a9c6b9c85b513287094b8957acba",
+    "src/submission/pdf.html.j2": "82cd8a175ebdf435cd09e082277e5b3a9eef95c05035ef52d0c190646ca15682",
+    "src/word/short-tables.xml": "56e226a93692c59ad65cadc1ede9863d47623f7297969776e79e63adb17ff6de",
+    "src/word/versions.html.j2": "dac94bd2a2b4bd1533f168eb9aebd1f2c257c2e22cb53b1e398ed543001a8dbc",
+    "src/word/index.html.j2": "34b38df76c10de8906f06dbb150c1d992cddcb4d29f7c5766be9bd10be3f00f7",
+    "src/word/reference.docx": "afdab49fd1fec07f035a1dfeeca5ab866c5c7d859e9ad9123370798a0b450bee",
+    "src/word/short-tables.lua": "e32bec49cf702e07e385eaeb32222e01ca59a9fc0a45bd5b1c8c2f541352c002",
+    "src/word/frontpage.html.j2": "c8fe6c9f4f9fb07f8c29f3702cada16c86bd2c55ceecb8ca674208c20c775710",
+    "src/word/preservation-reading.lua": "33e698d52863d300fb51fed2aa634eb8b238f2b46319d83d1a0725a053710e71",
+    "src/word/pilot.lua": "eb79e7cbb7a96972cc49e0e76bae462eeea66e0be911f049a259f48e8a7b0547",
+    "src/pdf/short-resources.html.j2": "38bc71799085308377b459d7bb68e9224027b9764509270742d3453b0018f6ad",
+    "src/pdf/index.html.j2": "6c4950c608e4401fa03eeab14b8d8208f8ce7e098e49ee8f6f2ab3460900e194",
+    "src/pdf/short-resource-rows.html.j2": "b15435defc8411135484872e3c36f579f94f821ef0df7201ee8d18c9ea06b542",
+    "src/questions/13-persistent-identifier.html.j2": "139a13589ca9a91e0c4325c8628e77d5b453a7d34fe5e68f4b4a138b68977246",
+    "src/questions/08-copyright-ipr.html.j2": "78febfe7110f7e74590c958fe6ca64b02ac83570b02f7af4ed67fab0008ad411",
+    "src/questions/14-dm-responsible.html.j2": "86635a662c5f138751a495e22153473d24cdf39ca5c5e7d48e134769d6f21d30",
+    "src/questions/09-ethical-issues.html.j2": "c3a517078e74897f7406369d759a3b444dbd9d010ac518309fca0e5653e988f9",
+    "src/questions/10-share-restrictions.html.j2": "2268e6989c752e6e99eea4de58de1c16bcbb9ddff3384f339d9140f3f0e2fd89",
+    "src/questions/03-docs-metadata.html.j2": "72b5a9560c1801e2c1b6dc9f96c195ebb66b978be10db4c9355b8945ec4b2ad1",
+    "src/questions/11-data-preservation.html.j2": "016e851fba197977c03cec600960e2428c09570982338afb06c192aa8d36c23a",
+    "src/questions/05-store-backup.html.j2": "3899bc0a7d8cfd68009ce857ba12da3bbc8f01cf93a0c9f096ae63102ec08206",
+    "src/questions/12-access-data.html.j2": "811f10011e2d5c40e513db8d04fd103ad47191e7815a39b4626fc0c33c7c29f0",
+    "src/questions/04-quality-control.html.j2": "58eb850370637b2ea912f34752fe0d0ad11a4abd788f72f61e0134610cfd130c",
+    "src/questions/15-required-resources.html.j2": "a337cd4c97c5d2dfa596f75df53f0587cd4528b46ac2c7ae002f96bb8d7600a1",
+    "src/questions/02-what-data.html.j2": "3903408adf95889eb72ee65fef6a189bcf8ef1ce9906d83de2eceaf5827c75c4",
+    "src/questions/06-access-security.html.j2": "dc9d071be143ae802bbea9e5f89cf33cabe1812645fc964e27ae43162a586714",
+    "src/questions/07-personal-data.html.j2": "23a526c6f45ef7107a692d4226817483a2a00542ebe17c99e353330c5b563e80",
+    "src/questions/01-how-data.html.j2": "afda4534a487107c82e8f2b87db89ac833ec7ba4f693fa607c008b798808f673"
+  },
+  "changed": [
+    "src/macros.html.j2",
+    "src/projects.html.j2",
+    "src/questions/09-ethical-issues.html.j2",
+    "src/questions/12-access-data.html.j2",
+    "src/questions/15-required-resources.html.j2"
+  ],
+  "added": [
+    "src/word/short-tables.lua",
+    "src/word/short-tables.xml"
+  ],
+  "after_metadata": {
+    "organizationId": "threemonth03",
+    "templateId": "science-europe-enhanced",
+    "version": "0.3.45",
+    "name": "Science Europe DMP — Output Profiles Pilot",
+    "description": "Experimental derivative of dsw:science-europe:1.30.1 with completeness handling and shared PDF/Word reading structure",
+    "license": "Apache-2.0",
+    "metamodelVersion": "18.0",
+    "allowedPackages": [
+      {
+        "orgId": "dsw",
+        "kmId": "root",
+        "minVersion": "2.7.0",
+        "maxVersion": null
+      },
+      {
+        "orgId": "dsw",
+        "kmId": "lifesciences",
+        "minVersion": "2.7.0",
+        "maxVersion": null
+      }
+    ],
+    "formats": [
+      {
+        "uuid": "a9293d08-59a4-4e6b-ae62-7a6a570b031c",
+        "name": "HTML — Internal review",
+        "icon": "far fa-file-code",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "template": "src/index.html.j2",
+              "content-type": "text/html",
+              "extension": "html"
+            }
+          }
+        ]
+      },
+      {
+        "uuid": "68c26e34-5e77-4e15-9bf7-06ff92582257",
+        "name": "PDF — Internal review",
+        "icon": "far fa-file-pdf",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "template": "src/pdf/index.html.j2",
+              "content-type": "text/html",
+              "extension": "html"
+            }
+          },
+          {
+            "name": "weasyprint",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "uuid": "dbc94579-40d7-42c3-975c-71e30d07778b",
+        "name": "LaTeX Document",
+        "icon": "far fa-file-alt",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "template": "src/index.html.j2",
+              "content-type": "text/html",
+              "extension": "html"
+            }
+          },
+          {
+            "name": "pandoc",
+            "options": {
+              "from": "html",
+              "to": "latex"
+            }
+          }
+        ]
+      },
+      {
+        "uuid": "f4bd941a-dfbe-4226-a1fc-200fb5269311",
+        "name": "Word — Internal review",
+        "icon": "far fa-file-word",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "content-type": "text/html",
+              "extension": "html",
+              "template": "src/word/index.html.j2"
+            }
+          },
+          {
+            "name": "pandoc",
+            "options": {
+              "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx --lua-filter=src/word/short-tables.lua",
+              "from": "html",
+              "to": "docx"
+            }
+          },
+          {
+            "name": "enrich-docx",
+            "options": {
+              "rewrite:word/document.xml": "render:src/word/short-tables.xml"
+            }
+          }
+        ]
+      },
+      {
+        "uuid": "499d9300-0183-5157-b6f4-38e6c2b91600",
+        "name": "HTML — Submission preview (pilot)",
+        "icon": "far fa-file-code",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "template": "src/submission/index.html.j2",
+              "content-type": "text/html",
+              "extension": "html"
+            }
+          }
+        ]
+      },
+      {
+        "uuid": "9fd0a115-4b8b-5013-a084-eaf2890ec940",
+        "name": "PDF — Submission preview (pilot)",
+        "icon": "far fa-file-pdf",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "template": "src/submission/pdf.html.j2",
+              "content-type": "text/html",
+              "extension": "html"
+            }
+          },
+          {
+            "name": "weasyprint",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "uuid": "98081811-41ff-5438-b98a-0472607527c6",
+        "name": "Word — Submission preview (pilot)",
+        "icon": "far fa-file-word",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "content-type": "text/html",
+              "extension": "html",
+              "template": "src/submission/word.html.j2"
+            }
+          },
+          {
+            "name": "pandoc",
+            "options": {
+              "args": "--filter=pandoc-docx-pagebreakpy --lua-filter=src/word/pilot.lua --lua-filter=src/word/preservation-reading.lua --reference-doc=src/word/reference.docx --lua-filter=src/word/short-tables.lua",
+              "from": "html",
+              "to": "docx"
+            }
+          },
+          {
+            "name": "enrich-docx",
+            "options": {
+              "rewrite:word/document.xml": "render:src/word/short-tables.xml"
+            }
+          }
+        ]
+      },
+      {
+        "uuid": "15e53172-bbae-4a0c-a4d9-8f3ddf60e7b6",
+        "name": "OpenDocument Text",
+        "icon": "far fa-file-alt",
+        "steps": [
+          {
+            "name": "jinja",
+            "options": {
+              "template": "src/index.html.j2",
+              "content-type": "text/html",
+              "extension": "html"
+            }
+          },
+          {
+            "name": "pandoc",
+            "options": {
+              "from": "html",
+              "to": "odt"
+            }
+          }
+        ]
+      }
+    ],
+    "_tdk": {
+      "version": "4.1.0",
+      "readmeFile": "README.md",
+      "files": [
+        "src/*",
+        "src/**/*"
+      ]
+    }
+  },
+  "source_adaptations": {
+    "src/questions/09-ethical-issues.html.j2": {
+      "before": "<div class=\"answer-detail\"><p class=\"answer-lead\" style=\"margin-bottom: 0\">{{ sentences[:ethicsLead.first]|join(' ') }}</p>{{ sentences[ethicsLead.first:]|join(' ') }}</div>",
+      "after": "{% set ethicsLeadSentences = sentences[:ethicsLead.first] %}{% set ethicsBodySentences = sentences[ethicsLead.first:] %}<div class=\"answer-detail\"><p class=\"answer-lead\" style=\"margin-bottom: 0\">{{ ethicsLeadSentences|join(' ') }}</p>{{ ethicsBodySentences|join(' ') }}</div>"
+    },
+    "src/questions/15-required-resources.html.j2": {
+      "before": "<p><strong>{% if output_profile|default('review') == 'submission' and not projectItemNameReply %}{{ macros.projectLabel(projectItems.index(i) + 1) }}{% else %}{{ projectItemNameReply if projectItemNameReply else \"(no name given)\" }}{% endif %}{{ \" - \" + projectItemNumberReply if projectItemNumberReply}} </strong></p>",
+      "after": "{% if output_profile|default('review') == 'submission' and not projectItemNameReply %}<p><strong>Project {{ projectItems.index(i) + 1 }}{{ \" - \" + projectItemNumberReply if projectItemNumberReply}} </strong></p>{% else %}<p><strong>{{ projectItemNameReply if projectItemNameReply else \"(no name given)\" }}{{ \" - \" + projectItemNumberReply if projectItemNumberReply}} </strong></p>{% endif %}"
+    }
+  }
+}
