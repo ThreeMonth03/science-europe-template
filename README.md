@@ -6,6 +6,13 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+The [empty-question spacing prototype](experiments/empty-question-spacing/README.md)
+keeps all 15 questions and tightens only empty submission headings. Its 28 native
+bilingual A/B pairs retain content and review layout, add no PDF pages and shorten
+five Word previews by one page each. Worker autoescaping and a PDF empty-box
+regression were caught and fixed. Production remains 0.3.46; paired source
+integration, wider prose review and Microsoft Word acceptance are still separate.
+
 A separate [Q1 reuse-summary prototype](experiments/reuse-summary/README.md) groups
 four related reuse facts into one paragraph while preserving authored restrictions.
 Both actual language packages pass 1,844 branch checks and 28 offline native A/B

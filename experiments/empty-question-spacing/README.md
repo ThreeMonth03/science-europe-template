@@ -31,7 +31,7 @@ For the actual prepared package, run:
 
 ```bash
 python experiments/empty-question-spacing/engine.py \
-  --source-dir ../science-europe-template-zhtw/outputs/empty-question-spacing-04/en \
+  --source-dir ../science-europe-template-zhtw/outputs/empty-question-spacing-08/en \
   --output /tmp/empty-spacing-new-engine.json
 ```
 
@@ -40,6 +40,11 @@ cases, including all 15 question IDs, filled/zero/unknown controls, authored
 lookalikes, the Q5 skeleton, and malformed XML rejection. Existing engine outputs
 must not be overwritten. Native/private A/B results are documented in the Chinese
 repo under `reviews/2026-09-22-empty-question-spacing`.
+
+Builds 04/05 are rejected for escaped Word properties; 06/07 fix that but regress
+PDF pagination after authored tables. The final recipe retains empty answer boxes
+and checks autoescaping explicitly. Their failed artifacts remain sealed; never
+use earlier reduced page counts as acceptance evidence.
 
 ## Version boundary
 
