@@ -1,0 +1,13 @@
+{%- import 'src/full-km-followups.j2' as followups with context -%}
+{%- set followupPath = followups.active_path(followups.referenceChapter, followups.referenceBranch, followups.maintenanceLeaf) -%}
+{%- if followupPath -%}
+  {%- set authored = repliesMap[followupPath]|reply_str_value -%}
+  {%- if authored|trim -%}
+    <div class="dataset-policy reference-maintenance-plan" data-requirement-id="SE-5b">
+      <div class="answer-lead"><p>Maintenance of reference data created by the project:</p></div>
+      <div class="answer-detail" data-fact-id="reference-data-maintenance">{{ authored|markdown }}</div>
+    </div>
+  {%- elif output_profile|default('review') != 'submission' -%}
+    <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-5b" data-fact-id="reference-data-maintenance" data-status="missing">Information not provided: how reference data created by the project will be maintained.</p></div>
+  {%- endif -%}
+{%- endif -%}
