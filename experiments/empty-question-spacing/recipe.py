@@ -8,11 +8,12 @@ ROOT = HERE.parents[1]
 CONTENT = 'src/content.html.j2'
 HELPERS = ['src/question-spacing.html.j2', 'src/word/question-spacing.lua', 'src/word/question-spacing.xml']
 CSS = b'''
-/* Empty submission questions: retain original headings, not empty answer space.
-   Only the conservative shared Jinja classifier can add this class. */
+/* Empty submission questions: retain original headings and tighten spacing.
+   Only the conservative shared Jinja classifier can add this class.
+   Keep empty answer boxes: display:none regresses WeasyPrint pagination when
+   a preceding answer ends with an authored table. */
 html body #dmp-content > .dmp-section > .question.compact-empty-question { margin-top: .5em; }
 html body #dmp-content > .dmp-section > .question.compact-empty-question > h3 { margin: .4em 0 .15em; break-after: auto; }
-html body #dmp-content > .dmp-section > .question.compact-empty-question > .answer { display: none; }
 '''
 
 

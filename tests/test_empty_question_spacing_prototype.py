@@ -26,6 +26,12 @@ class EmptyQuestionSpacingTests(unittest.TestCase):
         before = reuse.overlay(reuse.baseline_sources()); before['src/layout.css'] += b'\n'
         with self.assertRaises(AssertionError): recipe.overlay(before)
 
+    def test_empty_answer_boxes_remain_in_the_pdf_layout(self):
+        css = load('recipe').CSS.split(b'*/', 1)[1]
+        self.assertNotIn(b'display:', css)
+        self.assertNotIn(b'> .answer {', css)
+        self.assertIn(b'break-after: auto;', css)
+
     def test_word_properties_remain_xml_with_worker_autoescaping(self):
         # Captured include output is Markup when autoescaping is on. Replacing
         # into it with a plain string escapes the new XML even with a final safe.
