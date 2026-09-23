@@ -40,7 +40,7 @@ class FullKmFollowupIntegrationTests(unittest.TestCase):
         with self.assertRaises(AssertionError): project_source({**current, 'src/extra.j2': b''}, metadata)
         for field in ['version', 'format', 'uuid', 'compatibility']:
             bad = copy.deepcopy(metadata)
-            if field == 'version': bad['version'] = '0.3.48'
+            if field == 'version': bad['version'] = '0.3.49'
             elif field == 'format': bad['formats'][0]['name'] += '!'
             elif field == 'uuid': bad['formats'][0]['uuid'] = 'wrong'
             else: bad['allowedPackages'][0]['minVersion'] = '0.0.0'

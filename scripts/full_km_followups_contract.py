@@ -50,7 +50,7 @@ def project_source(sources=None, metadata=None):
     if sources is None:
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None: metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] == '0.3.47':
+    if metadata['version'] in ['0.3.47', '0.3.48']:
         from submission_flow_contract import project_source as before_flow
         sources, metadata = before_flow(sources, metadata)
     hashes = lambda values: {n: hashlib.sha256(v).hexdigest() for n, v in values.items()}

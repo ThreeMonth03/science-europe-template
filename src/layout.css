@@ -177,3 +177,23 @@ html body #q-share-restrictions > .answer > .dataset-section > ul > li > strong:
    a preceding answer ends with an authored table. */
 html body #dmp-content > .dmp-section > .question.compact-empty-question { margin-top: .5em; }
 html body #dmp-content > .dmp-section > .question.compact-empty-question > h3 { margin: .4em 0 .15em; break-after: auto; }
+
+/* BEGIN empty section spacing v1: all direct questions must carry the trusted empty marker.
+   Exact section ids, child counts and heading position reject mixed/unknown
+   structures. Only print margins change; retain empty answer boxes and all text.
+   One-step :has predicates avoid the unmatching descendant-chain diagnostic. */
+@media print {
+html body #dmp-content > section.dmp-section#sec-data-collection:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child),
+html body #dmp-content > section.dmp-section#sec-docs-metadata:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child),
+html body #dmp-content > section.dmp-section#sec-storage-backup:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child),
+html body #dmp-content > section.dmp-section#sec-ethics-legal:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3)):has(> div.question.compact-empty-question:nth-child(4):last-child),
+html body #dmp-content > section.dmp-section#sec-sharing-preservation:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3)):has(> div.question.compact-empty-question:nth-child(4)):has(> div.question.compact-empty-question:nth-child(5):last-child),
+html body #dmp-content > section.dmp-section#sec-responsibilities-resources:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) { margin-bottom: .8em; }
+html body #dmp-content > section.dmp-section#sec-data-collection:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2,
+html body #dmp-content > section.dmp-section#sec-docs-metadata:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2,
+html body #dmp-content > section.dmp-section#sec-storage-backup:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2,
+html body #dmp-content > section.dmp-section#sec-ethics-legal:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3)):has(> div.question.compact-empty-question:nth-child(4):last-child) > h2,
+html body #dmp-content > section.dmp-section#sec-sharing-preservation:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3)):has(> div.question.compact-empty-question:nth-child(4)):has(> div.question.compact-empty-question:nth-child(5):last-child) > h2,
+html body #dmp-content > section.dmp-section#sec-responsibilities-resources:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2 { margin-top: .9em; margin-bottom: .4em; }
+}
+/* END empty section spacing v1 */

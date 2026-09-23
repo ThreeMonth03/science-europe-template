@@ -26,6 +26,8 @@ def spacing_css():
                 and any(isinstance(t, ast.Name) and t.id == 'CSS' for t in n.targets))
 
 def prior_css(source):
+    from empty_section_spacing_contract import prior_css as before_sections
+    source = before_sections(source)
     marker = '/* Empty submission questions:'
     if marker not in source: return source
     delta = spacing_css()
@@ -36,6 +38,9 @@ def project_source(sources=None, metadata=None):
     if sources is None:
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None: metadata = json.loads((ROOT / 'template.json').read_text())
+    if metadata['version'] == '0.3.48':
+        from empty_section_spacing_contract import project_source as before_sections
+        sources, metadata = before_sections(sources, metadata)
     hashes = lambda values: {n: hashlib.sha256(v).hexdigest() for n,v in values.items()}
     assert hashes(sources) == CONTRACT['after'], 'Unreviewed 0.3.47 source or asset'
     assert metadata == CONTRACT['after_metadata'], 'Unreviewed 0.3.47 identity or conversion step'
