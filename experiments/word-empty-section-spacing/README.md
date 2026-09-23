@@ -4,7 +4,8 @@
 `fix/word-empty-section-spacing` 分支維護原型；檢核／提交不拆長期分支。
 
 原型在既有 `question-spacing.lua`／`question-spacing.xml` 中，僅對可信
-全空節的 Heading2 設定段前 6pt、段後 3pt。保留字級、keep-next、outline、
+全空節的 Heading2 設定段前 3pt、段後 2pt，並只對該節非末題的空題 Heading3
+開啟 keep-next，讓全空節保持連頁。保留字級、其他 keep-next、outline、
 所有題目、答案及 Word 轉換步驟；HTML／PDF／檢核版應完全不變。
 先驗證六節根結構與題目次序，再核對空題標記及空答案 AST。使用者答案內
 的仿造結構不處理；未知、混合與有答案的節維持原狀。

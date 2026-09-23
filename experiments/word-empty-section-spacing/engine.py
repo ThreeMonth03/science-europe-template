@@ -61,7 +61,17 @@ def cases(source):
     skeleton='<div class="workspace-policy dataset-policy"><div class="reading-gap"></div><div class="reading-gap"></div></div>'
     rows.append(('q5-known-empty-skeleton',base.replace(q5,q5.replace('<div class="answer">','<div class="answer">'+skeleton)),6))
     rows.append(('q5-unknown-empty-skeleton',base.replace(q5,q5.replace('<div class="answer">','<div class="answer">'+skeleton.replace('reading-gap','other-gap'))),5))
-    return rows
+    result=[]
+    for name,html,expected in rows:
+        if expected==6:links=9
+        elif expected==0:links=0
+        else:
+            if name.startswith('nonempty-'):index=next(i for i,g in enumerate(GROUPS) if name.removeprefix('nonempty-') in g)
+            elif name=='q5-unknown-empty-skeleton':index=2
+            else:index=int(name.split('-',1)[0])-1
+            links=9-(len(GROUPS[index])-1)
+        result.append((name,html,expected,links))
+    return result
 
 RUNNER=r'''
 import json,subprocess,sys,tempfile,zipfile
@@ -75,21 +85,22 @@ ns={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}; w='{'+n
 def command(root):
  return ['pandoc','-f','html',*[f'--lua-filter={root}/src/word/{n}.lua' for n in ['pilot','preservation-reading','short-tables','question-spacing']]]
 def strip_sections(value):
- if isinstance(value,list):return [strip_sections(v) for v in value if not (isinstance(v,dict) and v.get('t')=='RawBlock' and v['c'][0]=='openxml' and 'DSW:SE:empty-section:' in v['c'][1])]
+ if isinstance(value,list):return [strip_sections(v) for v in value if not (isinstance(v,dict) and v.get('t')=='RawBlock' and v['c'][0]=='openxml' and 'DSW:SE:empty-section' in v['c'][1])]
  if isinstance(value,dict):return {k:strip_sections(v) for k,v in value.items()}
  return value
-def count(value):
+def count(value,kind='empty-section'):
  if isinstance(value,dict):
-  if value.get('t')=='RawBlock' and value['c']==['openxml','<!--DSW:SE:empty-section:v1:begin-->']:return 1
-  return sum(count(v) for v in value.values())
- if isinstance(value,list):return sum(count(v) for v in value)
+  if value.get('t')=='RawBlock' and value['c']==['openxml','<!--DSW:SE:'+kind+':v1:begin-->']:return 1
+  return sum(count(v,kind) for v in value.values())
+ if isinstance(value,list):return sum(count(v,kind) for v in value)
  return 0
 rows=[]
 with tempfile.TemporaryDirectory() as tmp:
- for case,html,expected in p['cases']:
+ for case,html,expected,links in p['cases']:
   ast=[json.loads(subprocess.check_output(command(r)+['-t','json'],input=html.encode())) for r in roots]
   assert strip_sections(ast[1])==ast[0],(case,'AST changed beyond section markers')
   assert count(ast[1])==expected,(case,'eligibility',count(ast[1]),expected)
+  assert count(ast[1],'empty-section-link')==links,(case,'link eligibility')
   files=[]
   for i,r in enumerate(roots):
    path=Path(tmp)/f'{i}.docx'
@@ -102,25 +113,31 @@ with tempfile.TemporaryDirectory() as tmp:
    original=templates[0].render(content=a.read('word/document.xml').decode())
    marked=b.read('word/document.xml').decode(); current=templates[1].render(content=marked)
   x,y=[ET.fromstring(s.encode()) for s in [original,current]]
-  changed=[]
+  changed=[];linked=0
   for props in y.findall('.//w:pPr',ns):
    style=props.find('w:pStyle',ns); spacing=props.find('w:spacing',ns)
    if style is not None and style.get(w+'val')=='Heading2' and spacing is not None:
-    assert spacing.attrib=={w+'before':'120',w+'after':'60'}
+    assert spacing.attrib=={w+'before':'60',w+'after':'40'}
     assert props.find('w:keepNext',ns) is None
     changed.append(props);props.remove(spacing)
+   if style is not None and style.get(w+'val')=='Heading3':
+    keep=props.find('w:keepNext',ns)
+    if keep is not None and keep.get(w+'val')=='1':
+     assert spacing.attrib=={w+'before':'80',w+'after':'0'}
+     keep.set(w+'val','0');linked+=1
   assert len(changed)==expected,(case,'Word property count',len(changed),expected)
+  assert linked==links,(case,'Word link property count',linked,links)
   assert ET.tostring(x)==ET.tostring(y),(case,'Unexpected XML content or property edit')
-  assert '<!--DSW:SE:empty-section:' not in current and '<!--DSW:SE:empty-question:' not in current
+  assert '<!--DSW:SE:empty-section' not in current and '<!--DSW:SE:empty-question:' not in current
   if not expected:assert original==current,(case,'Unmarked document changed')
   if case=='all-empty':
-   for mutate in [marked.replace('w:val="Heading2"','w:val="Heading1"'),marked.replace('empty-section:v1:end','empty-section:v2:end')]:
+   for mutate in [marked.replace('w:val="Heading2"','w:val="Heading1"'),marked.replace('empty-section:v1:end','empty-section:v2:end'),marked.replace('empty-section-link:v1:end','empty-section-link:v2:end')]:
     try:templates[1].render(content=mutate)
     except UndefinedError:pass
     else:raise AssertionError('Malformed marker accepted')
    html_output=[subprocess.check_output(command(r)+['-t','html'],input=html.encode()) for r in roots]
    assert html_output[0]==html_output[1],'Non-Word output changed'
-  rows.append(dict(case=case,section_headings_changed=expected,passed=True))
+  rows.append(dict(case=case,section_headings_changed=expected,question_links_changed=links,passed=True))
 print(json.dumps(dict(passed=True,rows=rows,pandoc=subprocess.check_output(['pandoc','--version'],text=True).splitlines()[0])))
 '''
 

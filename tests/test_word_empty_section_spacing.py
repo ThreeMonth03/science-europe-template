@@ -39,7 +39,7 @@ class WordEmptySectionsTests(unittest.TestCase):
             for value in [marked,Markup(marked)]:
                 result=new.render(content=value); root=etree.fromstring(result.encode())
                 props=root.find('.//w:pPr',ns); spacing=props.find('w:spacing',ns)
-                self.assertEqual(spacing.attrib,{f'{{{ns["w"]}}}before':'120',f'{{{ns["w"]}}}after':'60'})
+                self.assertEqual(spacing.attrib,{f'{{{ns["w"]}}}before':'60',f'{{{ns["w"]}}}after':'40'})
                 self.assertIsNone(props.find('w:keepNext',ns)); self.assertIsNone(props.getparent().text)
                 props.remove(spacing)
                 self.assertEqual(etree.tostring(root),etree.tostring(etree.fromstring(plain.encode())))
@@ -51,5 +51,16 @@ class WordEmptySectionsTests(unittest.TestCase):
         for value in [marked.replace('Heading2','Heading3'),marked.replace('v1:end','v2:end'),
                       marked.replace(p,p+p),marked.replace('\n    ',''),marked.replace('</w:pPr>','<w:spacing/></w:pPr>')]:
             with self.assertRaises(UndefinedError):new.render(content=value)
+
+    def test_link_only_changes_the_known_empty_heading_keep_next(self):
+        p='<w:p><w:pPr><w:pStyle w:val="Heading3" /></w:pPr><w:r><w:t>Question</w:t></w:r></w:p>'
+        old='<!--DSW:SE:empty-question:v1:begin-->\n    '+p+'\n    <!--DSW:SE:empty-question:v1:end-->'
+        marked='<!--DSW:SE:empty-section-link:v1:begin-->\n    '+old+'\n    <!--DSW:SE:empty-section-link:v1:end-->'
+        for autoescape in [False,True]:
+            original,new=self.templates(autoescape)
+            expected=original.render(content=old).replace('<w:keepNext w:val="0"/>','<w:keepNext w:val="1"/>')
+            self.assertEqual(new.render(content=marked),expected)
+            for bad in [marked.replace('empty-section-link:v1:end','empty-section-link:v2:end'),marked.replace(old,p)]:
+                with self.assertRaises(UndefinedError):new.render(content=bad)
 
 if __name__=='__main__':unittest.main()

@@ -57,7 +57,17 @@ local function empty_sections(div)
         section.content[1],
         pandoc.RawBlock("openxml", "<!--DSW:SE:empty-section:v1:end-->")
       })
-      for j = 2, #section.content do content:insert(section.content[j]) end
+      for j = 2, #section.content do
+        -- Preserve one coherent empty section, not an isolated last question.
+        -- The existing question pass still runs on the unmodified question Div.
+        if j < #section.content then
+          content:insert(pandoc.RawBlock("openxml", "<!--DSW:SE:empty-section-link:v1:begin-->"))
+        end
+        content:insert(section.content[j])
+        if j < #section.content then
+          content:insert(pandoc.RawBlock("openxml", "<!--DSW:SE:empty-section-link:v1:end-->"))
+        end
+      end
       section.content = content
     end
   end
