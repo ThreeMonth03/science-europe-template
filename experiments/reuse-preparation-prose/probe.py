@@ -32,6 +32,20 @@ JOIN = {
                 'dataCompReadItselfYesOtherAUuid': ' and will make this version available to others',
                 'dataCompReadItselfNoAUuid': ' but will not make this version available to others'},
 }
+OLD_H = 'We need to harmonize different sources of existing data before reusing them'
+OLD_C = 'We will need to (re-)made the data into computer readable form before their using'
+OLD_M = 'We will provide machine readable, standardized metadata to others'
+OLD_WORDS = {
+    H + '.': OLD_H + '.',
+    H + JOIN['harm']['dataHarmoOthersYesAUuid'] + '.': OLD_H + ' and we will make this harmonization results available to others.',
+    H + JOIN['harm']['dataHarmoOthersNoAUuid'] + '.': OLD_H + " but we won't make this harmonization results available to others.",
+    C + '.': OLD_C + '.',
+    C + JOIN['version']['dataCompReadItselfYesAUuid'] + '.': OLD_C + ' and we will make this computer readable form available to others through a standard repository.',
+    C + JOIN['version']['dataCompReadItselfYesOtherAUuid'] + '.': OLD_C + ' and we will make this computer readable form available to others.',
+    C + JOIN['version']['dataCompReadItselfNoAUuid'] + '.': OLD_C + " but we won't make this computer readable form available to others.",
+    M + '.': OLD_M + '.',
+    M + SUFFIX: OLD_M + ' and we will use following Metadata Standards:',
+}
 
 
 def block(text):
@@ -80,7 +94,8 @@ def cases():
               version='dataCompReadItselfNoAUuid', metadata=yes['metadata'], standards=standards_cases[2])
 
 
-def expected(case, words=None):
+def expected(case, words=None, chinese=None):
+    chinese = bool(words) if chinese is None else chinese
     words = words or {}
     tr = lambda s: words[s] if words else s
     if case['parent'] != 'preexistingYesAUuid':
@@ -91,10 +106,10 @@ def expected(case, words=None):
     if case['convert'] == 'dataCompReadYesAUuid':
         text = tr(C + JOIN['version'].get(case['version'], '') + '.')
         if case['metadata'] == 'dataCompReadOthersYesAUuid':
-            text += '' if words else ' '
+            text += '' if chinese else ' '
             if case['standards']:
-                separator, stop = ('、', '。') if words else (', ', '.')
-                text += tr(M + SUFFIX) + ('' if words else ' ')
+                separator, stop = ('、', '。') if chinese else (', ', '.')
+                text += tr(M + SUFFIX) + ('' if chinese else ' ')
                 text += separator.join(label for _, label in case['standards']) + stop
             else:
                 text += tr(M + '.')
@@ -102,7 +117,7 @@ def expected(case, words=None):
     return paragraphs
 
 
-def check(root, before, after, words=None):
+def check(root, before, after, words=None, old_words=None):
     decode = lambda values: {n: v.decode() if isinstance(v, bytes) and n.endswith('.j2') else v for n, v in values.items()}
     before, after = decode(before), decode(after)
     assert set(before) == set(after)
@@ -123,12 +138,18 @@ def check(root, before, after, words=None):
                    "{% if repliesMap[preexistingPath]|reply_str_value == uuids.preexistingYesAUuid %}"
                    + block(after[QUESTION]) + '{% endif %}')
         template = environment(root, escape, overrides).from_string(wrapper)
+        old_template = environment(root, escape, {n: v for n, v in before.items() if n.endswith('.j2')}).from_string(
+            wrapper.replace(block(after[QUESTION]), block(before[QUESTION])))
         for case in cases():
             html = template.render(repliesMap=case['values'], output_profile=profile)
             structural = BlockProbe(); structural.feed(html)
             assert not structural.errors and not structural.stack, case['name']
             soup = BeautifulSoup(html, 'html.parser')
             assert [normalize(p.get_text()) for p in soup.find_all('p')] == expected(case, words), (case['name'], profile, escape)
+            old_soup = BeautifulSoup(old_template.render(repliesMap=case['values'], output_profile=profile), 'html.parser')
+            assert [normalize(p.get_text()) for p in old_soup.find_all('p')] == expected(
+                case, old_words or OLD_WORDS, chinese=bool(words)), ('baseline', case['name'], profile, escape)
+            assert [str(a) for a in old_soup.find_all('a')] == [str(a) for a in soup.find_all('a')]
             expected_links = [label for kind, label in case['standards'] if kind == 'IntegrationType'] if (
                 case['parent'] == 'preexistingYesAUuid' and case['convert'] == 'dataCompReadYesAUuid'
                 and case['metadata'] == 'dataCompReadOthersYesAUuid') else []

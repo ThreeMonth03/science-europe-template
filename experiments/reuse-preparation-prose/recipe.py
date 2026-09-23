@@ -1,4 +1,4 @@
-"""Text-only Q1 prototype; exact 0.3.48 inputs, no production-source edits."""
+"""Bounded Q1 prose prototype; exact 0.3.48, complete English branch sentences."""
 from pathlib import Path
 import subprocess
 
@@ -50,11 +50,15 @@ def overlay(current, root=ROOT):
         assert new.count(before) == 1
         new = new.replace(before, after)
     result[QUESTION] = text.replace(old, new).encode()
-    # No branch, whitespace, punctuation expression, macro or authored value changes.
+    # The first rehearsal is exactly reversible before the complete-sentence rewrite.
     restored = new
     for before, after in REPLACEMENTS:
         assert restored.count(after) == 1
         restored = restored.replace(after, before)
     assert restored == old
+    marker = '    {# Constrains - (Re)made data computer readable #}'
+    assert new.count(marker) == 1
+    new = new[:new.index(marker)] + (Path(__file__).parent / 'computer-readable.html.j2').read_text()
+    result[QUESTION] = text.replace(old, new).encode()
     assert {n for n in current if current[n] != result[n]} == {QUESTION}
     return result
