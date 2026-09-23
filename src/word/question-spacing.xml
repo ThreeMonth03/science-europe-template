@@ -1,3 +1,4 @@
+{%- set section_content -%}
 {# Preserve the existing short-table transformation before touching new markers. #}
 {%- set content -%}{%- include 'src/word/short-tables.xml' -%}{%- endset -%}
 {%- macro require(ok) -%}
@@ -22,4 +23,52 @@
   {{- require('<w:tbl' not in heading and '<w:drawing' not in heading and '<w:keepNext' not in heading) -}}
   {{- heading.replace(property, replacement, 1)|safe -}}
   {{- parts[1]|safe -}}
+{%- endfor -%}
+
+{%- endset -%}
+{# The existing question/short-table transforms have already run. #}
+{%- set linked_content -%}
+{%- macro require_section(ok) -%}
+  {%- if not ok -%}{{ empty_section_xml_contract_mismatch.raise_error() }}{%- endif -%}
+{%- endmacro -%}
+{%- set section_begin = '<!--DSW:SE:empty-section:v1:begin-->\n    ' -%}
+{%- set section_end = '\n    <!--DSW:SE:empty-section:v1:end-->' -%}
+{%- set section_property = '<w:pPr><w:pStyle w:val="Heading2" /></w:pPr>' -%}
+{# 3pt before / 2pt after; inherit the original font, outline and keep-next. #}
+{%- set section_replacement = '<w:pPr><w:pStyle w:val="Heading2" /><w:spacing w:before="60" w:after="40"/></w:pPr>'|safe -%}
+{%- set section_pieces = section_content.split(section_begin) -%}
+{{- require_section(section_content.count('<!--DSW:SE:empty-section:v1:begin-->') == section_pieces|length - 1) -}}
+{{- require_section(section_content.count('<!--DSW:SE:empty-section:v1:end-->') == section_pieces|length - 1) -}}
+{{- require_section(section_end not in section_pieces[0]) -}}
+{{- section_pieces[0]|safe -}}
+{%- for section_piece in section_pieces[1:] -%}
+  {%- set section_parts = section_piece.split(section_end) -%}
+  {{- require_section(section_parts|length == 2) -}}
+  {%- set section_heading = section_parts[0] -%}
+  {{- require_section(section_heading.count('<w:p>') == 1 and section_heading.count('</w:p>') == 1 and section_heading.count(section_property) == 1) -}}
+  {{- require_section('<w:tbl' not in section_heading and '<w:drawing' not in section_heading and '<w:spacing' not in section_heading and '<w:keepNext' not in section_heading) -}}
+  {{- section_heading.replace(section_property, section_replacement, 1)|safe -}}
+  {{- section_parts[1]|safe -}}
+{%- endfor -%}
+{%- endset -%}
+{%- macro require_link(ok) -%}
+  {%- if not ok -%}{{ empty_section_link_contract_mismatch.raise_error() }}{%- endif -%}
+{%- endmacro -%}
+{%- set link_begin = '<!--DSW:SE:empty-section-link:v1:begin-->\n    ' -%}
+{%- set link_end = '\n    <!--DSW:SE:empty-section-link:v1:end-->' -%}
+{%- set link_property = '<w:pPr><w:pStyle w:val="Heading3" /><w:keepNext w:val="0"/><w:spacing w:before="80" w:after="0"/></w:pPr>' -%}
+{%- set link_replacement = '<w:pPr><w:pStyle w:val="Heading3" /><w:keepNext w:val="1"/><w:spacing w:before="80" w:after="0"/></w:pPr>'|safe -%}
+{%- set link_pieces = linked_content.split(link_begin) -%}
+{{- require_link(linked_content.count('<!--DSW:SE:empty-section-link:v1:begin-->') == link_pieces|length - 1) -}}
+{{- require_link(linked_content.count('<!--DSW:SE:empty-section-link:v1:end-->') == link_pieces|length - 1) -}}
+{{- require_link(link_end not in link_pieces[0]) -}}
+{{- link_pieces[0]|safe -}}
+{%- for link_piece in link_pieces[1:] -%}
+  {%- set link_parts = link_piece.split(link_end) -%}
+  {{- require_link(link_parts|length == 2) -}}
+  {%- set link_heading = link_parts[0] -%}
+  {{- require_link(link_heading.count('<w:p>') == 1 and link_heading.count('</w:p>') == 1 and link_heading.count(link_property) == 1) -}}
+  {{- require_link('<w:tbl' not in link_heading and '<w:drawing' not in link_heading) -}}
+  {{- link_heading.replace(link_property, link_replacement, 1)|safe -}}
+  {{- link_parts[1]|safe -}}
 {%- endfor -%}

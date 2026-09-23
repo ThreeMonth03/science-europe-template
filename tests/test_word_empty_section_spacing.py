@@ -17,7 +17,7 @@ class WordEmptySectionsTests(unittest.TestCase):
         m=recipe(); old=m.baseline_sources(); new=m.overlay(old)
         self.assertEqual({n for n in old if old[n]!=new[n]},m.CHANGED)
         actual={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
-        self.assertEqual(actual,old)
+        self.assertEqual(actual,new)
         for changed in [{**old,'src/extra':b'x'},{**old,'src/layout.css':old['src/layout.css']+b' '},
                         {n:v for n,v in old.items() if n!=m.XML}]:
             with self.assertRaises(AssertionError):m.overlay(changed)

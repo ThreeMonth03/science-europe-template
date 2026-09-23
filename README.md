@@ -6,6 +6,11 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+Version 0.3.50 [integrates bounded Word empty-section spacing and keep chains](docs/word-empty-sections.md).
+Only two shared Word helpers change; Chinese translation files, PDF inputs,
+review behavior and all original questions remain. Paired native and workflow
+evidence is tracked in the Chinese repo; this is not deployment.
+
 Version 0.3.49 [integrates the reviewed Q1 preparation prose](docs/reuse-preparation.md).
 Complete English branch sentences feed the existing Chinese translation pipeline;
 the nine reviewed wording changes preserve answer states, authored content and

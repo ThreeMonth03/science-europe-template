@@ -35,7 +35,7 @@ def prior_css(source):
 def project_source(sources=None,metadata=None):
     if sources is None:sources={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
     if metadata is None:metadata=json.loads((ROOT/'template.json').read_text())
-    if metadata['version']=='0.3.49':
+    if metadata['version'] in ['0.3.49', '0.3.50']:
         from reuse_preparation_contract import project_source as before_preparation
         sources,metadata=before_preparation(sources,metadata)
     recipe=load('recipe');before=recipe.baseline_sources(ROOT)

@@ -35,6 +35,9 @@ def project_source(sources=None, metadata=None):
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None:
         metadata = json.loads((ROOT / 'template.json').read_text())
+    if metadata['version'] == '0.3.50':
+        from word_empty_section_contract import project_source as before_word_sections
+        sources, metadata = before_word_sections(sources, metadata)
     before = baseline()
     assert sources == load('recipe').overlay(before, ROOT), 'Unreviewed 0.3.49 source, inventory or asset'
     previous = json.loads(historical('template.json'))

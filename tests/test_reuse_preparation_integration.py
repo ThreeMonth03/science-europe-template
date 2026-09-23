@@ -15,7 +15,8 @@ class PreparationIntegrationTests(unittest.TestCase):
         before, metadata = project_source()
         self.assertEqual(metadata, json.loads(historical('template.json')))
         self.assertEqual(metadata['version'], '0.3.48')
-        actual = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+        from word_empty_section_contract import project_source as before_word_sections
+        actual, _ = before_word_sections()
         self.assertEqual(actual, load('recipe').overlay(before))
         self.assertEqual({n for n in before if before[n] != actual[n]}, {'src/questions/01-how-data.html.j2'})
 

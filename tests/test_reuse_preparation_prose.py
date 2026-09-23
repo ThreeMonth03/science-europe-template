@@ -17,7 +17,8 @@ class PreparationProseTests(unittest.TestCase):
         recipe = load('recipe'); before = recipe.baseline_sources()
         from reuse_preparation_contract import project_source
         self.assertEqual(before, project_source()[0])
-        actual = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+        from word_empty_section_contract import project_source as before_word
+        actual, _ = before_word()
         self.assertEqual(recipe.overlay(before), actual)
         rows = load('probe').check(ROOT, before, actual)
         self.assertEqual(396, sum(r['case'].startswith('fixture-') for r in rows))
