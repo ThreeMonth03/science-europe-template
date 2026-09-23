@@ -35,7 +35,7 @@ def project_source(sources=None, metadata=None):
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None:
         metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] == '0.3.50':
+    if metadata['version'] in ['0.3.50', '0.3.51']:
         from word_empty_section_contract import project_source as before_word_sections
         sources, metadata = before_word_sections(sources, metadata)
     before = baseline()

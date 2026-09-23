@@ -6,7 +6,7 @@
     {% include 'src/project-file-naming.html.j2' %}
 
     {# Metadata #}
-    <div class="dataset-policy metadata-policy">
+    <div class="dataset-policy metadata-policy">{% set metadataPolicyOriginal %}
     {%- set metadataPath = [uuids.creatingCUuid, uuids.metadataQUuid]|reply_path -%}
     {%- set metadataAUuid = repliesMap[metadataPath]|reply_str_value -%}
     {%- if metadataAUuid == uuids.metadataExploreAUuid -%}
@@ -131,7 +131,7 @@
       </div>
       {%- endif -%}
     {%- endif -%}
-    </div>
+    {% endset %}{% import 'src/metadata-prose.html.j2' as metadataProse %}{{ metadataProse.render(metadataPolicyOriginal) }}</div>
 
   {# Storage and file conventions #}
   {%- set storageConvPath = [uuids.processingCUuid, uuids.storageConvQUuid]|reply_path -%}

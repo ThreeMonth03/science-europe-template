@@ -6,7 +6,9 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
-Version 0.3.50 [integrates bounded Word empty-section spacing and keep chains](docs/word-empty-sections.md).
+Version 0.3.51 [integrates the reviewed shared Q3 policy joining rule](docs/q3-policy-prose.md).
+It keeps English and mixed runs byte-exact, preserves authored/missing-information barriers,
+and retains the [0.3.50 Word empty-section spacing and keep chains](docs/word-empty-sections.md).
 Only two shared Word helpers change; Chinese translation files, PDF inputs,
 review behavior and all original questions remain. Paired native and workflow
 evidence is tracked in the Chinese repo; this is not deployment.

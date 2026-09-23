@@ -18,7 +18,7 @@ def load(name):
 class SharedPolicyTests(unittest.TestCase):
     def render(self, value, escape=False):
         env=Environment(extensions=['jinja2.ext.do'],autoescape=escape)
-        module=env.from_string((HERE/'metadata-prose.html.j2').read_text()).module
+        module=env.from_string((ROOT/'src/metadata-prose.html.j2').read_text()).module
         return str(module.render(Markup(value)))
 
     def test_shared_boundaries_english_chinese_and_mixed(self):
@@ -59,8 +59,8 @@ class SharedPolicyTests(unittest.TestCase):
     def test_exact_source_scope_and_full_english_matrix(self):
         recipe=load('recipe');before=recipe.baseline_sources()
         current={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
-        self.assertEqual(current,before)
-        rows=load('probe').check(ROOT,before,recipe.overlay(before),'english')
+        self.assertEqual(current,recipe.overlay(before))
+        rows=load('probe').check(ROOT,before,current,'english')
         self.assertEqual(sum(r['case'].startswith('fixture-') for r in rows),396)
         self.assertGreater(len(rows),7000)
 

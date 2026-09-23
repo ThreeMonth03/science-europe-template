@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
       - run: make check
+      - name: Check integrated Q3 prose on actual production sources
+        run: python scripts/probe_q3_policy_prose.py --output outputs/q3-policy-prose-scope.json
       - name: Check integrated Word empty-section scope on actual production assets
         run: python scripts/probe_word_empty_sections.py --output outputs/word-empty-section-engine.json
       - name: Check integrated empty-section print spacing and unchanged screen scope

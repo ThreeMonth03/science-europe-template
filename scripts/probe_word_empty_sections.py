@@ -14,7 +14,8 @@ def main(output):
             path = baseline / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(value)
         result = load('engine').run(baseline, ROOT, output)
     assert len(result['rows']) == 121
-    print(json.dumps(dict(passed=True, version='0.3.50', actual_production_assets=True, cases=len(result['rows']))))
+    print(json.dumps(dict(passed=True, version=json.loads((ROOT/'template.json').read_text())['version'],
+        comparison_version='0.3.50', actual_production_assets=True, cases=len(result['rows']))))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)

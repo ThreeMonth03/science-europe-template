@@ -1,11 +1,13 @@
 """A punctuation experiment must not edit production or normalize user text."""
 import importlib.util
 from pathlib import Path
+import sys
 import unittest
 from bs4 import BeautifulSoup
 from jinja2 import Environment
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'scripts'))
 
 
 def load(name):
@@ -17,7 +19,8 @@ def load(name):
 class CjkPunctuationProbeTests(unittest.TestCase):
     def test_exact_scope_and_english_answer_matrix(self):
         recipe = load('recipe'); before = recipe.baseline_sources()
-        current = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+        from q3_policy_prose_contract import project_source as before_q3
+        current, _ = before_q3()
         self.assertEqual(current, before)
         rows = load('probe').check(ROOT, before, recipe.overlay(before))
         self.assertEqual(396, sum(r['case'].startswith('fixture-') for r in rows))

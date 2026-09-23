@@ -12,7 +12,8 @@ from word_empty_section_contract import project_source, historical, load
 class WordSectionIntegrationTests(unittest.TestCase):
     def test_exact_reviewed_overlay_and_prior_view(self):
         previous, metadata = project_source()
-        actual = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+        from q3_policy_prose_contract import project_source as before_q3
+        actual, _ = before_q3()
         self.assertEqual(metadata, json.loads(historical('template.json')))
         self.assertEqual(metadata['version'], '0.3.49')
         self.assertEqual(actual, load('recipe').overlay(previous))

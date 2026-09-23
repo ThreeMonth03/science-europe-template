@@ -1,0 +1,50 @@
+{# Called only for Q3's fixed metadata policy, never for arbitrary HTML.
+   Join a complete run of 2-3 plain owned paragraphs. A gap, authored Div,
+   nested markup, unknown attribute or incomplete sentence retains the entire
+   original block. Every boundary must be a Chinese full stop followed by BMP
+   Han; English and mixed runs also stay byte-exact. Keep fact attributes. #}
+{%- macro render(original) -%}
+  {%- set body = original|trim -%}
+  {%- set fragments = body.split('</p>') -%}
+  {%- set chosen = namespace(ok=fragments|length in [3, 4] and fragments[-1]|trim == '', texts=[], attributes=[], dictionaries=0) -%}
+  {%- for fragment in fragments[:-1] -%}
+    {%- set part = fragment|trim -%}
+    {%- set item = namespace(opening='', attributes='') -%}
+    {%- if part.startswith('<p>') -%}
+      {%- set item.opening = '<p>' -%}
+    {%- else -%}
+      {%- for status in ['complete', 'explicit-no'] -%}
+        {%- set opening = '<p data-fact-id="metadata-dictionary" data-status="' ~ status ~ '">' -%}
+        {%- if part.startswith(opening) -%}
+          {%- set item.opening = opening -%}
+          {%- set item.attributes = opening[2:-1] -%}
+          {%- set chosen.dictionaries = chosen.dictionaries + 1 -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endif -%}
+    {%- set text = part[item.opening|length:]|trim -%}
+    {%- if not item.opening or not text or '<' in text or '>' in text or '&' in text or not (text.endswith('.') or text.endswith('。')) -%}
+      {%- set chosen.ok = false -%}
+    {%- endif -%}
+    {%- if chosen.texts -%}
+      {%- set first = text[:1] -%}
+      {%- set cjk = ('㐀' <= first <= '䶿') or ('一' <= first <= '鿿') -%}
+      {%- if not chosen.texts[-1].endswith('。') or not cjk -%}
+        {%- set chosen.ok = false -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- do chosen.texts.append(text) -%}
+    {%- do chosen.attributes.append(item.attributes) -%}
+  {%- endfor -%}
+  {%- if chosen.ok and chosen.dictionaries <= 1 -%}
+    {%- set output = namespace(value='<p class="metadata-prose">'|safe) -%}
+    {%- for text in chosen.texts -%}
+      {%- set attributes = chosen.attributes[loop.index0] -%}
+      {%- set part = (('<span' ~ attributes ~ '>')|safe) + (text|safe) + ('</span>'|safe) if attributes else text|safe -%}
+      {%- set output.value = output.value + part -%}
+    {%- endfor -%}
+    {{- original|replace(body, output.value + ('</p>'|safe), 1) -}}
+  {%- else -%}
+    {{- original -}}
+  {%- endif -%}
+{%- endmacro -%}
