@@ -1,12 +1,15 @@
 """Word-only prototype must preserve all unmarked XML and source assets."""
 import importlib.util
 from pathlib import Path
+import sys
 import unittest
 from jinja2 import Environment, DictLoader, UndefinedError
 from markupsafe import Markup
 from lxml import etree
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from q3_policy_prose_contract import project_source as before_q3
 def recipe():
     spec = importlib.util.spec_from_file_location('word_empty_sections', ROOT / 'experiments/word-empty-section-spacing/recipe.py')
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
@@ -16,7 +19,7 @@ class WordEmptySectionsTests(unittest.TestCase):
     def test_only_two_word_helpers_change(self):
         m=recipe(); old=m.baseline_sources(); new=m.overlay(old)
         self.assertEqual({n for n in old if old[n]!=new[n]},m.CHANGED)
-        actual={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+        actual,_=before_q3()
         self.assertEqual(actual,new)
         for changed in [{**old,'src/extra':b'x'},{**old,'src/layout.css':old['src/layout.css']+b' '},
                         {n:v for n,v in old.items() if n!=m.XML}]:
