@@ -24,7 +24,7 @@ REPLACEMENTS = (
      'but will not make this version available to others'),
     ('We will provide machine readable, standardized metadata to others',
      'We will provide others with standardized, machine-readable metadata'),
-    ('and we will use following Metadata Standards:', 'using the following metadata standards:'),
+    ('and we will use following Metadata Standards:', 'and we will use the following metadata standards:'),
 )
 
 

@@ -24,7 +24,7 @@ STANDARDS = path(METADATA, 'dataCompReadOthersYesAUuid', 'dataCompReadOthersYesS
 H = 'Before reuse, we need to harmonize existing data from different sources'
 C = 'Before reuse, we will need to convert the data into a machine-readable form'
 M = 'We will provide others with standardized, machine-readable metadata'
-SUFFIX = ' using the following metadata standards:'
+SUFFIX = ' and we will use the following metadata standards:'
 JOIN = {
     'harm': {'dataHarmoOthersYesAUuid': ' and will make the results available to others',
              'dataHarmoOthersNoAUuid': ' but will not make the results available to others'},
