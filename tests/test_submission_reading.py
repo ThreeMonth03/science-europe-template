@@ -29,7 +29,7 @@ class SubmissionReadingTests(unittest.TestCase):
         with self.assertRaises(AssertionError): project_source({**current, 'src/extra.xml': b''}, metadata)
         for mutation in ['version', 'format', 'uuid', 'rewrite']:
             bad = copy.deepcopy(metadata)
-            if mutation == 'version': bad['version'] = '0.3.48'
+            if mutation == 'version': bad['version'] = '999.0.0'
             elif mutation == 'format': bad['formats'][0]['name'] += '!'
             elif mutation == 'uuid': bad['formats'][0]['uuid'] = 'wrong'
             else:

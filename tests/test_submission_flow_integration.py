@@ -35,7 +35,7 @@ class SubmissionFlowIntegrationTests(unittest.TestCase):
             with self.subTest(name=name), self.assertRaises(AssertionError): project_source({**source, name: source[name]+b'!'}, metadata)
             with self.assertRaises(AssertionError): project_source({n:v for n,v in source.items() if n != name}, metadata)
         with self.assertRaises(AssertionError): project_source({**source,'src/unreviewed.xml':b''}, metadata)
-        for mutation in [lambda m:m.update(version='0.3.49'), lambda m:m.update(templateId='wrong'),
+        for mutation in [lambda m:m.update(version='999.0.0'), lambda m:m.update(templateId='wrong'),
             lambda m:m['formats'][0].update(uuid='wrong'), lambda m:m['formats'][-1]['steps'].pop(),
             lambda m:m['allowedPackages'].clear()]:
             bad=copy.deepcopy(metadata); mutation(bad)

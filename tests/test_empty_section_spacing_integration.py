@@ -20,7 +20,7 @@ class EmptySectionIntegrationTests(unittest.TestCase):
             with self.subTest(name=name),self.assertRaises(AssertionError):project_source({**sources,name:sources[name]+b'!'},metadata)
             with self.assertRaises(AssertionError):project_source({n:v for n,v in sources.items() if n!=name},metadata)
         with self.assertRaises(AssertionError):project_source({**sources,'src/extra':b''},metadata)
-        for mutate in [lambda m:m.update(version='0.3.49'),lambda m:m.update(templateId='wrong'),
+        for mutate in [lambda m:m.update(version='999.0.0'),lambda m:m.update(templateId='wrong'),
             lambda m:m['formats'][0].update(uuid='wrong'),lambda m:m['formats'][-1]['steps'].pop(),lambda m:m['allowedPackages'].clear()]:
             bad=copy.deepcopy(metadata);mutate(bad)
             with self.assertRaises(AssertionError):project_source(sources,bad)
