@@ -1,0 +1,23 @@
+{# The existing question/short-table transforms have already run. #}
+{%- macro require_section(ok) -%}
+  {%- if not ok -%}{{ empty_section_xml_contract_mismatch.raise_error() }}{%- endif -%}
+{%- endmacro -%}
+{%- set section_begin = '<!--DSW:SE:empty-section:v1:begin-->\n    ' -%}
+{%- set section_end = '\n    <!--DSW:SE:empty-section:v1:end-->' -%}
+{%- set section_property = '<w:pPr><w:pStyle w:val="Heading2" /></w:pPr>' -%}
+{# 6pt before / 3pt after; inherit the original font, outline and keep-next. #}
+{%- set section_replacement = '<w:pPr><w:pStyle w:val="Heading2" /><w:spacing w:before="120" w:after="60"/></w:pPr>'|safe -%}
+{%- set section_pieces = section_content.split(section_begin) -%}
+{{- require_section(section_content.count('<!--DSW:SE:empty-section:v1:begin-->') == section_pieces|length - 1) -}}
+{{- require_section(section_content.count('<!--DSW:SE:empty-section:v1:end-->') == section_pieces|length - 1) -}}
+{{- require_section(section_end not in section_pieces[0]) -}}
+{{- section_pieces[0]|safe -}}
+{%- for section_piece in section_pieces[1:] -%}
+  {%- set section_parts = section_piece.split(section_end) -%}
+  {{- require_section(section_parts|length == 2) -}}
+  {%- set section_heading = section_parts[0] -%}
+  {{- require_section(section_heading.count('<w:p>') == 1 and section_heading.count('</w:p>') == 1 and section_heading.count(section_property) == 1) -}}
+  {{- require_section('<w:tbl' not in section_heading and '<w:drawing' not in section_heading and '<w:spacing' not in section_heading and '<w:keepNext' not in section_heading) -}}
+  {{- section_heading.replace(section_property, section_replacement, 1)|safe -}}
+  {{- section_parts[1]|safe -}}
+{%- endfor -%}

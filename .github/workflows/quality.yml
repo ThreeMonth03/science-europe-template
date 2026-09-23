@@ -19,6 +19,8 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - run: python -m pip install -r requirements-dev.txt
       - run: make check
+      - name: Check experimental Word empty-section scope without changing production
+        run: python experiments/word-empty-section-spacing/check.py --output outputs/word-empty-section-prototype.json
       - name: Check integrated empty-section print spacing and unchanged screen scope
         run: python scripts/probe_empty_section_spacing.py --output outputs/empty-section-spacing-engine.json
       - name: Check bounded many-budget PDF rows without changing cell text
