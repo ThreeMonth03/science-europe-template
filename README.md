@@ -6,6 +6,12 @@
 > `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
 > the official template accidentally.
 
+Version 0.3.49 [integrates the reviewed Q1 preparation prose](docs/reuse-preparation.md).
+Complete English branch sentences feed the existing Chinese translation pipeline;
+the nine reviewed wording changes preserve answer states, authored content and
+layout/Word assets. Paired native and CI checks are tracked in the Chinese repo.
+This is source integration, not deployment or full submission acceptance.
+
 Version 0.3.48 [integrates bounded empty-section print spacing](docs/empty-section-spacing.md)
 from the verified prototype. Only print margins change; all questions and answers,
 translations, review behavior and Word steps remain. Paired rebuilt-package native

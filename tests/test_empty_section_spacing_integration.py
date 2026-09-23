@@ -8,7 +8,8 @@ from empty_section_spacing_contract import project_source,prior_css,css,load
 class EmptySectionIntegrationTests(unittest.TestCase):
     def test_actual_sources_reproduce_prototype_and_old_view(self):
         before,metadata=project_source();self.assertEqual(metadata['version'],'0.3.47')
-        actual={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+        from reuse_preparation_contract import project_source as before_preparation
+        actual,_=before_preparation()
         self.assertEqual(len(load('probe').check(ROOT,before,actual)),396)
         from submission_flow_contract import project_source as older
         self.assertEqual(older(before,metadata)[1]['version'],'0.3.46')

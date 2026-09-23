@@ -15,8 +15,11 @@ def load(name):
 class PreparationProseTests(unittest.TestCase):
     def test_exact_scope_and_answer_matrix(self):
         recipe = load('recipe'); before = recipe.baseline_sources()
-        self.assertEqual(before, {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()})
-        rows = load('probe').check(ROOT, before, recipe.overlay(before))
+        from reuse_preparation_contract import project_source
+        self.assertEqual(before, project_source()[0])
+        actual = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
+        self.assertEqual(recipe.overlay(before), actual)
+        rows = load('probe').check(ROOT, before, actual)
         self.assertEqual(396, sum(r['case'].startswith('fixture-') for r in rows))
         self.assertGreater(len(rows), 8000)
 

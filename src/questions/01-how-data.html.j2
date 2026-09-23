@@ -397,13 +397,13 @@
     {%- set dataHarmo = [preexistingPath, uuids.preexistingYesAUuid, uuids.dataHarmoQUuid]|reply_path -%}
     {%- set dataHarmoReply = repliesMap [dataHarmo]|reply_str_value -%}
     {%- if dataHarmoReply == uuids.dataHarmoYesAUuid -%}
-      <p>We need to harmonize different sources of existing data before reusing them
+      <p>Before reuse, we need to harmonize existing data from different sources
       {%- set dataHarmonAvailable = [dataHarmo, uuids.dataHarmoYesAUuid, uuids.dataHarmoOthersQUuid]|reply_path  -%}
       {%- set dataHarmonAvailableReply = repliesMap[dataHarmonAvailable]|reply_str_value -%}
       {%- if dataHarmonAvailableReply == uuids.dataHarmoOthersYesAUuid -%}
-        {{+" "}}and we will make this harmonization results available to others
+        {{+" "}}and will make the results available to others
       {%- elif dataHarmonAvailableReply == uuids.dataHarmoOthersNoAUuid -%}
-        {{+" "}}but we won't make this harmonization results available to others
+        {{+" "}}but will not make the results available to others
       {%- endif -%}
       .</p>
     {%- endif -%}
@@ -412,43 +412,34 @@
     {%- set dataCompRead = [preexistingPath, uuids.preexistingYesAUuid, uuids.dataCompReadQUuid]|reply_path -%}
     {%- set dataCompReadReply = repliesMap[dataCompRead]|reply_str_value -%}
     {%- if dataCompReadReply == uuids.dataCompReadYesAUuid -%}
-      <p>We will need to (re-)made the data into computer readable form before their using
-
       {%- set dataCompReadItself = [dataCompRead, uuids.dataCompReadYesAUuid, uuids.dataCompReadItselfQUuid]|reply_path -%}
       {%- set dataCompReadItselfReply = repliesMap[dataCompReadItself]|reply_str_value -%}
-      {%- set dataCompReadOthers = [dataCompRead, uuids.dataCompReadYesAUuid, uuids.dataCompReadOthersQUuid]|reply_path  -%}
+      {%- set dataCompReadOthers = [dataCompRead, uuids.dataCompReadYesAUuid, uuids.dataCompReadOthersQUuid]|reply_path -%}
       {%- set dataCompReadOthersReply = repliesMap[dataCompReadOthers]|reply_str_value -%}
-
-      {%- if dataCompReadItselfReply -%}
-        {%- if dataCompReadItselfReply == uuids.dataCompReadItselfYesAUuid -%}
-          {{+" "}}and we will make this computer readable form available to others through a standard repository
-        {%- elif dataCompReadItselfReply == uuids.dataCompReadItselfYesOtherAUuid -%} 
-          {{+" "}}and we will make this computer readable form available to others
-        {%- elif dataCompReadItselfReply == uuids.dataCompReadItselfNoAUuid -%}
-          {{+" "}}but we won't make this computer readable form available to others
-        {%- endif -%}
+      <p>
+      {%- if dataCompReadItselfReply == uuids.dataCompReadItselfYesAUuid -%}
+        Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others through a standard repository.
+      {%- elif dataCompReadItselfReply == uuids.dataCompReadItselfYesOtherAUuid -%}
+        Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others.
+      {%- elif dataCompReadItselfReply == uuids.dataCompReadItselfNoAUuid -%}
+        Before reuse, we will need to convert the data into a machine-readable form but will not make this version available to others.
+      {%- else -%}
+        Before reuse, we will need to convert the data into a machine-readable form.
       {%- endif -%}
-      .
-
-      {%- if dataCompReadOthersReply -%}
-        {%- if dataCompReadOthersReply == uuids.dataCompReadOthersYesAUuid %}
-            We will provide machine readable, standardized metadata to others
-            {%- set dataCompReadWhichMetadataStandardPath = [dataCompReadOthers, uuids.dataCompReadOthersYesAUuid, uuids.dataCompReadOthersYesStandardsQUuid]|reply_path -%}
-            {%- set dataCompReadMetadataStandardItems =  repliesMap[dataCompReadWhichMetadataStandardPath]|reply_items -%}
-            {%- if dataCompReadMetadataStandardItems|length  > 0 -%}
-              {{+" "}}and we will use following Metadata Standards:{{+" "}}
-                {%- for dataCompReadMetadataStandardItem in dataCompReadMetadataStandardItems -%}
-                  {%- set dataCompReadMetadataStandardPrefix = [dataCompReadWhichMetadataStandardPath, dataCompReadMetadataStandardItem]|reply_path -%}
-                  {%- set dataCompReadMetadataStandard = [dataCompReadMetadataStandardPrefix, uuids.dataCompReadOthersYesStandardQUuid]|reply_path -%}
-                  {%- set dataCompReadMetadataStandardReply = repliesMap[dataCompReadMetadataStandard] -%}
-                  {{ macros.integrationFairSharing(dataCompReadMetadataStandardReply) }}{{ ", " if not loop.last else "." }}
-                {%- endfor -%}
-            {%- else -%}
-            .
-            {%- endif -%}
-
+      {%- if dataCompReadOthersReply == uuids.dataCompReadOthersYesAUuid -%}
+        {%- set dataCompReadWhichMetadataStandardPath = [dataCompReadOthers, uuids.dataCompReadOthersYesAUuid, uuids.dataCompReadOthersYesStandardsQUuid]|reply_path -%}
+        {%- set dataCompReadMetadataStandardItems = repliesMap[dataCompReadWhichMetadataStandardPath]|reply_items -%}
+        {%- if dataCompReadMetadataStandardItems|length > 0 -%}
+          {{+" "}}We will provide others with standardized, machine-readable metadata and we will use the following metadata standards:{{+" "}}
+          {%- for dataCompReadMetadataStandardItem in dataCompReadMetadataStandardItems -%}
+            {%- set dataCompReadMetadataStandardPrefix = [dataCompReadWhichMetadataStandardPath, dataCompReadMetadataStandardItem]|reply_path -%}
+            {%- set dataCompReadMetadataStandard = [dataCompReadMetadataStandardPrefix, uuids.dataCompReadOthersYesStandardQUuid]|reply_path -%}
+            {%- set dataCompReadMetadataStandardReply = repliesMap[dataCompReadMetadataStandard] -%}
+            {{ macros.integrationFairSharing(dataCompReadMetadataStandardReply) }}{{ ", " if not loop.last else "." }}
+          {%- endfor -%}
+        {%- else -%}
+          {{+" "}}We will provide others with standardized, machine-readable metadata.
         {%- endif -%}
-          
       {%- endif -%}
       </p>
     {%- endif -%}
