@@ -63,5 +63,27 @@ class CjkPunctuationProbeTests(unittest.TestCase):
             with self.assertRaises(AssertionError): probe.compare(before, BeautifulSoup(mutation, 'html.parser'), 'chinese')
         with self.assertRaises(AssertionError): probe.compare(before, after, 'english')
 
+    def test_naive_boundary_rule_has_an_explicit_mixed_counterexample(self):
+        cases = list(load('boundary_lab').cases())
+        self.assertEqual([c['name'] for c in cases if c['pdf_effect'] != c['word_effect']], ['mixed-boundary'])
+
+    def test_word_oracle_rejects_other_space_punctuation_and_style_changes(self):
+        import copy
+        lab = load('boundary_lab')
+        left, right = '資料 W3C。', '下一句。'
+        seq = [dict(t='Str', c='資料'), dict(t='Space'), dict(t='Str', c='W3C。'), dict(t='Space'), dict(t='Str', c=right)]
+        word = lambda text: '<w:p xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:pPr><w:pStyle w:val="BodyText"/></w:pPr><w:r><w:t>'+text+'</w:t></w:r></w:p>'
+        before = dict(ast=dict(blocks=[dict(t='Para', c=seq)]), word_blocks=[word(left+' '+right)])
+        after = dict(ast=dict(blocks=[dict(t='Para', c=seq[:3]+seq[4:])]), word_blocks=[word(left+right)])
+        lab.word_delta(before, after, left, right, True)
+        lab.word_delta(before, before, left, right, False)
+        for text in [left.replace(' ', '')+right, left+right.replace('。','.'), left+' '+right]:
+            changed = copy.deepcopy(after); changed['word_blocks'] = [word(text)]
+            with self.assertRaises(AssertionError): lab.word_delta(before, changed, left, right, True)
+        changed = copy.deepcopy(after); changed['word_blocks'][0] = changed['word_blocks'][0].replace('BodyText', 'Heading1')
+        with self.assertRaises(AssertionError): lab.word_delta(before, changed, left, right, True)
+        changed = copy.deepcopy(after); changed['ast']['blocks'][0]['c'][0]['c'] = 'OTHER'
+        with self.assertRaises(AssertionError): lab.word_delta(before, changed, left, right, True)
+
 
 if __name__ == '__main__': unittest.main()

@@ -106,6 +106,14 @@ def check(root, before, after, language='english'):
                 old, new = [BeautifulSoup(t.render(**args), 'html.parser') for t in (full if fixtures_only else templates)]
                 compare(old, new, language)
                 delta = changes(old, language)
+                if language == 'chinese' and not fixtures_only and name.startswith('join-'):
+                    _, mask, keywords, provenance = name.split('-')
+                    parts = zh_parts(int(mask), keywords == 'yes', provenance == 'yes')
+                    if parts:
+                        # The locked translator already rewrites the literal join(" ").
+                        # This is a negative experiment: prove the old package is fixed,
+                        # rather than count successful renders as an improvement.
+                        assert old.select_one(SELECTOR).find('p', recursive=False).get_text() == ''.join(parts)
                 assert not new.select('p p, p div, p ul, p table, script')
                 if fixtures_only:
                     assert len(new.select('.question')) == 15 and len(new.select('.dmp-section')) == 6
@@ -113,5 +121,5 @@ def check(root, before, after, language='english'):
                     assert not [n for n in new.select('.data-gap') if not n.find_parent(class_='answer-detail')]
                 rows.append(dict(case=('fixture-' if fixtures_only else '') + name, profile=profile,
                     autoescape=escape, removed_owned_separators=sum(len(a)-len(b) for a,b in delta)))
-    assert language != 'chinese' or sum(r['removed_owned_separators'] for r in rows) > 0
+    assert not any(r['removed_owned_separators'] for r in rows), 'Revisit the no-benefit finding'
     return rows
