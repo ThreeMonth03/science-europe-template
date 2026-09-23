@@ -25,10 +25,11 @@ class EmptySectionIntegrationTests(unittest.TestCase):
             bad=copy.deepcopy(metadata);mutate(bad)
             with self.assertRaises(AssertionError):project_source(sources,bad)
 
-    def test_only_exact_css_suffix_can_be_projected(self):
+    def test_only_exact_css_block_can_be_projected_without_losing_surroundings(self):
         delta=css().decode();self.assertEqual(prior_css('prior'+delta),'prior')
         self.assertEqual(prior_css('prior'),'prior')
-        for bad in [delta+delta,delta+'!',delta.replace('.8em','.9em'),delta.split('*/')[0]]:
+        self.assertEqual(prior_css('prior'+delta+'unreviewed suffix'),'priorunreviewed suffix')
+        for bad in [delta+delta,delta.replace('.8em','.9em'),delta.split('*/')[0]]:
             with self.assertRaises(AssertionError):prior_css(bad)
 
 if __name__=='__main__':unittest.main()

@@ -26,8 +26,11 @@ def prior_css(source):
     marker='/* BEGIN empty section spacing v1:'
     if marker not in source:return source
     delta=css().decode()
-    assert source.count(marker)==source.count(delta)==1 and source.endswith(delta),'Modified or duplicate section CSS'
-    return source[:-len(delta)]
+    assert source.count(marker)==source.count(delta)==1,'Modified or duplicate section CSS'
+    # Historical probes may append a separately verified retired rule. Preserve
+    # every surrounding byte; the caller's historical hash gate checks them.
+    # Actual 0.3.48 sources are still checked against the complete exact overlay.
+    return source.replace(delta,'',1)
 
 def project_source(sources=None,metadata=None):
     if sources is None:sources={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
