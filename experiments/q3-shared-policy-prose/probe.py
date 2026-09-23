@@ -33,7 +33,8 @@ def eligible(policy):
         if any(type(n) is not NavigableString for n in node.contents): return False
         text = node.get_text().strip()
         if not text or text[-1] not in '.。' or any(c in text for c in '<>&'): return False
-    return dictionaries <= 1
+    texts = [node.get_text().strip() for node in nodes]
+    return dictionaries <= 1 and all(separator(left, right) == '' for left, right in zip(texts, texts[1:]))
 
 
 def separator(left, right):
@@ -121,6 +122,6 @@ def check(root, before, after, language):
                 if name.startswith('authored-'):assert not changes
                 rows.append(dict(case=('fixture-' if fixtures_only else '')+name,profile=profile,autoescape=escape,
                     joined_policies=len(changes),removed_owned_separators=sum(c['removed_owned_separators'] for c in changes)))
-    assert any(r['joined_policies'] for r in rows)
+    assert any(r['joined_policies'] for r in rows) == (language=='chinese')
     assert bool(sum(r['removed_owned_separators'] for r in rows)) == (language=='chinese')
     return rows

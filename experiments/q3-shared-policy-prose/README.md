@@ -8,10 +8,17 @@ wording. It is not the rejected sentence-list or widened-CSS experiment.
 The caller passes only the existing Q3 metadata-policy block. The helper admits
 exactly 2–3 plain paragraphs with complete sentences. It preserves the dictionary
 fact's attributes on a span, retains the original order and internal text, and
-joins at the same boundary for HTML/PDF/Word. A fullwidth stop followed by a BMP
-Han opening needs no newly inserted ASCII separator; all other openings keep one.
-English and mixed-language boundaries therefore do not depend on renderer-specific
-language guesses. This is deliberately not a general language detector.
+joins at the same boundary for HTML/PDF/Word. Every boundary must be a fullwidth
+stop followed by a BMP Han opening; no new ASCII separator is inserted. Any other
+boundary returns the entire original block byte-for-byte, including a three-part
+run with just one mixed boundary. English and mixed-language runs are not merged.
+This is deliberately not a general language detector.
+
+The initial broader prototype merged English too, preserving its ASCII separators.
+Native engine checks nevertheless found a 0.013055 pt coordinate change and changed
+72-dpi pixels in an English control. The narrowed rule avoids that unnecessary
+reshaping; unchanged cases must pass exact geometry and pixel checks, not an
+increased tolerance. Initial failed evidence remains separate from the final run.
 
 The whole block is returned unchanged when it contains a gap, an authored Div,
 inline markup/entities, an unknown attribute, a duplicate dictionary fact,

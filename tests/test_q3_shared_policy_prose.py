@@ -26,8 +26,18 @@ class SharedPolicyTests(unittest.TestCase):
             ('First sentence.','Second sentence.',' '),('第一句。','W3C PROV is supported.',' '),
             ('First sentence.','第二句。',' '),('第一句。','「下一句」。',' '),('第一句。','𠀀。',' ')]:
             for escape in [False,True]:
-                self.assertEqual(self.render('<p>'+left+'</p><p>'+right+'</p>',escape),
-                    '<p class="metadata-prose">'+left+separator+right+'</p>')
+                original='<p>'+left+'</p><p>'+right+'</p>'
+                self.assertEqual(self.render(original,escape),original if separator else
+                    '<p class="metadata-prose">'+left+right+'</p>')
+
+    def test_one_mixed_boundary_preserves_entire_three_paragraph_run(self):
+        examples=['<p>第一句。</p><p>第二句。</p><p>W3C PROV works.</p>',
+            '<p>第一句。</p><p>W3C PROV works.</p><p>第三句。</p>',
+            '<p>First sentence.</p><p>第二句。</p><p>第三句。</p>']
+        probe=load('probe')
+        for original in examples:
+            self.assertFalse(probe.eligible(BeautifulSoup('<div>'+original+'</div>','html.parser').div))
+            for escape in [False,True]:self.assertEqual(self.render(original,escape),original)
 
     def test_preserves_dictionary_facts_and_internal_spaces(self):
         value='\n  <p>資料 W3C  PROV。</p>\n<p data-fact-id="metadata-dictionary" data-status="explicit-no">本計畫不建立字典。</p>\n<p>後設資料將公開提供。</p>  \n'
@@ -62,7 +72,8 @@ class SharedPolicyTests(unittest.TestCase):
         probe=load('probe')
         before=BeautifulSoup('<div id="q-docs-metadata"><div class="answer"><div class="metadata-policy"><p>第一句。</p><p data-fact-id="metadata-dictionary" data-status="complete">W3C PROV works.</p></div><div class="answer-detail"><p>原文。  X</p></div></div></div>','html.parser')
         after,_=probe.project(before);probe.compare(before,after)
-        for old,new in [('。 <span','。<span'),('原文。  X','原文。X'),('complete','explicit-no'),('PROV','Provenance')]:
+        self.assertEqual(str(after),str(before))
+        for old,new in [('。</p>','。 </p>'),('原文。  X','原文。X'),('complete','explicit-no'),('PROV','Provenance')]:
             changed=str(after).replace(old,new);self.assertNotEqual(str(after),changed)
             with self.assertRaises(AssertionError):probe.compare(before,BeautifulSoup(changed,'html.parser'))
 
