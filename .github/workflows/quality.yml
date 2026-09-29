@@ -21,7 +21,7 @@ jobs:
       - run: make check
       - name: Check integrated Q3 prose on actual production sources
         run: python scripts/probe_q3_policy_prose.py --output outputs/q3-policy-prose-scope.json
-      - name: Check integrated Word empty-section scope on actual production assets
+      - name: Verify current sources and replay frozen Word empty-section scope
         run: python scripts/probe_word_empty_sections.py --output outputs/word-empty-section-engine.json
       - name: Check integrated empty-section print spacing and unchanged screen scope
         run: python scripts/probe_empty_section_spacing.py --output outputs/empty-section-spacing-engine.json
