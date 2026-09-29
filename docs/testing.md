@@ -19,6 +19,12 @@ python scripts/check_current.py --build /path/to/bilingual-build --output output
 make check
 ```
 
+`make check` and `make test` first fetch the two public 2.7.0 Knowledge Model
+bundles from a fixed tooling commit and verify their SHA-256 digests. Downloads
+remain ignored; no credentials or project answers are involved. A verified
+cache works offline, while a corrupt cache fails without being overwritten.
+Before running unittest directly in a fresh checkout, run `make knowledge-models`.
+
 `--build` expects `en/` and `translated/`. Use the English checkout corresponding
 to that build; do not mix its UUID bindings or tests with another release.
 For one prepared tree, use `--root PATH --language en|zh-Hant`.

@@ -1,9 +1,12 @@
-.PHONY: test verify check check-current package audit-upstream
+.PHONY: test verify check check-current package audit-upstream knowledge-models
 
 PYTHON ?= python3
 DSW_TDK ?= dsw-tdk
 
-test:
+knowledge-models:
+	$(PYTHON) scripts/prepare_knowledge_models.py
+
+test: knowledge-models
 	$(PYTHON) -m unittest discover -s tests -v
 
 verify:
