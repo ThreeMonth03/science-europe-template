@@ -452,13 +452,87 @@ local function keep_q5_context(div)
 end
 -- END short Q5 context
 
+-- Keep the owned budget title/project label inside the first table's repeating
+-- header. A paragraph keepNext can instead try to keep an entire large table,
+-- leaving the title on its own page. Move original blocks, never rewrite text,
+-- size the table by row count, or walk into authored/nested tables.
+local function attach_budget_headings(div)
+  local function short_label(label)
+    if not label or label.t ~= "Div" or label.attributes["custom-style"] ~= "Pilot Label" or
+       #label.content ~= 1 or label.content[1].t ~= "Para" or
+       #label.content[1].content ~= 1 or label.content[1].content[1].t ~= "Strong" then return false end
+    for _, inline in ipairs(label.content[1].content[1].content) do
+      if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return false end
+    end
+    local width = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(label)) do width = width + (code >= 0x2E80 and 2 or 1) end
+    return width > 0 and width <= 160
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      local heading_index = nil
+      for index, block in ipairs(answer.content) do
+        if block.t == "Header" and block.level == 4 and block.classes:includes("word-budget-heading") then
+          heading_index = index
+          break
+        end
+      end
+      if heading_index then
+        local moved_heading = false
+        for index = heading_index + 1, #answer.content do
+          local project = answer.content[index]
+          if project.t ~= "Div" or not project.classes:includes("project-resources") then break end
+          local label, position = project.content[1], 1
+          if short_label(label) then
+            position = 2
+          else label = nil end
+          local tbl = project.content[position]
+          if tbl and tbl.t == "Table" and tbl.classes:includes("resource-table") and
+             #tbl.colspecs == 3 and #tbl.head.rows > 0 and #tbl.head.rows[1].cells == 3 and
+             #tbl.bodies == 1 and #tbl.bodies[1].body > 0 and
+             (label or index == heading_index + 1) then
+            local blocks = pandoc.List()
+            if index == heading_index + 1 then
+              blocks:insert(answer.content[heading_index]:clone())
+              moved_heading = true
+            end
+            if label then blocks:insert(label:clone()) end
+            local row = tbl.head.rows[1]:clone()
+            row.cells = {row.cells[1]}
+            row.cells[1].col_span = 3
+            row.cells[1].row_span = 1
+            row.cells[1].contents = blocks
+            local headers = pandoc.List({row})
+            headers:extend(tbl.head.rows)
+            tbl.head.rows = headers
+            if label then project.content:remove(1) end
+            -- End the final owned table with a real paragraph. Otherwise the
+            -- closing bookmarks can leave its last page unpainted in Writer,
+            -- even though PDF text extraction still finds the missing row.
+            -- Only this empty structural paragraph is 1pt, avoiding a blank
+            -- tail page. All headings, labels and answers keep their styles.
+            if index == #answer.content and project.content[#project.content].t == "Table" then
+              project.content:insert(pandoc.RawBlock("openxml",
+                '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/>' ..
+                '<w:keepNext w:val="0"/><w:snapToGrid w:val="0"/>' ..
+                '<w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>'))
+            end
+          end
+        end
+        if moved_heading then answer.content:remove(heading_index) end
+      end
+    end
+  end
+  return div
+end
+
 function Div(div)
   if div.identifier == "q-store-backup" then return keep_q5_context(div) end
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
-  if div.identifier == "q-required-resources" then return keep_short_budget_overview(div) end
+  if div.identifier == "q-required-resources" then return attach_budget_headings(keep_short_budget_overview(div)) end
   if div.classes:includes("identifier-heading") then
     -- Q13 only: combine the existing distribution number and repository type.
     -- Para may already wrap all-Strong labels. Reject unexpected/free blocks;

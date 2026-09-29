@@ -4,7 +4,7 @@
   "candidate_version": "0.3.51",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "8e6d37fe6acea6997044edd48e4860c1af2b036ba80e50682b47d300512a3402",
+  "candidate_tree_sha256": "dbea65f170646ec6cad4202a75e4e7839c34841fc26d6ea851bbf71ce40a9948",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
@@ -26,8 +26,11 @@
     "src/questions/12-access-data.html.j2",
     "src/questions/13-persistent-identifier.html.j2",
     "src/questions/14-dm-responsible.html.j2",
+    "src/questions/15-required-resources.html.j2",
     "src/uuids.j2",
-    "src/word/pilot.lua"
+    "src/word/pilot.lua",
+    "src/word/question-spacing.xml",
+    "src/word/short-tables.xml"
   ],
   "added": [
     "src/active-answer.j2",

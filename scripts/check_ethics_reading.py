@@ -76,7 +76,7 @@ def check(root, language):
 
         for personal, sensitive, name, profile in itertools.product(
                 ['Yes', 'No', '', 'unknown'], ['Yes', 'No', '', 'unknown'],
-                ['Coastal observations', None, ' \n ', '<Dataset> & "A"', 'Long dataset name ' * 30],
+                ['Coastal observations' if language == 'en' else '沿岸水溫觀測資料', None, ' \n ', '<Dataset> & "A"', 'Long dataset name ' * 30],
                 ['review', 'submission']):
             replies = data_replies(personal, sensitive, name)
             soup = render(ethics, replies, profile)
@@ -100,7 +100,9 @@ def check(root, language):
             assert bool(sentence) == any(key)
             if sentence:
                 assert sentence.get_text(' ', strip=True) == SUMMARY[language][key]
-                assert ' '.join(summary.get_text().split()) == ' '.join((label.get_text() + ' ' + SUMMARY[language][key]).split()), 'Actual name/sentence boundary lost'
+                assert ' '.join(summary.get_text().split()) == ' '.join((label.get_text() + ' — ' + SUMMARY[language][key]).split()), 'Actual name/sentence boundary lost'
+            else:
+                assert summary.get_text(strip=True) == label.get_text(strip=True), 'No dangling separator without a statement'
             for fact, state in [('dataset-personal-data', personal), ('dataset-sensitive-data', sensitive)]:
                 nodes = item.select(f'[data-fact-id="{fact}"]')
                 assert len(nodes) == int(state in ['Yes', 'No'])
@@ -110,13 +112,19 @@ def check(root, language):
         for approval, status, case, name, profile in itertools.product(
                 ['Yes', 'No', '', 'unknown'], ['Planned', 'Applied', 'Granted', 'Reject', '', 'unknown'],
                 [None, '', ' \n ', 'CASE-2026', 'Case <A> & "B"'],
-                ['Coastal project', ' \n '], ['review', 'submission']):
+                ['Coastal project' if language == 'en' else '沿岸環境觀測計畫', ' \n '], ['review', 'submission']):
             soup = render(ethics, approval_replies(approval, status, case, name), profile)
             project = soup.select_one('.ethical-project')
             assert bool(project) == (approval in ['Yes', 'No'])
             if project:
                 summary = project.select_one('.ethical-project-summary')
                 assert summary and summary.strong
+                statement = ({'Yes': 'This project requires ethical approval.',
+                              'No': 'According to the questionnaire, this project does not require ethical approval.'}
+                             if language == 'en' else
+                             {'Yes': '本計畫需要倫理審查核准。',
+                              'No': '依問卷填答，本計畫不需要倫理審查核准。'})[approval]
+                assert ' '.join(summary.get_text().split()) == ' '.join((summary.strong.get_text() + ' — ' + statement).split()), 'Project name/sentence boundary lost'
                 assert project['data-item-id'] == 'project-a'
                 if not name.strip() and profile == 'submission': assert '1' in summary.strong.get_text()
                 record = project.select_one('.ethical-approval-record')

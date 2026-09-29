@@ -45,7 +45,7 @@ def examples(root):
         replies=dict(base,**updates)
         for autoescape in [False,True]:
             before=render(root,replies,autoescape=autoescape);after=render(root,replies,autoescape=autoescape,word=True)
-            assert after.replace('class="resource-table word-short-budget"','class="resource-table"')==before,(name,'Question output changed')
+            assert after.replace('class="resource-table word-short-budget"','class="resource-table"').replace('<h4 class="word-budget-heading">','<h4>')==before,(name,'Question output changed')
             assert len(BeautifulSoup(after,'html.parser').select('.word-short-budget'))==int(eligible)
         result.append(('question-'+name,after,int(eligible)))
     return result

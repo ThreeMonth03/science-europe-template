@@ -33,7 +33,7 @@
       <ul>
       {%- for project in projects -%}
         <li class="ethical-project" data-item-id="{{ project.item_id|e }}">
-          <p class="ethical-project-summary"><strong>{% if output_profile|default('review') == 'submission' and not project.name|trim %}{{ macros.projectLabel(project.index) }}{% else %}{{ project.name|e if project.name|trim else "(no name given)" }}{% endif %}</strong> {% if project.approval == uuids.projEthicalApprovalNoAUuid %}According to the questionnaire, this project does not require ethical approval.{% else %}This project requires ethical approval.{% endif %}</p>
+          <p class="ethical-project-summary"><strong>{% if output_profile|default('review') == 'submission' and not project.name|trim %}{{ macros.projectLabel(project.index) }}{% else %}{{ project.name|e if project.name|trim else "(no name given)" }}{% endif %}</strong> — {% if project.approval == uuids.projEthicalApprovalNoAUuid %}According to the questionnaire, this project does not require ethical approval.{% else %}This project requires ethical approval.{% endif %}</p>
           {% if project.approval == uuids.projEthicalApprovalYesAUuid %}
           {% if project.authorities|length > 0 %}
           {% set approvalRecords %}
@@ -95,7 +95,7 @@
         <li class="ethical-dataset" data-item-id="{{ i|e }}">
           {# A submission label with no facts is not a Word heading that must
              keep the following dataset/section with it. Mark its inline role. #}
-          <p class="ethical-data-summary">{% if output_profile|default('review') == 'submission' %}<span class="ethical-dataset-name">{% endif %}<strong>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</strong>{% if output_profile|default('review') == 'submission' %}</span>{% endif %} {% include 'src/ethics-data-summary.html.j2' %}</p>
+          <p class="ethical-data-summary">{% if output_profile|default('review') == 'submission' %}<span class="ethical-dataset-name">{% endif %}<strong>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</strong>{% if output_profile|default('review') == 'submission' %}</span>{% endif %}{% if containPersonal in [uuids.containPersonalYesAUuid, uuids.containPersonalNoAUuid] or containSensitive in [uuids.containSensitiveYesAUuid, uuids.containSensitiveNoAUuid] %} — {% endif %}{% include 'src/ethics-data-summary.html.j2' %}</p>
           {% if not containPersonal and not containSensitive and output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing">Whether this dataset contains personal or sensitive data has not been specified.</p>{% endif %}
         </li>
       {%- endfor -%}

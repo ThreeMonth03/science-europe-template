@@ -2,10 +2,22 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from probe_budget_word import allowed_changes,cases
+from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading_move
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_heading_probe_covers_missing_long_and_unowned_tables(self):
+        rows=heading_cases()
+        self.assertEqual(21,len(rows))
+        self.assertEqual(len(rows),len({name for name,_,_ in rows}))
+        self.assertEqual(8,sum(count==0 for _,_,count in rows))
+        for name in ['long-paragraph','expanded-long','two-projects','first-empty-project','no-amount','no-currency','no-funding']:
+            self.assertIn(name,[row[0] for row in rows])
+
+    def test_heading_oracle_rejects_unrelated_text_changes(self):
+        before={'t':'Str','c':'Original'}
+        with self.assertRaises(AssertionError): verify_heading_move(before,{'t':'Str','c':'Changed'})
+
     def test_only_existing_text_in_keep_wrapper_is_allowed(self):
         before={'t':'Plain','c':[{'t':'Str','c':'0 TWD'}]}
         after={'t':'Div','c':[['',[],[['custom-style','Pilot List Lead']]],[{'t':'Para','c':before['c']}]]}

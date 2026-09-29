@@ -4,6 +4,29 @@
 {%- macro require(ok) -%}
   {%- if not ok -%}{{ short_table_xml_contract_mismatch.raise_error() }}{%- endif -%}
 {%- endmacro -%}
+{# Move only the owned DMP page break onto its first section heading. A separate
+   break paragraph can overflow a full cover and create an otherwise blank page.
+   Preserve heading runs/bookmarks; malformed native XML fails closed. #}
+{%- set body_marker = ' w:name="dmp-content" />' -%}
+{%- set body_parts = content.split(body_marker) -%}
+{%- if body_parts|length > 1 -%}
+  {{- require(body_parts|length == 2) -}}
+  {%- set break_paragraph = '\n    <w:p><w:r><w:br w:type="page"/></w:r></w:p>\n    ' -%}
+  {{- require(body_parts[1].startswith(break_paragraph)) -}}
+  {%- set first = body_parts[1][break_paragraph|length:].split('<w:p>', 1) -%}
+  {{- require(first|length == 2 and first[0].count('<w:bookmarkStart ') == 2 and ' w:name="sec-data-collection" />' in first[0]) -}}
+  {%- for token in first[0].strip().splitlines() -%}
+    {%- set token = token.strip() -%}
+    {{- require((token.startswith('<w:bookmarkStart w:id="') and token.endswith(' />')) or token == '<!--DSW:SE:empty-section:v1:begin-->') -}}
+  {%- endfor -%}
+  {%- set first_style = '<w:pPr><w:pStyle w:val="Heading2" /></w:pPr>' -%}
+  {{- require(first[1].startswith(first_style)) -}}
+  {%- set first_replacement = '<w:pPr><w:pStyle w:val="Heading2" /><w:pageBreakBefore/></w:pPr>'|safe -%}
+  {%- set content -%}
+    {{- body_parts[0]|safe -}}{{- body_marker|safe -}}{{- '\n    '|safe -}}{{- first[0]|safe -}}
+    <w:p>{{- first[1].replace(first_style, first_replacement, 1)|safe -}}
+  {%- endset -%}
+{%- endif -%}
 {%- set begin = '<!--DSW:SE:short-table:v1:begin-->\n    ' -%}
 {%- set end = '\n    <!--DSW:SE:short-table:v1:end-->' -%}
 {{- require(content is string) -}}

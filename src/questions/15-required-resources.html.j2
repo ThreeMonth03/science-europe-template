@@ -77,7 +77,7 @@
     {%- set projectPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
     {%- set projectItems = repliesMap[projectPath]|reply_items -%}
     {%- if projectItems|length > 0 -%}
-    {%- set visibleBudget = namespace(any=false) -%}{%- for budgetProject in projectItems -%}{%- if repliesMap[[projectPath, budgetProject, uuids.costQUuid]|reply_path]|reply_items -%}{%- set visibleBudget.any = true -%}{%- endif -%}{%- endfor -%}{% if output_profile|default('review') != 'submission' or visibleBudget.any %}<h4>Data-management budget</h4>{% endif %}
+    {%- set visibleBudget = namespace(any=false) -%}{%- for budgetProject in projectItems -%}{%- if repliesMap[[projectPath, budgetProject, uuids.costQUuid]|reply_path]|reply_items -%}{%- set visibleBudget.any = true -%}{%- endif -%}{%- endfor -%}{% if output_profile|default('review') != 'submission' or visibleBudget.any %}<h4{% if word_budget_reading|default(false) %} class="word-budget-heading"{% endif %}>Data-management budget</h4>{% endif %}
         {%- for i in projectItems -%}
             {%- set projectItem = [projectPath, i]|reply_path -%}
             {%- set projectItemNameQUuid = [projectItem, uuids.projectNameQUuid]|reply_path -%}

@@ -45,6 +45,12 @@
   {%- set section_parts = section_piece.split(section_end) -%}
   {{- require_section(section_parts|length == 2) -}}
   {%- set section_heading = section_parts[0] -%}
+  {# The shared Word helper gives only the first section a page break. Preserve
+     that property when also compacting an entirely unanswered section. #}
+  {%- if '<w:pageBreakBefore/>' in section_heading -%}
+    {%- set section_property = section_property.replace('</w:pPr>', '<w:pageBreakBefore/></w:pPr>') -%}
+    {%- set section_replacement = section_replacement.replace('<w:spacing', '<w:pageBreakBefore/><w:spacing'|safe) -%}
+  {%- endif -%}
   {{- require_section(section_heading.count('<w:p>') == 1 and section_heading.count('</w:p>') == 1 and section_heading.count(section_property) == 1) -}}
   {{- require_section('<w:tbl' not in section_heading and '<w:drawing' not in section_heading and '<w:spacing' not in section_heading and '<w:keepNext' not in section_heading) -}}
   {{- section_heading.replace(section_property, section_replacement, 1)|safe -}}
