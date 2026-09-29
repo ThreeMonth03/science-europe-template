@@ -73,11 +73,9 @@ html body .resource-table col.resource-purpose { width: 57%; }
 html body .resource-table col.resource-budget { width: 17%; }
 html body .resource-table col.resource-funding { width: 26%; }
 html body .resource-table tr { break-inside: auto; }
-html body .resource-table:has(tbody > tr:last-child:nth-child(-n+3)) { break-inside: avoid; }
-/* Row count alone cannot bound a table's height. Release the whole-table keep
-   for Q15 purposes with >=12 direct authored blocks; do not rewrite answers or
-   change the short/many-row controls. One huge paragraph is outside this hint. */
-html body #q-required-resources .resource-table:has(tbody > tr > td:first-child > .answer-detail > :nth-child(12)) { break-inside: auto; }
+/* Only the bounded-content classifier can keep a small budget together.
+   Few rows can still contain pages of text, even in a single paragraph. */
+html body .resource-table.pdf-bounded-budget, html body .resource-table.pdf-short-budget { break-inside: avoid; }
 html body .resource-table p { margin-bottom: .3em; }
 html body .resource-table ul { padding-left: 1.2em; }
 html body .resource-table .answer-detail { margin: .25em 0; }
@@ -195,7 +193,7 @@ html body #dmp-content > section.dmp-section#sec-docs-metadata:has(> h2:first-ch
 html body #dmp-content > section.dmp-section#sec-storage-backup:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child),
 html body #dmp-content > section.dmp-section#sec-ethics-legal:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3)):has(> div.question.compact-empty-question:nth-child(4):last-child),
 html body #dmp-content > section.dmp-section#sec-sharing-preservation:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3)):has(> div.question.compact-empty-question:nth-child(4)):has(> div.question.compact-empty-question:nth-child(5):last-child),
-html body #dmp-content > section.dmp-section#sec-responsibilities-resources:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) { margin-bottom: .8em; }
+html body #dmp-content > section.dmp-section#sec-responsibilities-resources:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) { margin-bottom: .8em; break-inside: avoid; }
 html body #dmp-content > section.dmp-section#sec-data-collection:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2,
 html body #dmp-content > section.dmp-section#sec-docs-metadata:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2,
 html body #dmp-content > section.dmp-section#sec-storage-backup:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2,

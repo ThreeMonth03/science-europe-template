@@ -11,7 +11,7 @@ from markupsafe import Markup
 from lxml import etree
 from probe_q8_word import ROOT,IMAGE,RUNNER
 from probe_short_budget import fragments
-from probe_pdf_budget_reading import matrix,render
+from probe_pdf_budget_reading import matrix,render,project_bounded_budget_hint
 from generate_pilot_fixtures import IDS
 from word_short_budget_contract import compare_ast,compare_blocks
 
@@ -27,7 +27,7 @@ def examples(root):
         expected=original.replace('class="resource-table"','class="resource-table word-short-budget"',1) if eligible else original
         for module in modules:
             assert module.short_table(Markup(original),rows,True)==expected,(name,'Only Word class may change, including autoescape')
-            assert module.short_table(Markup(original),rows)==expected.replace('word-short-budget','pdf-short-budget'),(name,'PDF behavior changed')
+            assert project_bounded_budget_hint(module.short_table(Markup(original),rows))==expected.replace('word-short-budget','pdf-short-budget'),(name,'PDF content changed')
         result.append((name,'<div id="q-required-resources">'+expected+'</div>',int(eligible)))
     good=next(html for name,html,count in result if name=='rows-1')
     for name,html in [('unmarked',good.replace(' word-short-budget','')),

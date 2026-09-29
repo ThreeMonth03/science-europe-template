@@ -67,6 +67,8 @@
     {%- else -%}
       {{- original|replace('<table class="resource-table">', '<table class="resource-table pdf-short-budget">'|safe, 1) -}}
     {%- endif -%}
+  {%- elif selection.short and not word -%}
+    {{- original|replace('<table class="resource-table">', '<table class="resource-table pdf-bounded-budget">'|safe, 1) -}}
   {%- else -%}{{ original }}{%- endif -%}
 {%- endmacro -%}
 

@@ -7,6 +7,37 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
 from check_current import SUITES, run_suite
 from current_repairs_contract import project_source, source_tree
+from current_support import environment
+
+
+class CurrentBudgetLayoutTests(unittest.TestCase):
+    def test_bounded_table_hint_preserves_question_grouping_and_rejections(self):
+        from markupsafe import Markup
+        from probe_short_resources import cases
+        for escape in [False, True]:
+            helper = environment(ROOT, escape).get_template('src/pdf/short-resources.html.j2').module
+            for name, original, _ in cases():
+                marked = original.replace('class="resource-table"', 'class="resource-table pdf-bounded-budget"')
+                actual = str(helper.document(Markup(marked))).replace('class="resource-table pdf-bounded-budget"', 'class="resource-table"')
+                self.assertEqual(actual, str(helper.document(Markup(original))), name)
+
+    def test_only_bounded_content_gets_whole_table_keep(self):
+        from markupsafe import Markup
+        original = Markup('<table class="resource-table"><tbody><tr><td>Unchanged</td></tr></tbody></table>')
+        row = dict(title='<p>Storage</p>', purpose='<p>Retain data.</p>',
+                   budget='<p>100 TWD</p>', funding='<p>Institution</p>')
+        for escape in [False, True]:
+            template = environment(ROOT, escape).from_string(
+                "{% import 'src/budget-reading.html.j2' as budget %}{{ budget.short_table(original, rows, word) }}")
+            for word in [False, True]:
+                for rows, bounded in [([row], True), ([row] * 3, True), ([row] * 4, False),
+                        ([dict(row, purpose='<p>' + 'Long description. ' * 100 + '</p>')], False),
+                        ([dict(row, purpose='<p>Paragraph</p>' * 16)], False),
+                        ([dict(row, purpose='<p><img src="chart.png"></p>')], False)]:
+                    expected = str(original)
+                    if bounded and not word:
+                        expected = expected.replace('class="resource-table"', 'class="resource-table pdf-bounded-budget"')
+                    self.assertEqual(template.render(original=original, rows=rows, word=word), expected)
 
 
 class CurrentBehaviorTests(unittest.TestCase):

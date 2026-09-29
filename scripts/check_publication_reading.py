@@ -53,7 +53,7 @@ def expected(publication, timing, catalogue, language):
 
 
 def check(root, language):
-    counts = dict(summary_cases=0, record_cases=0, full_documents=0)
+    counts = dict(summary_cases=0, record_cases=0, identifier_cases=0, full_documents=0)
     for escape in [False, True]:
         env = environment(root, escape)
         template = env.from_string(PREFIX + "{% include '" + Q10 + "' %}")
@@ -94,6 +94,47 @@ def check(root, language):
             assert bool(item.select('.data-gap[data-fact-id="publication-decision"]')) == (profile == 'review' and publication not in ['Yes', 'No'])
             assert not soup.select('script, img, p p, p div, p ul')
             counts['summary_cases'] += 1
+
+        # Identifier value/type are sibling answers: a missing type must not
+        # erase a value. Retained inactive Other labels must not leak through.
+        for kind, value, custom, profile in itertools.product(
+                ['Handle', 'Doi', 'Ark', 'Url', 'Other', '', 'unknown'],
+                ['10.1234/value', None, ' \n ', '<identifier> & "A"'],
+                [None, 'Catalogue ID', '<Type> & "B"'], ['review', 'submission']):
+            replies = publication_replies()
+            listing = path(DATASETS, 'dataset-a', 'producedDataIdentifiersQUuid')
+            item = path(listing, 'identifier-a')
+            type_path = path(item, 'dataIdentifierTypeQUuid')
+            replies[listing] = ['empty-before', 'identifier-a', 'empty-after']
+            if kind:
+                replies[type_path] = IDS.get('dataIdentifierType' + kind + 'AUuid', kind)
+            if value is not None:
+                replies[path(item, 'dataIdentifierIdentifierQUuid')] = value
+            if custom is not None:
+                replies[path(type_path, 'dataIdentifierTypeOtherAUuid', 'dataIdentifierTypeOtherTypeQUuid')] = custom
+            soup = render(template, replies, profile)
+            entries = soup.select('.dataset-section[data-item-id="dataset-a"] > ul > li')
+            actual_value = (value or '').strip()
+            labels = dict(Handle='Handle', Doi='DOI', Ark='ARK', Url='URL')
+            label = labels.get(kind, '')
+            if kind == 'Other':
+                label = custom or ('Other identifier' if language == 'en' else '其他識別碼')
+            elif not label and actual_value:
+                label = 'Identifier' if language == 'en' else '識別碼'
+            assert len(entries) == bool(label), (kind, value, custom, entries)
+            if entries:
+                separator = ': ' if language == 'en' else '：'
+                assert entries[0].get_text() == label + (separator + actual_value if actual_value else '')
+                links = entries[0].select('a')
+                assert len(links) == int(bool(actual_value) and kind in ['Doi', 'Url'])
+                if links:
+                    assert links[0]['href'] == ('https://doi.org/' if kind == 'Doi' else '') + actual_value
+                assert not entries[0].select('identifier, type, script, img')
+            else:
+                assert not soup.select('.dataset-section > ul')
+            if profile == 'submission':
+                assert not soup.select('.data-gap, .data-review')
+            counts['identifier_cases'] += 1
 
         for profile in ['review', 'submission']:
             replies = publication_replies(name='Same dataset')

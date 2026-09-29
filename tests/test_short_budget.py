@@ -16,7 +16,9 @@ class ShortBudgetTests(unittest.TestCase):
 
     def test_only_owned_pdf_hint_changes_css(self):
         before, panel = split_css((ROOT/'src/layout.css').read_text())
-        self.assertNotIn('.pdf-short-budget', before)
+        # The shared keep selector also covers complete, bounded budgets.
+        self.assertEqual(before.count('.pdf-short-budget'), 1)
+        self.assertIn('.resource-table.pdf-short-budget { break-inside: avoid; }', before)
         self.assertNotIn('font-', panel)
         self.assertNotIn('line-height', panel)
         self.assertNotIn('break-', panel)

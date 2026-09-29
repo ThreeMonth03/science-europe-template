@@ -100,6 +100,24 @@ def normalize_owned_allocation_indent(source):
     return str(soup)
 
 
+def project_bounded_budget_hint(source):
+    """Check the new keep hint independently before comparing older fragments."""
+    from short_resource_rows_contract import Fragment, row_fragments
+    source = str(source)
+    for table in BeautifulSoup(source, 'html.parser').select('.pdf-bounded-budget'):
+        assert table.name == 'table' and table.attrs == {'class': ['resource-table', 'pdf-bounded-budget']}
+        rows = table.tbody.find_all('tr', recursive=False)
+        assert 1 <= len(rows) <= 3
+        for row in rows:
+            parts = row_fragments(row)
+            for key, limit, paragraphs in [('title', 80, 1), ('purpose', 200, 2), ('budget', 80, 3), ('funding', 100, 3)]:
+                parser = Fragment(); parser.feed(parts[key]); parser.close()
+                value = ' '.join(''.join(parser.text).split())
+                assert parser.ok and not parser.stack and value and len(value) <= limit
+                assert parser.paragraphs <= paragraphs and len(parts[key]) <= 2000
+    return source.replace('<table class="resource-table pdf-bounded-budget">', '<table class="resource-table">')
+
+
 def expected(original, eligible, grouped=False):
     soup = BeautifulSoup(original, 'html.parser'); index = 0
     for table in list(soup.select('.resource-table')):
@@ -136,7 +154,7 @@ def check(root, prior=None):
     for name, replies, eligible in matrix(grouped=grouped):
         original = render(root, replies); pdf = render(root, replies, True)
         from short_resource_rows_contract import project_hints
-        pdf = project_hints(pdf)
+        pdf = project_bounded_budget_hint(project_hints(pdf))
         if prior is not None:
             before = render(root, replies, question=prior)
             historic_original = original

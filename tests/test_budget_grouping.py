@@ -27,7 +27,7 @@ class BudgetGroupingTests(unittest.TestCase):
         current = {name: project_embedded_text((ROOT / name).read_text(), name) for name in expected}
         for name, digest in expected.items():
             self.assertEqual(hashlib.sha256(current[name].encode()).hexdigest(), digest)
-        self.assertEqual(forward_budget(historical(ENTRY).decode()), (ROOT / ENTRY).read_text())
+        self.assertEqual(forward_budget(historical(ENTRY).decode()), current[ENTRY])
         self.assertEqual(forward_lua(historical(LUA).decode()), current[LUA])
         from full_km_followups_contract import project_source as before_followups
         verified, _ = before_followups()

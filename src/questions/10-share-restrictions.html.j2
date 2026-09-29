@@ -22,29 +22,36 @@
                 {# Identifiers #}
                 {% set identifiersPath = [pathPrefix, uuids.producedDataIdentifiersQUuid]|reply_path -%}
                 {%- set identifiersItems = repliesMap[identifiersPath]|reply_items -%}
-                {%- if identifiersItems|length > 0 -%}
-                    <p>The dataset has the following identifiers:</p>
-                    <ul>
+                {%- set identifierEntries -%}
                     {%- for j in identifiersItems -%}
                         {%- set identifierPrefix = [identifiersPath, j]|reply_path -%}
                         {%- set identifierTypePath = [identifierPrefix, uuids.dataIdentifierTypeQUuid]|reply_path -%}
                         {%- set identifierTypeAUuid = repliesMap[identifierTypePath]|reply_str_value -%}
                         {%- set identifierValuePath = [identifierPrefix, uuids.dataIdentifierIdentifierQUuid]|reply_path -%}
-                        {%- set identifierValue = repliesMap[identifierValuePath]|reply_str_value -%}
+                        {%- set identifierValue = repliesMap[identifierValuePath]|reply_str_value|trim -%}
+                        {%- set identifierLabel = '' -%}
                         {%- if identifierTypeAUuid == uuids.dataIdentifierTypeHandleAUuid -%}
-                            <li>Handle: <strong>{{ identifierValue }}</strong></li>
+                            {%- set identifierLabel = 'Handle' -%}
                         {%- elif identifierTypeAUuid == uuids.dataIdentifierTypeDoiAUuid -%}
-                            <li>DOI: <strong><a href="https://doi.org/{{ identifierValue }}" target="_blank">{{ identifierValue }}</a></strong></li>
+                            {%- set identifierLabel = 'DOI' -%}
                         {%- elif identifierTypeAUuid == uuids.dataIdentifierTypeArkAUuid -%}
-                            <li>ARK: <strong>{{ identifierValue }}</strong></li>
+                            {%- set identifierLabel = 'ARK' -%}
                         {%- elif identifierTypeAUuid == uuids.dataIdentifierTypeUrlAUuid -%}
-                            <li>URL: <strong><a href="{{ identifierValue }}" target="_blank">{{ identifierValue }}</a></strong></li>
+                            {%- set identifierLabel = 'URL' -%}
                         {%- elif identifierTypeAUuid == uuids.dataIdentifierTypeOtherAUuid -%}
-                            {%- set identifierType = repliesMap[[identifierTypePath, uuids.dataIdentifierTypeOtherAUuid, uuids.dataIdentifierTypeOtherTypeQUuid]|reply_path]|reply_str_value -%}
-                            <li>{{ identifierType }}: <strong>{{ identifierValue }}</strong></li>
+                            {%- set identifierLabel = repliesMap[[identifierTypePath, uuids.dataIdentifierTypeOtherAUuid, uuids.dataIdentifierTypeOtherTypeQUuid]|reply_path]|reply_str_value|trim -%}
+                            {%- if not identifierLabel -%}{%- set identifierLabel -%}Other identifier{%- endset -%}{%- endif -%}
+                        {%- elif identifierValue -%}
+                            {%- set identifierLabel -%}Identifier{%- endset -%}
+                        {%- endif -%}
+                        {%- if identifierLabel -%}
+                            <li>{{ identifierLabel|e }}{% if identifierValue %}: <strong>{% if identifierTypeAUuid == uuids.dataIdentifierTypeDoiAUuid %}<a href="https://doi.org/{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% elif identifierTypeAUuid == uuids.dataIdentifierTypeUrlAUuid %}<a href="{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% else %}{{ identifierValue|e }}{% endif %}</strong>{% endif %}</li>
                         {%- endif -%}
                     {%- endfor -%}
-                    </ul>
+                {%- endset -%}
+                {%- if identifierEntries|trim -%}
+                    <p>The dataset has the following identifiers:</p>
+                    <ul>{{ identifierEntries }}</ul>
                 {%- endif -%}
                 {# Distributions #}
                 {% set distrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}

@@ -101,7 +101,8 @@
         'p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no"',
         'table class="resource-table"', 'th scope="col"',
         'span data-fact-id="repository-charges" data-status="complete"',
-        'col class="resource-purpose"', 'col class="resource-budget"', 'col class="resource-funding"'
+        'col class="resource-purpose"', 'col class="resource-budget"', 'col class="resource-funding"',
+        'table class="resource-table pdf-bounded-budget"'
       ] -%}
       {%- for fragment in question.split('<')[1:] -%}
         {%- set tag = fragment.split('>', 1)[0] -%}
@@ -129,7 +130,7 @@
             {%- set legal.ok = (parent == 'div class="answer"' and (dynamic.ok or tag in [fixed[2], fixed[3]])) or (parent == 'td' and tag in [fixed[4], fixed[5]]) -%}
           {%- elif name == 'h4' -%}{%- set legal.ok = parent == 'div class="answer"' -%}
           {%- elif name == 'table' -%}{%- set legal.ok = parent.startswith('div class="project-resources" data-item-id="') -%}
-          {%- elif name in ['colgroup', 'thead', 'tbody'] -%}{%- set legal.ok = parent == 'table class="resource-table"' -%}
+          {%- elif name in ['colgroup', 'thead', 'tbody'] -%}{%- set legal.ok = parent in ['table class="resource-table"', 'table class="resource-table pdf-bounded-budget"'] -%}
           {%- elif name == 'col' -%}{%- set legal.ok = parent == 'colgroup' -%}
           {%- elif name == 'tr' -%}{%- set legal.ok = (tag == 'tr' and parent == 'thead') or (dynamic.ok and parent == 'tbody') -%}
           {%- elif name == 'th' -%}{%- set legal.ok = parent == 'tr' -%}

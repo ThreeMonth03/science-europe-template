@@ -1,5 +1,10 @@
 # 0.3.18: bounded budget spacing
 
+Historical record: the current development template uses explicit bounded-table
+hints instead of the paragraph-count exception below. `probe_budget_pdf.py`
+now checks those hints and the current computed styles; this older result is
+not a requirement to restore the superseded selector.
+
 Continues `feat/long-budget-reading` (0.3.17, `b7327b9`) on the short-lived
 `feat/budget-spacing` branch. Not an upstream merge, release, or deployment.
 
