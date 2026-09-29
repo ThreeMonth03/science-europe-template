@@ -1,10 +1,10 @@
 -- Keep standalone labels with the next paragraph without changing their words.
 -- This output-specific rule is independent of the English/Chinese translation.
 -- BEGIN identifier CJK separator
--- Q13 contains fixed policy sentences, not authored prose. Remove only the
+-- dataset-policy contains fixed policy sentences, not authored prose. Remove only the
 -- separator we would otherwise INSERT after an ideographic full stop before
 -- a Han character. Never delete an existing inline or edit internal spaces.
-local function identifier_cjk_boundary(left, right)
+local function cjk_sentence_boundary(left, right)
   local a, b = pandoc.utils.stringify(left), pandoc.utils.stringify(right)
   if a == "" or b == "" then return false end
   local last, first = utf8.codepoint(a, utf8.offset(a, -1)), utf8.codepoint(b)
@@ -95,12 +95,20 @@ local function keep_q8_reference_labels(div)
             if #item == 2 then
               local label, permission = item[1], item[2]
               -- BulletList may have wrapped only the permission in this style.
+              local linked_permission = false
               if permission.t == "Div" and permission.identifier == "" and #permission.classes == 0 and
                  #permission.attributes == 1 and permission.attributes["custom-style"] == "Pilot List Lead" and
-                 #permission.content == 1 then permission = permission.content[1] end
+                 #permission.content == 1 then
+                permission = permission.content[1]
+                linked_permission = true
+              end
               if label.t == "Div" and label.identifier == "" and #label.classes == 0 and #label.attributes == 0 and
                  #label.content == 1 and plain(label.content[1]) and width(label) <= 80 and
                  plain(permission) and width(permission) <= 320 then
+                -- The generic short-list rule linked this permission to the
+                -- next item. Q8 needs only label -> permission; otherwise all
+                -- entries form one unbreakable chain and Word may crowd them.
+                if linked_permission then item[2] = permission end
                 label.attributes["custom-style"] = "Pilot List Lead"
                 -- DOCX ignores custom styles on Plain; preserve all inlines in
                 -- one Para so the existing keep-with-next style reaches Word.
@@ -258,7 +266,9 @@ local function keep_short_budget_overview(div)
     end
   end
   scan(div.content, false, false, nil)
-  if not simple or tables ~= 1 or projects ~= 1 or headers ~= 2 or list_items > 3 or paragraphs > 24 then return div end
+  local short_with_budget = tables == 1 and projects == 1 and headers == 2 and list_items <= 3 and paragraphs <= 24
+  local short_without_budget = tables == 0 and projects <= 1 and headers >= 1 and headers <= 2 and list_items == 0 and paragraphs <= 8
+  if not simple or not (short_with_budget or short_without_budget) then return div end
   for _, item in ipairs(leading) do
     local style = item.in_list and "Pilot List Lead" or "Pilot Lead"
     item.blocks[item.index] = pandoc.Div({pandoc.Para(item.block.content)}, pandoc.Attr("", {}, {["custom-style"] = style}))
@@ -568,6 +578,16 @@ function Div(div)
     end
     return div
   end
+  -- Q14: the name already keeps with the following paragraph. Keep the lines
+  -- of a short owned summary together as well; keepNext alone permits a split
+  -- in its body. Do not chain different people or bind a long person record.
+  if div.classes:includes("person-responsibilities") and div.classes:includes("short-reading-unit") and
+     utf8.len(pandoc.utils.stringify(div)) <= 500 and #div.content == 2 and
+     div.content[1].t == "Div" and div.content[1].classes:includes("answer-lead") and
+     div.content[2].t == "Para" then
+    div.content[2] = pandoc.Div({div.content[2]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Responsibility Summary"}))
+    return div
+  end
   if div.classes:includes("short-reading-unit") and utf8.len(pandoc.utils.stringify(div)) <= 500 then
     -- Only bounded owned prose. Preserve nested divs and inline content, and
     -- reject free-answer/list/table units rather than making them unbreakable.
@@ -619,7 +639,7 @@ function Div(div)
     end
     for _, block in ipairs(div.content) do
       if block.t == "Para" then
-        if #inlines > 0 and not (div.classes:includes("identifier-arrangement") and identifier_cjk_boundary(inlines, block.content)) then inlines:insert(pandoc.Space()) end
+        if #inlines > 0 and not cjk_sentence_boundary(inlines, block.content) then inlines:insert(pandoc.Space()) end
         inlines:extend(block.content)
       else
         flush()

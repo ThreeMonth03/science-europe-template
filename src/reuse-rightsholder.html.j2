@@ -1,0 +1,11 @@
+{%- import 'src/active-answer.j2' as activeAnswer with context -%}
+{%- macro render(parts) -%}
+  {%- set ownerPath = activeAnswer.path(parts, 'ValueQuestion') -%}
+  {%- set owner = repliesMap[ownerPath]|reply_str_value if ownerPath else '' -%}
+  {%- if owner|trim -%}
+    <div class="answer-detail" data-fact-id="reuse-rightsholder" data-status="complete">
+      <p><strong>Data rights holder and contact information</strong></p>
+      {{ owner|markdown }}
+    </div>
+  {%- endif -%}
+{%- endmacro -%}

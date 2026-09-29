@@ -44,7 +44,8 @@ def project_source():
     assert metadata['version'] == '0.3.42'
     metadata['version'] = '0.3.41'
     assert metadata == json.loads(historical('template.json'))
-    assert (ROOT/'scripts/prepare_layout.py').read_bytes() == historical('scripts/prepare_layout.py')
+    from current_repairs_contract import project_support
+    assert project_support('scripts/prepare_layout.py') == historical('scripts/prepare_layout.py')
     return current, metadata
 
 

@@ -11,7 +11,9 @@ from q3_policy_prose_contract import project_source, load, historical
 class Q3IntegrationTests(unittest.TestCase):
     def test_exact_frozen_overlay_and_prior_view(self):
         before, metadata=project_source()
-        current={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+        candidate={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+        from current_repairs_contract import project_source as project_candidate
+        current, _ = project_candidate(candidate, json.loads((ROOT/'template.json').read_text()))
         self.assertEqual(current,load('recipe').overlay(before))
         self.assertEqual(metadata,json.loads(historical('template.json')))
         self.assertEqual(metadata['version'],'0.3.50')

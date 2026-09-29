@@ -23,6 +23,8 @@ W = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
 
 
 def prior_lua(source):
+    from current_repairs_contract import project_embedded_text
+    source = project_embedded_text(source, 'src/word/pilot.lua')
     assert source.count(NEW) == source.count(REMOVE) == 1, 'Missing/changed/duplicate Q5 join delta'
     assert OLD not in source
     return source.replace(NEW, OLD).replace(REMOVE, '')

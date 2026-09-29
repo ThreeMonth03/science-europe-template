@@ -28,6 +28,8 @@ def prior_css(css):
 
 def historical_css(css):
     """Restore the retired panel only for historical probes, never packaging."""
+    from current_repairs_contract import project_embedded_text
+    css = project_embedded_text(css, 'src/layout.css')
     if BEGIN in css:
         prior_css(css)
         return css

@@ -24,6 +24,7 @@
         'orcid': contributorOrcid,
         'roles': roles|sort,
         'affiliation': contributorAffiliationReply,
+        'index': contributorsItems.index(contributor) + 1,
       }) -%}
     {%- endif -%}
   {%- endfor -%}
@@ -32,7 +33,7 @@
   <ul>
   {% for contributor in contributors %}
     <li class="contributor">
-      <span class="name"><strong>{{ contributor.name if contributor.name else "(name not given)" }}</strong></span>
+      <span class="name"><strong>{% if contributor.name|trim %}{{ contributor.name|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.contributorLabel(contributor.index) }}{% else %}(name not given){% endif %}</strong></span>
       {%- if contributor.email and contributor.orcid %}
         <br>{{ macros.formatEmail(contributor.email) }}, {{ macros.formatOrcid(contributor.orcid) }}
       {%- elif contributor.email %}

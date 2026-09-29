@@ -66,9 +66,14 @@ def cases():
 
 
 def allowed_changes(before, after):
-    """Whitelist only an attribute on a previously unstyled one-paragraph Div."""
+    """Whitelist a label style and removal of the generic inter-item link."""
     if before == after: return 0
     if isinstance(before, dict) and isinstance(after, dict):
+        if before.get('t') == 'Div' and after.get('t') in ['Plain', 'Para']:
+            attr, blocks = before['c']
+            if attr == ['', [], [STYLE]] and len(blocks) == 1 and blocks[0].get('t') == 'Para':
+                assert blocks[0]['c'] == after['c']
+                return 0
         if before.get('t') == after.get('t') == 'Div':
             left, right = before['c'], after['c']
             if left[0] == ['', [], []] and right[0] == ['', [], [STYLE]]:
@@ -92,8 +97,11 @@ def word_changes(before, after):
         if left['text'].startswith('CASE: '):
             case = left['text'][6:]; counts[case] = 0
         if left['style'] != right['style']:
-            assert case is not None and left['style'] == 'Compact' and right['style'] == 'PilotListLead'
-            counts[case] += 1
+            assert case is not None
+            if left['style'] == 'Compact' and right['style'] == 'PilotListLead':
+                counts[case] += 1
+            else:
+                assert left['style'] == 'PilotListLead' and right['style'] in [None, 'Compact']
     return counts
 
 

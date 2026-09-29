@@ -12,6 +12,9 @@ FACTS = {'working-storage-arrangement', 'backup-reliability', 'workspace-managem
 
 def without_reviewed_context(source,kind):
     import hashlib
+    from current_repairs_contract import project_embedded_text
+    source = project_embedded_text(
+        source, 'src/layout.css' if kind == 'css' else 'src/word/pilot.lua')
     from budget_grouping_contract import without_grouping
     source = without_grouping(source, kind)
     from probe_storage_context import strip

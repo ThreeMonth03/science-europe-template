@@ -103,8 +103,8 @@
       {%- if caseReport -%}{%- do typesNames.append("case report forms") -%}{%- endif -%}
       {%- if eRecords -%}{%- do typesNames.append("electronic patient records") -%}{%- endif -%}
       {%- set typesCount = typesNames|length -%}
+      {%- if typesCount > 0 %}
       <p>
-        {%- if typesCount > 0 -%}
           We collect data from
           {% if typesCount == 1 -%}
               {{ typesNames[0] }}.
@@ -113,8 +113,8 @@
           {%- else -%}
               {{ typesNames[0] }}, {{ typesNames[1] }}, and {{ typesNames[2] }}.
           {%- endif -%}
-        {% endif %}
       </p>
+      {%- endif %}
         {# Datasets #}
         {%- if neqDataSetsItems|length > 0 -%}
           <p>The non-equipment datasets are:</p>
@@ -124,7 +124,7 @@
             {%- set neqDataSetsName = repliesMap[[pathPrefix, uuids.neqDataSetsNameQUuid]|reply_path]|reply_str_value -%}
             {%- set neqDataSetsDesc = repliesMap[[pathPrefix, uuids.neqDataSetsDescQUuid]|reply_path]|reply_str_value -%}
             <li>
-              <strong>{% if output_profile|default('review') == 'submission' and not neqDataSetsName %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ neqDataSetsName if neqDataSetsName else "(no name given)" }}{% endif %}</strong>
+              <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ neqDataSetsName if neqDataSetsName else "(no name given)" }}{% endif %}</strong>
               {% if neqDataSetsDesc -%}<div class="answer-detail">{{ neqDataSetsDesc|markdown }}</div>{%- endif -%}
             </li>
           {%- endfor -%}

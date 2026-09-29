@@ -69,19 +69,55 @@ class PersonalDataFollowupTests(unittest.TestCase):
             self.assertEqual('answer-lead', detail.find_previous_sibling()['class'][0])
 
     def test_all_other_legal_bases_still_form_complete_sentences(self):
-        expected = {'Contract': 'in order to fulfil contract.', 'Legit': 'based on legitimate interest.',
-                    'Vital': 'based on vital interest.', 'Legal': 'based on legal requirement.'}
+        expected = {
+            'Contract': 'because the processing is necessary to perform a contract.',
+            'Legit': 'because the processing is necessary for legitimate interests.',
+            'Vital': 'because the processing is necessary to protect vital interests.',
+            'Legal': 'because the processing is necessary to comply with a legal obligation.',
+        }
+        ethical_endings = {'Contract': 'performance of a contract.', 'Legit': 'legitimate interests.',
+                           'Vital': 'protection of vital interests.',
+                           'Legal': 'compliance with a legal obligation.'}
         for choice, ending in expected.items():
             values = replies('personal-transfer-complete')
             values[PATHS['other']] = UUIDS['cpersGdprLegalBasisOtherWhich'+choice+'AUuid']
             self.assertIn(ending, self.output(values).get_text())
-            self.assertNotIn('has not been specified', self.output(values, Q9).get_text())
+            ethical = self.output(values, Q9)
+            details = ethical.select('.answer-detail')
+            self.assertEqual(1, len(details))
+            self.assertIn('Alternative legal basis for collecting personal data', details[0].get_text())
+            self.assertIn(ethical_endings[choice], details[0].get_text())
+            self.assertNotIn('has not been specified', details[0].get_text())
+            # A different, unanswered dataset legitimately retains its prompt.
+            self.assertTrue(ethical.select('.ethical-datasets .data-gap'))
+        del values[PATHS['other']]
+        missing = self.output(values, Q9).select_one('.answer-detail')
+        self.assertIn('has not been specified; see Question 7.', missing.get_text())
 
     def test_explore_and_public_interest_do_not_add_unsupported_claims(self):
         text = self.output(case(), Q9).get_text(' ', strip=True)
         self.assertNotIn('We explored', text)
         self.assertNotIn('more important than the privacy', text)
-        self.assertIn('The stated legal basis for collecting and processing personal data is public interest.', text)
+        self.assertIn('The stated legal basis for collecting and processing personal data is a task carried out in the public interest.', text)
+
+    def test_consent_basis_and_ethics_prose_are_complete_sentences(self):
+        values = case()
+        values[PATHS['legal']] = UUIDS['cpersGdprLegalBasisAskAUuid']
+        consent_prefix = '.'.join([
+            PATHS['legal'], UUIDS['cpersGdprLegalBasisAskAUuid']])
+        values[consent_prefix+'.'+UUIDS['cpersConsentQUuid']] = UUIDS['cpersConsentUseAnonAUuid']
+        values[consent_prefix+'.'+UUIDS['cpersReusersQUuid']] = UUIDS['cpersReusersYesAUuid']
+        procedure = consent_prefix+'.'+UUIDS['cpersDescribeProcedureQUuid']
+        values[procedure] = 'Document consent before collection.'
+        q7 = self.output(values).get_text(' ', strip=True)
+        self.assertIn('with the consent of the data subjects.', q7)
+        q9 = self.output(values, Q9).get_text(' ', strip=True)
+        self.assertIn("We will obtain consent for this project's use of the data and for anonymization.", q9)
+        self.assertIn('We will then anonymize the data for subsequent reuse.', q9)
+        self.assertIn('The consent form will be available to people who reuse the data.', q9)
+        self.assertIn('The procedure for obtaining consent from data subjects is as follows:', q9)
+        self.assertNotIn('; We', q9)
+        self.assertNotIn('re-users', q9)
 
     def test_inactive_parent_hides_followups_even_if_children_are_stale(self):
         for value in [UUIDS['collectPersonalNoAUuid'], '']:

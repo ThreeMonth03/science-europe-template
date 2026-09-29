@@ -8,11 +8,11 @@
     {%- set sharedWorkspaceAUuid = repliesMap[sharedWorkspacePath]|reply_str_value -%}
     <div class="workspace-policy dataset-policy">
     {%- if sharedWorkspaceAUuid == uuids.sharedWorkspaceNoAUuid -%}
-      <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">There is no shared workspace used during the project for working with data.</p>
+      <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">The project will not use a shared workspace to work with data.</p>
       {%- set notSharedBackupPath = [sharedWorkspacePath, uuids.sharedWorkspaceNoAUuid, uuids.notSharedBackupQUuid]|reply_path -%}
       {%- set notSharedBackupAUuid = repliesMap[notSharedBackupPath]|reply_str_value -%}
       {%- if notSharedBackupAUuid == uuids.notSharedBackupYesAUuid -%}
-        <p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="complete">Data that project members themselves store are adequately backed up and traceable. Therefore data are protected against both equipment failure and human error.</p>
+        <p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="complete">Data stored by individual project members are backed up reliably and remain traceable, protecting them against loss caused by equipment failure or human error.</p>
       {%- elif notSharedBackupAUuid == uuids.notSharedBackupNoAUuid -%}
         <p data-requirement-id="SE-3a" data-fact-id="backup-reliability" data-status="explicit-no">Data stored by individual project members are not yet adequately backed up and traceable.</p>
       {%- else -%}

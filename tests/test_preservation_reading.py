@@ -20,6 +20,15 @@ class PreservationReadingTests(unittest.TestCase):
     def test_one_new_style_and_no_existing_reference_change(self):
         before, after = old_reference(ROOT, 'en'), reference(ROOT)
         prior_reference(before, after)
+        with zipfile.ZipFile(io.BytesIO(after)) as archive:
+            projected = {n: archive.read(n) for n in archive.namelist()}
+        styles = E.fromstring(projected['word/styles.xml'])
+        styles.remove(next(s for s in styles if s.get(W+'styleId') == 'PilotResponsibilitySummary'))
+        projected['word/styles.xml'] = E.tostring(styles)
+        historical = io.BytesIO()
+        with zipfile.ZipFile(historical, 'w') as target:
+            for name, value in projected.items(): target.writestr(name, value)
+        prior_reference(before, historical.getvalue())
         for mutation in ('old-font', 'new-keep', 'new-base', 'other-part', 'duplicate'):
             with self.subTest(mutation=mutation), zipfile.ZipFile(io.BytesIO(after)) as archive:
                 parts = {n: archive.read(n) for n in archive.namelist()}

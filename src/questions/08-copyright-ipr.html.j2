@@ -8,14 +8,14 @@
     {%- set asOpenAsPossiblePath = [uuids.accessCUuid, uuids.asOpenAsPossibleQUuid]|reply_path -%}
     {%- set asOpenAsPossibleAUuid = repliesMap[asOpenAsPossiblePath]|reply_str_value -%}
     {%- if asOpenAsPossibleAUuid == uuids.asOpenAsPossibleYesAUuid -%}
-      <p>We will be working with the philosophy <em>as open as possible</em> for our data.</p>
+      <p>We will manage our data according to the principle <em>as open as possible</em>.</p>
     {%- endif -%}
 
     {# Can open data #}
     {%- set openImmediatelyPath = [uuids.accessCUuid, uuids.openImmediatelyQUuid]|reply_path -%}
     {%- set openImmediatelyAUuid = repliesMap[openImmediatelyPath]|reply_str_value -%}
     {%- if openImmediatelyAUuid == uuids.openImmediatelyYesAUuid -%}
-      <p>All of our data can become completely open over time.</p>
+      <p>All project data can eventually be made openly available.</p>
     {%- elif openImmediatelyAUuid == uuids.openImmediatelyNoAUuid -%}
       {%- set pathPrefix = [openImmediatelyPath, uuids.openImmediatelyNoAUuid]|reply_path -%}
       {%- set notOpenLegalReasonsPath = [pathPrefix, uuids.notOpenLegalReasonsQUuid]|reply_path -%}
@@ -39,40 +39,40 @@
 
       {%- if nReasons > 0 -%}
         <div class="answer-detail">
-        The data cannot become completely open because 
+        The data cannot be made fully open because
         {%- if nReasons == 1 -%}
           {%- if legalReasons %}
-            of legal reasons.
+            of legal restrictions.
           {%- elif businessReasonsPatents %}
-            of patent-related business reasons.
+            of patent-related commercial considerations.
           {%- elif businessReasonsOther %}
-            of non-patent business reasons{{  ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "." }}
+            of commercial considerations unrelated to patents{{  ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "." }}
           {%- elif otherReasonsPapers %}
-            we want to publish a paper first.
+            we intend to publish a paper first.
           {%- elif otherReasonsOther %}
-            we have other than paper-publishing reasons{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "." }}
+            of reasons other than publishing a paper{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "." }}
           {%- endif -%}
         {%- else %}
           of:
           <ul>
             {%- if legalReasons %}
-              <li>legal reasons</li>
+              <li>legal restrictions</li>
             {%- endif -%}
             {%- if businessReasonsPatents %}
-              <li>patent-related business reasons</li>
+              <li>patent-related commercial considerations</li>
             {%- elif businessReasonsOther %}
-              <li>non-patent business reasons{{ ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "" }}</li>
+              <li>commercial considerations unrelated to patents{{ ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "" }}</li>
             {%- endif -%}
             {%- if otherReasonsPapers %}
-              <li>we want to publish a paper first</li>
+              <li>we intend to publish a paper first</li>
             {%- elif otherReasonsOther -%}
-              <li>we have other than paper-publishing reasons{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "" }}</li>
+              <li>reasons other than publishing a paper{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "" }}</li>
             {%- endif -%}
           </ul>
         {%- endif -%}
         </div>
       {%- else -%}
-        <p>The data cannot become completely open.</p>
+        <p>The data cannot be made fully open.</p>
       {%- endif -%}
 
       {# Authentication and authorization of users #}
@@ -102,9 +102,9 @@
             {%- set legalReasonsAuthenticatedOtherReply = repliesMap[legalReasonsAuthenticatedOtherQUuid]|reply_str_value -%}
 
             {%- if legalReasonsAuthenticatedOtherReply  -%}
-              <div class="answer-detail">We will have following arrangements: {{legalReasonsAuthenticatedOtherReply|markdown}}</div>
+              <div class="answer-detail">We will use the following authorization arrangements: {{legalReasonsAuthenticatedOtherReply|markdown}}</div>
             {%- else -%}
-              <p>We will have not decided yet.</p>
+              <p>We have not yet decided on the authorization arrangements.</p>
             {%- endif -%}
           {%- endif -%}
  
@@ -119,18 +119,18 @@
     {%- set embargoPath = [uuids.accessCUuid, uuids.limitedEmbargoQUuid]|reply_path -%}
     {%- set embargoAUuid = repliesMap[embargoPath]|reply_str_value -%}
     {%- if embargoAUuid == uuids.limitedEmbargoOpenAUuid -%}
-      <p>Limited embargo will not be used as all data will be opened.</p>
+      <p>No embargo period is needed because all data will be made openly available.</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoIndefinitelyAUuid -%}
-      <p>Limited embargo cannot be used because some restricted data will be embargoed indefinitely.</p>
+      <p>A fixed embargo period cannot be used because some restricted data must remain closed indefinitely.</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoReleasedSoonAUuid -%}
-      <p>Data will be released only as soon as restrictions are falling away.</p>
+      <p>Data will be released as soon as the restrictions no longer apply.</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoYesAUuid -%}
       {%- set embargoPeriodPath = [embargoPath, embargoAUuid, uuids.limitedEmbargoPeriodQUuid]|reply_path -%}
       {%- set embargoPeriod = repliesMap[embargoPeriodPath]|reply_str_value -%}
       {%- if embargoPeriod -%}
-        <p>Data that is not legally restrained will be released after a fixed time period ({{ embargoPeriod }}), unconditionally.</p>
+        <p>Data not subject to legal restrictions will be released unconditionally after a fixed period ({{ embargoPeriod }}).</p>
       {%- else -%}
-        <p>Data that is not legally restrained will be released after a fixed time period, unconditionally.</p>
+        <p>Data not subject to legal restrictions will be released unconditionally after a fixed period.</p>
       {%- endif -%}
     {%- endif -%}
     
@@ -138,18 +138,18 @@
     {%- set ownershipPath = [uuids.creatingCUuid, uuids.ownershipQUuid]|reply_path -%}
     {%- set ownershipAUuid = repliesMap[ownershipPath]|reply_str_value -%}
     {%- if ownershipAUuid == uuids.ownershipNoOwnerAUuid -%}
-      <p>Our data is legally not copyrightable, there is no legal owner.</p>
+      <p>The project data are not protected by copyright and therefore have no copyright owner.</p>
     {%- elif ownershipAUuid == uuids.ownershipPIAUuid -%}
       <p>All data will be owned by the Principal Investigator.</p>
     {%- elif ownershipAUuid == uuids.ownershipInstituteAUuid -%}
       <p>All data will be owned by the institute.</p>
     {%- elif ownershipAUuid == uuids.ownershipConsortiumAUuid -%}
-      <p>We have a consortium agreement that arranges Intellectual Property.</p>
+      <p>Our consortium agreement defines ownership of intellectual property rights.</p>
     {%- elif ownershipAUuid == uuids.ownershipOtherAUuid -%}
       {%- set ownershipOtherPath = [ownershipPath, uuids.ownershipOtherAUuid, uuids.ownershipOtherQUuid]|reply_path -%}
       {%- set ownershipOther = repliesMap[ownershipOtherPath]|reply_str_value -%}
       {%- if ownershipOther -%}
-        <div class="answer-detail">We have made the following arrangements regarding the data ownership: {{ ownershipOther|markdown }}</div>
+        <div class="answer-detail">We have made the following arrangements regarding data ownership: {{ ownershipOther|markdown }}</div>
       {%- endif -%}
     {%- endif -%}
 
@@ -178,7 +178,7 @@
         {%- endif -%}
       {%- endfor -%}
       {%- if (answeredRefData|length + answeredNRefData|length) > 0 -%}
-        <p>For the reference and non-reference data sets that we reuse, conditions are as follows:</p>
+        <p>The following conditions apply to the reference and non-reference datasets that we reuse:</p>
         <ul>
           {%- for i in answeredRefData -%}
             {%- set refDataPrefix = [refDataPath, i]|reply_path -%}
@@ -198,7 +198,7 @@
                 {% if refDataConditionsAUuid == uuids.refDataConditionsCC0AUuid -%}
                   It is freely available for any use (public domain or CC0).
                 {%- elif refDataConditionsAUuid == uuids.refDataConditionsCCBYAUuid -%}
-                  It is freely available with obligation to quote the source (e.g. CC-BY).
+                  It is freely available with an obligation to cite the source (e.g. CC BY).
                 {%- elif refDataConditionsAUuid == uuids.refDataConditionsOtherAUuid -%}
                   {%- set refDataConditionsOtherPath = [refDataConditionsPath, uuids.refDataConditionsOtherAUuid, uuids.refDataConditionsOtherQUuid]|reply_path -%}
                   {%- set refDataConditionsOther = repliesMap[refDataConditionsOtherPath]|reply_str_value -%}
@@ -224,7 +224,7 @@
                 {% if nrefDataConditionsAUuid == uuids.nrefDataConditionsCC0AUuid -%}
                   It is freely available for any use (public domain or CC0).
                 {%- elif nrefDataConditionsAUuid == uuids.nrefDataConditionsCCBYAUuid -%}
-                  It is freely available with obligation to quote the source (e.g. CC-BY).
+                  It is freely available with an obligation to cite the source (e.g. CC BY).
                 {%- elif nrefDataConditionsAUuid == uuids.nrefDataConditionsOtherAUuid -%}
                   {%- set nrefDataConditionsOtherPath = [nrefDataConditionsPath, uuids.nrefDataConditionsOtherAUuid, uuids.nrefDataConditionsOtherQUuid]|reply_path -%}
                   {%- set nrefDataConditionsOther = repliesMap[nrefDataConditionsOtherPath]|reply_str_value -%}

@@ -5,7 +5,7 @@ import unittest
 from bs4 import BeautifulSoup
 from test_identifier_reading import identifier_replies, render, IDS
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from identifier_concise_contract import ASSIGNERS, AFFIRMATIVE, compare
+from identifier_concise_contract import ASSIGNERS, AFFIRMATIVE, REPOSITORY_COMPOUND, RESOLUTIONS, compare
 
 
 class IdentifierConciseTests(unittest.TestCase):
@@ -23,7 +23,12 @@ class IdentifierConciseTests(unittest.TestCase):
                     first = policies[0]
                     self.assertEqual(first['data-status'], 'complete')
                     if actor in ['Repository', 'ProjectDataSteward', 'InstitDataSteward']:
-                        self.assertIn(first.get_text(), ASSIGNERS['english'])
+                        if actor == 'Repository' and resolution in ['Yes', 'No']:
+                            self.assertEqual(first.get_text(strip=True), REPOSITORY_COMPOUND['english'][resolution])
+                            self.assertIs(first.select_one('[data-fact-id="identifier-resolution"]'),
+                                          distro.select_one('[data-fact-id="identifier-resolution"]'))
+                        else:
+                            self.assertIn(first.get_text(), ASSIGNERS['english'])
                         self.assertEqual(first.span['data-fact-id'], 'identifier-assigner')
                         self.assertNotIn(AFFIRMATIVE['english'], distro.get_text())
                     else:
@@ -47,6 +52,29 @@ class IdentifierConciseTests(unittest.TestCase):
                             html.replace('Original.csv', 'Changed.csv'), html.replace('identifier-assigner', 'other-fact')]:
                 with self.assertRaises(AssertionError):
                     compare(before, BeautifulSoup(changed, 'html.parser'), language)
+
+    def test_repository_compound_preserves_assigner_and_resolution_facts(self):
+        for language in ['english', 'chinese']:
+            for choice, status in [('Yes', 'complete'), ('No', 'explicit-no')]:
+                pre = '<div id="q-persistent-identifier"><div class="identifier-arrangement">'
+                parent = '<p data-fact-id="persistent-identifier" data-status="complete">'
+                assign = ' data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete"'
+                resolve = f' data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="{status}"'
+                before = BeautifulSoup(
+                    pre + parent + AFFIRMATIVE[language] + '</p><p' + assign + '>' + ASSIGNERS[language][-1]
+                    + '</p><p' + resolve + '>' + RESOLUTIONS[language][choice] + '</p></div></div>',
+                    'html.parser',
+                )
+                after = BeautifulSoup(
+                    pre + parent + '<span' + assign + '><span' + resolve + '>'
+                    + REPOSITORY_COMPOUND[language][choice] + '</span></span></p></div></div>',
+                    'html.parser',
+                )
+                self.assertEqual(compare(before, after, language, repository_compound=True), 1)
+                with self.assertRaises(AssertionError):
+                    compare(before, BeautifulSoup(str(after).replace(
+                        REPOSITORY_COMPOUND[language][choice], REPOSITORY_COMPOUND[language][choice] + 'X'
+                    ), 'html.parser'), language, repository_compound=True)
 
 
 if __name__ == '__main__':

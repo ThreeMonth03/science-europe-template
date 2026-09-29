@@ -87,7 +87,7 @@ class StructureBindingTests(unittest.TestCase):
                    basis: IDS['cpersGdprLegalBasisOtherAUuid'],
                    path(basis, 'cpersGdprLegalBasisOtherAUuid', 'cpersGdprLegalBasisOtherWhichQUuid'): IDS['cpersGdprLegalBasisOtherWhichContractAUuid']}
         output = render_question('src/questions/07-personal-data.html.j2', replies)
-        self.assertIn('fulfil contract', output)
+        self.assertIn('because the processing is necessary to perform a contract.', output)
 
     def test_institutional_identifier_assigner_is_not_lost(self):
         datasets = path('preservingCUuid', 'producedDataQUuid')

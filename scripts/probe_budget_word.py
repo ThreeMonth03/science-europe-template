@@ -69,7 +69,9 @@ def allowed_changes(before,after):
 def main():
     p=argparse.ArgumentParser(description=__doc__); p.add_argument('--output',type=Path,required=True)
     p.add_argument('--container',choices=['science-europe-pilot-docworker-1']); a=p.parse_args()
-    source=ROOT/'src/word/pilot.lua'; lua=source.read_text(); assert lua.count(HANDLER)==1
+    source=ROOT/'src/word/pilot.lua'
+    from current_repairs_contract import project_embedded_text
+    lua=project_embedded_text(source.read_text(),'src/word/pilot.lua'); assert lua.count(HANDLER)==1
     tests=cases(); html=''.join('<div id="'+name+'">'+body+'</div>' for name,body,_ in tests)
     command=['docker','exec','-i',a.container,'python'] if a.container else ['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE]
     asts=[]
@@ -85,7 +87,9 @@ def main():
     version=subprocess.check_output((['docker','exec',a.container,'pandoc'] if a.container else ['docker','run','--rm','--network','none','--entrypoint','pandoc',IMAGE])+['--version'],text=True).splitlines()[0]
     report={'passed':True,'release_acceptance':False,'rows':rows,'worker_image':IMAGE,'pandoc_version':version,
         'source_commit':subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
-        'checker_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'lua_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
+        'checker_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        'lua_sha256':hashlib.sha256(lua.encode()).hexdigest(),
+        'current_lua_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),
         'limits':['Baseline disables only the new Q15 handler; native historic documents are compared separately','AST, not full-page or Microsoft Word acceptance']}
     a.output.parent.mkdir(parents=True,exist_ok=True); a.output.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps({'passed':True,'cases':len(rows),'pandoc':version}))

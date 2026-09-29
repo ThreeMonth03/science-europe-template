@@ -1,0 +1,35 @@
+{# Translate complete statements, not independent positive/negative fragments.
+   Both fact markers remain when two known answers share one sentence. #}
+{%- set personalKnown = containPersonal in [uuids.containPersonalYesAUuid, uuids.containPersonalNoAUuid] -%}
+{%- set sensitiveKnown = containSensitive in [uuids.containSensitiveYesAUuid, uuids.containSensitiveNoAUuid] -%}
+{%- if personalKnown or sensitiveKnown -%}
+<span class="ethical-data-statement">
+{%- if personalKnown -%}<span data-fact-id="dataset-personal-data" data-status="{{ 'complete' if containPersonal == uuids.containPersonalYesAUuid else 'explicit-no' }}">{%- endif -%}
+{%- if sensitiveKnown -%}<span data-fact-id="dataset-sensitive-data" data-status="{{ 'complete' if containSensitive == uuids.containSensitiveYesAUuid else 'explicit-no' }}">{%- endif -%}
+{%- if personalKnown and sensitiveKnown -%}
+  {%- if containPersonal == uuids.containPersonalYesAUuid and containSensitive == uuids.containSensitiveYesAUuid -%}
+    This dataset contains personal and sensitive data.
+  {%- elif containPersonal == uuids.containPersonalYesAUuid -%}
+    This dataset contains personal data but no sensitive data.
+  {%- elif containSensitive == uuids.containSensitiveYesAUuid -%}
+    This dataset contains sensitive data but no personal data.
+  {%- else -%}
+    This dataset contains neither personal nor sensitive data.
+  {%- endif -%}
+{%- elif personalKnown -%}
+  {%- if containPersonal == uuids.containPersonalYesAUuid -%}
+    This dataset contains personal data.
+  {%- else -%}
+    This dataset does not contain personal data.
+  {%- endif -%}
+{%- else -%}
+  {%- if containSensitive == uuids.containSensitiveYesAUuid -%}
+    This dataset contains sensitive data.
+  {%- else -%}
+    This dataset does not contain sensitive data.
+  {%- endif -%}
+{%- endif -%}
+{%- if sensitiveKnown -%}</span>{%- endif -%}
+{%- if personalKnown -%}</span>{%- endif -%}
+</span>
+{%- endif -%}

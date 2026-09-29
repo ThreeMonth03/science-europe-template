@@ -67,8 +67,9 @@ def project_source(sources=None, metadata=None):
     before = json.loads(historical('template.json'))
     expected_metadata = dict(before, version=CONTRACT['version'])
     assert before['version'] == CONTRACT['baseline_version'] and metadata == expected_metadata
+    from current_repairs_contract import project_support
     for name in ['scripts/prepare_layout.py', 'PACKAGE_README.md', 'LICENSE']:
-        assert (ROOT / name).read_bytes() == historical(name), name
+        assert project_support(name) == historical(name), name
     return result, before
 
 

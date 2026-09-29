@@ -2,59 +2,67 @@
   <h3>12. What methods or software tools are needed to access and use data?</h3>
 
   <div class="answer">
-    {# Produced datasets #}
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
-    {%- if producedDataItems|length > 0 -%}
-        {%- for i in producedDataItems -%}
-            {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
-            {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
-            <div class="dataset-section" data-item-id="{{ i }}">
-            {# If will be published #}
-            {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
-            {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
-            <h5>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName else "(no name given)" }}{% endif %}</h5>
-            {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
-                {# If SW is required #}
-                {%- set isPublishedDataSwUuid = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedSpecSwUseQUuid]|reply_path  -%}
-                {%- set isPublishedDataSwAUuid = repliesMap[isPublishedDataSwUuid]|reply_str_value  -%}
-                {%- if isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid -%}
-                    {%- set isPublishedSWPath = [isPublishedDataSwUuid, uuids.publishedSpecSwUseYesAUuid, uuids.publishedSpecSwUseWhatQUuid ]|reply_path  -%}
-                    {%- set isPublishedSwItems = repliesMap[isPublishedSWPath]|reply_items -%}
-                    {%- if isPublishedSwItems|length > 0 -%}
-                            <p>Software required to use this dataset:</p>
-                            <ul>
-                            {%- for swItem in isPublishedSwItems -%}
-                                {%- set swNameUuid = [isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatNameQUuid]|reply_path -%}
-                                {%- set swNameReply = repliesMap[swNameUuid]|reply_str_value -%}
-                                {%- set swPIDUuid = [isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path -%}
-                                {%- set swPIDReply = repliesMap[swPIDUuid]|reply_str_value -%}
-                                <li><strong>{% if output_profile|default('review') == 'submission' and not swNameReply %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}{{ swNameReply if swNameReply else "(no name given)" }}{% endif %}</strong>
-                                {%- if swPIDReply -%}
-                                <div>Available at: {{swPIDReply|e}}</div>
-                                {%- else -%}
-                                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="software-location" data-status="missing">An access location for this tool has not been provided.</p>{% endif %}
-                                {%- endif -%}
-                                </li>
-                            {%- endfor -%}
-                            </ul>
-                    {%- else -%}
-                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-list" data-status="missing">Software is required, but the tools have not yet been listed.</p>{% else %}<p data-requirement-id="SE-5c" data-fact-id="required-software-list" data-status="partial">Software is required to use this dataset.</p>{% endif %}
-                    {%- endif -%}
-                {%- elif isPublishedDataSwAUuid == uuids.publishedSpecSwUseNoAUuid -%}
-                    <p>There are no tools needed to access or use this data.</p>
-                {%- else -%}
-                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-decision" data-status="missing">It has not yet been specified whether software is required to use this dataset.</p>{% endif %}
-                {%- endif -%}
-            {%- elif isPublishedDataAUuid == uuids.isPublishedDataNoAUuid -%}
-                <p>This dataset will not be published.</p>
-            {%- else -%}
-                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5c" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}
-            {%- endif -%}
-            </div>
-        {%- endfor -%}
+    {%- for i in producedDataItems -%}
+      {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
+      {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
+      {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
+      {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
+      {%- set isPublishedDataSwUuid = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedSpecSwUseQUuid]|reply_path -%}
+      {%- set isPublishedDataSwAUuid = repliesMap[isPublishedDataSwUuid]|reply_str_value -%}
+      {%- set isPublishedSWPath = [isPublishedDataSwUuid, uuids.publishedSpecSwUseYesAUuid, uuids.publishedSpecSwUseWhatQUuid]|reply_path -%}
+      {%- set isPublishedSwItems = repliesMap[isPublishedSWPath]|reply_items -%}
+      {% set accessLabel %}{% if producedDataName|trim %}{{ producedDataName|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, loop.index) }}{% else %}(no name given){% endif %}{% endset %}
+      {# A run-in label and one owned sentence, not a heading for every short
+         answer. Never combine different dataset records, even equal names. #}
+      {% set accessSummary %}
+        {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
+          <span data-fact-id="publication-decision" data-status="explicit-no">This dataset will not be published.</span>
+        {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
+          {% if isPublishedDataSwAUuid == uuids.publishedSpecSwUseNoAUuid %}
+            <span data-fact-id="required-software-decision" data-status="explicit-no">No specific software is required to access or use this dataset.</span>
+          {% elif isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid %}
+            {% if isPublishedSwItems %}<span data-fact-id="required-software-list" data-status="complete">Software required to use this dataset:</span>
+            {% else %}<span data-fact-id="required-software-list" data-status="partial">Specific software is required to use this dataset.</span>{% endif %}
+          {% endif %}
+        {% endif %}
+      {% endset %}
+      {% set showAccessDataset = output_profile|default('review') != 'submission' or accessSummary|striptags|trim %}
+      {% if showAccessDataset %}
+      <div class="dataset-section" data-item-id="{{ i|e }}">
+        {% if accessSummary|striptags|trim %}
+          {% set accessLead %}<p class="dataset-access-summary"><strong>{{ accessLabel }}</strong> — {{ accessSummary }}</p>{% endset %}
+          {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid and isPublishedSwItems %}<div class="answer-lead">{{ accessLead }}</div>{% else %}{{ accessLead }}{% endif %}
+        {% else %}
+          <h5>{{ accessLabel }}</h5>
+        {% endif %}
+        {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
+          {% if isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid %}
+            {% if isPublishedSwItems %}
+              <ul class="required-software">
+                {% for swItem in isPublishedSwItems %}
+                  {% set swNameReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatNameQUuid]|reply_path]|reply_str_value %}
+                  {% set swPIDReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path]|reply_str_value %}
+                  <li data-item-id="{{ swItem|e }}"><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(loop.index) }}{% else %}(no name given){% endif %}</strong>
+                    {% if swPIDReply|trim %}<div>Available at: {{ swPIDReply|e }}</div>
+                    {% elif output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="software-location" data-status="missing">An access location for this tool has not been provided.</p>{% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            {% elif output_profile|default('review') != 'submission' %}
+              <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-list" data-status="missing">Software is required, but the tools have not yet been listed.</p>
+            {% endif %}
+          {% elif isPublishedDataSwAUuid != uuids.publishedSpecSwUseNoAUuid and output_profile|default('review') != 'submission' %}
+            <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-decision" data-status="missing">It has not yet been specified whether software is required to use this dataset.</p>
+          {% endif %}
+        {% elif isPublishedDataAUuid != uuids.isPublishedDataNoAUuid and output_profile|default('review') != 'submission' %}
+          <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>
+        {% endif %}
+      </div>
+      {% endif %}
     {%- else -%}
-        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5c" data-status="missing-output">This document does not yet identify the datasets to be shared or the tools needed to use them.</p>{% endif %}
-    {%- endif -%}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5c" data-status="missing-output">This document does not yet identify the datasets to be shared or the tools needed to use them.</p>{% endif %}
+    {%- endfor -%}
   </div>
 </div>

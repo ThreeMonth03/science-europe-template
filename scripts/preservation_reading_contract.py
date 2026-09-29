@@ -49,7 +49,8 @@ def source_delta():
                 step['options']['args'] = args.replace(anchor, anchor+' --lua-filter='+FILTER)
                 selected += 1
     assert selected == 2 and before == after, 'Only both Word filter chains and version may change'
-    preparation = (ROOT/'scripts/prepare_layout.py').read_text()
+    from current_repairs_contract import project_support
+    preparation = project_support('scripts/prepare_layout.py').decode()
     assert preparation.count(STYLE_BLOCK) == 1
     assert preparation.replace(STYLE_BLOCK, '').encode() == historic('scripts/prepare_layout.py')
     return dict(baseline=BASELINE, version='0.3.39', new_source=FILTER,
@@ -123,6 +124,16 @@ def prior_reference(before, after):
         for name in old.namelist():
             if name != 'word/styles.xml': assert old.read(name) == new.read(name), name
         first, second = [E.fromstring(z.read('word/styles.xml')) for z in (old, new)]
+        # The current candidate adds one separately verified Q14 style. Remove
+        # only that exact style before checking the older Q11-only delta.
+        responsibility = [s for s in second if s.get(W+'styleId') == 'PilotResponsibilitySummary']
+        assert len(responsibility) <= 1
+        if responsibility:
+            expected_responsibility = E.fromstring(('<w:style xmlns:w="'+W[1:-1]+'" w:type="paragraph" w:customStyle="1" w:styleId="PilotResponsibilitySummary">'
+                '<w:name w:val="Pilot Responsibility Summary"/><w:basedOn w:val="BodyText"/><w:pPr>'
+                '<w:keepNext w:val="0"/><w:keepLines/></w:pPr></w:style>').encode())
+            assert xml(responsibility[0]) == xml(expected_responsibility), 'Unreviewed responsibility style'
+            second.remove(responsibility[0])
         assert not [s for s in first if s.get(W+'styleId') == STYLE]
         added = [s for s in second if s.get(W+'styleId') == STYLE]; assert len(added) == 1
         expected = E.fromstring(('<w:style xmlns:w="'+W[1:-1]+'" w:type="paragraph" w:customStyle="1" w:styleId="'+STYLE+'">'

@@ -12,12 +12,24 @@
             {# If will be published #}
             {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
             {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
+            {%- set publishedDistrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
+            {%- set publishedDistrosItems = repliesMap[publishedDistrosPath]|reply_items -%}
+            {%- set identifierDistroItems = [] -%}
+            {%- if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid -%}
+                {%- for j in publishedDistrosItems -%}
+                    {%- set identifierPath = [publishedDistrosPath, j, uuids.publishedDataIdentifierQUuid]|reply_path -%}
+                    {%- set identifierAnswer = repliesMap[identifierPath]|reply_str_value -%}
+                    {%- if identifierAnswer in [uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierNoAUuid] -%}
+                        {%- do identifierDistroItems.append(j) -%}
+                    {%- endif -%}
+                {%- endfor -%}
+            {%- endif -%}
+            {%- set showIdentifierDataset = output_profile|default('review') != 'submission' or isPublishedDataAUuid == uuids.isPublishedDataNoAUuid or identifierDistroItems|length > 0 -%}
+            {% if showIdentifierDataset %}
             <div class="dataset-section" data-item-id="{{ i }}">
-                <h5>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName else "(no name given)" }}{% endif %}</h5>
+                <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</h5>
             {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
                 {# Where the data will be distributed #}
-                {%- set publishedDistrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
-                {%- set publishedDistrosItems = repliesMap[publishedDistrosPath]|reply_items -%}
                     {%- if publishedDistrosItems|length > 0  -%}
                         {%- for j in publishedDistrosItems -%}
                             {%- set publishedDistrosItem = [publishedDistrosPath, j]|reply_path -%}
@@ -26,9 +38,13 @@
 
                             {%- set repositoryKindQUuid = [publishedDistrosItem, uuids.publishedDataRepositoryKindQUuid]|reply_path -%}
                             {%- set repositoryKindAUuid = repliesMap[repositoryKindQUuid]|reply_str_value -%}
+                            {%- set repositoryKindKnown = repositoryKindAUuid in [uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.publishedDataRepositoryNationalAUuid, uuids.publishedDataRepositoryInstitutionalAUuid, uuids.publishedDataRepositorySpecialAUuid] -%}
+                            {% if output_profile|default('review') != 'submission' or publishedDataIdentifierAUuid in [uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierNoAUuid] %}
                             <div class="distribution-section" data-item-id="{{ j }}">
+                            {% if publishedDistrosItems|length > 1 or repositoryKindKnown %}
                             <div class="identifier-heading">
                             {% if publishedDistrosItems|length > 1 %}<p class="answer-lead"><strong>Distribution {{ loop.index }}</strong></p>{% endif %}
+                            {% if repositoryKindKnown %}
                             <p class="answer-lead">
                             {%- if repositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid -%}
                                 <strong>Domain-specific repository</strong>
@@ -42,7 +58,9 @@
                                 <strong>Special-purpose repository</strong>
                             {%- endif -%}
                             </p>
+                            {% endif %}
                             </div>
+                            {% endif %}
 
                             {# Will this data be assigned persistent identifier? #}
                             {%- if publishedDataIdentifierAUuid == uuids.publishedDataIdentifierYesAUuid -%}
@@ -52,11 +70,18 @@
                                 {# Who assigns #}
                                 {%- set publishedDataIdentifierAssignsQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierAssignsQUuid]|reply_path -%}
                                 {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}
+                                {%- set publishedDataIdentifierResolvableQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierResolvableQUuid]|reply_path -%}
+                                {%- set publishedDataIdentifierResolvableAUuid = repliesMap[publishedDataIdentifierResolvableQUuid]|reply_str_value -%}
+                                {%- set repositoryHandlesBoth = publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsRepositoryAUuid and publishedDataIdentifierResolvableAUuid in [uuids.publishedDataIdentifierResolvableYesAUuid, uuids.publishedDataIdentifierResolvableNoAUuid] -%}
 
                                 {# A known assigner sentence already states that identifiers will be
                                    assigned. Keep both facts, without repeating that assertion.
                                    Missing/unsupported assigners must retain the known parent answer. #}
-                                {%- if publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
+                                {%- if repositoryHandlesBoth -%}
+                                    {# One complete, translatable compound sentence carries both
+                                       facts. A negative guarantee is NOT a failed resolution. #}
+                                    <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">{% include 'src/identifier-repository.html.j2' with context %}</span></p>
+                                {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
                                     <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">A project data steward or principal investigator will assign the persistent identifier.</span></p>
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid -%}
@@ -69,13 +94,10 @@
                                 {%- endif -%}
 
                                 {# Resolvable #}
-                                {%- set publishedDataIdentifierResolvableQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierResolvableQUuid]|reply_path -%}
-                                {%- set publishedDataIdentifierResolvableAUuid = repliesMap[publishedDataIdentifierResolvableQUuid]|reply_str_value -%}
-
-                                {%- if publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid -%}
+                                {%- if not repositoryHandlesBoth and publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid -%}
                                     <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="complete">The repository will make sure the persistent identifier can be resolved to a digital object.</p>
 
-                                {%- elif publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableNoAUuid -%}
+                                {%- elif not repositoryHandlesBoth and publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableNoAUuid -%}
                                     <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="explicit-no">The repository will not make sure the persistent identifier can be resolved to a digital object.</p>
                                 {%- endif -%}
 
@@ -105,6 +127,7 @@
                               {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">The persistent identifier arrangement is not yet described.</p>{% endif %}
                             {%- endif -%}
                             </div>
+                            {% endif %}
                         {%- endfor -%}
                     {% else %}
                         {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="identifier-distributions" data-status="missing">The publication locations have not been listed.</p>{% endif %}
@@ -115,6 +138,7 @@
                 {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}
             {%- endif -%}
             </div>
+            {% endif %}
         {%- endfor -%}
     {%- else -%}
       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.</p>{% endif %}
@@ -136,7 +160,7 @@
             {%- set measuredDataNameQUuid = [measuredDataItem, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataNameReply = repliesMap[measuredDataNameQUuid]|reply_str_value -%}
             <li>
-            <strong>{% if output_profile|default('review') == 'submission' and not measuredDataNameReply %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply if measuredDataNameReply else "(no name given)" }}{% endif %}</strong>
+            <strong class="item-label">{% if output_profile|default('review') == 'submission' and not measuredDataNameReply %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply if measuredDataNameReply else "(no name given)" }}{% endif %}</strong>
             {%- set measuredDataReuseQUuid = [measuredDataItem, uuids.measuredDataReuseQUuid]|reply_path -%}
             {%- set measuredDataReuseAUuid = repliesMap[measuredDataReuseQUuid]|reply_str_value -%}
 

@@ -7,6 +7,73 @@
   {%- if not visible or result.width > limit -%}{%- set result.ok = false -%}{%- endif -%}
 {%- endmacro -%}
 
+{# A second, deliberately narrower path covers Q15 when no budget table exists.
+   It accepts only the template's bounded prose grammar; authored lists, links,
+   media, unknown attributes and long answers retain normal pagination. #}
+{%- macro no_budget_document(original) -%}
+  {%- set opening = '<div id="q-required-resources" class="question" data-requirement-id="SE-6b">' -%}
+  {%- set hint = '<div id="q-required-resources" class="question pdf-short-resources" style="break-inside: avoid" data-requirement-id="SE-6b">' -%}
+  {%- set selection = namespace(ok=false, width=0) -%}
+  {%- if original.count(opening) == 1 -%}
+    {%- set tail = original.split(opening, 1)[1] -%}
+    {%- if tail.count('</section>') == 1 -%}
+      {%- set question = (opening|safe) + (tail.split('</section>', 1)[0]|safe) -%}
+      {%- set selection.ok = question|length <= 12000 and question.count('<div class="answer">') == 1 and question.count('<h3>') == 1 and question.count('<h4>') <= 1 and question.count('<div class="project-resources" ') <= 1 and question.count('<div class="answer-detail"') <= 1 and question.count('<p') <= 8 and '<table' not in question and '<ul' not in question and '<ol' not in question and '<img' not in question and '<a ' not in question and '<blockquote' not in question and '<pre' not in question and '<br' not in question and '<hr' not in question -%}
+      {%- if selection.ok -%}
+        {{- measure(question, selection, 1000) -}}
+        {%- set stack = [] -%}
+        {%- set fixed = [
+          opening[1:-1], 'div class="answer"', 'div class="answer-lead"', 'div class="answer-detail"',
+          'div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete"',
+          'div class="answer-detail" data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="complete"',
+          'p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="complete"',
+          'p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="explicit-no"',
+          'p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="partial"',
+          'p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no"',
+          'p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="partial"',
+          'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise-detail" data-status="missing"',
+          'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="hardware-software-detail" data-status="missing"',
+          'p class="data-gap" data-fact-id="repository-charges" data-status="missing"',
+          'p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"',
+          'span data-fact-id="repository-charges" data-status="complete"'
+        ] -%}
+        {%- for fragment in question.split('<')[1:] -%}
+          {%- set tag = fragment.split('>', 1)[0] -%}
+          {%- set content = fragment.split('>', 1)[-1] -%}
+          {%- set name = tag.split(' ', 1)[0] -%}
+          {%- if tag.startswith('/') -%}
+            {%- if stack and stack[-1].split(' ', 1)[0] == tag[1:] -%}{%- do stack.pop() -%}
+            {%- else -%}{%- set selection.ok = false -%}{%- endif -%}
+          {%- else -%}
+            {%- set project = tag.startswith('div class="project-resources" data-item-id="') and tag.endswith('"') -%}
+            {%- if tag not in fixed and tag not in ['h3', 'h4', 'p', 'strong', 'em', 'code'] and not project -%}{%- set selection.ok = false -%}{%- endif -%}
+            {%- set parent = stack[-1] if stack else '' -%}
+            {%- set parentName = parent.split(' ', 1)[0] -%}
+            {%- set legal = namespace(ok=false) -%}
+            {%- if tag == opening[1:-1] -%}{%- set legal.ok = not stack -%}
+            {%- elif name == 'h3' or tag == 'div class="answer"' -%}{%- set legal.ok = parent == opening[1:-1] -%}
+            {%- elif name == 'h4' -%}{%- set legal.ok = parent == 'div class="answer"' -%}
+            {%- elif name == 'div' -%}{%- set legal.ok = parent == 'div class="answer"' -%}
+            {%- elif name == 'p' -%}{%- set legal.ok = parentName == 'div' and parent != opening[1:-1] -%}
+            {%- elif name == 'span' -%}{%- set legal.ok = parentName == 'p' and question.count('<span ') == 1 -%}
+            {%- elif name in ['strong', 'em', 'code'] -%}{%- set legal.ok = parentName == 'p' -%}
+            {%- endif -%}
+            {%- if not legal.ok -%}{%- set selection.ok = false -%}{%- endif -%}
+            {%- do stack.append(tag) -%}
+          {%- endif -%}
+          {%- if content|trim and (not stack or stack[-1].split(' ', 1)[0] not in ['p', 'span', 'strong', 'em', 'code', 'h3', 'h4']) -%}{%- set selection.ok = false -%}{%- endif -%}
+        {%- endfor -%}
+        {%- if stack -%}{%- set selection.ok = false -%}{%- endif -%}
+        {%- for paragraph in question.split('<p')[1:] -%}{{- measure(paragraph.split('>', 1)[-1].split('</p>', 1)[0], selection, 180) -}}{%- endfor -%}
+        {%- for value in question.split('<h3>')[1:] -%}{{- measure(value.split('</h3>', 1)[0], selection, 360) -}}{%- endfor -%}
+        {%- for value in question.split('<h4>')[1:] -%}{{- measure(value.split('</h4>', 1)[0], selection, 80) -}}{%- endfor -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if selection.ok -%}{{- original|replace(opening, hint|safe, 1) -}}
+  {%- else -%}{{- original -}}{%- endif -%}
+{%- endmacro -%}
+
 {%- macro document(original) -%}
   {%- set opening = '<div id="q-required-resources" class="question" data-requirement-id="SE-6b">' -%}
   {%- set hint = '<div id="q-required-resources" class="question pdf-short-resources" style="break-inside: avoid" data-requirement-id="SE-6b">' -%}

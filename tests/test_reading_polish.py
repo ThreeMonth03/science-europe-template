@@ -7,6 +7,47 @@ from generate_storage_fixtures import storage_cases
 
 
 class ReadingPolishTests(unittest.TestCase):
+    def test_fixed_english_prose_uses_complete_natural_sentences(self):
+        source = '\n'.join((ROOT/path).read_text() for path in [
+            'src/questions/05-store-backup.html.j2',
+            'src/questions/06-access-security.html.j2',
+            'src/questions/07-personal-data.html.j2',
+            'src/questions/08-copyright-ipr.html.j2',
+            'src/questions/09-ethical-issues.html.j2',
+        ])
+        for phrase in [
+            'There is no shared workspace used',
+            'secure HTTP (https://...)',
+            'We pseudonymize inside the project',
+            'We will use following policies',
+            "based on subject's consent",
+            'in order to fulfil contract',
+            'We will be working with the philosophy',
+            'restrictions are falling away',
+            'We will have not decided yet',
+            're-users',
+        ]:
+            self.assertNotIn(phrase, source)
+        for phrase in [
+            'The project will not use a shared workspace to work with data.',
+            'All project web services are accessible through HTTPS.',
+            'We will use the following policies and procedures:',
+            'with the consent of the data subjects.',
+            'We will manage our data according to the principle',
+            'Data will be released as soon as the restrictions no longer apply.',
+        ]:
+            self.assertIn(phrase, source)
+        for phrase in [
+            'data loss and data disclosure',
+            'data loss and data tampering',
+            'data disclosure and data tampering',
+            'data loss, data disclosure, and data tampering',
+        ]:
+            self.assertIn(phrase, source)
+        self.assertNotIn("join(' and ')", source)
+        self.assertEqual(4, source.count('risk_list('))
+        self.assertEqual(1, source.count('macro risk_list'))
+
     def test_missing_fields_have_one_lead_and_one_terminal_period(self):
         soup = BeautifulSoup(render_question(Q2, {FORMATS: ['format-1']}), 'html.parser')
         gap = soup.select_one('.format-description p.data-gap')

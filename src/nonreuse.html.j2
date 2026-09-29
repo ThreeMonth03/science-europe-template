@@ -1,0 +1,34 @@
+{# Source/location is metadata, never an unfinished sentence prefix. Authored
+   reasons remain Markdown blocks outside the template-owned paragraph. #}
+{%- macro render(source, reason, detail, noData, noAspect, noQuality, noConditions, other) -%}
+  {%- set nonreuseSentences = [] -%}
+  {%- set decisionSentence -%}This dataset was considered but will not be re-used.{%- endset -%}
+  {%- do nonreuseSentences.append(decisionSentence) -%}
+  {%- if reason == noData -%}
+    {%- set reasonSentence -%}<span data-fact-id="nonreuse-reason" data-status="complete">It does not contain the data required for this project.</span>{%- endset -%}
+    {%- do nonreuseSentences.append(reasonSentence) -%}
+  {%- elif reason == noAspect -%}
+    {%- set reasonSentence -%}<span data-fact-id="nonreuse-reason" data-status="complete">It does not cover the aspects required for this project.</span>{%- endset -%}
+    {%- do nonreuseSentences.append(reasonSentence) -%}
+  {%- elif reason == noQuality -%}
+    {%- set reasonSentence -%}<span data-fact-id="nonreuse-reason" data-status="complete">Its quality is insufficient for this project.</span>{%- endset -%}
+    {%- do nonreuseSentences.append(reasonSentence) -%}
+  {%- elif reason == noConditions -%}
+    {%- set reasonSentence -%}<span data-fact-id="nonreuse-reason" data-status="complete">Its conditions of use do not permit the intended re-use.</span>{%- endset -%}
+    {%- do nonreuseSentences.append(reasonSentence) -%}
+  {%- endif -%}
+  <p class="nonreuse-summary" data-fact-id="reuse-decision" data-status="explicit-no">{{ nonreuseSentences|join(" ") }}</p>
+  {% if source|trim %}
+    {% if source.startswith('https://') or source.startswith('http://') or source.startswith('ftp://') %}
+      <p class="dataset-source" data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ source }}">{{ source }}</a></p>
+    {% else %}
+      <p class="dataset-source" data-fact-id="dataset-source" data-status="complete">Source: {{ source }}</p>
+    {% endif %}
+  {% endif %}
+  {% if reason == other and detail|trim %}
+    <div class="answer-detail" data-fact-id="nonreuse-reason" data-status="complete"><p><strong>Reason for not re-using this dataset</strong></p>{{ detail|markdown }}</div>
+  {% elif reason not in [noData, noAspect, noQuality, noConditions] and output_profile|default('review') != 'submission' %}
+    {% set reasonStatus = 'needs-review' if reason and reason != other else 'missing' %}
+    <p class="data-gap" data-fact-id="nonreuse-reason" data-status="{{ reasonStatus }}"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>
+  {% endif %}
+{%- endmacro -%}

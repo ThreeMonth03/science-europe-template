@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from test_science_europe_contract import ROOT, render_question
 sys.path.insert(0, str(ROOT / 'scripts'))
 from generate_pilot_fixtures import IDS, path
+from current_support import support_replies
 
 Q5 = 'src/questions/05-store-backup.html.j2'
 Q11 = 'src/questions/11-data-preservation.html.j2'
@@ -25,22 +26,6 @@ def storage_matrix():
         if work: replies[workspace] = IDS[f'sharedWorkspace{work}AUuid']
         if arch: replies[archive] = IDS[f'archivedDuring{arch}AUuid']
         yield replies
-
-
-def support_replies(choices=(None,), repository='Special', publication='Yes'):
-    data = path('preservingCUuid', 'producedDataQUuid')
-    pub = path(data, 'dataset-a', 'isPublishedDataQUuid')
-    dist = path(pub, 'isPublishedDataYesAUuid', 'publishedDistrosQUuid')
-    replies = {data: ['dataset-a'], dist: [f'distro-{i}' for i in range(len(choices))]}
-    if publication: replies[pub] = IDS[f'isPublishedData{publication}AUuid']
-    for i, choice in enumerate(choices):
-        kind = path(dist, f'distro-{i}', 'publishedDataRepositoryKindQUuid')
-        if repository: replies[kind] = IDS[f'publishedDataRepository{repository}AUuid']
-        prefix = path(kind, 'publishedDataRepositorySpecialAUuid')
-        if choice is not None:
-            replies[path(prefix, 'specialRepoLongTermSupportQUuid')] = IDS.get(f'specialRepoLongTermSupport{choice}AUuid', choice)
-        replies[path(prefix, 'specialRepoServiceLevelQUuid')] = IDS['specialRepoServiceLevelAdvancedAUuid']
-    return replies
 
 
 class AnswerStateTests(unittest.TestCase):

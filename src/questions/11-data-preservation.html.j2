@@ -12,8 +12,7 @@
         {%- set repositoryDatasetIndex = loop.index -%}
         {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
-        <div class="dataset-section" data-item-id="{{ i }}">
-          <h5>{% if output_profile|default('review') == 'submission' and not producedDataName %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName else "(no name given)" }}{% endif %}</h5>
+        {% set preservationDatasetContent %}
           <div class="preservation-summary dataset-policy">
           {# One owned prose run for dataset context and preservation arrangements.
              Authored answer-detail and reading-gap blocks remain hard boundaries. #}
@@ -75,12 +74,15 @@
               {%- set domainSpecificRepoContactBeforePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoContactBeforeQUuid]|reply_path -%}
               {%- set domainSpecificRepoContactBeforeAUuid = repliesMap[domainSpecificRepoContactBeforePath]|reply_str_value -%}
               {%- set repositoryOtherContact = distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid and domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeOtherAUuid -%}
+              {# A missing/unknown destination has only a review diagnostic here.
+                 Omit the whole submission row, not just its text; use the original
+                 loop index for surviving labels and Q10 contact anchors. #}
+              {%- set repositoryKnown = distroRepositoryKindAUuid in [uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.publishedDataRepositoryNationalAUuid, uuids.publishedDataRepositoryInstitutionalAUuid, uuids.publishedDataRepositorySpecialAUuid] -%}
+              {% if repositoryKnown or output_profile|default('review') != 'submission' %}
                 <li class="repository-distribution" data-item-id="{{ j }}">
                   {% if repositoryOtherContact %}<div class="answer-lead repository-contact-heading"><p>{% endif %}
                   {% if distrosItems|length > 1 %}<span class="repository-label">Distribution {{ loop.index }}:</span> {% endif %}
-                  {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
-                    Domain-specific repository
-                    {%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
+                  {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}Domain-specific repository{%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
                     {%- set domainSpecificRepoNameReply = repliesMap[domainSpecificRepoNamePath] -%}
                     {%- if domainSpecificRepoNameReply -%}
                       : {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.
@@ -107,9 +109,7 @@
                         {% endif %}
                       </div>
                     {%- endif -%}
-                  {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}
-                    <em>General-purpose repository</em>
-                    {%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
+                  {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}<em>General-purpose repository</em>{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                     {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
                     {%- if generalPurposeRepoNameReply -%}
                       : {{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}.
@@ -120,33 +120,14 @@
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryInstitutionalAUuid %}
                     Our institutional repository.
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid %}
-                    Special-purpose repository for the project.
-                    {# Long-term support #}
-                    {%- set specialRepoLongTermSupportPath = [distroRepositoryKindPath, uuids.publishedDataRepositorySpecialAUuid, uuids.specialRepoLongTermSupportQUuid]|reply_path -%}
-                    {%- set specialRepoLongTermSupportAUuid = repliesMap[specialRepoLongTermSupportPath]|reply_str_value -%}
-                    {%- if specialRepoLongTermSupportAUuid == uuids.specialRepoLongTermSupportYesAUuid %}
-                      <span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="complete">We will be able to support this repository for a sufficiently long time.</span>
-                    {%- elif specialRepoLongTermSupportAUuid == uuids.specialRepoLongTermSupportNoAUuid %}
-                      <span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="explicit-no">We will not be able to support this repository for a sufficiently long time.</span>
-                    {%- else %}
-                      <span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="missing">Whether we will be able to support this repository for a sufficiently long time has not been specified.</span>
-                    {%- endif -%}
-                    {# Service level #}
-                    {%- set specialRepoServiceLevelPath = [distroRepositoryKindPath, uuids.publishedDataRepositorySpecialAUuid, uuids.specialRepoServiceLevelQUuid]|reply_path -%}
-                    {%- set specialRepoServiceLevelAUuid = repliesMap[specialRepoServiceLevelPath]|reply_str_value -%}
-                    {%- if specialRepoServiceLevelAUuid == uuids.specialRepoServiceLevelDownloadAUuid %}
-                      The repository will provide download-only service.
-                    {%- elif specialRepoServiceLevelAUuid == uuids.specialRepoServiceLevelSimpleAUuid %}
-                      The repository will provide a search and simple access interface.
-                    {%- elif specialRepoServiceLevelAUuid == uuids.specialRepoServiceLevelAdvancedAUuid %}
-                      The repository will provide an advanced processing service.
-                    {%- endif -%}
+                    {%- include 'src/repository-special.html.j2' with context -%}
                   {%- elif distroRepositoryKindAUuid %}
                     <span data-requirement-id="SE-5b" data-fact-id="repository-destination" data-status="needs-review">The selected repository type cannot be described by this template.</span>
                   {%- else %}
                     <span data-requirement-id="SE-5b" data-fact-id="repository-destination" data-status="missing">The repository for this distribution has not been specified.</span>
                   {%- endif -%}
                 </li>
+              {% endif %}
             {%- endfor -%}
             {% endset %}
             {# Only bounded inline repository summaries, never authored blocks. #}
@@ -156,18 +137,26 @@
               {% endif %}
             {% endfor %}
             {% set repositoryText = (repositoryItems|striptags).split()|join(' ') %}
+            {% if repositoryText %}
             <div class="repository-destinations{{ ' short-repository-list' if repositoryReading.simple and distrosItems|length <= 3 and repositoryText|length <= 900 else '' }}">
               <div class="answer-lead"><p>Preservation destinations by distribution:</p></div>
               <ul>{{ repositoryItems }}</ul>
             </div>
+            {% endif %}
           {%- endif -%}
           {# Catalogue #}
           {%- set publishedDataCataloguePath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid]|reply_path -%}
           {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
           {%- if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
-            <p>We will be adding a reference to the published data to at least one data catalogue.</p>
+            <p>We will add a reference to the published data in at least one data catalogue.</p>
           {%- endif -%}
+        {% endset %}
+        {% if output_profile|default('review') != 'submission' or preservationDatasetContent|striptags|trim or '<img' in preservationDatasetContent or '<table' in preservationDatasetContent %}
+        <div class="dataset-section" data-item-id="{{ i }}">
+          <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</h5>
+          {{ preservationDatasetContent }}
         </div>
+        {% endif %}
       {%- endfor -%}
     {%- endif -%}
     {% set archiveChoice = repliesMap[[uuids.preservingCUuid, uuids.archivedAfterQUuid]|reply_path]|reply_str_value %}

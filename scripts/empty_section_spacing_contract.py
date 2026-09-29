@@ -42,7 +42,8 @@ def project_source(sources=None,metadata=None):
     assert sources==recipe.overlay(before,ROOT),'Unreviewed 0.3.48 source, inventory or asset'
     previous=json.loads(historical('template.json'))
     assert metadata==dict(previous,version='0.3.48'),'Unreviewed identity or conversion step'
+    from current_repairs_contract import project_support
     for name in ['scripts/prepare_layout.py','PACKAGE_README.md','LICENSE']:
-        assert (ROOT/name).read_bytes()==historical(name),name
+        assert project_support(name)==historical(name),name
     for name in ['probe','engine']:load(name)
     return dict(before),previous

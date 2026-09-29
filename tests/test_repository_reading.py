@@ -60,6 +60,14 @@ class RepositoryReadingTests(unittest.TestCase):
             self.assertFalse(row.select('p, div, ul, ol, table'))
             self.assertEqual(1, len(row.select('.repository-label')))
 
+    def test_special_repository_sentences_have_one_explicit_english_separator(self):
+        row = render(support_replies(('Yes',), repository='Special')).select_one('.repository-distribution')
+        self.assertIn(
+            'Special-purpose repository for the project. We will be able to support this repository '
+            'for a sufficiently long time. The repository will provide an advanced processing service.',
+            row.get_text(' ', strip=True),
+        )
+
     def test_long_or_block_repository_name_cannot_enable_keep_hint(self):
         replies = support_replies(repository='GeneralPurpose')
         kind = next(p for p in replies if p.endswith(IDS['publishedDataRepositoryKindQUuid']))

@@ -6,7 +6,7 @@ from markupsafe import Markup
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
-from short_resources_contract import ENTRY, HELPER, HINT, project_source, historical
+from short_resources_contract import ENTRY, HELPER, HINT, OPENING, project_source, historical
 from probe_short_resources import cases, check, fragment
 
 
@@ -39,6 +39,29 @@ class ShortResourcesTests(unittest.TestCase):
             self.assertFalse(names[name],name)
         for name in ('rows-1','whole-1200','authored-warning','chinese-authored-warning'):
             self.assertTrue(names[name],name)
+
+    def test_no_budget_short_unit_is_kept_but_long_or_linked_prose_is_not(self):
+        source = (
+            '<section>' + OPENING + '<h3>15. Resources?</h3><div class="answer">'
+            '<p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" '
+            'data-status="complete">Support is available.</p><h4>Data-management budget</h4>'
+            '<div class="project-resources" data-item-id="aa.1">'
+            '<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" '
+            'data-status="missing">Budget details are pending.</p></div></div></div></section>'
+        )
+        for escape in (False, True):
+            env = Environment(loader=FileSystemLoader(ROOT), extensions=['jinja2.ext.do'], autoescape=escape)
+            helper = env.get_template(HELPER).module
+            value = Markup(source) if escape else source
+            selected = str(helper.no_budget_document(value))
+            self.assertEqual(1, selected.count(HINT))
+            self.assertEqual(source.replace(OPENING, HINT, 1), selected)
+            for changed in (
+                source.replace('Budget details are pending.', 'x' * 181),
+                source.replace('Budget details are pending.', '<a href="https://example.org">Budget</a>'),
+            ):
+                value = Markup(changed) if escape else changed
+                self.assertEqual(changed, str(helper.no_budget_document(value)))
 
 
 if __name__=='__main__':unittest.main()

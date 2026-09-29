@@ -27,10 +27,13 @@ def project_source(sources=None, metadata=None):
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None:
         metadata = json.loads((ROOT / 'template.json').read_text())
+    from current_repairs_contract import project_source as project_current
+    sources, metadata = project_current(sources, metadata)
     recipe = load('recipe'); before = recipe.baseline_sources(ROOT)
     assert sources == recipe.overlay(before, ROOT), 'Unreviewed 0.3.51 source, inventory or asset'
     previous = json.loads(historical('template.json'))
     assert metadata == dict(previous, version='0.3.51'), 'Unreviewed identity or conversion step'
+    from current_repairs_contract import project_support
     for name in ['scripts/prepare_layout.py', 'PACKAGE_README.md', 'LICENSE']:
-        assert (ROOT / name).read_bytes() == historical(name), name
+        assert project_support(name) == historical(name), name
     return dict(before), previous

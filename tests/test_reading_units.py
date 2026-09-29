@@ -54,6 +54,18 @@ class ReadingUnitTests(unittest.TestCase):
         detail.select_one('.answer-lead').decompose()
         self.assertEqual(AUTHORED, detail.decode_contents().strip())
 
+    def test_custom_non_equipment_dataset_does_not_emit_an_empty_type_paragraph(self):
+        parent = path('creatingCUuid', 'neqDataQUuid')
+        items = path(parent, 'neqDataYesAUuid', 'neqDataSetsQUuid')
+        values = {
+            parent: IDS['neqDataYesAUuid'],
+            items: ['custom'],
+            path(items, 'custom', 'neqDataSetsNameQUuid'): 'Custom registry extract',
+        }
+        soup = BeautifulSoup(render_question(Q2, values), 'html.parser')
+        self.assertIn('Custom registry extract', soup.get_text())
+        self.assertFalse([node for node in soup.find_all('p') if not node.get_text(strip=True)])
+
     def test_metadata_explanation_is_not_escaped_or_nested_in_paragraph(self):
         meta = path('accessCUuid', 'metadataOpenQUuid')
         values = {meta: IDS['metadataOpenNoAUuid'], path(meta, 'metadataOpenNoAUuid', 'metadataOpenNoExplainQUuid'): AUTHORED}

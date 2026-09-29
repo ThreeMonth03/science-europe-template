@@ -13,7 +13,9 @@ html body h5 { font-size: 10.5pt; margin: .75em 0 .3em; }
 html body h1, html body h2, html body h3, html body h4, html body h5 { break-after: avoid; break-inside: avoid; }
 html body p { margin: 0 0 .5em; orphans: 2; widows: 2; }
 html body li { margin-bottom: .6em; }
-html body li > strong:first-child { display: block; break-after: avoid; }
+/* Only explicit item labels are blocks. :first-child ignores text nodes and
+   would split a sentence such as "There will be a <strong>folder</strong>.". */
+html body li > strong.item-label { display: block; break-after: avoid; }
 html body ul { padding-left: 1.4em; margin: .4em 0 .8em; }
 html body .answer-detail { margin: .3em 0 .75em; }
 html body .answer-detail > p:first-child { break-after: avoid; }
@@ -42,6 +44,11 @@ html body .data-gap { padding: .45em .65em; border-left: 3px solid #95651b; back
 /* Reading units, not arbitrary fixed-height pages. */
 html body #dmp-content { break-before: page; }
 html body #dmp-projects h3 { font-size: 14pt; font-weight: bold; color: #222; }
+/* Stable overview columns: long acronyms must not squeeze labels vertically.
+   Keep wrapping in the value cell; other tables and Word styles are unchanged. */
+html body #dmp-projects > .project > table.project-details { table-layout: fixed; }
+html body #dmp-projects > .project > table.project-details th { width: 24%; }
+html body #dmp-projects > .project > table.project-details td { overflow-wrap: anywhere; word-break: break-word; }
 html body .document-meta { font-size: 9pt; color: #526169; }
 html body .document-kind { font-size: 14pt; color: #526169; }
 html body .document-provenance { border-top: 1px solid #bcc6cc; margin-top: 2em; padding-top: .7em; font-size: 8.5pt; color: #526169; }
@@ -103,8 +110,8 @@ html body .template-gap { font-size: 9.5pt; color: #526169; border-left-color: #
 /* Owned publication reading blocks: structure, not hidden list markers. */
 html body .dataset-section { margin: .6em 0 1em; }
 html body .dataset-section > h5 { font-size: 11pt; margin: .5em 0 .35em; }
-html body .distribution-section { margin: .35em 0 .65em; }
-html body .distribution-section + .distribution-section { border-top: 1px solid #cbd2d5; padding-top: .6em; }
+html body .distribution-section { margin: .25em 0 .45em; }
+html body .distribution-section + .distribution-section { border-top: 1px solid #cbd2d5; padding-top: .4em; }
 html body .license-entry { margin: .25em 0 .5em; }
 html body .license-entry + .license-entry { border-top: 1px dotted #cbd2d5; padding-top: .4em; }
 html body .storage-detail-limits li { margin-bottom: .25em; }
@@ -140,8 +147,8 @@ html body .data-gap[data-status="missing-output"] { border: none; border-left: 2
 .distribution-reading-unit .joined-policy > .answer-lead > p { display: inline; margin: 0; }
 .distribution-reading-unit > p:not(.data-gap):not(.answer-lead)::after,
 .distribution-reading-unit .joined-policy p::after { content: " "; }
-/* BEGIN identifier CJK separator: fixed Q13 sentences only, not headings. */
-html[lang="zh-Hant"] body .identifier-arrangement.dataset-policy > p::after { content: none; }
+/* BEGIN identifier CJK separator: fixed dataset-policy sentences only. */
+html[lang="zh-Hant"] body .dataset-policy > p::after { content: none; }
 /* END identifier CJK separator */
 /* BEGIN archive gap pairs: print-only, adjacent fixed missing facts, two per panel. */
 @media print {

@@ -1,0 +1,31 @@
+{# Q10 only. A known timing already states publication; do not repeat the generic
+   Yes sentence. Preserve independent timing/catalogue answers when the decision
+   is missing, but never revive these Yes-branch answers after an explicit No. #}
+{%- set publishedWhenPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedWhenQUuid]|reply_path -%}
+{%- set publishedWhenAUuid = repliesMap[publishedWhenPath]|reply_str_value -%}
+{%- set publishedDataCataloguePath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid]|reply_path -%}
+{%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
+{%- set publicationSentences = [] -%}
+{%- if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid -%}
+  {%- do publicationSentences.append('This dataset will not be published.') -%}
+{%- else -%}
+  {%- if publishedWhenAUuid == uuids.publishedWhenSoonAUuid -%}
+    {%- do publicationSentences.append('The dataset will be published as soon as possible after collection.') -%}
+  {%- elif publishedWhenAUuid == uuids.publishedWhenCleanupAUuid -%}
+    {%- do publicationSentences.append('The dataset will be published after initial cleanup.') -%}
+  {%- elif publishedWhenAUuid == uuids.publishedWhenFinishedAUuid -%}
+    {%- do publicationSentences.append('The dataset will be published after all processing has finished.') -%}
+  {%- elif publishedWhenAUuid == uuids.publishedWhenWrappedAUuid -%}
+    {%- do publicationSentences.append('The dataset will be published when the project is completed.') -%}
+  {%- elif publishedWhenAUuid == uuids.publishedWhenEmbargoAUuid -%}
+    {%- do publicationSentences.append('The dataset will be published after an embargo.') -%}
+  {%- elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid -%}
+    {%- do publicationSentences.append('This dataset will be published.') -%}
+  {%- endif -%}
+  {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
+    {%- do publicationSentences.append('We will add a reference to the published data in at least one data catalogue.') -%}
+  {%- endif -%}
+{%- endif -%}
+{%- if publicationSentences -%}
+  <p class="publication-summary">{{ publicationSentences|join(' ') }}</p>
+{%- endif -%}

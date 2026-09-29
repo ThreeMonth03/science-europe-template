@@ -47,8 +47,9 @@ def project_source(sources=None, metadata=None):
     before = dict(baseline()); assert hashes(before) == CONTRACT['before']
     assert set(sources) - set(before) == set(CONTRACT['added']) and not set(before) - set(sources)
     assert {n for n in before if before[n] != sources[n]} == set(CONTRACT['changed'])
+    from current_repairs_contract import project_support
     for name in ['scripts/prepare_layout.py', 'PACKAGE_README.md', 'LICENSE']:
-        assert (ROOT / name).read_bytes() == historical(name), name
+        assert project_support(name) == historical(name), name
     for name,digest in CONTRACT['prototype_recipes'].items():
         assert hashlib.sha256((ROOT/name).read_bytes()).hexdigest() == digest, name
         assert (ROOT/name).read_bytes() == historical(name, True), name

@@ -49,7 +49,7 @@ class StorageSharingTests(unittest.TestCase):
                    path(licences, 'l1', 'publishedDataLicenseQUuid'): IDS['publishedDataLicenseCCBYAUuid']}
         output = render_question('src/questions/10-share-restrictions.html.j2', replies)
         self.assertIn('2027-12-31', output)
-        self.assertIn('CC-BY', output)
+        self.assertIn('Freely available with an obligation to cite the source (e.g. CC BY).', output)
         self.assertIn('data-fact-id="distribution-access" data-status="missing"', output)
         probe = BlockProbe(); probe.feed(output)
         self.assertEqual([], probe.errors)

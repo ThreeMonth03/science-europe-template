@@ -1,26 +1,10 @@
 import unittest
 from bs4 import BeautifulSoup
-from test_science_europe_contract import render_question
-from test_answer_states import support_replies
+from test_science_europe_contract import ROOT, render_question
 from test_answer_retention import IDS, path
+from current_support import environment, identifier_replies
 
 Q13 = 'src/questions/13-persistent-identifier.html.j2'
-
-
-def identifier_replies(identifier='Yes', assigns='Repository', resolves='Yes', repository='Institutional', count=2):
-    replies = support_replies(('Yes',) * count, repository='Institutional')
-    for kind in [p for p in replies if p.endswith(IDS['publishedDataRepositoryKindQUuid'])]:
-        base = kind.rsplit('.', 1)[0]
-        if repository: replies[kind] = IDS.get('publishedDataRepository' + repository + 'AUuid', repository)
-        else: replies.pop(kind, None)
-        question = path(base, 'publishedDataIdentifierQUuid')
-        if identifier: replies[question] = IDS.get('publishedDataIdentifier' + identifier + 'AUuid', identifier)
-        else: replies.pop(question, None)
-        for name, value in [('Assigns', assigns), ('Resolvable', resolves)]:
-            key = path(question, 'publishedDataIdentifierYesAUuid', 'publishedDataIdentifier' + name + 'QUuid')
-            if value: replies[key] = IDS.get('publishedDataIdentifier' + name + value + 'AUuid', value)
-            else: replies.pop(key, None)
-    return replies
 
 
 def render(replies): return BeautifulSoup(render_question(Q13, replies), 'html.parser')
@@ -34,7 +18,7 @@ class IdentifierReadingTests(unittest.TestCase):
             self.assertEqual([f'Distribution {index}', 'Institutional repository'],
                              [p.get_text(strip=True) for p in heading.find_all('p', recursive=False)])
             policy = distro.select_one('.identifier-arrangement.dataset-policy')
-            self.assertEqual(2, len(policy.find_all('p', recursive=False)))
+            self.assertEqual(1, len(policy.find_all('p', recursive=False)))
             parent = policy.select_one('[data-fact-id="persistent-identifier"]')
             self.assertIs(parent.parent, policy)
             self.assertIs(parent.select_one('[data-fact-id="identifier-assigner"]').parent, parent)
@@ -49,6 +33,27 @@ class IdentifierReadingTests(unittest.TestCase):
         self.assertNotIn('Distribution 1', soup.get_text())
         self.assertEqual('Institutional repository', soup.select_one('.identifier-heading').get_text(strip=True))
 
+    def test_whitespace_name_and_missing_repository_do_not_emit_empty_headings(self):
+        replies = identifier_replies(repository=None, count=1)
+        dataset = path('preservingCUuid', 'producedDataQUuid')
+        replies[path(dataset, 'dataset-a', 'producedDataNameQUuid')] = '  \n '
+        review = render(replies)
+        self.assertEqual('(no name given)', review.select_one('.dataset-section > h5').get_text(strip=True))
+        self.assertFalse(review.select('.identifier-heading'))
+        self.assertFalse([node for node in review.find_all(['p', 'h5']) if not node.get_text(strip=True)])
+
+        env = environment(ROOT)
+        wrapper = env.from_string(
+            "{% import 'src/macros.html.j2' as macros with context %}"
+            "{% import 'src/uuids.j2' as uuids with context %}"
+            "{% include 'src/questions/13-persistent-identifier.html.j2' with context %}"
+        )
+        submission = BeautifulSoup(
+            wrapper.render(repliesMap=replies, output_profile='submission'), 'html.parser'
+        )
+        self.assertEqual('Produced dataset 1', submission.select_one('.dataset-section > h5').get_text(' ', strip=True))
+        self.assertFalse([node for node in submission.find_all(['p', 'h5']) if not node.get_text(strip=True)])
+
     def test_no_missing_and_unknown_identifier_do_not_leak_stale_yes_children(self):
         for choice in ['No', None, 'unsupported']:
             soup = render(identifier_replies(identifier=choice))
@@ -61,7 +66,7 @@ class IdentifierReadingTests(unittest.TestCase):
         soup = render(identifier_replies(assigns=None, resolves=None))
         self.assertTrue(all(len(p.find_all('p')) == 1 for p in soup.select('.identifier-arrangement')))
         soup = render(identifier_replies(resolves='No'))
-        self.assertEqual(2, soup.get_text().count('will not make sure'))
+        self.assertEqual(2, soup.get_text().count('will not guarantee'))
 
     def test_inactive_publication_discards_identifier_headings_and_stale_answers(self):
         for choice in [None, 'No']:

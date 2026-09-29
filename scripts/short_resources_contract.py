@@ -33,7 +33,8 @@ def project_source():
     before = json.loads(historical('template.json'))
     assert metadata['version'] == '0.3.40' and before['version'] == '0.3.39'
     metadata['version'] = '0.3.39'; assert metadata == before
-    assert (ROOT/'scripts/prepare_layout.py').read_bytes() == historical('scripts/prepare_layout.py')
+    from current_repairs_contract import project_support
+    assert project_support('scripts/prepare_layout.py') == historical('scripts/prepare_layout.py')
     return current, metadata
 
 
@@ -42,10 +43,12 @@ def units(value): return sum(2 if ord(c) >= 0x2e80 else 1 for c in ' '.join(valu
 
 def project_prepared(root, hashes):
     project_source()
-    assert (root/HELPER).read_bytes() == (ROOT/HELPER).read_bytes(), 'Presentation helper must not be translated'
-    assert (root/ENTRY).read_bytes() == (ROOT/ENTRY).read_bytes(), 'PDF entry must remain identical'
+    from current_repairs_contract import project_source as project_current
+    stable, _ = project_current()
+    assert (root/HELPER).read_bytes() == stable[HELPER], 'Presentation helper must not be translated'
+    assert (root/ENTRY).read_bytes() == stable[ENTRY], 'PDF entry must remain identical'
     projected = dict(hashes)
-    helper = (ROOT/HELPER).read_text()
+    helper = stable[HELPER].decode()
     if json.loads((ROOT/'template.json').read_text())['version'] in ['0.3.41','0.3.42','0.3.43','0.3.44','0.3.45','0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
         from resource_prose_contract import prior_pdf
         helper = prior_pdf(helper)

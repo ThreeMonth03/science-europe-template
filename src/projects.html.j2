@@ -1,5 +1,6 @@
 {%- set projectsPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
 {%- set projectsItems = repliesMap[projectsPath]|reply_items -%}
+{%- import 'src/active-answer.j2' as active with context -%}
 {% if projectsItems or output_profile|default('review') != 'submission' %}<div id="dmp-projects">
   <h2>Research overview</h2>
 
@@ -13,6 +14,8 @@
       {% if output_profile|default('review') == 'submission' %}<h3>{{ macros.projectLabel(projectsItems.index(projectsItem) + 1) }}</h3>{% else %}<h3 class="empty-value">(project name not given)</h3>{% endif %}
     {%- endif -%}
 
+    {%- set projectAcronymPath = active.path([uuids.adminDetailsCUuid, uuids.projectsQUuid, projectsItem, uuids.projectAcronymQUuid], 'ValueQuestion') -%}
+    {%- set projectAcronym = repliesMap[projectAcronymPath]|reply_str_value if projectAcronymPath else '' -%}
     {%- set projectNumberPath = [projectsPath, projectsItem, uuids.projectNumberQUuid]|reply_path -%}
     {%- set projectNumber = repliesMap[projectNumberPath]|reply_str_value -%}
     {%- set projectStartPath = [projectsPath, projectsItem, uuids.projectStartQUuid]|reply_path -%}
@@ -21,7 +24,8 @@
     {%- set projectEnd = repliesMap[projectEndPath]|reply_str_value -%}
     {%- set fundersPath = [projectsPath, projectsItem, uuids.fundersQUuid]|reply_path -%}
     {%- set fundersItems = repliesMap[fundersPath]|reply_items -%}
-      {% if projectNumber or projectStart or projectEnd or fundersItems or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
+      {% if projectAcronym|trim or projectNumber or projectStart or projectEnd or fundersItems or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
+        {% if projectAcronym|trim %}<tr data-fact-id="project-acronym" data-status="complete"><th scope="row">Project acronym</th><td>{{ projectAcronym|e }}</td></tr>{% endif %}
         {% if projectNumber or output_profile|default('review') != 'submission' %}<tr><th scope="row">Project Number</th><td>{{ projectNumber if projectNumber else "N/A" }}</td></tr>{% endif %}
         {% if projectStart or output_profile|default('review') != 'submission' %}<tr><th scope="row">Start date</th><td>{{ projectStart if projectStart else "N/A" }}</td></tr>{% endif %}
         {% if projectEnd or output_profile|default('review') != 'submission' %}<tr><th scope="row">End date</th><td>{{ projectEnd if projectEnd else "N/A" }}</td></tr>{% endif %}

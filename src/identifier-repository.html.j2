@@ -1,0 +1,7 @@
+{# Called only for a confirmed repository assigner and a known resolution choice.
+   Preserve the separate fact/status marker inside the complete shared sentence. #}
+{% if publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid %}
+  <span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="complete">The repository will assign the persistent identifier and ensure that it resolves to a digital object.</span>
+{% else %}
+  <span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="explicit-no">The repository will assign the persistent identifier but will not guarantee that it resolves to a digital object.</span>
+{% endif %}

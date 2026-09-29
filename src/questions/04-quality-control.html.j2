@@ -5,6 +5,7 @@
     {% set measuredAnswer = repliesMap[measuredPath]|reply_str_value %}
     {% set measuredDataPath = [measuredPath, uuids.measuredYesAUuid, uuids.measuredDataQUuid]|reply_path %}
     {% set measuredDataItems = repliesMap[measuredDataPath]|reply_items %}
+    {% set instrumentQuality %}
     {% if measuredAnswer == uuids.measuredYesAUuid and measuredDataItems %}
       {% for datasetItem in measuredDataItems %}
         {% set pathPrefix = [measuredDataPath, datasetItem]|reply_path %}
@@ -13,7 +14,11 @@
           {% include "src/quality-control.html.j2" with context %}
         </div>
       {% endfor %}
-    {% else %}
+    {% endif %}
+    {% endset %}
+    {% set researchQuality %}{% include 'src/research-quality.html.j2' %}{% endset %}
+    {{ instrumentQuality }}{{ researchQuality }}
+    {% if not instrumentQuality|striptags|trim and not researchQuality|striptags|trim %}
       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-2b" data-status="missing-output">This document does not yet describe data quality checks. Re-used data also need appropriate quality control.</p>{% endif %}
     {% endif %}
   </div>

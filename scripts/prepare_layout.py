@@ -93,6 +93,12 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     lead = document.styles.add_style("Pilot Lead", WD_STYLE_TYPE.PARAGRAPH)
     lead.base_style = document.styles["Body Text"]
     lead.paragraph_format.keep_with_next = True
+    # A bounded Q14 summary may follow a kept name, but must not pull the next
+    # person's record onto the same page. Long records retain Body Text.
+    responsibility = document.styles.add_style("Pilot Responsibility Summary", WD_STYLE_TYPE.PARAGRAPH)
+    responsibility.base_style = document.styles["Body Text"]
+    responsibility.paragraph_format.keep_with_next = False
+    responsibility.paragraph_format.keep_together = True
     list_lead = document.styles.add_style("Pilot List Lead", WD_STYLE_TYPE.PARAGRAPH)
     list_lead.base_style = document.styles["Compact"]
     list_lead.paragraph_format.keep_with_next = True

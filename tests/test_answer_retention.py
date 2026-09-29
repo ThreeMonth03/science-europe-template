@@ -1,6 +1,6 @@
 """Small counterexamples: related unanswered questions must not erase facts."""
 
-import re
+import sys
 import unittest
 from pathlib import Path
 
@@ -8,11 +8,8 @@ from test_science_europe_contract import render_question
 
 
 ROOT = Path(__file__).resolve().parents[1]
-IDS = dict(re.findall(r'set\s+(\w+)\s*=\s*"([0-9a-f-]{36})"', (ROOT / 'src/uuids.j2').read_text()))
-
-
-def path(*parts):
-    return '.'.join(IDS.get(part, part) for part in parts)
+sys.path.insert(0, str(ROOT / 'scripts'))
+from current_support import IDS, path
 
 
 class AnswerRetentionTests(unittest.TestCase):
@@ -66,9 +63,9 @@ class AnswerRetentionTests(unittest.TestCase):
                     replies[software] = IDS[answer]
                 output = render_question('src/questions/12-access-data.html.j2', replies)
                 if answer == 'publishedSpecSwUseNoAUuid':
-                    self.assertIn('There are no tools needed', output)
+                    self.assertIn('No specific software is required', output)
                 else:
-                    self.assertNotIn('There are no tools needed', output)
+                    self.assertNotIn('No specific software is required', output)
                     self.assertIn('data-status="missing"', output)
 
     def test_unknown_publication_is_not_no_published_data(self):

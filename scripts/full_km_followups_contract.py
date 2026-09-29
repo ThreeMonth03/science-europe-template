@@ -62,8 +62,9 @@ def project_source(sources=None, metadata=None):
     assert {n for n in previous if sources[n] != previous[n]} == set(CONTRACT['changed'])
     prior = json.loads(historical('template.json'))
     assert prior == CONTRACT['before_metadata'] and dict(prior, version='0.3.46') == metadata
+    from current_repairs_contract import project_support
     for name in ['scripts/prepare_layout.py', 'PACKAGE_README.md', 'LICENSE']:
-        assert (ROOT / name).read_bytes() == historical(name), name
+        assert project_support(name) == historical(name), name
     # Never let a mutable experiment recipe redefine the approved prototype.
     for file in (ROOT / 'experiments/full-km-followups').rglob('*'):
         if not file.is_file() or '__pycache__' in file.parts or file.name == 'README.md': continue

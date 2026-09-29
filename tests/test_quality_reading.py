@@ -92,10 +92,18 @@ class QualityReadingTests(unittest.TestCase):
         self.assertIn('All data will be owned by the Principal Investigator.', output)
         self.assertNotIn('data-status="missing-output"', output)
 
-    def test_unnamed_or_unmapped_roles_do_not_suppress_responsibility_gap(self):
+    def test_unnamed_roles_keep_facts_and_a_specific_name_gap(self):
         parent = path('adminDetailsCUuid', 'contributorsQUuid')
         template = 'src/questions/14-dm-responsible.html.j2'
         for name, roles in [('', ['contributorRoleDataStewardAUuid']), ('Named team', ['contributorRoleContactPersonAUuid'])]:
             values = {parent: ['person'], path(parent, 'person', 'contributorNameQUuid'): name,
                       path(parent, 'person', 'contributorRoleQUuid'): [IDS[r] for r in roles]}
-            self.assertIn('data-status="missing-output"', render_question(template, values))
+            output = render_question(template, values)
+            if name:
+                self.assertIn('data-status="missing-output"', output)
+                self.assertNotIn('class="responsibility-summary"', output)
+            else:
+                self.assertIn('Contributor 1', output)
+                self.assertIn('Data stewardship:', output)
+                self.assertIn('data-fact-id="responsible-person-name" data-status="missing"', output)
+                self.assertNotIn('data-status="missing-output"', output)

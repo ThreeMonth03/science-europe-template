@@ -47,6 +47,8 @@ def without_reviewed_archive_panels(source):
 
 def frozen_prepared_css(source):
     """Strip exact later additions, retaining the original prepared Q13 hash."""
+    from current_repairs_contract import project_embedded_text
+    source = project_embedded_text(source, 'src/layout.css')
     from metadata_gap_panel_contract import prior_css
     from budget_grouping_contract import without_grouping
     source = without_grouping(source, 'css')
@@ -156,8 +158,10 @@ def main():
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--preflight-only',action='store_true',help='Check frozen prepared-source gates before expensive engine probes')
     a=p.parse_args(); assert not a.output.exists()
-    lua=(a.source_dir/'src/word/pilot.lua').read_text()
-    css=prepared_css(a.source_dir)
+    current_lua=(a.source_dir/'src/word/pilot.lua').read_text()
+    from current_repairs_contract import project_embedded_text
+    lua=project_embedded_text(current_lua, 'src/word/pilot.lua')
+    css=project_embedded_text(prepared_css(a.source_dir), 'src/layout.css')
     # Freeze 0.3.27's actual prepared source, not a baseline inferred from the
     # new behavior. This probe deliberately requires a prepared build folder.
     digest=lambda s:hashlib.sha256(s.encode()).hexdigest()
@@ -169,7 +173,9 @@ def main():
         a.output.parent.mkdir(parents=True, exist_ok=True)
         a.output.write_text(json.dumps(dict(passed=True, preflight_only=True, release_acceptance=False,
             checker_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-            source_sha256={name:hashlib.sha256((a.source_dir/name).read_bytes()).hexdigest() for name in ['src/layout.css','src/word/pilot.lua']}), indent=2)+'\n')
+            source_sha256={name:hashlib.sha256((a.source_dir/name).read_bytes()).hexdigest() for name in ['src/layout.css','src/word/pilot.lua']},
+            tested_lua_sha256=hashlib.sha256(lua.encode()).hexdigest(),
+            tested_css_sha256=hashlib.sha256(css.encode()).hexdigest()), indent=2)+'\n')
         print(json.dumps(dict(passed=True, preflight_only=True)))
         return
     matrix=cases();rows=[]
@@ -185,6 +191,8 @@ def main():
     sha=lambda f:hashlib.sha256(f.read_bytes()).hexdigest()
     report={'passed':True,'release_acceptance':False,'word':rows,'pdf':pdf,'worker_image':IMAGE,
             'source_sha256':{n:sha(a.source_dir/n) for n in ['src/layout.css','src/word/pilot.lua','src/word/reference.docx']},
+            'tested_lua_sha256':hashlib.sha256(lua.encode()).hexdigest(),
+            'tested_css_sha256':hashlib.sha256(css.encode()).hexdigest(),
             'checker_sha256':sha(Path(__file__)),
             'limits':['Synthetic engine probes, not native project or Microsoft Word acceptance',
                       'Only fixed Q13 policy boundaries; other Chinese sentence spaces remain']}

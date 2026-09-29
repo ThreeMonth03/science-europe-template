@@ -21,7 +21,7 @@ class NarrativePaginationTests(unittest.TestCase):
         replies = test_storage_sharing.StorageSharingTests().storage_replies()
         replies[path('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksHttpsQUuid')] = IDS['risksHttpsYesAUuid']
         output = render_question('src/questions/06-access-security.html.j2', replies)
-        self.assertIn('All project web services are accessible via secure HTTP', output)
+        self.assertIn('All project web services are accessible through HTTPS', output)
         self.assertNotIn('data-status="missing-output"', output)
         self.assertIn('href="#q-store-backup"', output)
 
@@ -77,7 +77,11 @@ class NarrativePaginationTests(unittest.TestCase):
         replies[path(root, 'person', 'contributorNameQUuid')] = 'Very long institutional group name ' * 30
         output = render_question('src/questions/14-dm-responsible.html.j2', replies)
         self.assertNotIn('short-reading-unit', output)
-        self.assertEqual(2, output.count('Very long institutional group name ' * 30))
+        # A contributor label is emitted once; the length still prevents a
+        # keep-together class without duplicating the user's authored name.
+        self.assertEqual(1, output.count('Very long institutional group name ' * 30))
+        self.assertIn('Data stewardship:', output)
+        self.assertIn('DMP implementation:', output)
 
     def test_short_distribution_is_bounded_but_free_terms_are_not_kept_whole(self):
         from generate_storage_fixtures import storage_cases

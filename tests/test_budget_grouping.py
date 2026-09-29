@@ -23,9 +23,12 @@ class BudgetGroupingTests(unittest.TestCase):
         # Frozen 2026-09-21-large-resource-groups native package receipts.
         expected = {ENTRY:'0f20b29a988e17519b16201882e5d0a06acb002b197a4873f48061c39d0f2e9d',
                     LUA:'eb79e7cbb7a96972cc49e0e76bae462eeea66e0be911f049a259f48e8a7b0547'}
-        for name, digest in expected.items(): self.assertEqual(hashlib.sha256((ROOT / name).read_bytes()).hexdigest(), digest)
+        from current_repairs_contract import project_embedded_text
+        current = {name: project_embedded_text((ROOT / name).read_text(), name) for name in expected}
+        for name, digest in expected.items():
+            self.assertEqual(hashlib.sha256(current[name].encode()).hexdigest(), digest)
         self.assertEqual(forward_budget(historical(ENTRY).decode()), (ROOT / ENTRY).read_text())
-        self.assertEqual(forward_lua(historical(LUA).decode()), (ROOT / LUA).read_text())
+        self.assertEqual(forward_lua(historical(LUA).decode()), current[LUA])
         from full_km_followups_contract import project_source as before_followups
         verified, _ = before_followups()
         self.assertEqual(historical(CSS).decode() + TAIL, verified[CSS].decode())

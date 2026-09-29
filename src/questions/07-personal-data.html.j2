@@ -23,18 +23,18 @@
                     <h4>Legal basis for collecting and processing personal data</h4>
                     <p> We are collecting and processing personal data{{+" "}}
                     {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisPublicAUuid -%}
-                        based on public interest.
+                        because the processing is necessary to perform a task carried out in the public interest.
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisAskAUuid -%}
-                        based on subject's consent.
+                        with the consent of the data subjects.
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid -%}
                         {%- if personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichContractAUuid -%}
-                            in order to fulfil contract.
+                            because the processing is necessary to perform a contract.
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichLegitAUuid -%}
-                            based on legitimate interest.
+                            because the processing is necessary for legitimate interests.
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichVitalAUuid -%}
-                            based on vital interest.
+                            because the processing is necessary to protect vital interests.
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichLegalAUuid -%}
-                            based on legal requirement.
+                            because the processing is necessary to comply with a legal obligation.
                         {%- endif -%}
                     {%- endif -%}
                     </p>

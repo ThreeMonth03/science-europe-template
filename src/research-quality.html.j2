@@ -1,0 +1,47 @@
+{%- import 'src/active-answer.j2' as activeAnswer with context -%}
+{%- set integrityPrefix = ['10a10ffd-bfe1-4c6b-bbb6-3dfb1e63a5d5',
+    '918d5fd1-ea37-468f-8acd-ca3e80203900', '30d1e85c-0e3e-482f-97f9-22a7658b329e'] -%}
+{%- set integrityGaps = [] -%}
+{%- set integritySentences = [] -%}
+{%- macro integrityFact(question, yes, no, fact, label, positive, negative) -%}
+  {%- set path = activeAnswer.path(integrityPrefix + [question], 'OptionsQuestion') -%}
+  {%- if path -%}
+    {%- set selected = repliesMap[path]|reply_str_value -%}
+    {%- set known = selected in km.entities.questions[question].answerUuids and selected in km.entities.answers -%}
+    {%- if known and selected == yes -%}
+      {%- set sentence -%}<span data-fact-id="{{ fact }}" data-status="complete">{{ positive }}</span>{%- endset -%}
+      {%- do integritySentences.append(sentence) -%}
+    {%- elif known and selected == no -%}
+      {%- set sentence -%}<span data-fact-id="{{ fact }}" data-status="explicit-no">{{ negative }}</span>{%- endset -%}
+      {%- do integritySentences.append(sentence) -%}
+    {%- else -%}
+      {%- do integrityGaps.append((fact, label, 'needs-review' if selected else 'missing')) -%}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+{{- integrityFact('e8a08f27-9f82-4147-b446-822d34a5d468', 'be0761b6-421a-4683-8ff9-de496868feea', '8d038086-a207-46f4-9e7c-180780d9c3a6',
+      'quality-cross-infrastructure', 'Repeating jobs across computing infrastructures',
+      'We will repeat a subset of jobs across the computing infrastructures used to check the consistency of the results.',
+      'We will not repeat jobs across different computing infrastructures as a verification measure.') -}}
+{{- integrityFact('a3a4ce37-4ced-41df-8ec6-e42d87a6a3f1', '4715c145-8e34-45b9-b7c1-77d835d3ade8', '9ffbb7f2-5eb8-455a-bd98-6547887e0eb6',
+      'quality-automated-workflows', 'Automated pipelines and workflows',
+      'We will use automated tools to integrate the analysis tools into pipelines and workflows.',
+      'We will not use automated tools to integrate the analysis tools into pipelines and workflows.') -}}
+{{- integrityFact('34a3ef8b-4a17-4030-9157-ed1c1bf60b80', '56c899c9-fb21-449c-a905-4b9f4fbf6458', 'f14a3135-32d9-4520-bc09-45f50f0c6031',
+      'quality-independent-verification', 'Independent tools or workflows for key steps',
+      'We will cross-check key steps using independently developed tools or workflows to reduce human error.',
+      'We will not cross-check key steps using independently developed tools or workflows.') -}}
+{{- integrityFact('faf72b3d-ac29-41d1-97f2-5223b199a086', '2c9f5097-34a8-4852-8e10-b26bd71ee1ba', '168ba2ce-e5aa-4dc5-a840-845a5c20058f',
+      'quality-repeat-subsets', 'Repeated analysis of a subset of the data',
+      'We will repeat the analysis of a subset of the data to detect unexpected changes in the results.',
+      'We will not repeat the analysis of a subset of the data to detect changes in the results.') -}}
+{%- if integritySentences -%}
+  <div class="research-quality" data-requirement-id="SE-2b">
+    <p>{{ integritySentences|join(" ") }}</p>
+  </div>
+{%- endif -%}
+{%- if integrityGaps and output_profile|default('review') != 'submission' -%}
+  <p class="data-gap" data-requirement-id="SE-2b">Please check the unanswered or unsupported research-result verification options:
+    {% for fact, label, status in integrityGaps %}<span data-fact-id="{{ fact }}" data-status="{{ status }}">{{ label }}</span>{% if not loop.last %}; {% endif %}{% endfor %}.
+  </p>
+{%- endif -%}

@@ -1,5 +1,8 @@
 # Science Europe DMP
 
+For the current uncommitted repairs, see the [shared testing guide](docs/testing.md).
+It replaces eight per-round development notes; the release history below is unchanged.
+
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
 > contract. It packages as

@@ -1,4 +1,4 @@
-.PHONY: test verify check package audit-upstream
+.PHONY: test verify check check-current package audit-upstream
 
 PYTHON ?= python3
 DSW_TDK ?= dsw-tdk
@@ -10,6 +10,9 @@ verify:
 	$(DSW_TDK) --no-config verify .
 
 check: test verify
+
+check-current:
+	$(PYTHON) scripts/check_current.py
 
 package:
 	$(DSW_TDK) --no-config package .

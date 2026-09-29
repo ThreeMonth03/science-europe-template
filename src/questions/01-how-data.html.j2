@@ -2,7 +2,8 @@
   <h3>1. How will new data be collected or produced and/or how will existing data be re-used?</h3>
 
   <div class="answer">
-
+  {%- import 'src/reuse-rightsholder.html.j2' as reuseRightsholder with context -%}
+  {%- import 'src/nonreuse.html.j2' as nonreuse with context -%}
   
   {%- set measuredPath = [uuids.creatingCUuid, uuids.measuredQUuid]|reply_path -%}
   {%- set measuredAUuid = repliesMap[measuredPath]|reply_str_value -%}
@@ -100,12 +101,12 @@
           {%- if refDataNameReply -%}
             <h5>{{ refDataNameReply }}</h5>
           {%- else -%}
-            {% if output_profile|default('review') == 'submission' %}<strong>{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(refDataItem) + 1) }}</strong>{% else %}<strong>(no name given)</strong>{% endif %}
+            {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(refDataItem) + 1) }}</strong>{% else %}<strong class="item-label">(no name given)</strong>{% endif %}
           {%- endif -%}
           
           {# Reference data set will be used #}
           {%- if refDataUseReply == uuids.refDataUseYesAUuid  %}
-
+            {{ reuseRightsholder.render(refDataUsedPrefix.split('.') + [uuids.refDataOwnerQUuid]) }}
             {# identification #}
             <div data-fact-id="reuse-decision" data-status="complete">
             {% if refDataWhere %}
@@ -213,35 +214,9 @@
             {%- set refDataUseNoOtherReason = [refDataUsedNoPrefix, uuids.refDataUseNoReasonAUuid ,uuids.refDataUseNoReasonQUuid]|reply_path -%}
             {%- set refDataUseNoOtherReasonReply = repliesMap[refDataUseNoOtherReason]|reply_str_value %}
           
-            {# identification #}
-            <p> We considered reusing this standard reference data
-            {%- if refDataWhere -%}
-            {{" "}}available via:{{" "}}
-              {%- if refDataWhere.startswith("http://") or refDataWhere.startswith("https://") or refDataWhere.startswith("ftp://") -%}
-                <a href="{{ refDataWhere }}" target="_blank">{{ refDataWhere }} </a>.
-              {%- else -%}
-                {{ refDataWhere}}
-              {%- endif -%}
-            {%- endif -%}
-
-            {# no usage reason #}
-            {%- if refDataUseNoReply -%}
-              , but decided not to re-use it
-              {%- if refDataUseNoReply == uuids.refDataUseNoDataAUuid -%}
-                {{" "}}because it misses data we need.
-              {%- elif refDataUseNoReply == uuids.refDataUseNoAspectAUuid -%}
-                {{" "}}because it misses required aspects.
-              {%- elif refDataUseNoReply == uuids.refDataUseNoQualityAUuid -%}
-                {{" "}}because it is not sufficient quality.
-              {%- elif refDataUseNoReply == uuids.refDataUseNoCondAUuid -%}
-                {{" "}}because its conditions of use do not allow us to use it.
-              {%- elif refDataUseNoReply == uuids.refDataUseNoReasonAUuid and refDataUseNoOtherReasonReply -%}
-                {{" "}}because: {{refDataUseNoOtherReasonReply|markdown}}
-              {%- else -%}.
-              {%- endif -%}
-            {%- else -%}
-            . </p>
-            {%- endif -%}
+            {{ nonreuse.render(refDataWhere, refDataUseNoReply, refDataUseNoOtherReasonReply,
+                uuids.refDataUseNoDataAUuid, uuids.refDataUseNoAspectAUuid, uuids.refDataUseNoQualityAUuid,
+                uuids.refDataUseNoCondAUuid, uuids.refDataUseNoReasonAUuid) }}
 
           {%- endif -%}
         </li>
@@ -269,12 +244,12 @@
         {%- if nrefDataNameReply -%}
           <h5>{{ nrefDataNameReply }}</h5>
         {%- else -%}
-          {% if output_profile|default('review') == 'submission' %}<strong>{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(nrefDataItem) + 1) }}</strong>{% else %}<strong>(no name given)</strong>{% endif %}
+          {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(nrefDataItem) + 1) }}</strong>{% else %}<strong class="item-label">(no name given)</strong>{% endif %}
         {%- endif -%}
         
         {# Non-reference data set will be used #}
         {%- if nrefDataUseReply == uuids.nrefDataUseYesAUuid %}
-
+          {{ reuseRightsholder.render(nrefDataUsedPrefix.split('.') + [uuids.nrefDataOwnerQUuid]) }}
           {# identification #}
           <p data-fact-id="reuse-decision" data-status="complete">This dataset will be re-used.</p>
           {% if nrefDataWhere %}
@@ -360,28 +335,9 @@
           {%- set nrefDataUseNoOtherReason = [nrefDataUsedNoPrefix, uuids.nrefDataUseNoReasonAUuid ,uuids.nrefDataUseNoReasonQUuid]|reply_path -%}
           {%- set nrefDataUseNoOtherReasonReply = repliesMap[nrefDataUseNoOtherReason]|reply_str_value %}
           
-          {# identification #}
-          <p data-fact-id="reuse-decision" data-status="explicit-no">This dataset was considered but will not be re-used.</p>
-          {% if nrefDataWhere %}
-            {% if nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("ftp://") %}
-              <p>Source: <a href="{{ nrefDataWhere }}">{{ nrefDataWhere }}</a></p>
-            {% else %}
-              <p>Source: {{ nrefDataWhere }}</p>
-            {% endif %}
-          {% endif %}
-          {% if nrefDataUseNoReply == uuids.nrefDataUseNoDataAUuid %}
-            <p>It does not contain the data required for this project.</p>
-          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoAspectAUuid %}
-            <p>It does not cover the aspects required for this project.</p>
-          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoQualityAUuid %}
-            <p>Its quality is insufficient for this project.</p>
-          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoCondAUuid %}
-            <p>Its conditions of use do not permit the intended re-use.</p>
-          {% elif nrefDataUseNoReply == uuids.nrefDataUseNoReasonAUuid and nrefDataUseNoOtherReasonReply %}
-            <div class="answer-detail"><p><strong>Reason for not re-using this dataset</strong></p>{{ nrefDataUseNoOtherReasonReply|markdown }}</div>
-          {% else %}
-            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="nonreuse-reason" data-status="missing"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>{% endif %}
-          {% endif %}
+          {{ nonreuse.render(nrefDataWhere, nrefDataUseNoReply, nrefDataUseNoOtherReasonReply,
+              uuids.nrefDataUseNoDataAUuid, uuids.nrefDataUseNoAspectAUuid, uuids.nrefDataUseNoQualityAUuid,
+              uuids.nrefDataUseNoCondAUuid, uuids.nrefDataUseNoReasonAUuid) }}
         {% else %}
           {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-decision" data-status="missing"><strong>Information not provided:</strong> whether this dataset will be re-used.</p>{% endif %}
         {%- endif -%}

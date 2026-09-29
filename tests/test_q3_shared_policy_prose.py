@@ -58,7 +58,11 @@ class SharedPolicyTests(unittest.TestCase):
 
     def test_exact_source_scope_and_full_english_matrix(self):
         recipe=load('recipe');before=recipe.baseline_sources()
-        current={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+        candidate={str(p.relative_to(ROOT)):p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
+        import json, sys
+        sys.path.insert(0, str(ROOT/'scripts'))
+        from current_repairs_contract import project_source as project_candidate
+        current,_=project_candidate(candidate,json.loads((ROOT/'template.json').read_text()))
         self.assertEqual(current,recipe.overlay(before))
         rows=load('probe').check(ROOT,before,current,'english')
         self.assertEqual(sum(r['case'].startswith('fixture-') for r in rows),396)

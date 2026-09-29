@@ -1,0 +1,46 @@
+{# Resolve only a path still reachable through the compiled KM and selected answers.
+   A retained reply behind a removed question, unselected option or deleted list
+   item is not a current answer. Return no text on failure. #}
+{%- macro path(parts, expected_type) -%}
+  {%- if km is defined and parts|length > 1 and parts[0] in km.chapterUuids and parts[0] in km.entities.chapters -%}
+    {%- set state = namespace(valid=true, kind='question', prefix=parts[0],
+        children=km.entities.chapters[parts[0]].questionUuids, question=none) -%}
+    {%- for part in parts[1:] -%}
+      {%- if state.valid -%}
+        {%- if state.kind == 'question' -%}
+          {%- if part not in state.children or part not in km.entities.questions -%}
+            {%- set state.valid = false -%}
+          {%- else -%}
+            {%- set state.question = km.entities.questions[part] -%}
+            {%- if loop.last -%}
+              {%- set state.valid = state.question.questionType == expected_type -%}
+            {%- elif state.question.questionType == 'OptionsQuestion' -%}
+              {%- set state.kind = 'answer' -%}
+            {%- elif state.question.questionType == 'ListQuestion' -%}
+              {%- set state.kind = 'item' -%}
+            {%- else -%}
+              {%- set state.valid = false -%}
+            {%- endif -%}
+          {%- endif -%}
+        {%- elif state.kind == 'answer' -%}
+          {%- if loop.last or part not in state.question.answerUuids or part not in km.entities.answers
+              or repliesMap[state.prefix]|reply_str_value != part -%}
+            {%- set state.valid = false -%}
+          {%- else -%}
+            {%- set state.children = km.entities.answers[part].followUpUuids -%}
+            {%- set state.kind = 'question' -%}
+          {%- endif -%}
+        {%- elif state.kind == 'item' -%}
+          {%- if loop.last or part not in repliesMap[state.prefix]|reply_items -%}
+            {%- set state.valid = false -%}
+          {%- else -%}
+            {%- set state.children = state.question.itemTemplateQuestionUuids -%}
+            {%- set state.kind = 'question' -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+      {%- set state.prefix = [state.prefix, part]|reply_path -%}
+    {%- endfor -%}
+    {%- if state.valid -%}{{- state.prefix -}}{%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}

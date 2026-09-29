@@ -31,8 +31,9 @@ def project_source(sources=None, metadata=None):
     assert set(CONTRACT['after']) - set(result) == set(CONTRACT['added'])
     assert {n for n in result if CONTRACT['before'][n] != CONTRACT['after'][n]} == set(CONTRACT['changed'])
     previous = json.loads(historical('template.json')); assert previous['version'] == CONTRACT['baseline_version']
+    from current_repairs_contract import project_support
     for name in ['scripts/prepare_layout.py', 'PACKAGE_README.md', 'LICENSE']:
-        assert (ROOT / name).read_bytes() == historical(name), name
+        assert project_support(name) == historical(name), name
     return result, previous
 
 

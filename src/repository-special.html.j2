@@ -1,0 +1,32 @@
+{# A separately translated fragment keeps sentence assembly outside Q11's
+   legacy multi-sentence translation block. #}
+{%- set repositorySentences = [] -%}
+{%- set repositoryDestinationSentence -%}Special-purpose repository for the project.{%- endset -%}
+{%- do repositorySentences.append(repositoryDestinationSentence) -%}
+{# Long-term support #}
+{%- set specialRepoLongTermSupportPath = [distroRepositoryKindPath, uuids.publishedDataRepositorySpecialAUuid, uuids.specialRepoLongTermSupportQUuid]|reply_path -%}
+{%- set specialRepoLongTermSupportAUuid = repliesMap[specialRepoLongTermSupportPath]|reply_str_value -%}
+{%- if specialRepoLongTermSupportAUuid == uuids.specialRepoLongTermSupportYesAUuid -%}
+  {%- set repositorySupportSentence -%}<span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="complete">We will be able to support this repository for a sufficiently long time.</span>{%- endset -%}
+  {%- do repositorySentences.append(repositorySupportSentence) -%}
+{%- elif specialRepoLongTermSupportAUuid == uuids.specialRepoLongTermSupportNoAUuid -%}
+  {%- set repositorySupportSentence -%}<span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="explicit-no">We will not be able to support this repository for a sufficiently long time.</span>{%- endset -%}
+  {%- do repositorySentences.append(repositorySupportSentence) -%}
+{%- elif output_profile|default('review') != 'submission' -%}
+  {%- set repositorySupportSentence -%}<span data-requirement-id="SE-5b" data-fact-id="repository-long-term-support" data-status="missing">Whether we will be able to support this repository for a sufficiently long time has not been specified.</span>{%- endset -%}
+  {%- do repositorySentences.append(repositorySupportSentence) -%}
+{%- endif -%}
+{# Service level #}
+{%- set specialRepoServiceLevelPath = [distroRepositoryKindPath, uuids.publishedDataRepositorySpecialAUuid, uuids.specialRepoServiceLevelQUuid]|reply_path -%}
+{%- set specialRepoServiceLevelAUuid = repliesMap[specialRepoServiceLevelPath]|reply_str_value -%}
+{%- if specialRepoServiceLevelAUuid == uuids.specialRepoServiceLevelDownloadAUuid -%}
+  {%- set repositoryServiceSentence -%}The repository will provide a download-only service.{%- endset -%}
+  {%- do repositorySentences.append(repositoryServiceSentence) -%}
+{%- elif specialRepoServiceLevelAUuid == uuids.specialRepoServiceLevelSimpleAUuid -%}
+  {%- set repositoryServiceSentence -%}The repository will provide a search and simple access interface.{%- endset -%}
+  {%- do repositorySentences.append(repositoryServiceSentence) -%}
+{%- elif specialRepoServiceLevelAUuid == uuids.specialRepoServiceLevelAdvancedAUuid -%}
+  {%- set repositoryServiceSentence -%}The repository will provide an advanced processing service.{%- endset -%}
+  {%- do repositorySentences.append(repositoryServiceSentence) -%}
+{%- endif -%}
+{{- repositorySentences|join(" ") -}}

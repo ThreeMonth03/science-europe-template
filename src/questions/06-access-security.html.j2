@@ -39,10 +39,10 @@
           {%- if storeLab -%}They{%- else -%}Project members{%- endif %} can carry data with them on password-protected laptops.
         {%- endif -%}
         {%- if risksCertificationsAUuid == uuids.risksCertificationsYesAUuid %}
-          All data centers where project data is stored hold appropriate certifications.
+          All data centres that store project data hold appropriate certifications.
         {%- endif -%}
         {%- if risksHttpsAUuid == uuids.risksHttpsYesAUuid %}
-          All project web services are accessible via secure HTTP (https://...).
+          All project web services are accessible through HTTPS.
         {%- endif -%}
         {%- if risksInstructedAUuid == uuids.risksInstructedYesAUuid %}
           Project members have been instructed about both generic and specific risks to the project.
@@ -70,11 +70,32 @@
       uuids.risksInfoVandalismWillAUuid: 'will'
     } -%}
 
+    {# Captured labels remain translatable before they are joined into prose. #}
+    {%- set riskLoss %}data loss{% endset -%}
+    {%- set riskDisclosure %}data disclosure{% endset -%}
+    {%- set riskTampering %}data tampering{% endset -%}
+
+    {# Use complete translatable combinations so localized output never leaks
+       the English conjunction from a dynamically joined list. #}
+    {%- macro risk_list(values) -%}
+      {%- if values|length == 1 -%}
+        {{ values[0] }}
+      {%- elif riskLoss in values and riskDisclosure in values and riskTampering in values -%}
+        data loss, data disclosure, and data tampering
+      {%- elif riskLoss in values and riskDisclosure in values -%}
+        data loss and data disclosure
+      {%- elif riskLoss in values and riskTampering in values -%}
+        data loss and data tampering
+      {%- elif riskDisclosure in values and riskTampering in values -%}
+        data disclosure and data tampering
+      {%- endif -%}
+    {%- endmacro -%}
+
     {# Extract selected levels for each type #}
     {%- set selected = {
-      'loss': risk_levels[risksInfoLossAUuid],
-      'leak': risk_levels[risksInfoLeakAUuid],
-      'vandalism': risk_levels[risksInfoVandalismAUuid]
+      riskLoss: risk_levels[risksInfoLossAUuid],
+      riskDisclosure: risk_levels[risksInfoLeakAUuid],
+      riskTampering: risk_levels[risksInfoVandalismAUuid]
     } -%}
 
     {%- set small = [] -%}
@@ -95,16 +116,16 @@
     {# helper inline join #}
     {%- set fragments = [] -%}
     {%- if small|length > 0 -%}
-      {%- set risks = (small[:-1]|join(', ') ~ ', and ' ~ small[-1]) if small|length > 1 else small[0] -%}
-      {%- set _ = fragments.append("The possible impact of information " ~ risks ~ " is small") -%}
+      {%- set risks = risk_list(small)|trim -%}
+      {%- set _ = fragments.append("The potential impact of " ~ risks ~ " is small") -%}
     {%- endif -%}
     {%- if low|length > 0 -%}
-      {%- set risks = (low[:-1]|join(', ') ~ ', and ' ~ low[-1]) if low|length > 1 else low[0] -%}
-      {%- set _ = fragments.append("The risk of information " ~ risks ~ " is acceptably low") -%}
+      {%- set risks = risk_list(low)|trim -%}
+      {%- set _ = fragments.append("The risk of " ~ risks ~ " is acceptably low") -%}
     {%- endif -%}
     {%- if will|length > 0 -%}
-      {%- set risks = (will[:-1]|join(', ') ~ ', and ' ~ will[-1]) if will|length > 1 else will[0] -%}
-      {%- set _ = fragments.append("We will mitigate the risk of information " ~ risks) -%}
+      {%- set risks = risk_list(will)|trim -%}
+      {%- set _ = fragments.append("We will mitigate the risk of " ~ risks) -%}
     {%- endif -%}
     {%- if fragments|length > 0 -%}
       <p>{{ fragments | join('. ') }}.</p>
@@ -116,17 +137,17 @@
       <p>We are not using any personal information.</p>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataPseudoAUuid -%}
       <p>
-        All personal information will be processed in pseudonymized form only.
+        All personal data will be processed in pseudonymized form only.
         {%- set risksPseudonymizationPath = [risksPersonalDataPath, uuids.risksPersonalDataPseudoAUuid, uuids.risksPseudonymizationQUuid]|reply_path -%}
         {%- set risksPseudonymizationAUuid = repliesMap[risksPseudonymizationPath]|reply_str_value -%}
         {%- if risksPseudonymizationAUuid == uuids.risksPseudonymizationInsideAUuid %}
-          We pseudonymize inside the project, only limited people can access the keys.
+          Pseudonymization is performed within the project, and only a limited number of people can access the re-identification keys.
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationPartyAUuid %}
-          Pseudonymization is handled by an independent party in order to allow data coupling.
+          Pseudonymization is performed by an independent party to enable data linkage.
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationAnotherAUuid -%}
           {%- set risksPseudonymizationAnotherQUuid = [risksPseudonymizationPath, uuids.risksPseudonymizationAnotherAUuid, uuids.risksPseudonymizationAnotherQUuid]|reply_path -%}
           {%- set risksPseudonymizationAnother = repliesMap[risksPseudonymizationAnotherQUuid]|reply_str_value %}
-          We have a specific way of pseudonymization{{ ": " ~ risksPseudonymizationAnother|markdown if risksPseudonymizationAnother else "." }}
+          We use a specific pseudonymization method{{ ": " ~ risksPseudonymizationAnother|markdown if risksPseudonymizationAnother else "." }}
         {%- endif -%}
       </p>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataAnonymousAUuid -%}
@@ -145,13 +166,13 @@
     {%- if sharedAccessControlAUuid -%}
       <h4>Access to data during research</h4>
       {%- if sharedAccessControlAUuid == uuids.sharedAccessControlMembersRWAUuid -%}
-        <p>Only all project members have read/write access to the data.</p>
+        <p>All project members have read and write access to the data.</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlInstituteRAUuid -%}
-        <p>Anyone in the institute has read access to the data; all project members have read/write access.</p>
+        <p>Everyone at the institute has read access to the data; all project members have read and write access.</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlMembersRAUuid -%}
-        <p>Only project members will have read access; only selected project members will be able to write data.</p>
+        <p>Only project members have read access; only designated project members can modify the data.</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlMembersRequestAUuid -%}
-        <p>Anyone in the institute can read data, only project members can request write access.</p>
+        <p>Everyone at the institute can read the data; only project members can request write access.</p>
       {%- endif -%}
     {%- endif -%}
 
@@ -160,7 +181,7 @@
     {%- set policiesProceduresItems = repliesMap [policiesProceduresQUuid]|reply_items -%}
     {%- if policiesProceduresItems|length > 0 -%}
       <h4>Policies and Procedures</h4>
-      <p> We will use following policies and procedures: </p>
+      <p>We will use the following policies and procedures:</p>
       <ul>
         {%- for policiesProceduresItem in policiesProceduresItems -%}
           {%- set policiesProceduresPathPrefix =  [policiesProceduresQUuid, policiesProceduresItem ]|reply_path -%}

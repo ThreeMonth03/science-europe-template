@@ -1,0 +1,31 @@
+{# Sentences is an existing translation-pipeline convention: English uses a
+   space between complete sentences, while Traditional Chinese joins at 。.
+   Append to the caller's fresh lists; include assignments would be local. #}
+{% if uuids.contributorRoleDataCuratorAUuid in roles %}
+  {% do responsibilitySentences.append("Data curation: reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.") %}
+  {% do mappedRoles.append(uuids.contributorRoleDataCuratorAUuid) %}
+{% endif %}
+{% if uuids.contributorRoleDataCollectorAUuid in roles %}
+  {% do responsibilitySentences.append("Data collection: finding, gathering and collecting data.") %}
+  {% do mappedRoles.append(uuids.contributorRoleDataCollectorAUuid) %}
+{% endif %}
+{% if uuids.contributorRoleDataManagerAUuid in roles %}
+  {% do responsibilitySentences.append("Data management: maintaining the completed resource.") %}
+  {% do mappedRoles.append(uuids.contributorRoleDataManagerAUuid) %}
+{% endif %}
+{% if uuids.contributorRoleDataStewardAUuid in roles %}
+  {% do responsibilitySentences.append("Data stewardship: managing data and supporting its effective use, including data processing, policies, guidelines and availability.") %}
+  {% do mappedRoles.append(uuids.contributorRoleDataStewardAUuid) %}
+{% endif %}
+{% if uuids.contributorRoleDistributorAUuid in roles %}
+  {% do responsibilitySentences.append("Distribution: producing and disseminating electronic or print copies of the resource.") %}
+  {% do mappedRoles.append(uuids.contributorRoleDistributorAUuid) %}
+{% endif %}
+{% if uuids.contributorRoleDataProtectorAUuid in roles %}
+  {% do responsibilitySentences.append("Data protection: addressing personal-data protection and data-protection policies.") %}
+  {% do mappedRoles.append(uuids.contributorRoleDataProtectorAUuid) %}
+{% endif %}
+{% if uuids.contributorRoleCreatorOfDMPAUuid in roles %}
+  {% do responsibilitySentences.append("DMP implementation: implementing the data management plan and ensuring that it is reviewed and revised.") %}
+  {% do mappedRoles.append(uuids.contributorRoleCreatorOfDMPAUuid) %}
+{% endif %}

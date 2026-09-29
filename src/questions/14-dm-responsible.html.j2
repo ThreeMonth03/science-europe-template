@@ -6,46 +6,32 @@
     {%- set contributorsPath = [uuids.adminDetailsCUuid, uuids.contributorsQUuid]|reply_path -%}
     {%- set contributorsItems = repliesMap[contributorsPath]|reply_items -%}
     {%- if contributorsItems|length > 0 -%}
-      {%- macro contributorsResponsibility(contributors, contributorRoleAUuid, responsibility) -%}
-        {%- set names = [] -%}
-        {%- for i in contributors -%}
-          {%- set roles = repliesMap[[contributorsPath, i, uuids.contributorRoleQUuid]|reply_path]|reply_items -%}
-          {%- set name = repliesMap[[contributorsPath, i, uuids.contributorNameQUuid]|reply_path]|reply_str_value -%}
-          {%- if contributorRoleAUuid in roles and name -%}
-            {%- do names.append(name) -%}
-          {%- endif -%}
-        {%- endfor -%}
-        {%- set nNames = names|length -%}
-        {%- if nNames > 0 -%}
-          <p>
-            {%- if nNames > 2 -%}
-              {{ names[0:-1]|join(", ") }}, and {{ names[-1] }} are {{ responsibility }}
-            {%- elif nNames == 2 -%}
-              {{ names[0] }} and {{ names[1] }} are {{ responsibility }}
-            {%- else -%}
-              {{ names[0] }} is {{ responsibility }}
-            {%- endif %}
-          </p>
+      {# Group by the actual list item, never by a possibly shared person name.
+         These are the same seven role bindings as before; non-DM roles do not
+         imply an assignment. Only template-owned sentences are joined. #}
+      {%- for contributorItem in contributorsItems -%}
+        {%- set contributorIndex = loop.index -%}
+        {%- set personPath = [contributorsPath, contributorItem]|reply_path -%}
+        {%- set name = repliesMap[[personPath, uuids.contributorNameQUuid]|reply_path]|reply_str_value -%}
+        {%- set roles = repliesMap[[personPath, uuids.contributorRoleQUuid]|reply_path]|reply_items -%}
+        {% set responsibilitySentences = [] %}
+        {% set mappedRoles = [] %}
+        {% include 'src/responsibility-sentences.j2' with context %}
+        {%- if responsibilitySentences -%}
+          {% set personContent %}
+            <div class="answer-lead"><p class="responsible-person"><strong>{% if name|trim %}{{ name|e }}{% else %}{{ macros.contributorLabel(contributorIndex) }}{% endif %}</strong></p></div>
+            <p class="responsibility-summary" data-fact-id="data-management-responsibilities" data-role-uuids="{{ mappedRoles|join(' ') }}">{{ responsibilitySentences|join(" ") }}</p>
+            {% if not name|trim and output_profile|default('review') != 'submission' %}
+              <p class="data-gap" data-fact-id="responsible-person-name" data-status="missing">Please provide the name of the person or team assigned these responsibilities.</p>
+            {% endif %}
+          {% endset %}
+          <div class="person-responsibilities{{ ' short-reading-unit' if personContent|striptags|length <= 500 else '' }}" data-contributor-id="{{ contributorItem|e }}" data-contributor-index="{{ contributorIndex }}">{{ personContent }}</div>
         {%- endif -%}
-      {%- endmacro -%}
-      {# Data curators #}
-      {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleDataCuratorAUuid, "responsible for reviewing, enhancing, cleaning, or standardizing metadata and the associated data submitted for storage, use and maintenance within a data centre or repository.") }}
-      {# Data collectors #}
-      {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleDataCollectorAUuid, "responsible for finding, gathering, and collecting data.") }}
-      {# Data managers #}
-      {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleDataManagerAUuid, "responsible for maintaining the finished resource.") }}
-      {# Data stewards #}
-      {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleDataStewardAUuid, "responsible for the management and proficiency of data including data processing, data policies, data guidelines, and data availability.") }}
-      {# Distributors #}
-      {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleDistributorAUuid, "responsible for generating and disseminating copies of the resource in either electronic or print form.") }}
-      {# Data protection officers #}
-      {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleDataProtectorAUuid, "responsible for all issues relating to the protection of personal data and data protection policies in general.") }}
-      {# Data protection officers #}
-      {{ contributorsResponsibility(contributorsItems, uuids.contributorRoleCreatorOfDMPAUuid, "responsible for implementing the DMP, and ensuring it is reviewed and revised.") }}
+      {%- endfor -%}
     {%- endif -%}
     {% endset %}
     {% if responsibilitiesContent|striptags|trim %}
-      <div class="responsibilities-block{{ ' short-reading-unit' if responsibilitiesContent|striptags|length <= 500 else '' }}">{{ responsibilitiesContent }}</div>
+      <div class="responsibilities-block">{{ responsibilitiesContent }}</div>
     {% else %}
       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6a" data-status="missing-output">This document does not yet identify a named person or team with a data management responsibility. Please check the contributor names and roles.</p>{% endif %}
     {% endif %}
