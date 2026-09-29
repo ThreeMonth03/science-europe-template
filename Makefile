@@ -1,4 +1,5 @@
 .PHONY: test verify check check-current package audit-upstream knowledge-models
+.DEFAULT_GOAL := test
 
 PYTHON ?= python3
 DSW_TDK ?= dsw-tdk
