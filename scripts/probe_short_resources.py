@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from short_resources_contract import ROOT, HELPER, OPENING, HINT, compare, eligible, units
 from probe_budget_word import IMAGE
 from probe_empty_pdf import prepared_css
+from probe_render_cache import CACHED_RENDERER
 
 
 def fragment(rows=2, language='en'):
@@ -86,14 +87,14 @@ def cases():
     return rows
 
 
-RUNNER = '''import json,sys,re
+RUNNER = CACHED_RENDERER + '''import json,sys,re
 from weasyprint import HTML,__version__
 p=json.load(sys.stdin);rows=[]
 for name,before,after,selected in p['cases']:
  for media in ['print','screen']:
   pair=[]
   for source in [before,after]:
-   doc=HTML(string='<style>'+p['css']+'</style><div style="height:210mm">Prefix.</div>'+source,media_type=media).render()
+   doc=render_cached('<style></style><div style="height:210mm">Prefix.</div>'+source,p['css'],media)
    boxes=[(i,b) for i,page in enumerate(doc.pages,1) for b in page._page_box.descendants()]
    text=[b.text for i,b in boxes if type(b).__name__=='TextBox']
    geometry=[(i,round(b.position_x,4),round(b.position_y,4),round(b.width,4),round(b.height,4),b.text) for i,b in boxes if type(b).__name__=='TextBox']

@@ -11,6 +11,7 @@ from lxml import etree
 from probe_budget_word import ROOT,IMAGE
 from probe_q8_word import RUNNER as WORD_RUNNER
 from probe_empty_pdf import prepared_css
+from probe_render_cache import CACHED_RENDERER
 from storage_context_contract import fragments,fragment
 
 HANDLER='  if div.identifier == "q-store-backup" then return keep_q5_context(div) end\n'
@@ -60,14 +61,14 @@ def ast_changes(before,after):
     return sum(ast_changes(a,b) for a,b in zip(before,after))
 
 
-PDF_RUNNER='''import json,sys,re
+PDF_RUNNER=CACHED_RENDERER+'''import json,sys,re
 from weasyprint import HTML,__version__
 p=json.load(sys.stdin);rows=[]
 for name,source,eligible in p['cases']:
  for media in ['print','screen']:
   pair=[]
   for css in [p['before'],p['after']]:
-   doc=HTML(string='<style>'+css+'</style><div style="height:210mm">Before.</div>'+source,media_type=media).render()
+   doc=render_cached('<style></style><div style="height:210mm">Before.</div>'+source,css,media)
    boxes=[(i,b) for i,page in enumerate(doc.pages,1) for b in page._page_box.descendants()]
    text=''.join(b.text for i,b in boxes if type(b).__name__=='TextBox')
    paragraphs=[(i,round(b.position_y,4),round(b.height,4)) for i,b in boxes if type(b).__name__=='BlockBox' and b.element.tag in ['p','li','h3']]

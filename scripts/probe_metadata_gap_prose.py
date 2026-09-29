@@ -10,6 +10,7 @@ from xml.etree import ElementTree as E
 from bs4 import BeautifulSoup
 from probe_budget_word import IMAGE, ROOT
 from probe_empty_pdf import prepared_css
+from probe_render_cache import CACHED_RENDERER
 from probe_q8_word import RUNNER as WORD_RUNNER
 from metadata_gap_panel_contract import historical_css, digest
 from metadata_gap_prose_contract import templates, compare, OLD, joined
@@ -79,7 +80,7 @@ def cases(root, frozen, language):
     return result
 
 
-PDF_RUNNER = '''import json,sys,re
+PDF_RUNNER = CACHED_RENDERER + '''import json,sys,re
 from weasyprint import HTML,__version__
 p=json.load(sys.stdin);rows=[];compact=lambda t:re.sub(r'\\s+','',''.join(t))
 for name,before,after,selected in p['cases']:
@@ -88,7 +89,7 @@ for name,before,after,selected in p['cases']:
    snapshots=[]
    for source,css in [(before,p['before_css']),(after,p['after_css'])]:
     spacer='<div style="height:200mm">Before.</div>' if near_end else ''
-    doc=HTML(string='<html><body><style>'+css+'</style>'+spacer+source+'</body></html>',media_type=media).render()
+    doc=render_cached('<html><body><style></style>'+spacer+source+'</body></html>',css,media)
     text=[];geometry=[];warnings=[]
     for n,page in enumerate(doc.pages,1):
      roots=[b for b in page._page_box.children if type(b).__name__=='BlockBox' and b.element.tag=='html'];assert len(roots)==1

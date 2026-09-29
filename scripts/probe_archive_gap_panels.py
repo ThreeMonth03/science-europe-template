@@ -10,6 +10,7 @@ import sys
 from bs4 import BeautifulSoup
 from probe_budget_word import ROOT,IMAGE
 from probe_empty_pdf import prepared_css
+from probe_render_cache import CACHED_RENDERER
 
 BEGIN='/* BEGIN archive gap pairs:'
 END='/* END archive gap pairs */'
@@ -71,7 +72,7 @@ def cases(root):
     return result
 
 
-RUNNER='''import json,sys
+RUNNER=CACHED_RENDERER+'''import json,sys
 from weasyprint import HTML,__version__
 p=json.load(sys.stdin);results=[]
 keys=['font_size','line_height','padding_left','padding_right','border_left_width','border_right_width']
@@ -81,7 +82,7 @@ for name,source,pairs in p['cases']:
    snapshots=[]
    for css in [p['before'],p['after']]:
     prefix='<div style="height:198mm">Before.</div>' if near_end else ''
-    doc=HTML(string=source.replace('<body>','<body><style>'+css+'</style>'+prefix),media_type=media).render()
+    doc=render_cached(source.replace('<body>','<body><style></style>'+prefix),css,media)
     boxes={};texts=[]
     for number,page in enumerate(doc.pages,1):
      roots=[b for b in page._page_box.children if type(b).__name__=='BlockBox' and b.element.tag=='html'];assert len(roots)==1

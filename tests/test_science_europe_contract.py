@@ -6,7 +6,7 @@ import re
 import unittest
 from pathlib import Path
 
-from jinja2 import Environment, FileSystemLoader, Undefined
+from jinja2 import BytecodeCache, Environment, FileSystemLoader, Undefined
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -39,11 +39,32 @@ def reply_items(reply):
     return reply if isinstance(reply, list) else []
 
 
+class QuestionBytecodeCache(BytecodeCache):
+    """Cache compilation only; Jinja verifies each loader source checksum."""
+    def __init__(self):
+        self.code = {}
+
+    def load_bytecode(self, bucket):
+        key = (bucket.key, bucket.checksum)
+        if key in self.code:
+            bucket.bytecode_from_string(self.code[key])
+
+    def dump_bytecode(self, bucket):
+        key = (bucket.key, bucket.checksum)
+        if key not in self.code and len(self.code) >= 256:
+            self.code.pop(next(iter(self.code)))
+        self.code[key] = bucket.bytecode_to_string()
+
+
+QUESTION_BYTECODE = QuestionBytecodeCache()
+
+
 def render_question(path: str, replies: dict[str, object]) -> str:
     env = Environment(
         loader=FileSystemLoader(ROOT),
         extensions=["jinja2.ext.do"],
         autoescape=False,
+        bytecode_cache=QUESTION_BYTECODE,
     )
     env.filters.update(
         reply_path=reply_path,

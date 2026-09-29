@@ -28,8 +28,12 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - name: Install declared English dependencies
         run: python -m pip install -r requirements-dev.txt
-      - name: Check English unit contracts and template validity
-        run: make check
+      - name: Check source seal and template validity before long tests
+        run: |
+          PYTHONPATH=scripts python -c 'from current_repairs_contract import verified_current; verified_current()'
+          make verify
+      - name: Check English unit contracts
+        run: make test
       - name: Check integrated Q3 prose on actual production sources
         run: python scripts/probe_q3_policy_prose.py --output outputs/q3-policy-prose-scope.json
       - name: Verify current sources and replay frozen Word empty-section scope

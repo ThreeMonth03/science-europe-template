@@ -17,6 +17,9 @@ sys.path.insert(0, str(ROOT/'tests'))
 import test_science_europe_contract as adapter
 from probe_pdf_budget_reading import dom
 
+# Compiler settings affect bytecode; never share escaped/unescaped entries.
+PROFILE_BYTECODE = {escape: adapter.QuestionBytecodeCache() for escape in (False, True)}
+
 CONTRACT = json.loads((ROOT/'requirements/output-profiles.json').read_text())
 WRAPPER = ("{% import 'src/macros.html.j2' as macros with context %}"
            "{% import 'src/uuids.j2' as uuids with context %}"
@@ -25,7 +28,8 @@ WRAPPER = ("{% import 'src/macros.html.j2' as macros with context %}"
 
 def environment(root, escape=False, overrides=None):
     loaders = ([DictLoader(overrides)] if overrides else []) + [FileSystemLoader(root)]
-    env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=escape)
+    env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=escape,
+                      bytecode_cache=PROFILE_BYTECODE[escape])
     env.filters.update(reply_path=adapter.reply_path, reply_items=adapter.reply_items,
         reply_str_value=adapter.reply_str_value, markdown=lambda v: Markup(v) if escape else v,
         any=any, dot=lambda v: str(v) + ('' if str(v).endswith('.') else '.'))
