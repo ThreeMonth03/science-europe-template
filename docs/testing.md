@@ -46,7 +46,7 @@ standalone command-line entry points have been replaced by `check_current.py`.
 | `access_reading` | Specific-software decisions; identifier assignment and resolution | 1,368 |
 | `project_acronym` | Acronym-only, partial and inactive projects; scoped table rules | 156 |
 | `ethics_reading` | Independent ethical flags and partial approval records | 1,288 |
-| `publication_reading` | Publication summary, independent timing and stale No-branch children | 1,800 |
+| `publication_reading` | Publication summary, independent timing, stale No-branch children and partial identifier records | 2,136 |
 | `repository_profiles` | Review-only repository notices; retained facts, links and numbering | 2,256 |
 
 Counts describe deterministic combinations, not distinct real projects or proof
@@ -86,7 +86,7 @@ do not substitute a floating branch or skip a missing runner.
 Historical frozen-source/reference gates remain enabled. The development-only
 `current-repairs-delta.json` verifies the complete candidate tree, changed/added
 path scope, support files and unchanged 0.3.51 identity before projecting the
-committed parent to those gates. It is explicitly not release approval. Locally,
+committed parent to those gates. It is explicitly not release approval. In the prior batch,
 all 297 English and 482 Chinese unit tests, TDK validation, and the commands from
 both workflows pass. The current bilingual runner passes 17,980 combinations;
 historical projections remain separate evidence, not tests of current prose.
@@ -106,6 +106,14 @@ Triage shared causes first: multiple historical failures can come from one
 unregistered source layer rather than independent output defects. Old prose or
 count expectations must still be reconciled with the approved repair; never
 replace an exact assertion with a blanket pass.
+
+CI retains the existing workflow/job identities and all native checks. New
+commits cancel superseded runs for that branch/PR; manually dispatched runs
+remain independent. Reports are uploaded even after a failed check and retained
+for 14 days. The paired Chinese workflow times its major stages separately and
+runs its unchanged native probes in two language lanes; either lane failing
+fails the job. Historical native checks are not yet optional: a portable current
+full-package smoke test must cover their role before changing their frequency.
 
 Use short-lived repair branches in both repositories. Pin their paired release
 by exact English commit/tool commit/translation version, not by assuming matching
