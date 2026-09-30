@@ -68,6 +68,85 @@ def allowed_changes(before,after):
 
 
 HEADING_CALL = 'attach_budget_headings(keep_short_budget_overview(div))'
+ROW_CALL = 'keep_short_budget_rows(' + HEADING_CALL + ')'
+ROW_MARKER = '<!--DSW:SE:budget-row:v1-->'
+
+
+def short_row_cases():
+    base = fixture(rows=8)
+    return [
+        ('eight',base,8), ('one',fixture(rows=1),1), ('32',fixture(rows=32),32),
+        ('33-fallback',fixture(rows=33),0), ('zero-rows',fixture(rows=0),0),
+        ('chinese',fixture(cell='整理後設資料並檢查寄存檔案。'),2),
+        ('emphasis',fixture(cell='<em>Keep</em> <strong>original</strong>.'),2),
+        ('real-fact-attributes',base.replace('class="answer-detail"','class="answer-detail" data-fact-id="resource-justification" data-status="complete"'),8),
+        ('missing-amount',base.replace('0 TWD','TWD'),8),
+        ('missing-currency',base.replace('0 TWD','0'),8),
+        ('missing-funding',base.replace('Institute.',''),8),
+        ('missing-purpose',fixture(cell=''),2),
+        ('four-paragraphs',fixture(cell='First.</p><p>Second.'),2),
+        ('five-paragraphs',fixture(cell='First.</p><p>Second.</p><p>Third.'),0),
+        ('long-purpose',fixture(cell='Long text. '*60),0),
+        ('long-token',fixture(cell='x'*41),0),
+        ('long-funding',base.replace('Institute.','Funding '*30),0),
+        ('hard-break',fixture(cell='First.<br>Second.'),0),
+        ('list',fixture(cell='<ul><li>Original</li></ul>'),0),
+        ('image',fixture(cell='<img src="not-fetched.png" alt="Keep">'),0),
+        ('link',fixture(cell='<a href="https://example.org">Keep</a>'),0),
+        ('nested-table',fixture(cell='<table><tr><td>Keep</td></tr></table>'),0),
+        ('styled',fixture(cell='<span style="font-size:40pt">Keep</span>'),0),
+        ('column-span',base.replace('<td>0 TWD</td>','<td colspan="2">0 TWD</td>'),0),
+        ('four-columns',base.replace('<td>0 TWD</td>','<td>0</td><td>TWD</td>'),0),
+        ('other-question',base.replace('q-required-resources','q-other'),0),
+        ('other-table',base.replace('resource-table','authored-table'),0),
+        ('authored-wrapper',base.replace('project-resources','answer-detail'),0),
+        ('mixed',base.replace('Purpose.','Long text. '*60,1),7),
+        ('mixed-expanded-33',fixture(rows=33).replace('Purpose.','</p><p>'.join(['Long original paragraph.']*20),1),32),
+        ('literal-marker',fixture(cell='&lt;!--DSW:SE:budget-row:v1--&gt;'),2),
+    ]
+
+
+def verify_row_xml(before, after, count):
+    from lxml import etree as E
+    ns={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+    left,right=E.fromstring(before.encode()),E.fromstring(after.encode())
+    added=right.findall('.//w:cantSplit',ns)
+    assert len(added)==count and not left.findall('.//w:cantSplit',ns)
+    for node in added:
+        parent=node.getparent();parent.remove(node)
+        if not len(parent):parent.getparent().remove(parent)
+    assert E.tostring(left)==E.tostring(right),'Only the bounded row property may change'
+
+
+def check_current_rows():
+    from jinja2 import Environment,FileSystemLoader,StrictUndefined
+    lua=(ROOT/'src/word/pilot.lua').read_text(); assert lua.count(ROW_CALL)==1
+    runner='''import json,sys,tempfile,subprocess,zipfile
+from pathlib import Path
+p=json.load(sys.stdin); results=[]
+with tempfile.TemporaryDirectory() as temp:
+ f=Path(temp)/'pilot.lua'; out=Path(temp)/'probe.docx'
+ for name,html,count in p['cases']:
+  pair=[]
+  for lua in p['lua']:
+   f.write_text(lua)
+   subprocess.run(['pandoc','--from=html','--to=docx','--lua-filter='+str(f),'-o',str(out)],input=html.encode(),check=True)
+   with zipfile.ZipFile(out) as z: pair.append(z.read('word/document.xml').decode())
+  results.append([name,count,pair])
+print(json.dumps(results))
+'''
+    raw=subprocess.check_output(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',runner],
+        input=json.dumps(dict(lua=[lua.replace(ROW_CALL,HEADING_CALL),lua],cases=short_row_cases())).encode())
+    templates=[Environment(loader=FileSystemLoader(ROOT),undefined=StrictUndefined,autoescape=escape).get_template('src/word/short-tables.xml') for escape in [False,True]]
+    rows=[]
+    for name,count,(before,marked) in json.loads(raw):
+        assert marked.count(ROW_MARKER)==count,(name,'marker count')
+        after=templates[0].render(content=marked)
+        assert templates[1].render(content=marked)==after,(name,'Escaping changed XML')
+        assert ROW_MARKER not in after
+        verify_row_xml(before,after,count)
+        rows.append(dict(case=name,kept_rows=count,passed=True))
+    return dict(passed=True,cases=len(rows),rows=rows)
 
 
 def heading_cases():
@@ -190,6 +269,7 @@ def main():
     version=subprocess.check_output((['docker','exec',a.container,'pandoc'] if a.container else ['docker','run','--rm','--network','none','--entrypoint','pandoc',IMAGE])+['--version'],text=True).splitlines()[0]
     report={'passed':True,'release_acceptance':False,'rows':rows,'worker_image':IMAGE,'pandoc_version':version,
         'current_budget_headings':check_current_headings(),
+        'current_short_budget_rows':check_current_rows(),
         'source_commit':subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
         'checker_sha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         'lua_sha256':hashlib.sha256(lua.encode()).hexdigest(),

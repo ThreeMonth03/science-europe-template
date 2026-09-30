@@ -526,13 +526,78 @@ local function attach_budget_headings(div)
   return div
 end
 
+-- Keep short owned budget rows intact, not the entire table. Pandoc does not
+-- emit cantSplit from paragraph keeps or table styles reliably across readers.
+-- Mark only bounded rows; the existing XML pass adds the actual row property.
+local function keep_short_budget_rows(div)
+  local function width(value)
+    local total = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(value)) do total = total + (code >= 0x2E80 and 2 or 1) end
+    return total
+  end
+  local function inline_ok(items)
+    for _, item in ipairs(items) do
+      if item.t == "Strong" or item.t == "Emph" then
+        if not inline_ok(item.content) then return false end
+      elseif item.t ~= "Str" and item.t ~= "Space" and item.t ~= "SoftBreak" then return false end
+      if item.t == "Str" then
+        for token in item.text:gmatch("[A-Za-z0-9_.-]+") do if #token > 40 then return false end end
+      end
+    end
+    return true
+  end
+  local function paragraphs(blocks)
+    local count = 0
+    for _, block in ipairs(blocks) do
+      if block.t == "Para" or block.t == "Plain" then
+        if not inline_ok(block.content) then return nil end
+        count = count + 1
+      elseif block.t == "Div" and block.identifier == "" then
+        local style = block.attributes["custom-style"]
+        if style and style ~= "Pilot Label" and style ~= "Pilot Lead" then return nil end
+        for name, _ in pairs(block.attributes) do
+          if name ~= "custom-style" and name ~= "fact-id" and name ~= "status" and name ~= "requirement-id" then return nil end
+        end
+        local children = paragraphs(block.content)
+        if not children then return nil end
+        count = count + children
+      else return nil end
+    end
+    return count
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      for _, project in ipairs(answer.content) do
+        if project.t == "Div" and project.classes:includes("project-resources") then
+          for _, tbl in ipairs(project.content) do
+            if tbl.t == "Table" and tbl.classes:includes("resource-table") and not tbl.attributes["custom-style"] and
+               #tbl.colspecs == 3 and #tbl.bodies == 1 and #tbl.bodies[1].head == 0 and #tbl.foot.rows == 0 and
+               #tbl.caption.long == 0 and #tbl.bodies[1].body <= 32 then
+              for _, row in ipairs(tbl.bodies[1].body) do
+                local eligible = #row.cells == 3
+                for column, cell in ipairs(row.cells) do
+                  local count = paragraphs(cell.contents)
+                  if cell.row_span ~= 1 or cell.col_span ~= 1 or not count or count > (column == 1 and 4 or 3) or
+                     width(cell.contents) > (({320,80,160})[column] or 0) or (column == 1 and count == 0) then eligible = false end
+                end
+                if eligible then row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:budget-row:v1-->")) end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
 function Div(div)
   if div.identifier == "q-store-backup" then return keep_q5_context(div) end
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
-  if div.identifier == "q-required-resources" then return attach_budget_headings(keep_short_budget_overview(div)) end
+  if div.identifier == "q-required-resources" then return keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div))) end
   if div.classes:includes("identifier-heading") then
     -- Q13 only: combine the existing distribution number and repository type.
     -- Para may already wrap all-Strong labels. Reject unexpected/free blocks;

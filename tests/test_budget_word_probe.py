@@ -2,10 +2,34 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading_move
+from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading_move,short_row_cases,verify_row_xml
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_row_guards_cover_partial_mixed_and_unowned_content(self):
+        rows=short_row_cases()
+        self.assertEqual(len(rows),len({name for name,_,_ in rows}))
+        for name in ['missing-amount','missing-currency','missing-funding','mixed','chinese']:
+            self.assertGreater(next(count for key,_,count in rows if key==name),0)
+        for name in ['long-purpose','five-paragraphs','hard-break','styled','nested-table','authored-wrapper','four-columns']:
+            self.assertEqual(next(count for key,_,count in rows if key==name),0)
+
+    def test_row_oracle_rejects_text_and_unrelated_style_changes(self):
+        prefix='<w:tbl xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:tr>'
+        body='<w:tc><w:p><w:r><w:t>0 TWD</w:t></w:r></w:p></w:tc></w:tr></w:tbl>'
+        before=prefix+body; after=prefix+'<w:trPr><w:cantSplit/></w:trPr>'+body
+        verify_row_xml(before,after,1)
+        for broken in [after.replace('0 TWD','100 TWD'),after.replace('<w:p>','<w:p><w:pPr><w:keepNext/></w:pPr>')]:
+            with self.assertRaises(AssertionError): verify_row_xml(before,broken,1)
+
+    def test_row_xml_rejects_forged_marker_outside_a_valid_row(self):
+        from jinja2 import Environment,FileSystemLoader,StrictUndefined,UndefinedError
+        root=Path(__file__).resolve().parents[1]
+        template=Environment(loader=FileSystemLoader(root),undefined=StrictUndefined).get_template('src/word/short-tables.xml')
+        marker='<!--DSW:SE:budget-row:v1-->'
+        for malformed in [marker,'<w:tr>'+marker+'</w:tr>','<w:tr><w:tc><w:tcPr />'+marker*2+'</w:tc></w:tr>']:
+            with self.assertRaises(UndefinedError): template.render(content=malformed)
+
     def test_heading_probe_covers_missing_long_and_unowned_tables(self):
         rows=heading_cases()
         self.assertEqual(21,len(rows))

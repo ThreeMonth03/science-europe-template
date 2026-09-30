@@ -5,7 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
-from probe_budget_word import IMAGE, ROOT, RUNNER, fixture
+from probe_budget_word import IMAGE, ROOT, RUNNER, fixture, ROW_CALL, HEADING_CALL
 
 HANDLER='  if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end'
 
@@ -105,6 +105,10 @@ def main():
     p=argparse.ArgumentParser(description=__doc__); p.add_argument('--output',type=Path,required=True)
     p.add_argument('--container',choices=['science-europe-pilot-docworker-1']); a=p.parse_args()
     lua=(ROOT/'src/word/pilot.lua').read_text(); assert lua.count(HANDLER)==1
+    # Isolate long-table expansion from the separately verified short-row XML
+    # marker. Expansion can split 33+ rows into eligible batches of <=32 rows.
+    assert lua.count(ROW_CALL)==1
+    lua=lua.replace(ROW_CALL,HEADING_CALL)
     from budget_grouping_contract import WORD_BATCHED
     grouped = WORD_BATCHED in lua
     tests=cases(grouped=grouped); html=''.join('<div id="'+name+'">'+body+'</div>' for name,body,_ in tests)
@@ -124,7 +128,10 @@ def main():
         'source_commit':subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),
         'checker_sha256':digest(Path(__file__)),'helper_sha256':{'scripts/probe_budget_word.py':digest(ROOT/'scripts/probe_budget_word.py')},
         'lua_sha256':digest(ROOT/'src/word/pilot.lua'),
-        'limits':['Handler-disabled AST comparison, not historic native outputs','No whole-DMP or Microsoft Word acceptance']}
+        'tested_lua_sha256':hashlib.sha256(lua.encode()).hexdigest(),
+        'limits':['Handler-disabled AST comparison, not historic native outputs',
+                  'Short-row markers are isolated here; probe_budget_word.py verifies their current XML effect',
+                  'No whole-DMP or Microsoft Word acceptance']}
     a.output.parent.mkdir(parents=True,exist_ok=True); a.output.write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps({'passed':True,'cases':len(rows)}))
 
