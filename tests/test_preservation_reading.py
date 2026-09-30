@@ -23,21 +23,28 @@ class PreservationReadingTests(unittest.TestCase):
         with zipfile.ZipFile(io.BytesIO(after)) as archive:
             projected = {n: archive.read(n) for n in archive.namelist()}
         styles = E.fromstring(projected['word/styles.xml'])
-        styles.remove(next(s for s in styles if s.get(W+'styleId') == 'PilotResponsibilitySummary'))
+        for name in ['PilotResponsibilitySummary','PilotBudgetLabel']:
+            styles.remove(next(s for s in styles if s.get(W+'styleId') == name))
         projected['word/styles.xml'] = E.tostring(styles)
         historical = io.BytesIO()
         with zipfile.ZipFile(historical, 'w') as target:
             for name, value in projected.items(): target.writestr(name, value)
         prior_reference(before, historical.getvalue())
-        for mutation in ('old-font', 'new-keep', 'new-base', 'other-part', 'duplicate'):
+        for mutation in ('old-font', 'new-keep', 'new-base', 'other-part', 'duplicate',
+                         'budget-spacing', 'budget-keep', 'budget-base', 'budget-duplicate'):
             with self.subTest(mutation=mutation), zipfile.ZipFile(io.BytesIO(after)) as archive:
                 parts = {n: archive.read(n) for n in archive.namelist()}
             tree = E.fromstring(parts['word/styles.xml'])
             new = next(s for s in tree if s.get(W+'styleId') == STYLE)
+            budget = next(s for s in tree if s.get(W+'styleId') == 'PilotBudgetLabel')
             if mutation == 'old-font': tree[0].set('unexpected', 'true')
             elif mutation == 'new-keep': new.find(W+'pPr/'+W+'keepNext').set(W+'val', '1')
             elif mutation == 'new-base': new.find(W+'basedOn').set(W+'val', 'Heading5')
             elif mutation == 'duplicate': tree.append(copy.deepcopy(new))
+            elif mutation == 'budget-spacing': budget.find(W+'pPr/'+W+'spacing').set(W+'before','80')
+            elif mutation == 'budget-keep': budget.find(W+'pPr/'+W+'keepNext').set(W+'val','0')
+            elif mutation == 'budget-base': budget.find(W+'basedOn').set(W+'val','Heading5')
+            elif mutation == 'budget-duplicate': tree.append(copy.deepcopy(budget))
             else: parts['docProps/core.xml'] += b' '
             parts['word/styles.xml'] = E.tostring(tree)
             data = io.BytesIO()

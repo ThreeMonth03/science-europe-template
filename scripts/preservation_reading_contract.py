@@ -134,6 +134,16 @@ def prior_reference(before, after):
                 '<w:keepNext w:val="0"/><w:keepLines/></w:pPr></w:style>').encode())
             assert xml(responsibility[0]) == xml(expected_responsibility), 'Unreviewed responsibility style'
             second.remove(responsibility[0])
+        # Project only the exact later Q15 style; the Q11 comparison below still
+        # rejects every existing style edit, additional property or ZIP change.
+        budget = [s for s in second if s.get(W+'styleId') == 'PilotBudgetLabel']
+        assert len(budget) <= 1
+        if budget:
+            expected_budget = E.fromstring(('<w:style xmlns:w="'+W[1:-1]+'" w:type="paragraph" w:customStyle="1" w:styleId="PilotBudgetLabel">'
+                '<w:name w:val="Pilot Budget Label"/><w:basedOn w:val="BodyText"/><w:pPr>'
+                '<w:keepNext/><w:spacing w:before="0" w:after="60"/></w:pPr></w:style>').encode())
+            assert xml(budget[0]) == xml(expected_budget), 'Unreviewed budget label style'
+            second.remove(budget[0])
         assert not [s for s in first if s.get(W+'styleId') == STYLE]
         added = [s for s in second if s.get(W+'styleId') == STYLE]; assert len(added) == 1
         expected = E.fromstring(('<w:style xmlns:w="'+W[1:-1]+'" w:type="paragraph" w:customStyle="1" w:styleId="'+STYLE+'">'
