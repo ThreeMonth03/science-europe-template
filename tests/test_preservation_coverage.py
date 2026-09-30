@@ -9,6 +9,7 @@ from test_science_europe_contract import ROOT, render_question
 sys.path.insert(0, str(ROOT / 'scripts'))
 from generate_pilot_fixtures import IDS, path
 from generate_preservation_fixtures import preservation_cases
+from check_repository_profiles import preservation_schema
 
 Q11 = 'src/questions/11-data-preservation.html.j2'
 AUTHORED = '<p>Keep Selection-2027-12-31.csv.</p><p>Do not merge this paragraph.</p><ul><li>First.</li><li>Second.</li></ul>'
@@ -18,7 +19,7 @@ def plain(case='preservation-complete'):
     return {p: v['value'] for p,v in preservation_cases('en')[case].items()}
 
 
-def render(replies): return BeautifulSoup(render_question(Q11, replies), 'html.parser')
+def render(replies): return BeautifulSoup(render_question(Q11, replies, km=preservation_schema()), 'html.parser')
 
 
 def archive_matrix():

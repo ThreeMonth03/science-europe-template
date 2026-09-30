@@ -17,7 +17,8 @@ SUITES = {
     'project_acronym': dict(value_cases=108, inactive_cases=40, identity_cases=4, full_documents=4),
     'ethics_reading': dict(dataset_cases=320, approval_cases=960, identity_cases=4, full_documents=4),
     'publication_reading': dict(summary_cases=1792, record_cases=4, identifier_cases=336, full_documents=4),
-    'repository_profiles': dict(repository_cases=2240, identity_cases=8, full_documents=8),
+    'repository_profiles': dict(repository_cases=2240, preservation_cases=320, inactive_preservation=112,
+                               identity_cases=8, full_documents=8),
 }
 
 

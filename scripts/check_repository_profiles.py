@@ -27,6 +27,35 @@ SERVICE = {
     'zh-Hant': {'Download': '資料儲存庫將僅提供下載服務。', 'Simple': '資料儲存庫將提供搜尋與簡易取用介面。',
                 'Advanced': '資料儲存庫將提供進階處理服務。'},
 }
+PRESERVATION = {
+    'en': {
+        'metadata': {'Yes': 'The metadata will be available even when the data no longer exists.',
+                     'No': 'The metadata will not remain available once the data no longer exists.'},
+        'catalogue': {'Yes': 'We will add a reference to the published data in at least one data catalogue.',
+                      'No': 'We will not add a reference to the published data in a data catalogue.',
+                      'Prime': 'We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field.'}},
+    'zh-Hant': {
+        'metadata': {'Yes': '即使資料已不存在，仍會持續提供後設資料。',
+                     'No': '資料不再存在時，後設資料也將無法取得。'},
+        'catalogue': {'Yes': '本計畫將在至少一個資料目錄中登錄已發布資料的參照資訊。',
+                      'No': '本計畫不會在資料目錄中登錄已發布資料的參照資訊。',
+                      'Prime': '此儲存庫是本領域取得資料進行再利用的主要來源，因此不另在資料目錄登錄已發布資料的參照資訊。'}},
+}
+
+
+def preservation_schema():
+    from check_answer_mapping import schema, chapter, question
+    km = schema()
+    children = chapter(km, IDS['preservingCUuid'])
+    children = question(km, children, IDS['producedDataQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+    question(km, children, IDS['publishedDataMetadataPersistentQUuid'], 'OptionsQuestion',
+             [IDS['publishedDataMetadataPersistent' + suffix + 'AUuid'] for suffix in ['Yes', 'No']])
+    question(km, children, IDS['isPublishedDataQUuid'], 'OptionsQuestion',
+             [IDS['isPublishedData' + suffix + 'AUuid'] for suffix in ['Yes', 'No']])
+    children = km['entities']['answers'][IDS['isPublishedDataYesAUuid']]['followUpUuids']
+    question(km, children, IDS['publishedDataCatalogueQUuid'], 'OptionsQuestion',
+             [IDS['publishedDataCatalogue' + suffix + 'AUuid'] for suffix in ['Yes', 'No', 'Prime']])
+    return km
 
 
 def repository_replies(repository='Special', support='', service='Advanced', publication='Yes',
@@ -59,15 +88,69 @@ def contact_replies(text, item='dataset-a', distribution='distro-c'):
 
 
 def check(root, language):
-    counts = dict(repository_cases=0, identity_cases=0, full_documents=0)
+    counts = dict(repository_cases=0, preservation_cases=0, inactive_preservation=0, identity_cases=0, full_documents=0)
     for escape in [False, True]:
         env = environment(root, escape)
         template = env.from_string(PREFIX + "{% include '" + Q11 + "' %}")
         full = env.from_string(WRAPPER)
 
-        def render(template, replies, profile):
-            return BeautifulSoup(template.render(repliesMap=replies, output_profile=profile,
+        def render(template, replies, profile, km=None):
+            return BeautifulSoup(template.render(km=preservation_schema() if km is None else km,
+                repliesMap=replies, output_profile=profile,
                 dc={'project': {'created_by': None}, 'e': {'choices': {}}}), 'html.parser')
+
+        fields = [('metadata', 'publishedDataMetadataPersistent', 'preservation-metadata-persistence'),
+                  ('catalogue', 'publishedDataCatalogue', 'preservation-catalogue')]
+        base = path(DATASETS, 'dataset-a')
+        paths = [path(base, 'publishedDataMetadataPersistentQUuid'),
+                 path(base, 'isPublishedDataQUuid', 'isPublishedDataYesAUuid', 'publishedDataCatalogueQUuid')]
+        for metadata, catalogue, publication, profile in itertools.product(
+                ['Yes', 'No', '', 'unknown'], ['Yes', 'No', 'Prime', '', 'unknown'],
+                ['Yes', 'No', '', 'unknown'], ['review', 'submission']):
+            replies = repository_replies(publication=publication)
+            # No dataset name or retention answer: each known fact must survive alone.
+            replies = {k: v for k, v in replies.items() if k not in [path(base, 'producedDataNameQUuid')]
+                       and IDS['publishedDataHowLongQUuid'] not in k}
+            for key, (_, binding, _), value in zip(paths, fields, [metadata, catalogue]):
+                if value: replies[key] = IDS.get(binding + value + 'AUuid', value)
+            soup = render(template, replies, profile)
+            for (name, _, fact), value in zip(fields, [metadata, catalogue]):
+                node = soup.select_one('[data-fact-id="' + fact + '"]')
+                active = value in PRESERVATION[language][name] and (name == 'metadata' or publication == 'Yes')
+                assert bool(node) == active, (name, value, publication)
+                if node:
+                    assert node['data-status'] == ('complete' if value == 'Yes' else 'explicit-no')
+                    assert node.get_text() == PRESERVATION[language][name][value]
+                    if profile == 'submission':
+                        assert node.find_parent(class_='dataset-section').select_one('.dataset-label[data-list-index="1"]')
+                for option, text in PRESERVATION[language][name].items():
+                    assert (text in soup.get_text()) == (active and option == value)
+            assert soup.select_one('#q-data-preservation > h3')
+            assert not soup.select('p p, p div, p ul, ul:empty, li:empty')
+            if profile == 'submission': assert not soup.select('.data-gap, .data-review')
+            counts['preservation_cases'] += 1
+
+        for selected, change, profile in itertools.product(['Yes', 'No'],
+                ['question-filtered', 'question-deleted', 'answer-filtered', 'answer-deleted',
+                 'wrong-type', 'chapter-filtered', 'dataset-deleted'], ['review', 'submission']):
+            for index, (_, binding, fact) in enumerate(fields):
+                km = preservation_schema()
+                replies = repository_replies()
+                qid, aid = IDS[binding + 'QUuid'], IDS[binding + selected + 'AUuid']
+                replies[paths[index]] = aid
+                children = (km['entities']['questions'][IDS['producedDataQUuid']]['itemTemplateQuestionUuids']
+                            if index == 0 else km['entities']['answers'][IDS['isPublishedDataYesAUuid']]['followUpUuids'])
+                if change == 'question-filtered': children.remove(qid)
+                if change == 'question-deleted': km['entities']['questions'].pop(qid)
+                if change == 'answer-filtered': km['entities']['questions'][qid]['answerUuids'].remove(aid)
+                if change == 'answer-deleted': km['entities']['answers'].pop(aid)
+                if change == 'wrong-type': km['entities']['questions'][qid]['questionType'] = 'ValueQuestion'
+                if change == 'chapter-filtered': km['chapterUuids'].clear()
+                if change == 'dataset-deleted': replies[DATASETS] = []
+                soup = render(template, replies, profile, km)
+                assert not soup.select('[data-fact-id="' + fact + '"]'), (binding, selected, change)
+                if change != 'dataset-deleted': assert '7 years' in soup.get_text()
+                counts['inactive_preservation'] += 1
 
         for repo, support, service, publication, profile in itertools.product(
                 KNOWN + ['', 'unknown'], ['Yes', 'No', '', 'unknown'], [*SERVICE[language], '', 'unknown'],

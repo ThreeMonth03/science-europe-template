@@ -59,7 +59,7 @@ class QuestionBytecodeCache(BytecodeCache):
 QUESTION_BYTECODE = QuestionBytecodeCache()
 
 
-def render_question(path: str, replies: dict[str, object]) -> str:
+def render_question(path: str, replies: dict[str, object], **context) -> str:
     env = Environment(
         loader=FileSystemLoader(ROOT),
         extensions=["jinja2.ext.do"],
@@ -80,7 +80,7 @@ def render_question(path: str, replies: dict[str, object]) -> str:
         "{% import 'src/uuids.j2' as uuids with context %}"
         f"{{% include '{path}' with context %}}"
     )
-    return wrapper.render(repliesMap=replies)
+    return wrapper.render(repliesMap=replies, **context)
 
 
 class ScienceEuropeContractTests(unittest.TestCase):

@@ -8,6 +8,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 from generate_sharing_fixtures import sharing_cases
 from generate_storage_fixtures import storage_cases
 from generate_pilot_fixtures import IDS, path
+from check_repository_profiles import preservation_schema
 
 Q10 = 'src/questions/10-share-restrictions.html.j2'
 Q11 = 'src/questions/11-data-preservation.html.j2'
@@ -67,7 +68,7 @@ class SharingPreservationTests(unittest.TestCase):
 
     def test_preservation_gaps_break_runs_without_hiding_metadata(self):
         replies = {p: v['value'] for p,v in sharing_cases('en')['sharing-missing'].items()}
-        soup = BeautifulSoup(render_question(Q11, replies), 'html.parser')
+        soup = BeautifulSoup(render_question(Q11, replies, km=preservation_schema()), 'html.parser')
         summary = soup.select_one('.preservation-summary')
         self.assertEqual(2, len(summary.select('.reading-gap')))
         self.assertFalse(summary.select(':scope > p.data-gap'))

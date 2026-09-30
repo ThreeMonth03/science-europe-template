@@ -2,6 +2,7 @@
   <h3>11. How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?</h3>
 
   <div class="answer">
+  {% import 'src/active-answer.j2' as activeAnswer with context %}
   {% set answerContent %}
     {% include 'src/reference-maintenance-plan.html.j2' %}
     {# Produced datasets #}
@@ -31,9 +32,8 @@
           {# How long will be stored + Metadata FAIRness #}
           {%- set publishedDataHowLongPath = [pathPrefix, uuids.publishedDataHowLongQUuid]|reply_path -%}
           {%- set publishedDataHowLongAUuid = repliesMap[publishedDataHowLongPath]|reply_str_value -%}
-          {%- set publishedDataMetadataPersistentPath = [pathPrefix, uuids.publishedDataMetadataPersistentQUuid]|reply_path -%}
+          {%- set publishedDataMetadataPersistentPath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.publishedDataMetadataPersistentQUuid], 'OptionsQuestion') -%}
           {%- set publishedDataMetadataPersistentAUuid = repliesMap[publishedDataMetadataPersistentPath]|reply_str_value -%}
-          {%- if publishedDataHowLongAUuid or (publishedDataMetadataPersistentAUuid == uuids.publishedDataMetadataPersistentYesAUuid) %}
             {% if publishedDataHowLongAUuid == uuids.publishedDataHowLongTechnicalAUuid -%}
               <p>This data set will be kept available as long as technically possible.</p>
             {%- elif publishedDataHowLongAUuid == uuids.publishedDataHowLongDeletedAUuid -%}
@@ -55,8 +55,11 @@
                 <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-payment" data-status="needs-review">Please check how the prepaid retention period relates to the answer that repository services have no charges.</p>{% endif %}</div>
               {% endif %}
             {%- endif -%}
+          {%- if publishedDataMetadataPersistentPath and publishedDataMetadataPersistentAUuid in km.entities.questions[uuids.publishedDataMetadataPersistentQUuid].answerUuids and publishedDataMetadataPersistentAUuid in km.entities.answers %}
             {%- if publishedDataMetadataPersistentAUuid == uuids.publishedDataMetadataPersistentYesAUuid %}
-              <p>The metadata will be available even when the data no longer exists.</p>
+              <p data-fact-id="preservation-metadata-persistence" data-status="complete">The metadata will be available even when the data no longer exists.</p>
+            {%- elif publishedDataMetadataPersistentAUuid == uuids.publishedDataMetadataPersistentNoAUuid %}
+              <p data-fact-id="preservation-metadata-persistence" data-status="explicit-no">The metadata will not remain available once the data no longer exists.</p>
             {%- endif -%}
           {%- endif -%}
           </div>
@@ -145,10 +148,16 @@
             {% endif %}
           {%- endif -%}
           {# Catalogue #}
-          {%- set publishedDataCataloguePath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid]|reply_path -%}
+          {%- set publishedDataCataloguePath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid], 'OptionsQuestion') -%}
           {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
-          {%- if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
-            <p>We will add a reference to the published data in at least one data catalogue.</p>
+          {%- if publishedDataCataloguePath and publishedDataCatalogueAUuid in km.entities.questions[uuids.publishedDataCatalogueQUuid].answerUuids and publishedDataCatalogueAUuid in km.entities.answers -%}
+            {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
+              <p data-fact-id="preservation-catalogue" data-status="complete">We will add a reference to the published data in at least one data catalogue.</p>
+            {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCatalogueNoAUuid -%}
+              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a reference to the published data in a data catalogue.</p>
+            {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCataloguePrimeAUuid -%}
+              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field.</p>
+            {%- endif -%}
           {%- endif -%}
         {% endset %}
         {% if output_profile|default('review') != 'submission' or preservationDatasetContent|striptags|trim or '<img' in preservationDatasetContent or '<table' in preservationDatasetContent %}
