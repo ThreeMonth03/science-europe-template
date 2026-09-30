@@ -72,6 +72,45 @@ ROW_CALL = 'keep_short_budget_rows(' + HEADING_CALL + ')'
 ROW_MARKER = '<!--DSW:SE:budget-row:v1-->'
 
 
+def overview_cases():
+    # Real budgets must paginate independently; retain the small no-budget rule.
+    rows = [(name, html, name == 'no-budget') for name, html, _ in cases()]
+    def question(body):
+        return '<div id="q-required-resources"><h3>15. Resources?</h3><div class="answer">'+body+'</div></div>'
+    rows += [(name, question(body), kept) for name, body, kept in [
+        ('empty-answer', '', False),
+        ('short-answer', '<p>Support is available.</p><p>No charges.</p>', True),
+        ('chinese-answer', '<p>已有專業人員。</p><p>不需額外設備。</p>', True),
+        ('eight-paragraphs', '<p>Keep this answer.</p>' * 8, True),
+        ('nine-paragraphs', '<p>Keep this answer.</p>' * 9, False),
+        ('long-answer', '<p>' + 'Original. ' * 120 + '</p>', False),
+        ('answer-list', '<ul><li>First.</li><li>Second.</li></ul>', False),
+        ('answer-link', '<p><a href="https://example.org">Keep this link.</a></p>', False),
+        ('answer-break', '<p>First.<br>Second.</p>', False),
+        ('answer-style', '<div custom-style="Unrelated"><p>Keep.</p></div>', False),
+        ('two-empty-projects', '<div class="project-resources"><p>Not yet listed.</p></div>' * 2, False),
+        ('existing-lead', '<div class="answer-lead"><p>Training:</p></div><p>Keep the training answer.</p>', True),
+    ]]
+    return rows
+
+
+def check_current_overview():
+    lua = (ROOT/'src/word/pilot.lua').read_text()
+    assert lua.count(HEADING_CALL) == 1
+    tests = overview_cases()
+    html = ''.join('<div id="'+name+'">'+body+'</div>' for name,body,_ in tests)
+    results = []
+    for source in [lua.replace(HEADING_CALL, 'attach_budget_headings(div)'), lua]:
+        raw = subprocess.check_output(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',RUNNER],
+            input=json.dumps(dict(html=html,lua=source)).encode())
+        results.append({b['c'][0][0]: b for b in json.loads(raw)['blocks']})
+    for name,_,kept in tests:
+        before,after = [result[name] for result in results]
+        if kept: assert allowed_changes(before,after) > 0, name
+        else: assert before == after, (name, 'Do not chain a budget table or unbounded answer to the overview')
+    return dict(passed=True,cases=len(tests),kept_no_budget_answers=sum(kept for _,_,kept in tests))
+
+
 def short_row_cases():
     base = fixture(rows=8)
     return [
@@ -268,6 +307,7 @@ def main():
         rows.append({'case':name,'eligible':eligible,'changed_overview_paragraphs':changes,'passed':True})
     version=subprocess.check_output((['docker','exec',a.container,'pandoc'] if a.container else ['docker','run','--rm','--network','none','--entrypoint','pandoc',IMAGE])+['--version'],text=True).splitlines()[0]
     report={'passed':True,'release_acceptance':False,'rows':rows,'worker_image':IMAGE,'pandoc_version':version,
+        'current_overview_flow':check_current_overview(),
         'current_budget_headings':check_current_headings(),
         'current_short_budget_rows':check_current_rows(),
         'source_commit':subprocess.check_output(['git','-C',str(ROOT),'rev-parse','HEAD'],text=True).strip(),

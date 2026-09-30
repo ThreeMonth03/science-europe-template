@@ -6,6 +6,15 @@ from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_current_overview_releases_budgets_but_keeps_small_no_budget_answers(self):
+        from probe_budget_word import overview_cases
+        rows = overview_cases()
+        self.assertEqual(36, len(rows))
+        self.assertEqual(len(rows), len({name for name,_,_ in rows}))
+        for name,html,kept in rows:
+            if '<table' in html: self.assertFalse(kept, name)
+        self.assertEqual(5, sum(kept for _,_,kept in rows))
+
     def test_row_guards_cover_partial_mixed_and_unowned_content(self):
         rows=short_row_cases()
         self.assertEqual(len(rows),len({name for name,_,_ in rows}))

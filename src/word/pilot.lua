@@ -195,16 +195,16 @@ local function keep_q9_dataset_labels(div)
   if changed then return div end
 end
 
--- Q15: keep a genuinely short overview with its small budget, without a forced
--- page break. Inspect the entire unit before changing anything. Long, complex,
--- or multi-project budgets retain the original AST and pagination rules.
+-- Q15: keep only a short answer without a budget together. A budget has its own
+-- repeating heading and bounded row guards; linking the overview to that table
+-- can push the whole question to a new page and leave half the previous blank.
 local function keep_short_budget_overview(div)
   local units = 0
   for _, code in utf8.codes(pandoc.utils.stringify(div)) do
     units = units + (code >= 0x2E80 and 2 or 1)
   end
   if units > 1000 then return div end
-  local leading, tables, projects, paragraphs, list_items, headers = {}, 0, 0, 0, 0, 0
+  local leading, projects, paragraphs, headers = {}, 0, 0, 0
   local simple = true
   local function inline_ok(inlines)
     for _, item in ipairs(inlines) do
@@ -217,61 +217,28 @@ local function keep_short_budget_overview(div)
     return true
   end
   local scan
-  scan = function(blocks, in_list, in_table, styled)
+  scan = function(blocks, styled)
     for index, block in ipairs(blocks) do
       if block.t == "Para" or block.t == "Plain" then
         paragraphs = paragraphs + 1
         if not inline_ok(block.content) then simple = false end
-        if not in_table then
-          if tables > 0 then simple = false end
-          if not styled then table.insert(leading, {blocks=blocks, index=index, block=block, in_list=in_list}) end
-        end
+        if not styled then table.insert(leading, {blocks=blocks, index=index, block=block}) end
       elseif block.t == "Div" then
         if block.classes:includes("project-resources") then projects = projects + 1 end
         local style = block.attributes["custom-style"]
         if style and style ~= "Pilot Lead" and style ~= "Pilot Label" and style ~= "Pilot List Lead" then simple = false end
-        scan(block.content, in_list, in_table, styled or style ~= nil)
-      elseif block.t == "Header" and not in_list and not in_table and tables == 0 then
+        scan(block.content, styled or style ~= nil)
+      elseif block.t == "Header" then
         headers = headers + 1
         if (headers == 1 and block.level ~= 3) or (headers == 2 and block.level ~= 4) or not inline_ok(block.content) then simple = false end
-      elseif block.t == "BulletList" and not in_list and not in_table then
-        list_items = list_items + #block.content
-        for _, item in ipairs(block.content) do
-          if #item ~= 1 then simple = false end
-          scan(item, true, false, styled)
-        end
-      elseif block.t == "Table" and not in_table and not in_list then
-        tables = tables + 1
-        if not block.classes:includes("resource-table") or #block.colspecs ~= 3 or #block.bodies ~= 1 or
-           #block.head.rows ~= 1 or #block.foot.rows ~= 0 or #block.caption.long ~= 0 then
-          simple = false
-        else
-          local body = block.bodies[1]
-          if #body.head ~= 0 or #body.body < 1 or #body.body > 2 then simple = false end
-          local rows = {block.head.rows[1]}
-          for _, row in ipairs(body.body) do table.insert(rows, row) end
-          for _, row in ipairs(rows) do
-            if #row.cells ~= 3 then simple = false end
-            for _, cell in ipairs(row.cells) do
-              local width = 0
-              for _, code in utf8.codes(pandoc.utils.stringify(cell.contents)) do width = width + (code >= 0x2E80 and 2 or 1) end
-              if cell.row_span ~= 1 or cell.col_span ~= 1 or width > 200 then simple = false end
-              local previous = paragraphs
-              scan(cell.contents, false, true, nil)
-              if paragraphs - previous > 3 then simple = false end
-            end
-          end
-        end
       else simple = false end
     end
   end
-  scan(div.content, false, false, nil)
-  local short_with_budget = tables == 1 and projects == 1 and headers == 2 and list_items <= 3 and paragraphs <= 24
-  local short_without_budget = tables == 0 and projects <= 1 and headers >= 1 and headers <= 2 and list_items == 0 and paragraphs <= 8
-  if not simple or not (short_with_budget or short_without_budget) then return div end
+  scan(div.content, nil)
+  local short_without_budget = projects <= 1 and headers >= 1 and headers <= 2 and paragraphs <= 8
+  if not simple or not short_without_budget then return div end
   for _, item in ipairs(leading) do
-    local style = item.in_list and "Pilot List Lead" or "Pilot Lead"
-    item.blocks[item.index] = pandoc.Div({pandoc.Para(item.block.content)}, pandoc.Attr("", {}, {["custom-style"] = style}))
+    item.blocks[item.index] = pandoc.Div({pandoc.Para(item.block.content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
   end
   return div
 end
