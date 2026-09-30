@@ -12,7 +12,7 @@ SUITES = {
     'answer_mapping': dict(research_combinations=1024, inactive_branches=10, owner_cases=48, full_documents=4),
     'sentence_layout': dict(nonreuse_cases=448, inactive_cases=24, inline_cases=4),
     'responsibility_reading': dict(role_subsets=512, identity_cases=32, missing_name_cases=12, full_documents=4),
-    'access_reading': dict(access_cases=384, software_cases=16, identifier_cases=960, identity_cases=4, full_documents=4),
+    'access_reading': dict(access_cases=384, software_cases=64, identifier_cases=960, identity_cases=4, full_documents=4),
     'project_acronym': dict(value_cases=108, inactive_cases=40, identity_cases=4, full_documents=4),
     'ethics_reading': dict(dataset_cases=320, approval_cases=960, identity_cases=4, full_documents=4),
     'publication_reading': dict(summary_cases=1792, record_cases=4, identifier_cases=336, full_documents=4),

@@ -13,6 +13,16 @@
       {%- set isPublishedDataSwAUuid = repliesMap[isPublishedDataSwUuid]|reply_str_value -%}
       {%- set isPublishedSWPath = [isPublishedDataSwUuid, uuids.publishedSpecSwUseYesAUuid, uuids.publishedSpecSwUseWhatQUuid]|reply_path -%}
       {%- set isPublishedSwItems = repliesMap[isPublishedSWPath]|reply_items -%}
+      {# Omit wholly blank submission rows, not partial tools or the known need
+         for software. Keep original list indices for neutral labels. #}
+      {%- set visibleSoftwareItems = [] -%}
+      {%- for swItem in isPublishedSwItems -%}
+        {%- set swName = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatNameQUuid]|reply_path]|reply_str_value -%}
+        {%- set swLocation = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path]|reply_str_value -%}
+        {%- if output_profile|default('review') != 'submission' or swName|trim or swLocation|trim -%}
+          {%- do visibleSoftwareItems.append(swItem) -%}
+        {%- endif -%}
+      {%- endfor -%}
       {% set accessLabel %}{% if producedDataName|trim %}{{ producedDataName|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, loop.index) }}{% else %}(no name given){% endif %}{% endset %}
       {# A run-in label and one owned sentence, not a heading for every short
          answer. Never combine different dataset records, even equal names. #}
@@ -23,7 +33,7 @@
           {% if isPublishedDataSwAUuid == uuids.publishedSpecSwUseNoAUuid %}
             <span data-fact-id="required-software-decision" data-status="explicit-no">No specific software is required to access or use this dataset.</span>
           {% elif isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid %}
-            {% if isPublishedSwItems %}<span data-fact-id="required-software-list" data-status="complete">Software required to use this dataset:</span>
+            {% if visibleSoftwareItems %}<span data-fact-id="required-software-list" data-status="complete">Software required to use this dataset:</span>
             {% else %}<span data-fact-id="required-software-list" data-status="partial">Specific software is required to use this dataset.</span>{% endif %}
           {% endif %}
         {% endif %}
@@ -33,18 +43,18 @@
       <div class="dataset-section" data-item-id="{{ i|e }}">
         {% if accessSummary|striptags|trim %}
           {% set accessLead %}<p class="dataset-access-summary"><strong>{{ accessLabel }}</strong> — {{ accessSummary }}</p>{% endset %}
-          {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid and isPublishedSwItems %}<div class="answer-lead">{{ accessLead }}</div>{% else %}{{ accessLead }}{% endif %}
+          {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid and visibleSoftwareItems %}<div class="answer-lead">{{ accessLead }}</div>{% else %}{{ accessLead }}{% endif %}
         {% else %}
           <h5>{{ accessLabel }}</h5>
         {% endif %}
         {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
           {% if isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid %}
-            {% if isPublishedSwItems %}
+            {% if visibleSoftwareItems %}
               <ul class="required-software">
-                {% for swItem in isPublishedSwItems %}
+                {% for swItem in visibleSoftwareItems %}
                   {% set swNameReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatNameQUuid]|reply_path]|reply_str_value %}
                   {% set swPIDReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path]|reply_str_value %}
-                  <li data-item-id="{{ swItem|e }}"><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(loop.index) }}{% else %}(no name given){% endif %}</strong>
+                  <li data-item-id="{{ swItem|e }}"><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}(no name given){% endif %}</strong>
                     {% if swPIDReply|trim %}<div>Available at: {{ swPIDReply|e }}</div>
                     {% elif output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="software-location" data-status="missing">An access location for this tool has not been provided.</p>{% endif %}
                   </li>

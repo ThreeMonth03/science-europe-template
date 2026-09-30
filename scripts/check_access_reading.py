@@ -78,13 +78,12 @@ def check(root, language):
             assert (NO_TOOLS[language] in dataset.get_text()) == (pub == 'Yes' and sw == 'No')
             tools = dataset.select('ul.required-software > li')
             active_tools = pub == 'Yes' and sw == 'Yes' and count > 0
-            assert len(tools) == (count if active_tools else 0)
+            assert len(tools) == ((count if profile == 'review' else 1) if active_tools else 0)
             assert bool(dataset.select('.answer-lead')) == active_tools
             if active_tools:
                 assert tools[0].strong.get_text() == 'Tool <A> & "B"'
                 assert 'https://example.org/tool?x=1&y=2' in tools[0].get_text()
-                assert bool(tools[1].select('.data-gap')) == (profile == 'review')
-                if profile == 'submission': assert '2' in tools[1].strong.get_text()
+                if profile == 'review': assert tools[1].select('.data-gap')
             else:
                 assert 'Tool <A>' not in dataset.get_text() and 'https://example.org/tool' not in dataset.get_text()
             if pub == 'Yes' and sw == 'Yes' and not count:
@@ -93,18 +92,26 @@ def check(root, language):
             counts['access_cases'] += 1
 
         for name, location, profile in itertools.product(
-                ['Tool <A> & "B"', ' \n '], ['https://example.org/tool?x=1&y=2', ' \n '], ['review', 'submission']):
+                ['Tool <A> & "B"', ' \n ', '', None], ['https://example.org/tool?x=1&y=2', ' \n ', '', None], ['review', 'submission']):
             replies = access_replies(software='Yes', count=1)
             base = path(LISTING, 'dataset-a', 'isPublishedDataQUuid', 'isPublishedDataYesAUuid',
                         'publishedSpecSwUseQUuid', 'publishedSpecSwUseYesAUuid', 'publishedSpecSwUseWhatQUuid', 'tool-0')
-            replies[path(base, 'publishedSpecSwUseWhatNameQUuid')] = name
-            replies[path(base, 'publishedSpecSwUseWhatPIDQUuid')] = location
-            tool = render(access, replies, profile).select_one('ul.required-software > li')
-            assert tool
-            if name.strip(): assert tool.strong.get_text() == name
-            elif profile == 'submission': assert '1' in tool.strong.get_text()
-            if location.strip(): assert location in tool.get_text()
-            assert bool(tool.select('.data-gap')) == (not location.strip() and profile == 'review')
+            for field, value in [('publishedSpecSwUseWhatNameQUuid', name), ('publishedSpecSwUseWhatPIDQUuid', location)]:
+                if value is None: replies.pop(path(base, field), None)
+                else: replies[path(base, field)] = value
+            soup = render(access, replies, profile)
+            tool = soup.select_one('ul.required-software > li')
+            named, located = bool((name or '').strip()), bool((location or '').strip())
+            assert bool(tool) == (profile == 'review' or named or located)
+            if tool:
+                if named: assert tool.strong.get_text() == name
+                elif profile == 'submission': assert '1' in tool.strong.get_text()
+                if located: assert location in tool.get_text()
+                assert bool(tool.select('.data-gap')) == (not located and profile == 'review')
+            else:
+                assert NEEDS_TOOLS[language] in soup.get_text() and NO_TOOLS[language] not in soup.get_text()
+                assert soup.select_one('[data-fact-id="required-software-list"][data-status="partial"]')
+                assert not soup.select('ul.required-software, .answer-lead')
             counts['software_cases'] += 1
 
         for pub, parent, actor, resolves, profile in itertools.product(
@@ -145,6 +152,13 @@ def check(root, language):
             # and a sibling's software or identifier state must never leak.
             replies = access_replies(name='Same Name')
             other = access_replies(software='Yes', name='Same Name', count=2, item='dataset-b')
+            # Blank rows around partially filled tools must not renumber or
+            # swallow them, and stale replies outside the list stay inactive.
+            listing = next(key for key in other if key.endswith(IDS['publishedSpecSwUseWhatQUuid']))
+            other[listing] = ['empty-before', 'tool-0', 'tool-1', 'empty-after']
+            other[path(listing, 'tool-1', 'publishedSpecSwUseWhatPIDQUuid')] = 'https://example.org/location-only'
+            other.pop(path(listing, 'tool-0', 'publishedSpecSwUseWhatPIDQUuid'))
+            other[path(listing, 'deleted', 'publishedSpecSwUseWhatNameQUuid')] = 'Deleted tool'
             replies.update({k: v for k, v in other.items() if k != LISTING})
             replies[LISTING].append('dataset-b')
             deleted = access_replies(software='Yes', name='Deleted dataset', count=2, item='deleted')
@@ -152,7 +166,13 @@ def check(root, language):
             soup = render(access, replies, profile)
             assert len(soup.select('.dataset-section')) == 2 and 'Deleted dataset' not in soup.get_text()
             assert not soup.select('[data-item-id="dataset-a"] .required-software')
-            assert len(soup.select('[data-item-id="dataset-b"] .required-software > li')) == 2
+            tools = soup.select('[data-item-id="dataset-b"] .required-software > li')
+            assert [tool['data-item-id'] for tool in tools] == (other[listing] if profile == 'review' else ['tool-0', 'tool-1'])
+            assert 'Deleted tool' not in soup.get_text()
+            if profile == 'submission':
+                expected = 'Software tool 3' if language == 'en' else '軟體工具 3'
+                assert tools[1].strong.get_text() == expected
+                assert 'https://example.org/location-only' in tools[1].get_text()
             counts['identity_cases'] += 1
             extra = identifier_replies(count=2)
             for key in list(extra):
