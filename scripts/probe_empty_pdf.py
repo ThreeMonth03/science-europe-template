@@ -9,6 +9,7 @@ import subprocess
 from bs4 import BeautifulSoup
 from probe_pdf_budget_reading import render
 from probe_budget_word import IMAGE, ROOT
+from probe_render_cache import CACHED_RENDERER
 
 FACTS = ('specialist-expertise', 'hardware-software', 'repository-charges', 'resources-costing')
 SELECTOR = 'html body #q-required-resources > .answer' + ''.join(
@@ -61,7 +62,7 @@ def cases(source):
     return result
 
 
-RUNNER = '''import json,sys,re
+RUNNER = CACHED_RENDERER + '''import json,sys,re
 from weasyprint import HTML,__version__
 from cssselect2 import ElementWrapper,compile_selector_list
 p=json.load(sys.stdin);rows=[]
@@ -70,7 +71,7 @@ for case,source,eligible in p['cases']:
     print(case,file=sys.stderr,flush=True)
     snapshots=[]
     for css in [p['before'],p['after']]:
-        doc=HTML(string='<style>'+css+'</style><div style="height:205mm">Before.</div>'+source).render()
+        doc=render_cached('<style></style><div style="height:205mm">Before.</div>'+source,css)
         paragraphs=[b for page in doc.pages for b in page._page_box.descendants() if type(b).__name__=='BlockBox' and b.element.tag=='p']
         panels=[b for page in doc.pages for b in page._page_box.descendants() if type(b).__name__=='BlockBox' and b.element.get('class')=='answer']
         texts=[''.join(b.text for b in page._page_box.descendants() if type(b).__name__=='TextBox') for page in doc.pages]

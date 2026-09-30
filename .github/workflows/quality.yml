@@ -14,9 +14,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  contract-and-template:
+  checks:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [unit, native]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -28,52 +32,84 @@ jobs:
           cache-dependency-path: requirements-dev.txt
       - name: Install declared English dependencies
         run: python -m pip install -r requirements-dev.txt
+      - name: Prepare public Knowledge Model fixtures independently
+        run: make knowledge-models
       - name: Check source seal and template validity before long tests
         run: |
           PYTHONPATH=scripts python -c 'from current_repairs_contract import verified_current; verified_current()'
           make verify
       - name: Check English unit contracts
+        if: matrix.group == 'unit'
         run: make test
       - name: Check integrated Q3 prose on actual production sources
+        if: matrix.group == 'native'
         run: python scripts/probe_q3_policy_prose.py --output outputs/q3-policy-prose-scope.json
       - name: Verify current sources and replay frozen Word empty-section scope
+        if: matrix.group == 'native'
         run: python scripts/probe_word_empty_sections.py --output outputs/word-empty-section-engine.json
       - name: Check integrated empty-section print spacing and unchanged screen scope
+        if: matrix.group == 'native'
         run: python scripts/probe_empty_section_spacing.py --output outputs/empty-section-spacing-engine.json
       - name: Check bounded many-budget PDF rows without changing cell text
+        if: matrix.group == 'native'
         run: python scripts/probe_short_resource_rows.py --engine --output outputs/short-resource-rows-engine.json
       - name: Check bounded Q15 PDF entry and unchanged fallbacks
+        if: matrix.group == 'native'
         run: python scripts/probe_short_resources.py --engine --output outputs/short-resources-engine.json
       - name: Check Q11 bounded preservation labels with pinned Pandoc
+        if: matrix.group == 'native'
         run: python scripts/probe_preservation_reading.py --output outputs/preservation-reading-engine.json
       - name: Check bounded Word pagination with pinned worker Pandoc
+        if: matrix.group == 'native'
         run: python scripts/probe_budget_word.py --output outputs/budget-word-probe.json
       - name: Check long-budget Word structure with pinned worker Pandoc
+        if: matrix.group == 'native'
         run: python scripts/probe_long_budget_word.py --output outputs/long-budget-word-probe.json
       - name: Check short-budget Word widths and unchanged fallbacks
+        if: matrix.group == 'native'
         run: python scripts/probe_word_short_budget.py --output outputs/word-short-budget-probe.json
       - name: Check Q8 and Q9 labels in actual DOCX as well as AST
+        if: matrix.group == 'native'
         run: |
           python scripts/probe_q8_word.py --output outputs/q8-word-probe.json
           python scripts/probe_q9_word.py --output outputs/q9-word-probe.json
       - name: Check budget CSS with the pinned worker rendering engine
+        if: matrix.group == 'native'
         run: python scripts/probe_budget_pdf.py --output outputs/budget-pdf-probe.json
       - name: Check exact empty-Q15 panel and unchanged fallback cases
+        if: matrix.group == 'native'
         run: python scripts/probe_empty_pdf.py --output outputs/empty-pdf-probe.json
       - name: Check PDF budget reading structure and repeating headers
+        if: matrix.group == 'native'
         run: python scripts/probe_pdf_budget_reading.py --engine --output outputs/pdf-budget-reading-probe.json
       - name: Check Q11 fixed gap pairs in print, screen and near-page-end controls
+        if: matrix.group == 'native'
         run: python scripts/probe_archive_gap_panels.py --output outputs/archive-gap-panels-engine.json
       - name: Check bounded Q5 context in PDF, screen, AST and editable Word
+        if: matrix.group == 'native'
         run: python scripts/probe_storage_context.py --output outputs/storage-context-engine.json
       - name: Check exact Q5 Word join against the preserved 0.3.34 behavior
+        if: matrix.group == 'native'
         run: python scripts/probe_q5_word_join.py --output outputs/q5-word-join-engine.json
       - name: Check Q3 concise missing prose in PDF, screen and editable Word
+        if: matrix.group == 'native'
         run: python scripts/probe_metadata_gap_prose.py --output outputs/metadata-gap-prose-engine.json
       - name: Preserve regression reports even after failure
-        if: always()
+        if: always() && matrix.group == 'native'
         uses: actions/upload-artifact@v4
         with:
           name: english-regression-reports
           path: outputs/*.json
           retention-days: 14
+
+  # Preserve the required-check identity; a skipped/cancelled lane is not green.
+  contract-and-template:
+    if: always()
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every check group to succeed
+        env:
+          CHECK_RESULT: ${{ needs.checks.result }}
+        run: test "$CHECK_RESULT" = success

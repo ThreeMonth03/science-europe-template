@@ -107,12 +107,27 @@ unregistered source layer rather than independent output defects. Old prose or
 count expectations must still be reconciled with the approved repair; never
 replace an exact assertion with a blanket pass.
 
-CI retains the existing workflow/job identities and all native checks. New
-commits cancel superseded runs for that branch/PR; manually dispatched runs
+CI retains the existing workflow and required-check identities and all checks.
+English unit tests and native probes run in two parallel groups. The Chinese
+workflow uses five fixed groups: locked-English units, Chinese units, package
+integration/current answers, translated reading, and native PDF/Word probes.
+Each starts from the same exact locks and prepares its own public KM fixtures;
+the three package-consuming groups independently build identical packages.
+This avoids transferring prepared trees or depending on another group's outputs.
+The existing `contract-and-template` / `build` checks now aggregate the groups:
+failure, cancellation or skipping is not success. Matrix fail-fast is disabled
+so one failed group does not discard the other groups' evidence.
+
+New commits cancel superseded runs for that branch/PR; manually dispatched runs
 remain independent. Reports are uploaded even after a failed check and retained
-for 14 days. The paired Chinese workflow times its major stages separately and
-runs its unchanged native probes in two language lanes; either lane failing
-fails the job. Historical native checks are not yet optional: a portable current
+for 14 days. Only the Chinese integration group uploads the candidate ZIPs;
+reading and native reports have separate artifact names. The native group still
+runs all 31 probes in two language lanes; either lane failing fails the group.
+The slow repeated-font probes reuse compiled CSS/font configurations per exact
+CSS/media pair, not rendered documents or answers; before/after geometry and
+text must remain identical. Measure improvement on the exact GitHub runs, not
+by comparing local and hosted runtimes. Historical native checks are not yet
+optional: a portable current
 full-package smoke test must cover their role before changing their frequency.
 
 Use short-lived repair branches in both repositories. Pin their paired release
