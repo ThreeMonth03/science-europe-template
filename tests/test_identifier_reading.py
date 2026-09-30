@@ -3,11 +3,12 @@ from bs4 import BeautifulSoup
 from test_science_europe_contract import ROOT, render_question
 from test_answer_retention import IDS, path
 from current_support import environment, identifier_replies
+from check_access_reading import reuse_schema
 
 Q13 = 'src/questions/13-persistent-identifier.html.j2'
 
 
-def render(replies): return BeautifulSoup(render_question(Q13, replies), 'html.parser')
+def render(replies): return BeautifulSoup(render_question(Q13, replies, km=reuse_schema()), 'html.parser')
 
 
 class IdentifierReadingTests(unittest.TestCase):

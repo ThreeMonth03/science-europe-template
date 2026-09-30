@@ -26,6 +26,42 @@ SOFTWARE_FACTS = {
                                  'No': '此軟體的說明文件不會納入後設資料。'},
                 'included': {'Yes': '將一併提供此軟體。', 'No': '不會一併提供此軟體。'}},
 }
+REUSE = {
+    'en': {'Us': 'Only we will be interested in re-using this data.',
+           'SameField': 'Other researchers in this field will be interested in re-using this data.',
+           'OtherField': 'Researchers working in other fields will be interested in re-using this data.'},
+    'zh-Hant': {'Us': '只有我們有意再次使用這份資料。',
+                'SameField': '本領域的其他研究人員會有興趣再次使用這份資料。',
+                'OtherField': '其他領域的研究人員會有興趣再次使用這份資料。'},
+}
+
+
+def reuse_schema():
+    from check_answer_mapping import schema, chapter, question
+    km = schema()
+    children = chapter(km, IDS['creatingCUuid'])
+    question(km, children, IDS['measuredQUuid'], 'OptionsQuestion', [IDS['measuredYesAUuid'], IDS['measuredNoAUuid']])
+    children = km['entities']['answers'][IDS['measuredYesAUuid']]['followUpUuids']
+    children = question(km, children, IDS['measuredDataQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+    question(km, children, IDS['measuredDataNameQUuid'], 'ValueQuestion')
+    question(km, children, IDS['measuredDataReuseQUuid'], 'OptionsQuestion',
+             [IDS['measuredDataReuse' + option + 'AUuid'] for option in REUSE['en']])
+    question(km, km['entities']['answers'][IDS['measuredDataReuseOtherFieldAUuid']]['followUpUuids'],
+             IDS['measuredDataReuseOtherFieldHowQUuid'], 'ValueQuestion')
+    return km
+
+
+def reuse_replies(option='OtherField', name='Dataset <A> & "B"', detail='<p>Original use.</p>'):
+    parent = path('creatingCUuid', 'measuredQUuid')
+    listing = path(parent, 'measuredYesAUuid', 'measuredDataQUuid')
+    base = path(listing, 'measured-a')
+    selection = path(base, 'measuredDataReuseQUuid')
+    replies = {parent: IDS['measuredYesAUuid'], listing: ['measured-a']}
+    for key, value in [(path(base, 'measuredDataNameQUuid'), name),
+                       (selection, choice('measuredDataReuse', option)),
+                       (path(selection, 'measuredDataReuseOtherFieldAUuid', 'measuredDataReuseOtherFieldHowQUuid'), detail)]:
+        if value is not None: replies[key] = value
+    return replies, listing
 
 
 def software_schema():
@@ -64,7 +100,8 @@ def access_replies(publication='Yes', software='No', name='Dataset A', count=0, 
 
 def check(root, language):
     counts = dict(access_cases=0, software_cases=0, software_followups=0, inactive_software=0,
-                  identifier_cases=0, identity_cases=0, full_documents=0)
+                  identifier_cases=0, reuse_cases=0, inactive_reuse=0, reuse_identity=0,
+                  identity_cases=0, full_documents=0)
     for escape in (False, True):
         env = environment(root, escape)
         access = env.from_string(PREFIX + "{% include '" + Q12 + "' %}")
@@ -232,6 +269,79 @@ def check(root, language):
             else:
                 assert not soup.select('.identifier-followups, [data-fact-id="identifier-assigner"], [data-fact-id="identifier-resolution"]')
             counts['identifier_cases'] += 1
+
+        authored = '<p>Combine v1.2.csv with <a href="https://example.org/observations">other observations</a>.</p><ul><li>Keep this list.</li></ul><p>Keep this paragraph.</p>'
+        for option, name, detail, profile in itertools.product(
+                [*REUSE[language], '', 'unknown'], ['Dataset <A> & "B"', 'Same name', None, ' \n '],
+                [None, ' \n ', authored], ['review', 'submission']):
+            replies, listing = reuse_replies(option, name, detail)
+            soup = render(identifier, replies, profile, reuse_schema())
+            entries = soup.select('.measured-data-reuse > ul > li')
+            visible = profile == 'review' or bool((name or '').strip()) or option in REUSE[language]
+            assert len(entries) == int(visible)
+            assert bool(soup.select('.measured-data-reuse h4')) == visible
+            if visible:
+                summary = entries[0].select_one('.reuse-summary')
+                assert not summary.select('p, div, ul, br')
+                label = summary.strong
+                if name and name.strip():
+                    assert label.get_text() == name and not label.find(True), 'Dataset names are text, not HTML'
+                elif profile == 'submission': assert label.select_one('.dataset-label[data-list-index="1"]')
+                else: assert label.get_text() == ('(no name given)' if language == 'en' else '（名稱尚未提供）')
+                fact = summary.select_one('[data-fact-id="measured-data-reuse"]')
+                assert bool(fact) == (option in REUSE[language])
+                if fact: assert fact.get_text() == REUSE[language][option] and fact['data-status'] == 'complete'
+                assert (' — ' in summary.get_text()) == bool(fact)
+            body = soup.select_one('[data-fact-id="measured-data-reuse-uses"]')
+            assert bool(body) == (option == 'OtherField' and bool((detail or '').strip()))
+            if body:
+                assert body.decode_contents() == authored, 'Never prepend a fabricated because-clause to authored uses'
+                assert body.find_previous_sibling().get_text() == ('Potential uses in other fields:' if language == 'en' else '其他領域的可能用途：')
+            else: assert 'v1.2.csv' not in soup.get_text()
+            assert not soup.select('ul:empty, li:empty')
+            counts['reuse_cases'] += 1
+
+        for change, profile in itertools.product(
+                ['chapter-filtered', 'list-filtered', 'name-filtered', 'choice-filtered', 'choice-removed',
+                 'option-filtered', 'answer-removed', 'how-filtered', 'parent-no', 'parent-missing', 'item-deleted'],
+                ['review', 'submission']):
+            schema = reuse_schema()
+            replies, listing = reuse_replies(detail=authored)
+            e = schema['entities']
+            children = e['questions'][IDS['measuredDataQUuid']]['itemTemplateQuestionUuids']
+            if change == 'chapter-filtered': schema['chapterUuids'].clear()
+            if change == 'list-filtered': e['answers'][IDS['measuredYesAUuid']]['followUpUuids'].clear()
+            if change == 'name-filtered': children.remove(IDS['measuredDataNameQUuid'])
+            if change == 'choice-filtered': children.remove(IDS['measuredDataReuseQUuid'])
+            if change == 'choice-removed': e['questions'].pop(IDS['measuredDataReuseQUuid'])
+            if change == 'option-filtered': e['questions'][IDS['measuredDataReuseQUuid']]['answerUuids'].remove(IDS['measuredDataReuseOtherFieldAUuid'])
+            if change == 'answer-removed': e['answers'].pop(IDS['measuredDataReuseOtherFieldAUuid'])
+            if change == 'how-filtered': e['answers'][IDS['measuredDataReuseOtherFieldAUuid']]['followUpUuids'].clear()
+            if change == 'parent-no': replies[path('creatingCUuid', 'measuredQUuid')] = IDS['measuredNoAUuid']
+            if change == 'parent-missing': replies.pop(path('creatingCUuid', 'measuredQUuid'))
+            if change == 'item-deleted': replies[listing] = []
+            soup = render(identifier, replies, profile, schema)
+            assert bool(soup.select('.measured-data-reuse')) == (change in ['name-filtered', 'choice-filtered', 'choice-removed', 'option-filtered', 'answer-removed', 'how-filtered'])
+            assert bool(soup.select('[data-fact-id="measured-data-reuse"]')) == (change in ['name-filtered', 'how-filtered'])
+            assert bool(soup.select('[data-fact-id="measured-data-reuse-uses"]')) == (change == 'name-filtered')
+            counts['inactive_reuse'] += 1
+
+        for profile in ['review', 'submission']:
+            replies, listing = reuse_replies(name=' \n ', detail=authored)
+            replies[listing] = ['empty-before', 'name-only', 'measured-a', 'same-name', 'empty-after']
+            for item in ['name-only', 'same-name', 'deleted']:
+                replies[path(listing, item, 'measuredDataNameQUuid')] = 'Same name'
+            replies[path(listing, 'same-name', 'measuredDataReuseQUuid')] = IDS['measuredDataReuseSameFieldAUuid']
+            soup = render(full, replies, profile, reuse_schema())
+            assert len(soup.select('.question')) == 15 and len(soup.select('.dmp-section')) == 6
+            rows = soup.select('.measured-data-reuse > ul > li')
+            expected = replies[listing] if profile == 'review' else ['name-only', 'measured-a', 'same-name']
+            assert [r['data-item-id'] for r in rows] == expected
+            if profile == 'submission': assert rows[1].select_one('.dataset-label[data-list-index="3"]')
+            assert soup.select_one('.measured-data-reuse .answer-detail').decode_contents() == authored
+            replies[listing] = []
+            assert not render(identifier, replies, profile, reuse_schema()).select('.measured-data-reuse, ul:empty')
+            counts['reuse_identity'] += 1
 
         for profile in ['review', 'submission']:
             # Same dataset names are not an identity key; stale deleted entries

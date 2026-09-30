@@ -144,53 +144,47 @@
       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.</p>{% endif %}
     {%- endif -%}
 
-    {# Explain how the data might be re-used in other contexts. #}
-
-    {%- set dataMeasuredQUuid = [uuids.creatingCUuid, uuids.measuredQUuid]|reply_path  -%}
-    {%- set dataMeasuredAUuid = repliesMap[dataMeasuredQUuid]|reply_str_value -%}
-
-    {%- if dataMeasuredAUuid == uuids.measuredYesAUuid  -%}
-
-        {%- set dataMeasuredPath = [dataMeasuredQUuid, uuids.measuredYesAUuid, uuids.measuredDataQUuid]|reply_path -%}
-        {%- set dataMeasuredItems = repliesMap[dataMeasuredPath]|reply_items -%}
-        {% if dataMeasuredItems %}<h4>Possible re-use of created data in other contexts</h4>{% endif %}
-        <ul>
+    {# Keep the optional re-use summary compact, with authored uses in their own
+       blocks. The follow-up asks HOW others could use the data, not WHY. #}
+    {% import 'src/active-answer.j2' as activeAnswer with context %}
+    {%- set reuseParts = [uuids.creatingCUuid, uuids.measuredQUuid, uuids.measuredYesAUuid, uuids.measuredDataQUuid] -%}
+    {%- set dataMeasuredPath = activeAnswer.path(reuseParts, 'ListQuestion') -%}
+    {%- set dataMeasuredItems = repliesMap[dataMeasuredPath]|reply_items if dataMeasuredPath else [] -%}
+    {% set reuseItems %}
         {%- for k in dataMeasuredItems -%}
-            {%- set measuredDataItem = [dataMeasuredPath, k]|reply_path -%}
-            {%- set measuredDataNameQUuid = [measuredDataItem, uuids.measuredDataNameQUuid]|reply_path -%}
+            {%- set measuredDataNameQUuid = activeAnswer.path(reuseParts + [k, uuids.measuredDataNameQUuid], 'ValueQuestion') -%}
             {%- set measuredDataNameReply = repliesMap[measuredDataNameQUuid]|reply_str_value -%}
-            <li>
-            <strong class="item-label">{% if output_profile|default('review') == 'submission' and not measuredDataNameReply %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply if measuredDataNameReply else "(no name given)" }}{% endif %}</strong>
-            {%- set measuredDataReuseQUuid = [measuredDataItem, uuids.measuredDataReuseQUuid]|reply_path -%}
+            {%- set measuredDataReuseQUuid = activeAnswer.path(reuseParts + [k, uuids.measuredDataReuseQUuid], 'OptionsQuestion') -%}
             {%- set measuredDataReuseAUuid = repliesMap[measuredDataReuseQUuid]|reply_str_value -%}
-
-            {%- if measuredDataReuseAUuid == uuids.measuredDataReuseUsAUuid -%}
-                <p>Only we will be interested in re-using this data.</p>
-
-            {%- elif measuredDataReuseAUuid == uuids.measuredDataReuseSameFieldAUuid  -%}
-                <p>Other researchers in this field will be interested in re-using this data.</p>
-            {%- elif measuredDataReuseAUuid == uuids.measuredDataReuseOtherFieldAUuid -%}
-                {%- set measuredDataReuseOtherFieldHowQUuid = [measuredDataReuseQUuid, uuids.measuredDataReuseOtherFieldAUuid, uuids.measuredDataReuseOtherFieldHowQUuid]|reply_path -%}
-                {%- set measuredDataReuseOtherFieldHowReply = repliesMap[measuredDataReuseOtherFieldHowQUuid]|reply_str_value -%}
-
-                <div class="answer-detail">Researchers working in other fields will be interested in re-using this data
-                
-                {%- if measuredDataReuseOtherFieldHowReply -%}
-                
-                 {{" "}}because: {{measuredDataReuseOtherFieldHowReply|markdown}}
-                {%- else -%}
-                .
+            {%- set reuseSummary -%}
+              {%- if measuredDataReuseQUuid and measuredDataReuseAUuid in km.entities.questions[uuids.measuredDataReuseQUuid].answerUuids and measuredDataReuseAUuid in km.entities.answers -%}
+                {%- if measuredDataReuseAUuid == uuids.measuredDataReuseUsAUuid -%}
+                  Only we will be interested in re-using this data.
+                {%- elif measuredDataReuseAUuid == uuids.measuredDataReuseSameFieldAUuid -%}
+                  Other researchers in this field will be interested in re-using this data.
+                {%- elif measuredDataReuseAUuid == uuids.measuredDataReuseOtherFieldAUuid -%}
+                  Researchers working in other fields will be interested in re-using this data.
                 {%- endif -%}
-                </div>
-
-            {%- endif -%}
-            </li>
+              {%- endif -%}
+            {%- endset -%}
+            {%- set reuseHowPath = activeAnswer.path(reuseParts + [k, uuids.measuredDataReuseQUuid, uuids.measuredDataReuseOtherFieldAUuid, uuids.measuredDataReuseOtherFieldHowQUuid], 'ValueQuestion') -%}
+            {%- set reuseHow = repliesMap[reuseHowPath]|reply_str_value -%}
+            {% if output_profile|default('review') != 'submission' or measuredDataNameReply|trim or reuseSummary or reuseHow|trim %}
+              <li data-item-id="{{ k }}">
+                <p class="reuse-summary"><strong>{% if output_profile|default('review') == 'submission' and not measuredDataNameReply|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply|e if measuredDataNameReply|trim else "(no name given)" }}{% endif %}</strong>{% if reuseSummary %} — <span data-fact-id="measured-data-reuse" data-status="complete">{{ reuseSummary }}</span>{% endif %}</p>
+                {% if reuseHow|trim %}
+                  <div class="answer-lead"><p>Potential uses in other fields:</p></div>
+                  <div class="answer-detail" data-fact-id="measured-data-reuse-uses" data-status="complete">{{ reuseHow|markdown }}</div>
+                {% endif %}
+              </li>
+            {% endif %}
         {%- endfor -%}
-        </ul>
-
-    {%- endif -%}
-
-
-
+    {% endset %}
+    {% if reuseItems|trim %}
+      <div class="measured-data-reuse">
+        <h4>Possible re-use of created data in other contexts</h4>
+        <ul>{{ reuseItems }}</ul>
+      </div>
+    {% endif %}
     </div>
 </div>
