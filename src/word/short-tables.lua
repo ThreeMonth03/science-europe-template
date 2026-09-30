@@ -1,4 +1,4 @@
--- Word-only Q9 short authored tables; run after the existing shared filters.
+-- Word-only Q9 short authored tables and bounded version-history rows.
 -- The matching enrich-docx step consumes these exact generated XML comments.
 local begin_marker = "<!--DSW:SE:short-table:v1:begin-->"
 local end_marker = "<!--DSW:SE:short-table:v1:end-->"
@@ -98,4 +98,33 @@ local function question(div)
   return nil, false
 end
 
-return {{traverse="topdown", Div=question}}
+-- A version table may span many pages; keep only individually bounded rows.
+-- The question/abstract traversal guards above exclude authored answer tables.
+local function history_rows(tbl)
+  if (FORMAT ~= "docx" and FORMAT ~= "json") or tbl.identifier ~= "" or
+     #tbl.classes ~= 1 or not tbl.classes:includes("version-history") or #tbl.attributes ~= 0 or
+     #tbl.colspecs ~= 3 or #tbl.head.rows ~= 1 or #tbl.foot.rows ~= 0 or
+     #tbl.bodies ~= 1 or #tbl.bodies[1].head ~= 0 or tbl.bodies[1].row_head_columns ~= 0 or
+     #tbl.caption.long ~= 0 or tbl.caption.short ~= nil then return nil end
+  for _, row in ipairs(tbl.bodies[1].body) do
+    -- Empty name cells have a different Pandoc placeholder encoding; leave
+    -- those records unchanged rather than introducing a new paragraph style.
+    local eligible = empty_attr(row) and #row.cells == 3 and width(row.cells[1].contents) > 0
+    for column, cell in ipairs(row.cells) do
+      if not empty_attr(cell) or cell.row_span ~= 1 or cell.col_span ~= 1 or
+         #cell.contents > 1 or width(cell.contents) > (({80,32,160})[column] or 0) then eligible = false end
+      for _, block in ipairs(cell.contents) do
+        if (block.t ~= "Plain" and block.t ~= "Para") or not simple(block.content) then eligible = false end
+        for token in pandoc.utils.stringify(block):gmatch("%S+") do
+          if token:match("^[%z\1-\127]+$") and #token > 40 then eligible = false end
+        end
+      end
+    end
+    if eligible then
+      row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:history-row:v1-->"))
+    end
+  end
+  return tbl
+end
+
+return {{traverse="topdown", Div=question, Table=history_rows}}

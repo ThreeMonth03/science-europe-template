@@ -4,7 +4,7 @@
   "candidate_version": "0.3.51",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "0ecc2009e0efa7566df2b6ed08ef589563891ea06422ceee78ff4154de1a4162",
+  "candidate_tree_sha256": "2731208f0f969e564279ab48685fd64ba95ff441b92fd1df202ce84509b88fb8",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
@@ -32,7 +32,9 @@
     "src/uuids.j2",
     "src/word/pilot.lua",
     "src/word/question-spacing.xml",
-    "src/word/short-tables.xml"
+    "src/word/short-tables.lua",
+    "src/word/short-tables.xml",
+    "src/word/versions.html.j2"
   ],
   "added": [
     "src/active-answer.j2",

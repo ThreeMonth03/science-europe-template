@@ -35,9 +35,9 @@ class BudgetProbeTests(unittest.TestCase):
         from jinja2 import Environment,FileSystemLoader,StrictUndefined,UndefinedError
         root=Path(__file__).resolve().parents[1]
         template=Environment(loader=FileSystemLoader(root),undefined=StrictUndefined).get_template('src/word/short-tables.xml')
-        marker='<!--DSW:SE:budget-row:v1-->'
-        for malformed in [marker,'<w:tr>'+marker+'</w:tr>','<w:tr><w:tc><w:tcPr />'+marker*2+'</w:tc></w:tr>']:
-            with self.assertRaises(UndefinedError): template.render(content=malformed)
+        for marker in ['<!--DSW:SE:budget-row:v1-->', '<!--DSW:SE:history-row:v1-->']:
+            for malformed in [marker,'<w:tr>'+marker+'</w:tr>','<w:tr><w:tc><w:tcPr />'+marker*2+'</w:tc></w:tr>']:
+                with self.assertRaises(UndefinedError): template.render(content=malformed)
 
     def test_heading_probe_covers_missing_long_and_unowned_tables(self):
         rows=heading_cases()

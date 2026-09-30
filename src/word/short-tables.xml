@@ -7,6 +7,9 @@
 {# Only Lua-validated short Q15 rows receive this marker. Preserve every cell,
    paragraph and run; long/complex rows and other tables remain unchanged. #}
 {%- set budget_marker = '<!--DSW:SE:budget-row:v1-->' -%}
+{# History rows use the same three-cell XML contract. The dedicated Lua marker
+   is normalized only here; authored text is XML-escaped and cannot match it. #}
+{%- set content = content.replace('<!--DSW:SE:history-row:v1-->', budget_marker) -%}
 {%- if budget_marker in content -%}
   {%- set budget_rows = content.split('<w:tr>') -%}
   {{- require(budget_marker not in budget_rows[0]) -}}

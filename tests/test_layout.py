@@ -9,7 +9,7 @@ from pathlib import Path
 from docx import Document
 from docx.oxml.ns import qn
 from docx.enum.text import WD_LINE_SPACING
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, StrictUndefined
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("prepare_layout", ROOT / "scripts/prepare_layout.py")
@@ -18,6 +18,79 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_word_history_keeps_only_bounded_rows_and_preserves_every_other_xml_byte(self):
+        probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
+        worker = importlib.util.module_from_spec(probe_spec)
+        probe_spec.loader.exec_module(worker)
+        env = Environment(loader=FileSystemLoader(ROOT), autoescape=True)
+        env.filters['datetime_format'] = lambda value, fmt: '30 Sep 2026'
+        template = env.get_template('src/word/versions.html.j2')
+        def render(title='Review A', note='Short note.', count=1):
+            return template.render(dc=dict(project=dict(versions=[dict(name=title, description=note, created_at='')] * count)))
+        base = render()
+        cases = [('short', base, 1), ('many', render(count=24), 24), ('64', render(count=64), 64),
+            ('no-versions', render(count=0), 0), ('missing-note', render(note=''), 1),
+            ('missing-name', render(title=''), 0), ('chinese', render(note='核對資料與後設資料。'), 1),
+            ('escaped', render(title='Review <A> & "B"', note='Keep <sensor> &lt;tag&gt;.'), 1),
+            ('literal-marker', render(note='<!--DSW:SE:history-row:v1-->'), 1),
+            ('ascii-boundary', render(note='a ' * 79 + 'ab'), 1),
+            ('ascii-over', render(note='a ' * 79 + 'abc'), 0),
+            ('cjk-boundary', render(note='中' * 80), 1), ('cjk-over', render(note='中' * 81), 0),
+            ('token-boundary', render(title='A' * 40), 1), ('token-over', render(title='A' * 41), 0),
+            ('long-note', render(note='Long note. ' * 100), 0),
+            ('long-name', render(title='Review A ' * 20), 0),
+            ('unmarked', base.replace(' class="version-history"', ''), 0),
+            ('other-class', base.replace('version-history', 'authored-table'), 0),
+            ('extra-class', base.replace('version-history', 'version-history authored'), 0),
+            ('styled-table', base.replace('<table ', '<table custom-style="Other" '), 0),
+            ('extra-column', base.replace('<td>Short note.</td>', '<td>Extra</td><td>Short note.</td>'), 0),
+            ('spanning-cell', base.replace('<td>Short note.', '<td colspan="2">Short note.'), 0)]
+        for name, detail in [('paragraphs', '<p>First.</p><p>Second.</p>'), ('break', 'First.<br>Second.'),
+                ('list', '<ul><li>Keep.</li></ul>'), ('code', '<code>Keep.</code>'),
+                ('style', '<span style="font-size:40pt">Keep.</span>'),
+                ('nested-table', '<table><tr><td>Keep.</td></tr></table>')]:
+            cases.append((name, base.replace('Short note.', detail), 0))
+        for name, start, end in [('abstract', '<div class="abstract">', '</div>'),
+                ('answer', '<div class="answer">', '</div>'),
+                ('q9', '<div id="q-ethical-issues" class="question"><div class="answer"><div class="answer-detail">', '</div></div></div>'),
+                ('q15', '<div id="q-required-resources" class="question">', '</div>')]:
+            cases.append((name, start + base + end, 0))
+        mixed = render(count=3).replace('Short note.', 'Long note. ' * 100, 1)
+        cases.append(('mixed', mixed, 2))
+        lua = (ROOT / 'src/word/short-tables.lua').read_text()
+        self.assertEqual(lua.count(', Table=history_rows'), 1)
+        runner = '''import json,sys,tempfile,subprocess,zipfile
+from pathlib import Path
+p=json.load(sys.stdin);results=[]
+with tempfile.TemporaryDirectory() as tmp:
+    f=Path(tmp)/'filter.lua';out=Path(tmp)/'test.docx'
+    for name,html,count in p['cases']:
+        pair=[]
+        for lua in p['lua']:
+            f.write_text(lua)
+            subprocess.run(['pandoc','--from=html','--to=docx','--lua-filter='+str(f),'-o',str(out)],input=html.encode(),check=True)
+            with zipfile.ZipFile(out) as z:pair.append(z.read('word/document.xml').decode())
+        results.append([name,count,pair])
+    outputs=[]
+    for lua in p['lua']:
+        f.write_text(lua)
+        outputs.append(subprocess.check_output(['pandoc','--from=html','--to=html','--lua-filter='+str(f)],input=''.join(c[1] for c in p['cases']).encode()))
+    assert outputs[0]==outputs[1],'Non-Word output changed'
+print(json.dumps(results))
+'''
+        raw = subprocess.check_output(['docker', 'run', '--rm', '--network', 'none', '-i',
+            '--entrypoint', 'python', worker.IMAGE, '-c', runner],
+            input=json.dumps(dict(cases=cases, lua=[lua.replace(', Table=history_rows', ''), lua])).encode(), timeout=180)
+        templates = [Environment(loader=FileSystemLoader(ROOT), undefined=StrictUndefined, autoescape=escape)
+                     .get_template('src/word/short-tables.xml') for escape in [False, True]]
+        for name, count, (before, marked) in json.loads(raw):
+            with self.subTest(case=name):
+                self.assertEqual(marked.count('<!--DSW:SE:history-row:v1-->'), count)
+                after = templates[0].render(content=marked)
+                self.assertEqual(templates[1].render(content=marked), after)
+                self.assertNotIn('<!--DSW:SE:history-row:v1-->', after)
+                worker.verify_row_xml(before, after, count)
+
     def test_history_and_provenance_wrap_without_changing_ordinary_layout(self):
         probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
         worker = importlib.util.module_from_spec(probe_spec)
