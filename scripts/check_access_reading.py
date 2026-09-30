@@ -292,7 +292,8 @@ def check(root, language):
                 else: assert label.get_text() == ('(no name given)' if language == 'en' else '（名稱尚未提供）')
                 fact = summary.select_one('[data-fact-id="measured-data-reuse"]')
                 assert bool(fact) == (option in REUSE[language])
-                if fact: assert fact.get_text() == REUSE[language][option] and fact['data-status'] == 'complete'
+                # Translation wrappers can retain trailing indentation around fixed prose.
+                if fact: assert fact.get_text().strip() == REUSE[language][option] and fact['data-status'] == 'complete'
                 assert (' — ' in summary.get_text()) == bool(fact)
             body = soup.select_one('[data-fact-id="measured-data-reuse-uses"]')
             assert bool(body) == (option == 'OtherField' and bool((detail or '').strip()))
