@@ -50,8 +50,12 @@ class LayoutTests(unittest.TestCase):
                 for style_name in ("Normal", "Body Text", "First Paragraph", "Compact"):
                     item = document.styles[style_name]
                     self.assertEqual(10.5, item.font.size.pt)
-                    self.assertEqual(1.2, item.paragraph_format.line_spacing)
-                    self.assertEqual(WD_LINE_SPACING.MULTIPLE, item.paragraph_format.line_spacing_rule)
+                    if style_name == "Normal":
+                        self.assertEqual(1.2, item.paragraph_format.line_spacing)
+                        self.assertEqual(WD_LINE_SPACING.MULTIPLE, item.paragraph_format.line_spacing_rule)
+                    else:
+                        self.assertEqual(15.75, item.paragraph_format.line_spacing.pt)
+                        self.assertEqual(WD_LINE_SPACING.AT_LEAST, item.paragraph_format.line_spacing_rule)
                     self.assertEqual(2 if style_name == "Compact" else 4, item.paragraph_format.space_after.pt)
                     self.assertTrue(item.paragraph_format.widow_control)
                 for level in range(1, 6):
@@ -80,6 +84,8 @@ class LayoutTests(unittest.TestCase):
             font = root / 'font.ttf'; font.write_bytes(b'fixture font asset')
             module.prepare_layout(root, font, 'en')
             d = Document(root / 'src/word/reference.docx')
-            self.assertEqual(1.2, d.styles['Normal'].paragraph_format.line_spacing)
-            self.assertEqual(10.5, d.styles['Normal'].font.size.pt)
+            for name in ('Normal', 'Body Text', 'First Paragraph', 'Compact'):
+                self.assertEqual(1.2, d.styles[name].paragraph_format.line_spacing)
+                self.assertEqual(WD_LINE_SPACING.MULTIPLE, d.styles[name].paragraph_format.line_spacing_rule)
+                self.assertEqual(10.5, d.styles[name].font.size.pt)
             self.assertEqual('en-GB', d.styles['Normal'].element.rPr.find(qn('w:lang')).get(qn('w:val')))

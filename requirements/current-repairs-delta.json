@@ -48,7 +48,7 @@
   "support": {
     "scripts/prepare_layout.py": {
       "before_sha256": "a47b9631e638d8f693adb99186c280754be9f7bde7105f4d40467099dc96de5a",
-      "after_sha256": "daaed13a17f86169a09d0b876873dc9a6d535a07da5c877ded3d46e1c30b6989"
+      "after_sha256": "e938850defdf0f585f78e9c880689017c393de243d3de6348f31dd8c2f73422b"
     },
     "PACKAGE_README.md": {
       "before_sha256": "47fee033565ab06a3527a46b3f133083bed109a513235730d717bc2a738d65ae",

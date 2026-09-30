@@ -9,7 +9,7 @@ from pathlib import Path
 
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE
-from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Mm, Pt, RGBColor
@@ -65,9 +65,13 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         if name in document.styles:
             item = document.styles[name]
             item.font.size = Pt(10.5)
-            # A relative line height keeps mixed-script text expandable. Do not
-            # use an exact height or smaller type merely to reduce page count.
+            # Both rules expand for tall content. Chinese body text needs a
+            # minimum in points: multiplying CJK font metrics adds excess lead.
+            # Normal stays relative so headings, tables and footers are unchanged.
             item.paragraph_format.line_spacing = 1.2
+            if language == "zh-Hant" and name != "Normal":
+                item.paragraph_format.line_spacing = Pt(15.75)
+                item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
             item.paragraph_format.space_before = Pt(0)
             item.paragraph_format.space_after = Pt(2 if name == "Compact" else 4)
             item.paragraph_format.widow_control = True
