@@ -1,5 +1,6 @@
 """Q12 compact records and Q13 same-repository prose, in both language trees."""
 import itertools
+import copy
 
 from bs4 import BeautifulSoup
 from current_support import PREFIX, IDS, WRAPPER, environment, path, identifier_replies
@@ -17,6 +18,30 @@ COMPOUND = {
     'zh-Hant': {'Yes': '儲存庫將指派持續識別碼，並確保該識別碼能解析至數位物件。',
                 'No': '儲存庫將指派持續識別碼，但不保證該識別碼能解析至數位物件。'},
 }
+SOFTWARE_FACTS = {
+    'en': {'documentation': {'Yes': 'Documentation for this software will be included in the metadata.',
+                            'No': 'Documentation for this software will not be included in the metadata.'},
+           'included': {'Yes': 'This software will be included.', 'No': 'This software will not be included.'}},
+    'zh-Hant': {'documentation': {'Yes': '此軟體的說明文件將納入後設資料。',
+                                 'No': '此軟體的說明文件不會納入後設資料。'},
+                'included': {'Yes': '將一併提供此軟體。', 'No': '不會一併提供此軟體。'}},
+}
+
+
+def software_schema():
+    from check_answer_mapping import schema, chapter, question
+    km = schema()
+    children = chapter(km, IDS['preservingCUuid'])
+    children = question(km, children, IDS['producedDataQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+    for prefix in ['isPublishedData', 'publishedSpecSwUse']:
+        question(km, children, IDS[prefix + 'QUuid'], 'OptionsQuestion', [IDS[prefix + 'YesAUuid'], IDS[prefix + 'NoAUuid']])
+        children = km['entities']['answers'][IDS[prefix + 'YesAUuid']]['followUpUuids']
+    children = question(km, children, IDS['publishedSpecSwUseWhatQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+    for prefix in ['publishedSpecSwDocumentation', 'publishedSpecSwIncluded']:
+        question(km, children, IDS[prefix + 'QUuid'], 'OptionsQuestion', [IDS[prefix + 'YesAUuid'], IDS[prefix + 'NoAUuid']])
+    question(km, km['entities']['answers'][IDS['publishedSpecSwDocumentationNoAUuid']]['followUpUuids'],
+             IDS['publishedSpecSwDocumentationReasonQUuid'], 'ValueQuestion')
+    return km
 
 
 def choice(binding, suffix):
@@ -38,15 +63,17 @@ def access_replies(publication='Yes', software='No', name='Dataset A', count=0, 
 
 
 def check(root, language):
-    counts = dict(access_cases=0, software_cases=0, identifier_cases=0, identity_cases=0, full_documents=0)
+    counts = dict(access_cases=0, software_cases=0, software_followups=0, inactive_software=0,
+                  identifier_cases=0, identity_cases=0, full_documents=0)
     for escape in (False, True):
         env = environment(root, escape)
         access = env.from_string(PREFIX + "{% include '" + Q12 + "' %}")
         identifier = env.from_string(PREFIX + "{% include '" + Q13 + "' %}")
         full = env.from_string(WRAPPER)
 
-        def render(template, replies, profile):
-            soup = BeautifulSoup(template.render(repliesMap=replies, output_profile=profile,
+        def render(template, replies, profile, km=None):
+            context = dict(km=km) if km is not None else {}
+            soup = BeautifulSoup(template.render(repliesMap=replies, output_profile=profile, **context,
                 dc={'project': {'created_by': None}, 'e': {'choices': {}}}), 'html.parser')
             assert not soup.select('p p, p div, p ul, p table, script, img')
             if profile == 'submission': assert not soup.select('.data-gap, .data-review')
@@ -113,6 +140,65 @@ def check(root, language):
                 assert soup.select_one('[data-fact-id="required-software-list"][data-status="partial"]')
                 assert not soup.select('ul.required-software, .answer-lead')
             counts['software_cases'] += 1
+
+        km = software_schema()
+        for documentation, included, named, profile in itertools.product(
+                ['Yes', 'No', '', 'unknown'], ['Yes', 'No', '', 'unknown'], [False, True], ['review', 'submission']):
+            replies = access_replies(software='Yes', count=1)
+            listing = next(key for key in replies if key.endswith(IDS['publishedSpecSwUseWhatQUuid']))
+            base = path(listing, 'tool-0')
+            replies[path(base, 'publishedSpecSwUseWhatNameQUuid')] = 'Tool <A> & "B"' if named else ''
+            replies[path(base, 'publishedSpecSwUseWhatPIDQUuid')] = ''
+            docpath = path(base, 'publishedSpecSwDocumentationQUuid')
+            replies[docpath] = choice('publishedSpecSwDocumentation', documentation)
+            replies[path(base, 'publishedSpecSwIncludedQUuid')] = choice('publishedSpecSwIncluded', included)
+            reason = '<p>Keep v1.2 &amp; README.md.</p><p>Second authored paragraph.</p><ul><li>Original item.</li></ul>'
+            replies[path(docpath, 'publishedSpecSwDocumentationNoAUuid', 'publishedSpecSwDocumentationReasonQUuid')] = reason
+            soup = render(access, replies, profile, km)
+            assert bool(soup.select('.required-software > li')) == (profile == 'review' or named or documentation in ['Yes', 'No'] or included in ['Yes', 'No'])
+            for fact, state in [('documentation', documentation), ('included', included)]:
+                node = soup.select_one('[data-fact-id="software-' + fact + '"]')
+                assert bool(node) == (state in ['Yes', 'No'])
+                if node:
+                    assert node.get_text() == SOFTWARE_FACTS[language][fact][state]
+                    assert node['data-status'] == ('complete' if state == 'Yes' else 'explicit-no')
+            detail = soup.select_one('[data-fact-id="software-documentation-reason"]')
+            assert bool(detail) == (documentation == 'No')
+            if detail: assert detail.decode_contents().strip().endswith(reason)
+            else: assert 'README.md' not in soup.get_text()
+            counts['software_followups'] += 1
+
+        # An old reply behind a filtered question, removed answer, deleted item
+        # or inactive parent must not create a new factual statement.
+        for change in ['documentation-filtered', 'reason-filtered', 'included-filtered', 'answer-removed',
+                       'chapter-filtered', 'publication-no', 'software-no', 'item-deleted']:
+            schema = copy.deepcopy(km)
+            replies = access_replies(software='Yes', count=1)
+            listing = next(key for key in replies if key.endswith(IDS['publishedSpecSwUseWhatQUuid']))
+            base = path(listing, 'tool-0')
+            docpath = path(base, 'publishedSpecSwDocumentationQUuid')
+            replies[docpath] = IDS['publishedSpecSwDocumentationNoAUuid']
+            replies[path(base, 'publishedSpecSwIncludedQUuid')] = IDS['publishedSpecSwIncludedYesAUuid']
+            replies[path(docpath, 'publishedSpecSwDocumentationNoAUuid', 'publishedSpecSwDocumentationReasonQUuid')] = '<p>Original reason.</p>'
+            children = schema['entities']['questions'][IDS['publishedSpecSwUseWhatQUuid']]['itemTemplateQuestionUuids']
+            if change == 'documentation-filtered': children.remove(IDS['publishedSpecSwDocumentationQUuid'])
+            if change == 'included-filtered': children.remove(IDS['publishedSpecSwIncludedQUuid'])
+            if change == 'reason-filtered': schema['entities']['answers'][IDS['publishedSpecSwDocumentationNoAUuid']]['followUpUuids'].clear()
+            if change == 'answer-removed': schema['entities']['answers'].pop(IDS['publishedSpecSwDocumentationNoAUuid'])
+            if change == 'chapter-filtered': schema['chapterUuids'].clear()
+            if change == 'item-deleted': replies[listing] = []
+            if change == 'publication-no': replies[path(LISTING, 'dataset-a', 'isPublishedDataQUuid')] = IDS['isPublishedDataNoAUuid']
+            if change == 'software-no': replies[listing.rsplit('.', 2)[0]] = IDS['publishedSpecSwUseNoAUuid']
+            for profile in ['review', 'submission']:
+                soup = render(access, replies, profile, schema)
+                expected = {'software-documentation', 'software-included', 'software-documentation-reason'}
+                if change in ['documentation-filtered', 'answer-removed']: expected -= {'software-documentation', 'software-documentation-reason'}
+                if change == 'included-filtered': expected.remove('software-included')
+                if change == 'reason-filtered': expected.remove('software-documentation-reason')
+                if change in ['chapter-filtered', 'publication-no', 'software-no', 'item-deleted']: expected.clear()
+                actual = {node['data-fact-id'] for node in soup.select('[data-fact-id^="software-"]') if node['data-fact-id'] != 'software-location'}
+                assert actual == expected, (change, actual)
+                counts['inactive_software'] += 1
 
         for pub, parent, actor, resolves, profile in itertools.product(
                 ['Yes', 'No', ''], ['Yes', 'No', '', 'unknown'],

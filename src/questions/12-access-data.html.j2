@@ -1,6 +1,38 @@
 <div id="q-access-data" class="question">
   <h3>12. What methods or software tools are needed to access and use data?</h3>
 
+  {% import 'src/active-answer.j2' as activeAnswer with context %}
+  {% macro softwareDetails(parts) -%}
+    {%- set facts = [] -%}
+    {%- for question, fact in [(uuids.publishedSpecSwDocumentationQUuid, 'software-documentation'), (uuids.publishedSpecSwIncludedQUuid, 'software-included')] -%}
+      {%- set answerPath = activeAnswer.path(parts + [question], 'OptionsQuestion') -%}
+      {%- set selected = repliesMap[answerPath]|reply_str_value if answerPath else '' -%}
+      {%- if answerPath and selected in km.entities.questions[question].answerUuids and selected in km.entities.answers -%}
+        {%- set sentence -%}
+          {%- if question == uuids.publishedSpecSwDocumentationQUuid and selected == uuids.publishedSpecSwDocumentationYesAUuid -%}
+            <span data-fact-id="software-documentation" data-status="complete">Documentation for this software will be included in the metadata.</span>
+          {%- elif question == uuids.publishedSpecSwDocumentationQUuid and selected == uuids.publishedSpecSwDocumentationNoAUuid -%}
+            <span data-fact-id="software-documentation" data-status="explicit-no">Documentation for this software will not be included in the metadata.</span>
+          {%- elif question == uuids.publishedSpecSwIncludedQUuid and selected == uuids.publishedSpecSwIncludedYesAUuid -%}
+            <span data-fact-id="software-included" data-status="complete">This software will be included.</span>
+          {%- elif question == uuids.publishedSpecSwIncludedQUuid and selected == uuids.publishedSpecSwIncludedNoAUuid -%}
+            <span data-fact-id="software-included" data-status="explicit-no">This software will not be included.</span>
+          {%- endif -%}
+        {%- endset -%}
+        {%- if sentence|trim -%}{%- do facts.append(sentence) -%}{%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if facts -%}<p class="software-details">{{ facts|join(" ") }}</p>{%- endif -%}
+    {%- set reasonPath = activeAnswer.path(parts + [uuids.publishedSpecSwDocumentationQUuid, uuids.publishedSpecSwDocumentationNoAUuid, uuids.publishedSpecSwDocumentationReasonQUuid], 'ValueQuestion') -%}
+    {%- set reason = repliesMap[reasonPath]|reply_str_value if reasonPath else '' -%}
+    {%- if reason|trim -%}
+      <div class="answer-detail" data-fact-id="software-documentation-reason" data-status="complete">
+        <p><strong>Reason for not including software documentation:</strong></p>
+        {{ reason|markdown }}
+      </div>
+    {%- endif -%}
+  {%- endmacro %}
+
   <div class="answer">
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
@@ -16,10 +48,13 @@
       {# Omit wholly blank submission rows, not partial tools or the known need
          for software. Keep original list indices for neutral labels. #}
       {%- set visibleSoftwareItems = [] -%}
+      {%- set softwareDetailsByItem = {} -%}
       {%- for swItem in isPublishedSwItems -%}
         {%- set swName = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatNameQUuid]|reply_path]|reply_str_value -%}
         {%- set swLocation = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path]|reply_str_value -%}
-        {%- if output_profile|default('review') != 'submission' or swName|trim or swLocation|trim -%}
+        {%- set detail = softwareDetails(isPublishedSWPath.split('.') + [swItem]) -%}
+        {%- do softwareDetailsByItem.update({swItem: detail}) -%}
+        {%- if output_profile|default('review') != 'submission' or swName|trim or swLocation|trim or detail|trim -%}
           {%- do visibleSoftwareItems.append(swItem) -%}
         {%- endif -%}
       {%- endfor -%}
@@ -57,6 +92,7 @@
                   <li data-item-id="{{ swItem|e }}"><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}(no name given){% endif %}</strong>
                     {% if swPIDReply|trim %}<div>Available at: {{ swPIDReply|e }}</div>
                     {% elif output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="software-location" data-status="missing">An access location for this tool has not been provided.</p>{% endif %}
+                    {{ softwareDetailsByItem[swItem] }}
                   </li>
                 {% endfor %}
               </ul>
