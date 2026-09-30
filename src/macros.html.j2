@@ -84,12 +84,17 @@
   {%- if reply and reply.value.value.type == "IntegrationType" -%}
     {%- if reply.value.value.raw -%}
       {%- set replyObject = reply.value.value.raw -%}
-      <a href="{{ replyObject.uri }}" target="_blank">{{ replyObject.name }}</a>
+      {%- set funderUri = replyObject.uri|default('', true) -%}
+      {%- set funderName = replyObject.name|default('', true) -%}
+      {%- set funderText = funderName if funderName|trim else funderUri -%}
+      {%- if funderText|trim -%}
+        {%- if funderUri|trim -%}<a href="{{ funderUri|e }}" target="_blank">{{ funderText|e }}</a>{%- else -%}{{ funderText|e }}{%- endif -%}
+      {%- endif -%}
     {%- else -%}
-      {{ reply.value.value.value.rsplit(" ![]")[0]|replace("**", "")|markdown|replace("<p>", "")|replace("</p>", "") }}
+      {{ reply.value.value.value.rsplit(" ![]")[0]|replace("**", "")|e|markdown|replace("<p>", "")|replace("</p>", "") }}
     {%- endif -%}
   {%- elif reply and reply.value.value.type == "PlainType" -%}
-    {{ reply.value.value.value }}
+    {{ reply.value.value.value|e }}
   {%- endif -%}
 {%- endmacro -%}
 
