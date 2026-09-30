@@ -166,16 +166,16 @@
     {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}
     {%- set repoChargesAUuid = repliesMap[repoChargesPath]|reply_str_value -%}
     {%- if repoChargesAUuid == uuids.repoChargesNoAUuid -%}
-      <p>None of the used repositories charge for their services.</p>
+      <p>The repositories we use do not charge for their services.</p>
     {%- elif repoChargesAUuid == uuids.repoChargesYesAUuid -%}
       {%- set repoChargesHowPayPath = [repoChargesPath, uuids.repoChargesYesAUuid, uuids.repoChargesHowPayQUuid]|reply_path -%}
       {%- set repoChargesHowPayAUuid = repliesMap[repoChargesHowPayPath]|reply_str_value -%}
       {%- if repoChargesHowPayAUuid == uuids.repoChargesHowPayBudgetedAUuid -%}
-        <p>We have budgeted for the costs in the project to pay charges of the used repositories.</p>
+        <p>The project budget includes the repository service fees.</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayDepartmentAUuid -%}
-        <p>The costs related to the used repositories will be carried by (one of) the departments involved in the project.</p>
+        <p>A participating department will cover the repository service fees.</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayInstituteAUuid -%}
-        <p>The costs related to the used repositories will be carried by (one of) the institutes involved in the project.</p>
+        <p>A participating institute will cover the repository service fees.</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayOtherAUuid -%}
         {%- set repoChargesHowPayOtherPath = [repoChargesHowPayPath, uuids.repoChargesHowPayOtherAUuid, uuids.repoChargesHowPayOtherQUuid]|reply_path -%}
         {%- set repoChargesHowPayOther = repliesMap[repoChargesHowPayOtherPath]|reply_str_value -%}
@@ -189,7 +189,7 @@
     {%- set budgetTimeEffortPath = [uuids.preservingCUuid, uuids.budgetTimeEffortQUuid]|reply_path -%}
     {%- set budgetTimeEffortAUuid = repliesMap[budgetTimeEffortPath]|reply_str_value -%}
     {%- if budgetTimeEffortAUuid == uuids.budgetTimeEffortYesAUuid -%}
-      <p>We have a reserved budget for the time and effort it will take to prepare the data for publication.</p>
+      <p>We have allocated funds for the time and effort needed to prepare the data for publication.</p>
     {%- endif -%}
     </div>
     {% endset %}

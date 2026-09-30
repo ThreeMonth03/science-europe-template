@@ -37,11 +37,11 @@
           {%- do metadataStandards.append("DDI (Data Documentation Initiative)") -%}
         {%- endif -%}
         {%- if metadataStandards|length == 1 -%}
-          {%- do metadataSentences.append("We will be documenting the data with " ~ metadataStandards[0] ~ " metadata standard.") -%}
+          {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ " metadata standard.") -%}
         {%- elif metadataStandards|length == 2 -%}
-          {%- do metadataSentences.append("We will be documenting the data with " ~ metadataStandards[0] ~ " and " ~ metadataStandards[1] ~ " metadata standards.") -%}
+          {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ " and " ~ metadataStandards[1] ~ " metadata standards.") -%}
         {%- elif metadataStandards|length == 3 -%}
-          {%- do metadataSentences.append("We will be documenting the data with " ~ metadataStandards[0] ~ ", " ~ metadataStandards[1] ~ ", and " ~ metadataStandards[2] ~ " metadata standards.") -%}
+          {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ ", " ~ metadataStandards[1] ~ ", and " ~ metadataStandards[2] ~ " metadata standards.") -%}
         {%- endif -%}
         {%- if metadataStandardsKeywordsAUuid == uuids.metadataStandardsKeywordsYesAUuid -%}
           {%- do metadataSentences.append("We will include keywords and relevant ontology references to optimize the possibility for discovery and potential reuse.") -%}

@@ -1,12 +1,64 @@
+import itertools
 import unittest
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 from test_science_europe_contract import ROOT, render_question
 from test_format_volume import values, FORMATS, Q2
 from generate_storage_fixtures import storage_cases
+from current_support import IDS, environment, path, PREFIX
 
 
 class ReadingPolishTests(unittest.TestCase):
+    def test_metadata_standard_sentences_keep_selected_names_and_parent_guards(self):
+        parent = path('creatingCUuid', 'metadataQUuid')
+        standards = path(parent, 'metadataExploreAUuid', 'metadataStandardsQUuid')
+        prefix = path(standards, 'metadataStandardsExploreAUuid')
+        options = [('DC', 'Dublin Core'), ('DataCite', 'DataCite'),
+                   ('DDI', 'DDI (Data Documentation Initiative)')]
+        render = environment(ROOT, escape=True).from_string(
+            PREFIX + "{% include 'src/questions/03-docs-metadata.html.j2' %}").render
+        for selected, profile in itertools.product(itertools.product([False, True], repeat=3), ['review', 'submission']):
+            replies = {parent: IDS['metadataExploreAUuid'], standards: IDS['metadataStandardsExploreAUuid']}
+            for (key, _), enabled in zip(options, selected):
+                if enabled:
+                    replies[path(prefix, 'metadataStandards' + key + 'QUuid')] = IDS['metadataStandards' + key + 'YesAUuid']
+            names = [label for (_, label), enabled in zip(options, selected) if enabled]
+            expected = ''
+            if names:
+                joined = names[0] if len(names) == 1 else ' and '.join(names) if len(names) == 2 else ', '.join(names[:-1]) + ', and ' + names[-1]
+                expected = 'We will document the data using the ' + joined + (' metadata standard.' if len(names) == 1 else ' metadata standards.')
+            soup = BeautifulSoup(render(repliesMap=replies, output_profile=profile), 'html.parser')
+            paragraphs = [p.get_text() for p in soup.select('.metadata-policy p') if 'document the data using' in p.get_text()]
+            self.assertEqual([expected] if expected else [], paragraphs)
+            for guard in [parent, standards]:
+                inactive = dict(replies, **{guard: 'unknown'})
+                self.assertNotIn('document the data using', render(repliesMap=inactive, output_profile=profile))
+
+    def test_repository_cost_prose_preserves_payer_and_independent_preparation_budget(self):
+        charges = path('preservingCUuid', 'repoChargesQUuid')
+        payer = path(charges, 'repoChargesYesAUuid', 'repoChargesHowPayQUuid')
+        preparation = path('preservingCUuid', 'budgetTimeEffortQUuid')
+        sentences = {
+            'Budgeted': 'The project budget includes the repository service fees.',
+            'Department': 'A participating department will cover the repository service fees.',
+            'Institute': 'A participating institute will cover the repository service fees.',
+        }
+        free = 'The repositories we use do not charge for their services.'
+        funded = 'We have allocated funds for the time and effort needed to prepare the data for publication.'
+        authored = 'Keep v1.2: 0 TWD; department A does not pay.'
+        render = environment(ROOT, escape=True).from_string(
+            PREFIX + "{% include 'src/questions/11-data-preservation.html.j2' %}").render
+        for charge, payment, budget, profile in itertools.product([None, 'No', 'Yes', 'unknown'], [None, *sentences, 'Other', 'unknown'], [None, 'No', 'Yes'], ['review', 'submission']):
+            replies = {path(payer, 'repoChargesHowPayOtherAUuid', 'repoChargesHowPayOtherQUuid'): authored}
+            for key, value, stem in [(charges, charge, 'repoCharges'), (payer, payment, 'repoChargesHowPay'), (preparation, budget, 'budgetTimeEffort')]:
+                if value is not None: replies[key] = IDS.get(stem + value + 'AUuid', value)
+            text = BeautifulSoup(render(repliesMap=replies, output_profile=profile), 'html.parser').get_text(' ', strip=True)
+            for option, sentence in sentences.items():
+                self.assertEqual(charge == 'Yes' and payment == option, sentence in text)
+            self.assertEqual(charge == 'No', free in text)
+            self.assertEqual(budget == 'Yes', funded in text)
+            self.assertEqual(charge == 'Yes' and payment == 'Other', authored in text)
+
     def test_fixed_english_prose_uses_complete_natural_sentences(self):
         source = '\n'.join((ROOT/path).read_text() for path in [
             'src/questions/05-store-backup.html.j2',

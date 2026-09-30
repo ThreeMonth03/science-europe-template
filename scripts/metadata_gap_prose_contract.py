@@ -64,6 +64,11 @@ def compare(before, after, language):
 def templates(root, frozen, escape=False):
     import test_science_europe_contract as adapter
     env = Environment(loader=FileSystemLoader(root), extensions=['jinja2.ext.do'], autoescape=escape)
+    if root.resolve() == adapter.ROOT.resolve():
+        # Validate the current source before replaying the historical Q3 proof.
+        from current_repairs_contract import project_source
+        sources, _ = project_source()
+        env.loader = ChoiceLoader([DictLoader({QUESTION: sources[QUESTION].decode()}), env.loader])
     env.filters.update(reply_path=adapter.reply_path, reply_items=adapter.reply_items, reply_str_value=adapter.reply_str_value, markdown=lambda v: v, any=any)
     env.tests['true'] = lambda value: value is True
     prior = env.overlay(loader=ChoiceLoader([DictLoader({QUESTION: frozen.read_text()}), env.loader]))

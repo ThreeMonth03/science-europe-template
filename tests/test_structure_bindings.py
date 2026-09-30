@@ -46,7 +46,7 @@ class StructureBindingTests(unittest.TestCase):
                 self.assertNotIn('10 years', output)
             else:
                 self.assertIn('10 years', output)
-                self.assertIn('We have budgeted for the costs', output)
+                self.assertIn('The project budget includes the repository service fees.', output)
                 soup = BeautifulSoup(output, 'html.parser')
                 self.assertFalse(soup.select('.preservation-summary [data-status="needs-review"]'))
                 self.assertEqual('needs-review', soup.select_one('[data-fact-id="preservation-selection-review"]')['data-status'])
@@ -77,7 +77,7 @@ class StructureBindingTests(unittest.TestCase):
     def test_repository_costs_survive_absent_dataset_list(self):
         replies = {path('preservingCUuid', 'repoChargesQUuid'): IDS['repoChargesNoAUuid']}
         output = render_question('src/questions/11-data-preservation.html.j2', replies)
-        self.assertIn('None of the used repositories charge', output)
+        self.assertIn('The repositories we use do not charge for their services.', output)
 
     def test_contract_legal_basis_binding_is_not_misspelled(self):
         personal = path('creatingCUuid', 'collectPersonalQUuid')
