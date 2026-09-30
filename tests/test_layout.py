@@ -18,6 +18,78 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_version_value_alignment_preserves_content_and_unowned_tables(self):
+        probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
+        worker = importlib.util.module_from_spec(probe_spec)
+        probe_spec.loader.exec_module(worker)
+        def table(value='<p>2026.1</p>', label='Version'):
+            return ('<table class="dataset-version" data-fact-id="dataset-version" data-status="complete">'
+                    '<tbody><tr><th scope="row">'+label+'</th><td>'+value+'</td></tr></tbody></table>')
+        base = table()
+        cases = [(name, table(value, label), count) for name, value, label, count in [
+            ('english', '<p>2026.1</p>', 'Version', 1),
+            ('chinese', '<p>2026.1</p>', '使用版本', 1),
+            ('chinese-value', '<p>第二版（校正後）</p>', '使用版本', 1),
+            ('plain', '2026.1', 'Version', 1), ('empty', '', 'Version', 0),
+            ('long', '<p>'+'校正版本 2026.1；'*160+'</p>', '使用版本', 1),
+            ('paragraphs', '<p>2026.1</p><p>Original note.</p>', 'Version', 1),
+            ('bold', '<p><strong>2026.1</strong></p>', 'Version', 1),
+            ('inline', '<p><em>2026.1</em> &lt;tag&gt; &amp; <code>v2</code><br>Keep.</p>', 'Version', 1),
+            ('link', '<p><a href="https://example.org/?a=1&amp;b=2">2026.1</a></p>', 'Version', 1),
+            ('list', '<ul><li>2026.1</li></ul>', 'Version', 0),
+            ('styled-value', '<div custom-style="Other"><p>2026.1</p></div>', 'Version', 0),
+            ('nested-table', '<table><tr><td>2026.1</td></tr></table>', 'Version', 0),
+        ]]
+        cases += [(name, base.replace(old, new), 0) for name, old, new in [
+            ('unmarked', ' data-fact-id="dataset-version"', ''),
+            ('missing', 'data-status="complete"', 'data-status="missing"'),
+            ('other-class', 'class="dataset-version"', 'class="authored"'),
+            ('extra-class', 'class="dataset-version"', 'class="dataset-version authored"'),
+            ('custom-table', '<table ', '<table custom-style="Other" '),
+            ('extra-column', '</td>', '</td><td>Original.</td>'),
+            ('span', '<td>', '<td colspan="2">'),
+            ('extra-row', '</tbody>', '<tr><td>Original.</td><td>Keep.</td></tr></tbody>'),
+        ]]
+        lua = (ROOT / 'src/word/pilot.lua').read_text()
+        self.assertEqual(lua.count('return align_dataset_version(tbl)'), 1)
+        sources = [lua.replace('return align_dataset_version(tbl)', 'return tbl'), lua]
+        html = ''.join('<div id="case-'+name+'">'+body+'</div>' for name, body, _ in cases)
+        runner = '''import json,sys,subprocess,tempfile
+from pathlib import Path
+p=json.load(sys.stdin);results=[]
+with tempfile.TemporaryDirectory() as tmp:
+ f=Path(tmp)/'filter.lua'
+ for lua in p['sources']:
+  f.write_text(lua);row=[]
+  for fmt in ['json','html']:
+   row.append(subprocess.check_output(['pandoc','--from=html','--to='+fmt,'--lua-filter='+str(f)],input=p['html'].encode()).decode())
+  results.append(row)
+print(json.dumps(results))
+'''
+        output = subprocess.check_output(['docker','run','--rm','--network','none','-i',
+            '--entrypoint','python',worker.IMAGE,'-c',runner],
+            input=json.dumps(dict(sources=sources,html=html)).encode(),timeout=180)
+        rows = json.loads(output)
+        self.assertEqual(rows[0][1], rows[1][1], 'Non-Word output changed')
+        results = [{b['c'][0][0]: b for b in json.loads(row[0])['blocks']} for row in rows]
+        def only_first_style(before, after):
+            if before == after: return 0
+            if isinstance(before, dict) and isinstance(after, dict):
+                if before.get('t') in ['Plain','Para'] and after.get('t') == 'Div':
+                    self.assertEqual(after['c'], [['',[],[['custom-style','Body Text']]],[dict(t='Para',c=before['c'])]])
+                    return 1
+                if before.get('t') == after.get('t') == 'Div' and before['c'][0] == ['',[],[['custom-style','Pilot Label']]]:
+                    self.assertEqual(after['c'], [['',[],[['custom-style','Body Text']]],before['c'][1]])
+                    return 1
+                self.assertEqual(before.keys(), after.keys())
+                return sum(only_first_style(before[k], after[k]) for k in before)
+            self.assertIsInstance(before, list); self.assertIsInstance(after, list)
+            self.assertEqual(len(before), len(after))
+            return sum(only_first_style(a,b) for a,b in zip(before,after))
+        for name, _, count in cases:
+            with self.subTest(case=name):
+                self.assertEqual(only_first_style(results[0]['case-'+name],results[1]['case-'+name]),count)
+
     def test_word_history_keeps_only_bounded_rows_and_preserves_every_other_xml_byte(self):
         probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
         worker = importlib.util.module_from_spec(probe_spec)

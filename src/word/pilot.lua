@@ -21,13 +21,39 @@ function Meta(meta)
   return meta
 end
 
+-- The owned version label uses Compact; its value needs the same language-aware
+-- line metrics (Body Text), not Normal's shorter Latin-only first line in Chinese.
+-- Preserve the label, every inline/later block, and all table pagination rules.
+local function align_dataset_version(tbl)
+  if FORMAT ~= "docx" and FORMAT ~= "json" then return tbl end
+  if tbl.identifier ~= "" or #tbl.classes ~= 1 or not tbl.classes:includes("dataset-version") or
+     #tbl.attributes ~= 2 or tbl.attributes["fact-id"] ~= "dataset-version" or tbl.attributes["status"] ~= "complete" or
+     #tbl.colspecs ~= 2 or #tbl.head.rows ~= 0 or #tbl.foot.rows ~= 0 or #tbl.caption.long ~= 0 or
+     #tbl.bodies ~= 1 or #tbl.bodies[1].head ~= 0 or #tbl.bodies[1].body ~= 1 then return tbl end
+  local cells = tbl.bodies[1].body[1].cells
+  if #cells ~= 2 then return tbl end
+  for _, cell in ipairs(cells) do
+    if cell.row_span ~= 1 or cell.col_span ~= 1 then return tbl end
+  end
+  local blocks = cells[2].contents
+  local first = blocks[1]
+  if first and (first.t == "Plain" or first.t == "Para") then
+    blocks[1] = pandoc.Div({pandoc.Para(first.content)}, pandoc.Attr("", {}, {["custom-style"]="Body Text"}))
+  elseif first and first.t == "Div" and first.identifier == "" and #first.classes == 0 and #first.attributes == 1 and
+         first.attributes["custom-style"] == "Pilot Label" and #first.content == 1 and first.content[1].t == "Para" then
+    -- A wholly bold version is still a value, not a separate heading.
+    first.attributes["custom-style"] = "Body Text"
+  end
+  return tbl
+end
+
 function Table(tbl)
   if tbl.classes:includes("resource-table") then
     tbl.colspecs = {{pandoc.AlignLeft, 0.57}, {pandoc.AlignLeft, 0.17}, {pandoc.AlignLeft, 0.26}}
   elseif tbl.classes:includes("project-details") or tbl.classes:includes("dataset-version") then
     tbl.colspecs = {{pandoc.AlignLeft, 0.22}, {pandoc.AlignLeft, 0.78}}
   end
-  return tbl
+  return align_dataset_version(tbl)
 end
 
 function Para(paragraph)
