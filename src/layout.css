@@ -49,6 +49,8 @@ html body #dmp-projects h3 { font-size: 14pt; font-weight: bold; color: #222; }
 html body #dmp-projects > .project > table.project-details { table-layout: fixed; }
 html body #dmp-projects > .project > table.project-details th { width: 24%; }
 html body #dmp-projects > .project > table.project-details td { overflow-wrap: anywhere; word-break: break-word; }
+/* Funding is a flowing list, not one unbreakable table row. */
+html body #dmp-projects .project-funding { overflow-wrap: anywhere; word-break: break-word; }
 html body .document-meta { font-size: 9pt; color: #526169; }
 html body .document-kind { font-size: 14pt; color: #526169; }
 html body .document-provenance { border-top: 1px solid #bcc6cc; margin-top: 2em; padding-top: .7em; font-size: 8.5pt; color: #526169; }

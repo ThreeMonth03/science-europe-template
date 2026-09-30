@@ -53,6 +53,7 @@ def check(root, language):
     for rule in [' { table-layout: fixed; }', ' th { width: 24%; }',
                  ' td { overflow-wrap: anywhere; word-break: break-word; }']:
         assert selector + rule in css, ('Missing project table rule', rule)
+    assert 'html body #dmp-projects .project-funding { overflow-wrap: anywhere; word-break: break-word; }' in css
     counts = dict(value_cases=0, inactive_cases=0, identity_cases=0, full_documents=0,
                   funding_cases=0, inactive_funding=0, funding_identity=0)
     for escape in (False, True):
@@ -146,6 +147,10 @@ def check(root, language):
             km, replies, listing = funding_fixture(name, grant, status)
             soup = render(overview, km, replies, profile)
             rows = soup.select('[data-fact-id="project-funding"] li')
+            funding = soup.select_one('[data-fact-id="project-funding"]')
+            if funding:
+                assert funding.name == 'div' and funding.h4 is not None
+                assert funding.find_parent('table') is None, 'Funding must flow outside the metadata table'
             visible = profile == 'review' or bool(expected or (grant or '').strip() or status in FUNDING_STATUS[language])
             assert len(rows) == int(visible)
             if visible:
@@ -158,7 +163,7 @@ def check(root, language):
                 assert [a['href'] for a in rows[0].select('a')] == ([link] if link else [])
                 assert not rows[0].select('b, img, script'), 'Funding fields are text, not HTML'
             if profile == 'submission':
-                assert bool(soup.select('table.project-details')) == visible
+                assert not soup.select('table.project-details')
                 assert bool(soup.select('[data-fact-id="project-funding"]')) == visible
             assert not soup.select('ul:empty, li:empty')
             counts['funding_cases'] += 1
