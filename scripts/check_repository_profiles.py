@@ -119,6 +119,8 @@ def check(root, language):
                 active = value in PRESERVATION[language][name] and (name == 'metadata' or publication == 'Yes')
                 assert bool(node) == active, (name, value, publication)
                 if node:
+                    assert 'preservation-summary' in node.parent.get('class', [])
+                    assert 'dataset-policy' in node.parent.get('class', [])
                     assert node['data-status'] == ('complete' if value == 'Yes' else 'explicit-no')
                     assert node.get_text() == PRESERVATION[language][name][value]
                     if profile == 'submission':

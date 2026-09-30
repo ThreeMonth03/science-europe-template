@@ -62,6 +62,19 @@
               <p data-fact-id="preservation-metadata-persistence" data-status="explicit-no">The metadata will not remain available once the data no longer exists.</p>
             {%- endif -%}
           {%- endif -%}
+          {# Catalogue decisions are fixed prose in the same preservation summary,
+             not a detached paragraph after repository or authored detail blocks. #}
+          {%- set publishedDataCataloguePath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid], 'OptionsQuestion') -%}
+          {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
+          {%- if publishedDataCataloguePath and publishedDataCatalogueAUuid in km.entities.questions[uuids.publishedDataCatalogueQUuid].answerUuids and publishedDataCatalogueAUuid in km.entities.answers -%}
+            {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
+              <p data-fact-id="preservation-catalogue" data-status="complete">We will add a reference to the published data in at least one data catalogue.</p>
+            {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCatalogueNoAUuid -%}
+              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a reference to the published data in a data catalogue.</p>
+            {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCataloguePrimeAUuid -%}
+              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field.</p>
+            {%- endif -%}
+          {%- endif -%}
           </div>
           {% include "src/preservation-paper.html.j2" %}
            {# Distributions #}
@@ -146,18 +159,6 @@
               <ul>{{ repositoryItems }}</ul>
             </div>
             {% endif %}
-          {%- endif -%}
-          {# Catalogue #}
-          {%- set publishedDataCataloguePath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid], 'OptionsQuestion') -%}
-          {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
-          {%- if publishedDataCataloguePath and publishedDataCatalogueAUuid in km.entities.questions[uuids.publishedDataCatalogueQUuid].answerUuids and publishedDataCatalogueAUuid in km.entities.answers -%}
-            {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
-              <p data-fact-id="preservation-catalogue" data-status="complete">We will add a reference to the published data in at least one data catalogue.</p>
-            {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCatalogueNoAUuid -%}
-              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a reference to the published data in a data catalogue.</p>
-            {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCataloguePrimeAUuid -%}
-              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field.</p>
-            {%- endif -%}
           {%- endif -%}
         {% endset %}
         {% if output_profile|default('review') != 'submission' or preservationDatasetContent|striptags|trim or '<img' in preservationDatasetContent or '<table' in preservationDatasetContent %}

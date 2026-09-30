@@ -4,7 +4,7 @@
   "candidate_version": "0.3.51",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "0169337f3105fd621a3c22f744f040d1c3bd0b5aa1cafe82a17e68078902a5b0",
+  "candidate_tree_sha256": "7cd24967bd6abd35e9416e37a46c58b5e59dde572acb935787eeddc8797139fd",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
