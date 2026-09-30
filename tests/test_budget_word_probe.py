@@ -1,4 +1,6 @@
 import sys
+import json
+import subprocess
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
@@ -6,6 +8,57 @@ from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_owned_budget_first_lines_align_without_touching_other_content(self):
+        from probe_budget_word import ROOT, IMAGE, RUNNER, ROW_CALL, fixture
+        lua=(ROOT/'src/word/pilot.lua').read_text()
+        call='align_budget_cells('+ROW_CALL+')'
+        self.assertEqual(lua.count(call),1)
+        expected={'eight':8,'one':1,'32':32,'33-fallback':33,'zero-rows':0,
+            'chinese':2,'emphasis':2,'real-fact-attributes':8,'missing-amount':8,
+            'missing-currency':8,'missing-funding':8,'missing-purpose':2,
+            'four-paragraphs':2,'five-paragraphs':2,'long-purpose':2,'long-token':2,
+            'long-funding':8,'hard-break':2,'list':2,'image':2,'link':2,'nested-table':2,
+            'styled':2,'column-span':0,'four-columns':0,'other-question':0,'other-table':0,
+            'authored-wrapper':0,'mixed':8,'mixed-expanded-33':33,'literal-marker':2}
+        self.assertEqual(set(expected),{name for name,_,_ in short_row_cases()})
+        cases=[(name,html,expected[name]) for name,html,_ in short_row_cases()]
+        base=fixture()
+        cases += [
+            ('custom-table',base.replace('<table class=', '<table custom-style="Other" class='),0),
+            ('custom-amount',base.replace('0 TWD','<div custom-style="Other"><p>0 TWD</p></div>'),0),
+            ('no-label',base.replace('<strong>Resource 0</strong>','Resource 0').replace('<strong>Resource 1</strong>','Resource 1'),0),
+            ('multi-paragraph-funding',base.replace('Institute.','<p>Institute.</p><p>Original funding note.</p>'),2),
+            ('owned-funding-wrapper',base.replace('Institute.','<div class="answer-detail"><p>Institute.</p></div>'),2),
+            ('owned-multi-paragraph-funding',base.replace('Institute.','<div class="answer-detail"><p>Institute.</p><p>Original note.</p></div>'),2),
+            ('escaped-inline',base.replace('0 TWD','<em>0</em> TWD &amp; tax').replace('Institute.','<a href="https://example.org/?a=1&amp;b=2">Institute.</a>'),2),
+        ]
+        html=''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases)
+        results=[]
+        for source in [lua.replace(call,ROW_CALL),lua]:
+            raw=subprocess.check_output(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',RUNNER],
+                input=json.dumps(dict(html=html,lua=source)).encode(),timeout=180)
+            results.append({b['c'][0][0]:b for b in json.loads(raw)['blocks']})
+        def only_styles(before,after):
+            if before==after:return 0
+            if isinstance(before,dict) and isinstance(after,dict):
+                if before.get('t') in ['Plain','Para'] and after.get('t')=='Div':
+                    self.assertEqual(after['c'],[['',[],[['custom-style','Body Text']]],[dict(t='Para',c=before['c'])]])
+                    return 0
+                if before.get('t')==after.get('t')=='Div' and before['c'][0]==['',[],[['custom-style','Pilot Label']]]:
+                    self.assertEqual(after['c'],[['',[],[['custom-style','Pilot Budget Label']]],before['c'][1]])
+                    return 1
+                self.assertEqual(before.keys(),after.keys())
+                return sum(only_styles(before[k],after[k]) for k in before)
+            if isinstance(before,list) and isinstance(after,list):
+                self.assertEqual(len(before),len(after))
+                return sum(only_styles(a,b) for a,b in zip(before,after))
+            self.fail('Unexpected content, keep, column width or row change')
+        for name,_,count in cases:
+            with self.subTest(case=name):
+                before,after=[r['case-'+name] for r in results]
+                self.assertEqual(only_styles(before,after),count)
+                if count==0:self.assertEqual(before,after)
+
     def test_current_overview_releases_budgets_but_keeps_small_no_budget_answers(self):
         from probe_budget_word import overview_cases
         rows = overview_cases()

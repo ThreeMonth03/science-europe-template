@@ -94,6 +94,13 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     label.paragraph_format.keep_with_next = True
     label.paragraph_format.space_before = Pt(4)
     label.paragraph_format.space_after = Pt(3)
+    # Budget row labels share the other cells' first-line metrics, without the
+    # extra separation intended for standalone labels. Retain their keep/after.
+    table_label = document.styles.add_style("Pilot Budget Label", WD_STYLE_TYPE.PARAGRAPH)
+    table_label.base_style = document.styles["Body Text"]
+    table_label.paragraph_format.keep_with_next = True
+    table_label.paragraph_format.space_before = Pt(0)
+    table_label.paragraph_format.space_after = Pt(3)
     lead = document.styles.add_style("Pilot Lead", WD_STYLE_TYPE.PARAGRAPH)
     lead.base_style = document.styles["Body Text"]
     lead.paragraph_format.keep_with_next = True

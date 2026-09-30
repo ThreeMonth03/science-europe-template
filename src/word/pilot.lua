@@ -558,13 +558,78 @@ local function keep_short_budget_rows(div)
   return div
 end
 
+-- Only owned Q15 identity rows: use the same first-line metrics in each cell.
+-- Leave every inline, later paragraph, paragraph keep and row property intact.
+-- Expanded long budgets also carry identity rows in their repeating header.
+local function align_budget_cells(div)
+  if FORMAT ~= "docx" and FORMAT ~= "json" then return div end
+  local function first_paragraph(cell)
+    local blocks = cell.contents
+    local block = blocks[1]
+    -- The actual funding answer retains its authored wrapper/paragraphs.
+    if block and block.t == "Div" and block.identifier == "" and #block.classes == 1 and
+       block.classes:includes("answer-detail") and #block.attributes == 0 then
+      blocks = block.content; block = blocks[1]
+    end
+    if not block then return {blocks=blocks} end
+    if block.t == "Plain" or block.t == "Para" then return {blocks=blocks, paragraph=block} end
+    -- A multi-paragraph answer's existing lead already inherits Body Text.
+    if block.t == "Div" and block.identifier == "" and #block.classes == 0 and #block.attributes == 1 and
+       block.attributes["custom-style"] == "Pilot Lead" and #block.content == 1 and block.content[1].t == "Para" then
+      return {blocks=blocks}
+    end
+    return nil
+  end
+  local function align(row)
+    if #row.cells ~= 3 then return end
+    for _, cell in ipairs(row.cells) do
+      if cell.row_span ~= 1 or cell.col_span ~= 1 then return end
+    end
+    local first = row.cells[1].contents
+    local index = first[1] and first[1].t == "RawBlock" and
+      first[1].format == "openxml" and first[1].text == "<!--DSW:SE:budget-row:v1-->" and 2 or 1
+    local label = first[index]
+    if not label or label.t ~= "Div" or label.identifier ~= "" or #label.classes ~= 0 or
+       #label.attributes ~= 1 or label.attributes["custom-style"] ~= "Pilot Label" or
+       #label.content ~= 1 or label.content[1].t ~= "Para" then return end
+    -- Arbitrary styled cells keep their complete original row.
+    local plans = {first_paragraph(row.cells[2]), first_paragraph(row.cells[3])}
+    if not plans[1] or not plans[2] then return end
+    label.attributes["custom-style"] = "Pilot Budget Label"
+    for _, plan in ipairs(plans) do
+      if plan.paragraph then
+        plan.blocks[1] = pandoc.Div({pandoc.Para(plan.paragraph.content)},
+          pandoc.Attr("", {}, {["custom-style"]="Body Text"}))
+      end
+    end
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      for _, project in ipairs(answer.content) do
+        if project.t == "Div" and project.classes:includes("project-resources") then
+          for _, tbl in ipairs(project.content) do
+            if tbl.t == "Table" and tbl.classes:includes("resource-table") and #tbl.colspecs == 3 and
+               (not tbl.attributes["custom-style"] or tbl.attributes["custom-style"] == "PilotLongBudget") then
+              for _, row in ipairs(tbl.head.rows) do align(row) end
+              for _, body in ipairs(tbl.bodies) do
+                for _, row in ipairs(body.body) do align(row) end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
 function Div(div)
   if div.identifier == "q-store-backup" then return keep_q5_context(div) end
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
-  if div.identifier == "q-required-resources" then return keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div))) end
+  if div.identifier == "q-required-resources" then return align_budget_cells(keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div)))) end
   if div.classes:includes("identifier-heading") then
     -- Q13 only: combine the existing distribution number and repository type.
     -- Para may already wrap all-Strong labels. Reject unexpected/free blocks;

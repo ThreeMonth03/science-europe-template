@@ -4,7 +4,7 @@
   "candidate_version": "0.3.51",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "2731208f0f969e564279ab48685fd64ba95ff441b92fd1df202ce84509b88fb8",
+  "candidate_tree_sha256": "7b9ac695bdf7b30c2e5ce06a46ccda4461cba8482bc4022ec4cba74c0c8394b2",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
@@ -51,7 +51,7 @@
   "support": {
     "scripts/prepare_layout.py": {
       "before_sha256": "a47b9631e638d8f693adb99186c280754be9f7bde7105f4d40467099dc96de5a",
-      "after_sha256": "e938850defdf0f585f78e9c880689017c393de243d3de6348f31dd8c2f73422b"
+      "after_sha256": "d85f51d4df42807122f86c5eacbeac74f4c5776d088ada80cb1afc2fe1d20c1f"
     },
     "PACKAGE_README.md": {
       "before_sha256": "47fee033565ab06a3527a46b3f133083bed109a513235730d717bc2a738d65ae",
