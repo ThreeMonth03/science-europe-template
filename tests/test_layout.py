@@ -1,5 +1,7 @@
 import importlib.util
+import json
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -7,6 +9,7 @@ from pathlib import Path
 from docx import Document
 from docx.oxml.ns import qn
 from docx.enum.text import WD_LINE_SPACING
+from jinja2 import Environment, FileSystemLoader
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("prepare_layout", ROOT / "scripts/prepare_layout.py")
@@ -15,6 +18,53 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_history_and_provenance_wrap_without_changing_ordinary_layout(self):
+        probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
+        worker = importlib.util.module_from_spec(probe_spec)
+        probe_spec.loader.exec_module(worker)
+        env = Environment(loader=FileSystemLoader(ROOT), autoescape=True)
+        env.filters['datetime_format'] = lambda value, fmt: '30 Sep 2026'
+        template = env.from_string("{% include 'src/versions.html.j2' %}{% include 'src/document-provenance.html.j2' %}")
+        css = (ROOT / 'src/style.css').read_text() + (ROOT / 'src/layout.css').read_text()
+        rule = ('html body #dmp-versions td.version-name,\n'
+                'html body #dmp-versions td.version-changes,\n'
+                'html body .document-provenance { overflow-wrap: anywhere; word-break: break-word; }')
+        self.assertEqual(css.count(rule), 1)
+        cases = []
+        for name, count, title, description, model in [
+                ('short', 1, 'Review A', 'Checked the data.', 'Coastal KM'),
+                ('missing-description', 1, '核對 A', '', '沿岸觀測'),
+                ('many', 24, 'Review A', 'Checked the data.', 'Coastal KM'),
+                ('long', 1, 'VERSION' + 'ABCDEFGHIJ' * 18, 'CHANGES' + '0123456789' * 45, 'MODEL' + 'ABCDEFGHIJ' * 18)]:
+            dc = dict(project=dict(versions=[dict(name=title, description=description, created_at='')] * count),
+                      pkg=dict(name=model, version='2.7.0', organization_id='dsw', km_id='root'),
+                      config=dict(service_name='DMP service', service_url='https://example.org/'))
+            cases.append(dict(name=name, html=template.render(dc=dc), text=[title, description, model]))
+        runner = '''import json,sys,re
+from weasyprint import HTML
+p=json.load(sys.stdin)
+def render(case,css):
+    return HTML(string='<html><head><style>'+css+'</style></head><body>'+case['html']+'</body></html>').render()
+def boxes(doc):
+    return [(i,b.text,b.position_x,b.position_y,b.width,b.height) for i,page in enumerate(doc.pages)
+            for b in page._page_box.descendants() if type(b).__name__=='TextBox']
+norm=lambda s:re.sub(r'\\s+','',s)
+for case in p['cases']:
+    doc=render(case,p['css']); current=boxes(doc)
+    for i,text,x,y,w,h in current:
+        page=doc.pages[i]._page_box; left=page.content_box_x(); right=left+page.width
+        assert x>=left-1 and x+w<=right+1,(case['name'],'overflow',text)
+    for text in case['text']:
+        assert norm(text) in norm(''.join(row[1] for row in current)),(case['name'],'missing',text)
+    if case['name']!='long':
+        assert current==boxes(render(case,p['css'].replace(p['rule'],''))),(case['name'],'ordinary layout changed')
+print(json.dumps({'passed':True,'cases':len(p['cases'])}))
+'''
+        output = subprocess.check_output(['docker', 'run', '--rm', '--network', 'none', '-i',
+            '--entrypoint', 'python', worker.IMAGE, '-c', runner],
+            input=json.dumps(dict(css=css, rule=rule, cases=cases)).encode(), timeout=180)
+        self.assertEqual(json.loads(output), dict(passed=True, cases=4))
+
     def test_word_styles_and_deterministic_reference(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

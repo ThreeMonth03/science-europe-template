@@ -60,6 +60,10 @@ html body #dmp-projects .project-funding { overflow-wrap: anywhere; word-break: 
 html body .document-meta { font-size: 9pt; color: #526169; }
 html body .document-kind { font-size: 14pt; color: #526169; }
 html body .document-provenance { border-top: 1px solid #bcc6cc; margin-top: 2em; padding-top: .7em; font-size: 8.5pt; color: #526169; }
+/* Long version identifiers and model names must not widen the page. */
+html body #dmp-versions td.version-name,
+html body #dmp-versions td.version-changes,
+html body .document-provenance { overflow-wrap: anywhere; word-break: break-word; }
 html body .dataset-list { list-style: none; padding-left: 0; }
 html body .dataset-list > li { margin: 0 0 1em; }
 html body .dataset-list h5 { font-size: 11pt; margin: .8em 0 .35em; }
