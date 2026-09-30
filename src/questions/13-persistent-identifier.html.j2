@@ -171,7 +171,11 @@
             {%- set reuseHow = repliesMap[reuseHowPath]|reply_str_value -%}
             {% if output_profile|default('review') != 'submission' or measuredDataNameReply|trim or reuseSummary or reuseHow|trim %}
               <li data-item-id="{{ k }}">
+                {# Keep a short summary with its use label, not an entire authored answer. #}
+                {% set keepReuseLead = reuseHow|trim and measuredDataNameReply|length <= 80 %}
+                {% if keepReuseLead %}<div class="answer-lead">{% endif %}
                 <p class="reuse-summary"><strong>{% if output_profile|default('review') == 'submission' and not measuredDataNameReply|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply|e if measuredDataNameReply|trim else "(no name given)" }}{% endif %}</strong>{% if reuseSummary %} — <span data-fact-id="measured-data-reuse" data-status="complete">{{ reuseSummary }}</span>{% endif %}</p>
+                {% if keepReuseLead %}</div>{% endif %}
                 {% if reuseHow|trim %}
                   <div class="answer-lead"><p>Potential uses in other fields:</p></div>
                   <div class="answer-detail" data-fact-id="measured-data-reuse-uses" data-status="complete">{{ reuseHow|markdown }}</div>

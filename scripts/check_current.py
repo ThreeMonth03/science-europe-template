@@ -13,7 +13,7 @@ SUITES = {
     'sentence_layout': dict(nonreuse_cases=448, inactive_cases=24, inline_cases=4),
     'responsibility_reading': dict(role_subsets=512, identity_cases=32, missing_name_cases=12, full_documents=4),
     'access_reading': dict(access_cases=384, software_cases=64, software_followups=128, inactive_software=32,
-                          identifier_cases=960, reuse_cases=240, inactive_reuse=44, reuse_identity=4,
+                          identifier_cases=960, reuse_cases=300, inactive_reuse=44, reuse_identity=4,
                           identity_cases=4, full_documents=4),
     'project_acronym': dict(value_cases=108, inactive_cases=40, identity_cases=4, full_documents=4),
     'ethics_reading': dict(dataset_cases=320, approval_cases=960, identity_cases=4, full_documents=4),

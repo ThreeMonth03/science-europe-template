@@ -272,7 +272,7 @@ def check(root, language):
 
         authored = '<p>Combine v1.2.csv with <a href="https://example.org/observations">other observations</a>.</p><ul><li>Keep this list.</li></ul><p>Keep this paragraph.</p>'
         for option, name, detail, profile in itertools.product(
-                [*REUSE[language], '', 'unknown'], ['Dataset <A> & "B"', 'Same name', None, ' \n '],
+                [*REUSE[language], '', 'unknown'], ['Dataset <A> & "B"', 'Same name', None, ' \n ', 'Long dataset name ' * 10],
                 [None, ' \n ', authored], ['review', 'submission']):
             replies, listing = reuse_replies(option, name, detail)
             soup = render(identifier, replies, profile, reuse_schema())
@@ -282,6 +282,8 @@ def check(root, language):
             assert bool(soup.select('.measured-data-reuse h4')) == visible
             if visible:
                 summary = entries[0].select_one('.reuse-summary')
+                assert ('answer-lead' in summary.parent.get('class', [])) == (
+                    option == 'OtherField' and bool((detail or '').strip()) and len(name or '') <= 80)
                 assert not summary.select('p, div, ul, br')
                 label = summary.strong
                 if name and name.strip():
