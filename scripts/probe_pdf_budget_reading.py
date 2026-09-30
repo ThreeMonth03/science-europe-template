@@ -15,6 +15,7 @@ from generate_preservation_fixtures import preservation_cases
 from probe_budget_word import IMAGE, ROOT
 sys.path.insert(0, str(ROOT / 'tests'))
 from test_science_europe_contract import reply_path, reply_items, reply_str_value
+from check_project_acronym import fixture as project_fixture
 
 QUESTION = 'src/questions/15-required-resources.html.j2'
 
@@ -81,7 +82,9 @@ def render(root, replies, pdf=False, question=None, autoescape=False, word=False
     env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=autoescape)
     env.filters.update(reply_path=reply_path, reply_items=reply_items, reply_str_value=reply_str_value, markdown=lambda value: Markup(value) if autoescape else value)
     template = env.from_string("{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include '"+QUESTION+"' %}")
-    return template.render(repliesMap=replies, pdf_budget_reading=pdf, word_budget_reading=word)
+    # The project list and labels are active KM fields, not unscoped replies.
+    km, _ = project_fixture()
+    return template.render(repliesMap=replies, km=km, pdf_budget_reading=pdf, word_budget_reading=word)
 
 
 def dom(node):
