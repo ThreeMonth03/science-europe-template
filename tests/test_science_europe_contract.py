@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import json
 import re
+import sys
 import unittest
 from pathlib import Path
 
@@ -10,6 +11,8 @@ from jinja2 import BytecodeCache, Environment, FileSystemLoader, Undefined
 
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+from check_project_acronym import fixture as project_fixture
 CONTRACT = json.loads(
     (ROOT / "requirements" / "science-europe-2021.json").read_text(encoding="utf-8")
 )
@@ -242,7 +245,8 @@ class ScienceEuropeContractTests(unittest.TestCase):
             cover: "2e37f71b-b7aa-4182-888a-8b7a5156b53c",
             f"{cover}.2e37f71b-b7aa-4182-888a-8b7a5156b53c.2964c7f7-d9be-42ac-8cfe-dbcf4d62f8a2": "institutional funds",
         }
-        output = render_question("src/questions/15-required-resources.html.j2", replies)
+        km, _ = project_fixture(None, 'Example project', 'project-1')
+        output = render_question("src/questions/15-required-resources.html.j2", replies, km=km)
         self.assertIn("Data curator time", output)
         self.assertIn("5000 EUR", output)
         self.assertIn('class="resource-table"', output)

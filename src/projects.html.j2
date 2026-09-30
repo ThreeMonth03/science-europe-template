@@ -1,28 +1,30 @@
-{%- set projectsPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
-{%- set projectsItems = repliesMap[projectsPath]|reply_items -%}
 {%- import 'src/active-answer.j2' as active with context -%}
+{%- set projectListParts = [uuids.adminDetailsCUuid, uuids.projectsQUuid] -%}
+{%- set projectsPath = active.path(projectListParts, 'ListQuestion') -%}
+{%- set projectsItems = repliesMap[projectsPath]|reply_items if projectsPath else [] -%}
 {% if projectsItems or output_profile|default('review') != 'submission' %}<div id="dmp-projects">
   <h2>Research overview</h2>
 
   {% for projectsItem in projectsItems %}
-    <div class="project">
-    {%- set projectNamePath = [projectsPath, projectsItem, uuids.projectNameQUuid]|reply_path -%}
-    {%- set projectName = repliesMap[projectNamePath]|reply_str_value -%}
-    {%- if projectName and projectsItems|length > 1 -%}
-      <h3>{{ projectName }}</h3>
-    {%- elif not projectName -%}
+    <div class="project" data-item-id="{{ projectsItem }}">
+    {%- set projectParts = projectListParts + [projectsItem] -%}
+    {%- set projectNamePath = active.path(projectParts + [uuids.projectNameQUuid], 'ValueQuestion') -%}
+    {%- set projectName = repliesMap[projectNamePath]|reply_str_value if projectNamePath else '' -%}
+    {%- if projectName|trim and projectsItems|length > 1 -%}
+      <h3>{{ projectName|e }}</h3>
+    {%- elif not projectName|trim -%}
       {% if output_profile|default('review') == 'submission' %}<h3>{{ macros.projectLabel(projectsItems.index(projectsItem) + 1) }}</h3>{% else %}<h3 class="empty-value">(project name not given)</h3>{% endif %}
     {%- endif -%}
 
-    {%- set projectAcronymPath = active.path([uuids.adminDetailsCUuid, uuids.projectsQUuid, projectsItem, uuids.projectAcronymQUuid], 'ValueQuestion') -%}
+    {%- set projectAcronymPath = active.path(projectParts + [uuids.projectAcronymQUuid], 'ValueQuestion') -%}
     {%- set projectAcronym = repliesMap[projectAcronymPath]|reply_str_value if projectAcronymPath else '' -%}
-    {%- set projectNumberPath = [projectsPath, projectsItem, uuids.projectNumberQUuid]|reply_path -%}
-    {%- set projectNumber = repliesMap[projectNumberPath]|reply_str_value -%}
-    {%- set projectStartPath = [projectsPath, projectsItem, uuids.projectStartQUuid]|reply_path -%}
-    {%- set projectStart = repliesMap[projectStartPath]|reply_str_value -%}
-    {%- set projectEndPath = [projectsPath, projectsItem, uuids.projectEndQUuid]|reply_path -%}
-    {%- set projectEnd = repliesMap[projectEndPath]|reply_str_value -%}
-    {%- set funderParts = [uuids.adminDetailsCUuid, uuids.projectsQUuid, projectsItem, uuids.fundersQUuid] -%}
+    {%- set projectNumberPath = active.path(projectParts + [uuids.projectNumberQUuid], 'ValueQuestion') -%}
+    {%- set projectNumber = repliesMap[projectNumberPath]|reply_str_value if projectNumberPath else '' -%}
+    {%- set projectStartPath = active.path(projectParts + [uuids.projectStartQUuid], 'ValueQuestion') -%}
+    {%- set projectStart = repliesMap[projectStartPath]|reply_str_value if projectStartPath else '' -%}
+    {%- set projectEndPath = active.path(projectParts + [uuids.projectEndQUuid], 'ValueQuestion') -%}
+    {%- set projectEnd = repliesMap[projectEndPath]|reply_str_value if projectEndPath else '' -%}
+    {%- set funderParts = projectParts + [uuids.fundersQUuid] -%}
     {%- set fundersPath = active.path(funderParts, 'ListQuestion') -%}
     {%- set fundersItems = repliesMap[fundersPath]|reply_items if fundersPath else [] -%}
     {% set fundingItems %}
@@ -39,11 +41,11 @@
         {% endif %}
       {% endfor %}
     {% endset %}
-      {% if projectAcronym|trim or projectNumber or projectStart or projectEnd or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
+      {% if projectAcronym|trim or projectNumber|trim or projectStart|trim or projectEnd|trim or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
         {% if projectAcronym|trim %}<tr data-fact-id="project-acronym" data-status="complete"><th scope="row">Project acronym</th><td>{{ projectAcronym|e }}</td></tr>{% endif %}
-        {% if projectNumber or output_profile|default('review') != 'submission' %}<tr><th scope="row">Project Number</th><td>{{ projectNumber if projectNumber else "N/A" }}</td></tr>{% endif %}
-        {% if projectStart or output_profile|default('review') != 'submission' %}<tr><th scope="row">Start date</th><td>{{ projectStart if projectStart else "N/A" }}</td></tr>{% endif %}
-        {% if projectEnd or output_profile|default('review') != 'submission' %}<tr><th scope="row">End date</th><td>{{ projectEnd if projectEnd else "N/A" }}</td></tr>{% endif %}
+        {% if projectNumber|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-number"><th scope="row">Project Number</th><td>{{ projectNumber|e if projectNumber|trim else "N/A" }}</td></tr>{% endif %}
+        {% if projectStart|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-start"><th scope="row">Start date</th><td>{{ projectStart|e if projectStart|trim else "N/A" }}</td></tr>{% endif %}
+        {% if projectEnd|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-end"><th scope="row">End date</th><td>{{ projectEnd|e if projectEnd|trim else "N/A" }}</td></tr>{% endif %}
       </tbody></table>{% endif %}
       {% if fundingItems|trim or output_profile|default('review') != 'submission' %}<div class="project-funding" data-fact-id="project-funding"><h4>Funding</h4>
           {%- if fundingItems|trim %}
@@ -53,9 +55,9 @@
           {%- endif -%}
       </div>{% endif %}
 
-    {%- set projectAbstractPath = [projectsPath, projectsItem, uuids.projectAbstractQUuid]|reply_path -%}
-    {%- set projectAbstract = repliesMap[projectAbstractPath]|reply_str_value -%}
-    {%- if projectAbstract %}
+    {%- set projectAbstractPath = active.path(projectParts + [uuids.projectAbstractQUuid], 'ValueQuestion') -%}
+    {%- set projectAbstract = repliesMap[projectAbstractPath]|reply_str_value if projectAbstractPath else '' -%}
+    {%- if projectAbstract|trim %}
       <section class="abstract">
         {{ projectAbstract|markdown }}
       </section>

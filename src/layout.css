@@ -44,6 +44,12 @@ html body .data-gap { padding: .45em .65em; border-left: 3px solid #95651b; back
 /* Reading units, not arbitrary fixed-height pages. */
 html body #dmp-content { break-before: page; }
 html body #dmp-projects h3 { font-size: 14pt; font-weight: bold; color: #222; }
+/* A project title or identifier may contain a long unbroken token. */
+html body .document-heading h1,
+html body .document-heading .document-meta,
+html body #dmp-projects > .project > h3,
+html body .ethical-project-summary > strong,
+html body #q-required-resources .project-resources > p:first-child > strong { overflow-wrap: anywhere; word-break: break-word; }
 /* Stable overview columns: long acronyms must not squeeze labels vertically.
    Keep wrapping in the value cell; other tables and Word styles are unchanged. */
 html body #dmp-projects > .project > table.project-details { table-layout: fixed; }

@@ -74,19 +74,21 @@
     {%- import 'src/resource-prose.html.j2' as resourceProse -%}
     {{- resourceProse.render(resourceOverview.original, resourceOverview.explicitPair) -}}
     {# costs #}
-    {%- set projectPath = [uuids.adminDetailsCUuid, uuids.projectsQUuid]|reply_path -%}
-    {%- set projectItems = repliesMap[projectPath]|reply_items -%}
+    {%- import 'src/active-answer.j2' as active with context -%}
+    {%- set budgetProjectParts = [uuids.adminDetailsCUuid, uuids.projectsQUuid] -%}
+    {%- set projectPath = active.path(budgetProjectParts, 'ListQuestion') -%}
+    {%- set projectItems = repliesMap[projectPath]|reply_items if projectPath else [] -%}
     {%- if projectItems|length > 0 -%}
     {%- set visibleBudget = namespace(any=false) -%}{%- for budgetProject in projectItems -%}{%- if repliesMap[[projectPath, budgetProject, uuids.costQUuid]|reply_path]|reply_items -%}{%- set visibleBudget.any = true -%}{%- endif -%}{%- endfor -%}{% if output_profile|default('review') != 'submission' or visibleBudget.any %}<h4{% if word_budget_reading|default(false) %} class="word-budget-heading"{% endif %}>Data-management budget</h4>{% endif %}
         {%- for i in projectItems -%}
             {%- set projectItem = [projectPath, i]|reply_path -%}
-            {%- set projectItemNameQUuid = [projectItem, uuids.projectNameQUuid]|reply_path -%}
-            {%- set projectItemNameReply = repliesMap[projectItemNameQUuid]|reply_str_value -%}
+            {%- set projectItemNameQUuid = active.path(budgetProjectParts + [i, uuids.projectNameQUuid], 'ValueQuestion') -%}
+            {%- set projectItemNameReply = repliesMap[projectItemNameQUuid]|reply_str_value if projectItemNameQUuid else '' -%}
 
-            {%- set projectItemNumberQUuid = [projectItem, uuids.projectNumberQUuid]|reply_path -%}
-            {%- set projectItemNumberReply = repliesMap[projectItemNumberQUuid]|reply_str_value -%}
+            {%- set projectItemNumberQUuid = active.path(budgetProjectParts + [i, uuids.projectNumberQUuid], 'ValueQuestion') -%}
+            {%- set projectItemNumberReply = repliesMap[projectItemNumberQUuid]|reply_str_value if projectItemNumberQUuid else '' -%}
             {% if output_profile|default('review') != 'submission' or repliesMap[[projectItem, uuids.costQUuid]|reply_path]|reply_items %}<div class="project-resources" data-item-id="{{ projectItem }}">
-                {% if projectItems|length > 1 %}{% if output_profile|default('review') == 'submission' and not projectItemNameReply %}<p><strong>Project {{ projectItems.index(i) + 1 }}{{ " - " + projectItemNumberReply if projectItemNumberReply}} </strong></p>{% else %}<p><strong>{{ projectItemNameReply if projectItemNameReply else "(no name given)" }}{{ " - " + projectItemNumberReply if projectItemNumberReply}} </strong></p>{% endif %}{% endif %}
+                {% if projectItems|length > 1 %}{% if output_profile|default('review') == 'submission' and not projectItemNameReply|trim %}<p><strong>Project {{ projectItems.index(i) + 1 }}{{ (" - " + projectItemNumberReply)|e if projectItemNumberReply|trim}} </strong></p>{% else %}<p><strong>{{ projectItemNameReply|e if projectItemNameReply|trim else "(no name given)" }}{{ (" - " + projectItemNumberReply)|e if projectItemNumberReply|trim}} </strong></p>{% endif %}{% endif %}
 
                 {%- set projectCostPath = [projectItem, uuids.costQUuid]|reply_path -%}
                 {%- set projectCostItems = repliesMap[projectCostPath]|reply_items -%}
