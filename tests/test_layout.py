@@ -18,6 +18,65 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_authorization_keep_changes_only_the_fixed_word_lead(self):
+        import sys
+        from lxml import etree as E
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from current_support import IDS, PREFIX, environment, path
+        from probe_budget_word import IMAGE
+        parent = path('accessCUuid', 'openImmediatelyQUuid')
+        reason = path(parent, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
+        auth = path(reason, 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid')
+        who = path(auth, 'legalReasonsAuthenticatedYesAUuid', 'legalReasonsAuthorizeQUuid')
+        template = environment(ROOT).from_string(PREFIX + "{% include 'src/questions/10-share-restrictions.html.j2' %}")
+        cases = []
+        for kind in ['Other', 'OldCommittee']:
+            for value in ['', '  ', '<p>Access office.</p>', '<p>Original.</p>' * 50,
+                    '<ul><li>Original A.</li><li>Original B.</li></ul>',
+                    '<table><tr><td>Original.</td><td>Keep.</td></tr></table>']:
+                replies = {parent: IDS['openImmediatelyNoAUuid'], reason: IDS['notOpenLegalReasonsYesAUuid'],
+                    auth: IDS['legalReasonsAuthenticatedYesAUuid'], who: IDS['legalReasonsAuthorize'+kind+'AUuid'],
+                    path(who, 'legalReasonsAuthorize'+kind+'AUuid', 'legalReasonsAuthorize'+kind+'QUuid'): value}
+                html = template.render(repliesMap=replies, output_profile='submission')
+                cases.append([html, int(bool(value.strip()))])
+        runner = '''import json,sys,subprocess,tempfile,zipfile
+from pathlib import Path
+p=json.load(sys.stdin);results=[]
+with tempfile.TemporaryDirectory() as tmp:
+ f=Path(tmp)/'pilot.lua';f.write_text(p['lua']);out=Path(tmp)/'test.docx'
+ for html,count in p['cases']:
+  pair=[]
+  for text in [html.replace('class="answer-lead"','class="authorization-control"'),html]:
+   subprocess.run(['pandoc','--from=html','--to=docx','--lua-filter='+str(f),'-o',str(out)],input=text.encode(),check=True)
+   with zipfile.ZipFile(out) as z:pair.append(z.read('word/document.xml').decode())
+  results.append([count,pair])
+print(json.dumps(results))
+'''
+        raw = subprocess.check_output(['docker','run','--rm','--network','none','-i',
+            '--entrypoint','python',IMAGE,'-c',runner],
+            input=json.dumps(dict(cases=cases,lua=(ROOT/'src/word/pilot.lua').read_text())).encode(),timeout=180)
+        ns = {'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+        for count, pair in json.loads(raw):
+            before, after = [E.fromstring(value.encode()) for value in pair]
+            oldps, newps = [tree.findall('.//w:p',ns) for tree in [before,after]]
+            self.assertEqual(len(oldps),len(newps)); changed = 0
+            for oldp,newp in zip(oldps,newps):
+                if E.tostring(oldp) == E.tostring(newp): continue
+                style = newp.find('w:pPr/w:pStyle',ns)
+                self.assertIsNotNone(style)
+                self.assertEqual(style.get('{'+ns['w']+'}val'),'PilotLead')
+                old_style = oldp.find('w:pPr/w:pStyle',ns)
+                if old_style is not None:
+                    self.assertEqual(old_style.get('{'+ns['w']+'}val'),'FirstParagraph')
+                self.assertIn('A data sharing agreement will be required.', ''.join(newp.itertext()))
+                prop = style.getparent()
+                if old_style is None: prop.remove(style)
+                else: style.set('{'+ns['w']+'}val','FirstParagraph')
+                if not len(prop) and oldp.find('w:pPr',ns) is None: newp.remove(prop)
+                changed += 1
+            self.assertEqual(changed,count)
+            self.assertEqual(E.tostring(before),E.tostring(after),'Authored content or other Word properties changed')
+
     def test_version_value_alignment_preserves_content_and_unowned_tables(self):
         probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
         worker = importlib.util.module_from_spec(probe_spec)

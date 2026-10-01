@@ -271,28 +271,41 @@
       {%- set legalReasonsAuthenticatedAUuid = repliesMap[legalReasonsAuthenticatedPath]|reply_str_value -%}
       {%- set legalReasonsPath = [pathPrefix, uuids.notOpenLegalReasonsQUuid]|reply_path -%}
       {%- if repliesMap[legalReasonsPath]|reply_str_value == uuids.notOpenLegalReasonsYesAUuid and legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthenticatedYesAUuid -%}
+        {%- set legalReasonsAuthorizePath = [legalReasonsAuthenticatedPath, uuids.legalReasonsAuthenticatedYesAUuid, uuids.legalReasonsAuthorizeQUuid]|reply_path -%}
+        {%- set legalReasonsAuthorizeAUuid = repliesMap[legalReasonsAuthorizePath]|reply_str_value -%}
+        {%- set authorizationDetails = '' -%}
+        {%- if legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeOldCommitteeAUuid -%}
+          {%- set detailPath = [legalReasonsAuthorizePath, uuids.legalReasonsAuthorizeOldCommitteeAUuid, uuids.legalReasonsAuthorizeOldCommitteeQUuid]|reply_path -%}
+          {%- set authorizationDetails = repliesMap[detailPath]|reply_str_value -%}
+        {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeOtherAUuid -%}
+          {%- set detailPath = [legalReasonsAuthorizePath, uuids.legalReasonsAuthorizeOtherAUuid, uuids.legalReasonsAuthorizeOtherQUuid]|reply_path -%}
+          {%- set authorizationDetails = repliesMap[detailPath]|reply_str_value -%}
+        {%- endif -%}
+        {%- set hasAuthorizationDetails = authorizationDetails|trim != '' -%}
+        {% set authorizationLead %}
         <p data-fact-id="authenticated-access">
           A data sharing agreement will be required.
-          {%- set legalReasonsAuthorizePath = [legalReasonsAuthenticatedPath, uuids.legalReasonsAuthenticatedYesAUuid, uuids.legalReasonsAuthorizeQUuid]|reply_path -%}
-          {%- set legalReasonsAuthorizeAUuid = repliesMap[legalReasonsAuthorizePath]|reply_str_value -%}
           {%- if legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeMemberAUuid %}
             People can apply to one of the project members.
           {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeNewCommitteeAUuid %}
             People can apply to the data access committee that we will set up.
           {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeOldCommitteeAUuid %}
-            {%- set legalReasonsAuthorizeOldCommitteePath = [legalReasonsAuthorizePath, uuids.legalReasonsAuthorizeOldCommitteeAUuid, uuids.legalReasonsAuthorizeOldCommitteeQUuid]|reply_path -%}
-            {%- set legalReasonsAuthorizeOldCommittee = repliesMap[legalReasonsAuthorizeOldCommitteePath]|reply_str_value -%}
-            {%- if legalReasonsAuthorizeOldCommittee %}
-              People can apply to the following data access committee: <em>{{ legalReasonsAuthorizeOldCommittee|markdown }}</em>
-            {%- else -%}
+            {%- if hasAuthorizationDetails %}
+              People can apply to the following data access committee:
+            {%- else %}
               People can apply to an existing data access committee.
             {%- endif -%}
           {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeOtherAUuid %}
-            {%- set legalReasonsAuthorizeOtherPath = [legalReasonsAuthorizePath, uuids.legalReasonsAuthorizeOtherAUuid, uuids.legalReasonsAuthorizeOtherQUuid]|reply_path -%}
-            {%- set legalReasonsAuthorizeOther = repliesMap[legalReasonsAuthorizeOtherPath]|reply_str_value %}
-            For the authorization of potential users, we will make special arrangements{{ ": " ~ legalReasonsAuthorizeOther|markdown if legalReasonsAuthorizeOther else "." }}
+            {% if hasAuthorizationDetails %}For the authorization of potential users, we will make special arrangements:{% else %}For the authorization of potential users, we will make special arrangements.{% endif %}
           {%- endif -%}
         </p>
+        {% endset %}
+        {# Keep only the fixed lead with the first authored block. Never place
+           block Markdown inside a paragraph or bind the entire free answer. #}
+        {% if hasAuthorizationDetails %}
+          <div class="answer-lead">{{ authorizationLead }}</div>
+          <div class="authorization-details">{{ authorizationDetails|markdown }}</div>
+        {% else %}{{ authorizationLead }}{% endif %}
       {%- endif -%}
     {%- endif -%}
 

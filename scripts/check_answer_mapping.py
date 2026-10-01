@@ -84,13 +84,17 @@ def check(root, language="en"):
         authenticated = path(reason, 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid')
         authorization = path(authenticated, 'legalReasonsAuthenticatedYesAUuid', 'legalReasonsAuthorizeQUuid')
         detail = path(authorization, 'legalReasonsAuthorizeOtherAUuid', 'legalReasonsAuthorizeOtherQUuid')
+        committee = path(authorization, 'legalReasonsAuthorizeOldCommitteeAUuid', 'legalReasonsAuthorizeOldCommitteeQUuid')
         base = {parent: IDS['openImmediatelyNoAUuid'], reason: IDS['notOpenLegalReasonsYesAUuid'],
                 authenticated: IDS['legalReasonsAuthenticatedYesAUuid']}
         authored = '<p>Access office: <em>Coast A</em>.</p><p>Retain original notes.</p>'
         for choice, value, profile in itertools.product(
                 ['Member', 'NewCommittee', 'OldCommittee', 'Other', None, 'obsolete'],
-                ['', '  \n ', authored], ['review', 'submission']):
-            replies = dict(base); replies[detail] = value
+                ['', '  \n ', authored, authored * 40,
+                 '<ul><li>Access office: Coast A.</li><li>Keep the original decision.</li></ul>',
+                 '<table><tr><th>Office</th><th>Record</th></tr><tr><td>Access office: Coast A.</td><td>access.csv</td></tr></table>'],
+                ['review', 'submission']):
+            replies = dict(base); replies[detail] = replies[committee] = value
             if choice: replies[authorization] = IDS.get('legalReasonsAuthorize'+choice+'AUuid', choice)
             soup = BeautifulSoup(legal.render(repliesMap=replies, output_profile=profile), 'html.parser')
             q8 = soup.select_one('#q-copyright-ipr')
@@ -98,7 +102,22 @@ def check(root, language="en"):
             assert len(q8.select('[data-fact-id="authorization-arrangements"]')) == int(known)
             assert len(q8.select('[data-fact-id="authorization-details"]')) == int(choice == 'Other' and not value.strip() and profile == 'review')
             assert '尚未決定授權安排' not in q8.get_text() and 'not yet decided on the authorization' not in q8.get_text()
-            assert ('Access office:' in q8.get_text()) == (choice == 'Other' and bool(value.strip()))
+            assert ('Access office:' in q8.get_text()) == (choice in ['Other', 'OldCommittee'] and bool(value.strip()))
+            q10 = soup.select_one('#q-share-restrictions')
+            body = q10.select_one('.authorization-details')
+            has_detail = choice in ['Other', 'OldCommittee'] and bool(value.strip())
+            assert bool(body) == has_detail
+            assert bool(q10.select('.answer-lead > [data-fact-id="authenticated-access"]')) == has_detail
+            assert not q10.select('p p,p div,p ul,p table,em p')
+            if has_detail:
+                assert body.decode_contents() == value
+                assert body.find_previous_sibling('div')['class'] == ['answer-lead']
+            elif choice == 'Other':
+                lead = q10.select_one('[data-fact-id="authenticated-access"]')
+                assert lead.get_text().strip().endswith('.' if language == 'en' else '。')
+            if language == 'en' and choice == 'OldCommittee' and not value.strip():
+                lead = q10.select_one('[data-fact-id="authenticated-access"]')
+                assert 'required. People can apply' in ' '.join(lead.get_text().split())
             if choice == 'Other':
                 if value.strip():
                     for p in BeautifulSoup(value, 'html.parser').select('p'): assert str(p) in str(q8)
