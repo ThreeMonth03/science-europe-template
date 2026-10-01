@@ -14,8 +14,10 @@
 {% elif reason == uuids.notPublishedReasonLostAUuid %}
   <p data-fact-id="nonpublication-reason" data-status="complete">According to the questionnaire, this dataset will not be published because it was lost.</p>
 {% elif reason == uuids.notPublishedReasonOtherAUuid %}
-  <div class="answer-lead"><p>Other reasons for not publishing this dataset:</p></div>
   {% set reasonText = repliesMap[[reasonPath, uuids.notPublishedReasonOtherAUuid, uuids.notPublishedReasonOtherQUuid]|reply_path]|reply_str_value %}
+  {% if reasonText|trim or output_profile|default('review') != 'submission' %}
+    <div class="answer-lead"><p>Other reasons for not publishing this dataset:</p></div>
+  {% endif %}
   {% if reasonText|trim %}
     <div class="answer-detail" data-fact-id="nonpublication-reason" data-status="complete">{{ reasonText|markdown }}</div>
   {% else %}

@@ -28,15 +28,17 @@ class LayoutTests(unittest.TestCase):
             for value, long in [('x' * 160, False), ('x' * 161, True),
                                 ('中' * 80, False), ('中' * 81, True),
                                 ('<em>Original.csv</em> ' * 80, True)]:
-                name = 'case-' + str(len(cases))
-                body = '<div class="'+cls+'"><p>'+value+'</p><p>Original second paragraph.</p></div>'
-                cases.append((name, body, int(long and cls != 'unowned')))
+                for bold in [False, True]:
+                    name = 'case-' + str(len(cases))
+                    content = '<strong>'+value+'</strong>' if bold else value
+                    body = '<div class="'+cls+'"><p>'+content+'</p><p>Original second paragraph.</p></div>'
+                    cases.append((name, body, int(long and (bold or cls != 'unowned'))))
         lua = (ROOT / 'src/word/pilot.lua').read_text()
-        guard = 'if units <= 160 then'
+        guard = 'return units <= 160'
         self.assertEqual(lua.count(guard), 1)
         html = ''.join('<div id="'+name+'">'+body+'</div>' for name, body, _ in cases)
         results = []
-        for variant in [lua.replace(guard, 'if true then'), lua]:
+        for variant in [lua.replace(guard, 'return true'), lua]:
             raw = subprocess.check_output(['docker', 'run', '--rm', '--network', 'none', '-i',
                 '--entrypoint', 'python', IMAGE, '-c', RUNNER], input=json.dumps(dict(
                     lua=variant, html=html,
@@ -46,7 +48,8 @@ class LayoutTests(unittest.TestCase):
             if before == after: return 0
             if isinstance(before, dict) and isinstance(after, dict):
                 if before.get('t') == 'Div' and after.get('t') == 'Para':
-                    self.assertEqual(before['c'], [['', [], [['custom-style', 'Pilot Lead']]], [after]])
+                    self.assertIn(before['c'][0], [['', [], [['custom-style', style]]] for style in ['Pilot Lead', 'Pilot Label']])
+                    self.assertEqual(before['c'][1], [after])
                     return 1
                 self.assertEqual(before.keys(), after.keys())
                 return sum(removed_leads(before[k], after[k]) for k in before)
@@ -62,7 +65,7 @@ class LayoutTests(unittest.TestCase):
             self.assertEqual(before['text'], after['text'])
             self.assertEqual(before['other_xml'], after['other_xml'])
             if before['style'] != after['style']:
-                self.assertEqual(before['style'], 'PilotLead')
+                self.assertIn(before['style'], ['PilotLead', 'PilotLabel'])
                 self.assertIn(after['style'], [None, 'BodyText', 'FirstParagraph'])
                 changed += 1
         self.assertEqual(changed, sum(expected for _, _, expected in cases))

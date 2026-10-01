@@ -56,8 +56,18 @@ function Table(tbl)
   return align_dataset_version(tbl)
 end
 
+-- Both automatic label paths need the same bound: bold authored paragraphs
+-- are still prose and must be free to paginate when they are long.
+local function short_automatic_lead(block)
+  local units = 0
+  for _, code in utf8.codes(pandoc.utils.stringify(block)) do
+    units = units + (code >= 0x2E80 and 2 or 1)
+  end
+  return units <= 160
+end
+
 function Para(paragraph)
-  if #paragraph.content == 1 and paragraph.content[1].t == "Strong" then
+  if #paragraph.content == 1 and paragraph.content[1].t == "Strong" and short_automatic_lead(paragraph) then
     return pandoc.Div({paragraph}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Label"}))
   end
 end
@@ -821,11 +831,7 @@ function Div(div)
   if (div.classes:includes("answer-detail") or div.classes:includes("answer")) and #div.content > 1 and div.content[1].t == "Para" then
     -- Only a short opening may act as a lead. Binding a long authored paragraph
     -- to the next block can strand its heading on an otherwise empty page.
-    local units = 0
-    for _, code in utf8.codes(pandoc.utils.stringify(div.content[1])) do
-      units = units + (code >= 0x2E80 and 2 or 1)
-    end
-    if units <= 160 then
+    if short_automatic_lead(div.content[1]) then
       div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
     end
     return div

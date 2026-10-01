@@ -37,7 +37,7 @@ def folder_replies():
 
 def check(root, language):
     counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0, missing_name_cases=0, quality_other_cases=0,
-                  reference_identity_cases=0, instrument_cases=0)
+                  reference_identity_cases=0, instrument_cases=0, missing_detail_cases=0)
     css = (root / 'src/layout.css').read_text()
     assert 'html body li > strong:first-child {' not in css
     assert 'html body li > strong.item-label { display: block; break-after: avoid; }' in css
@@ -49,6 +49,54 @@ def check(root, language):
         names = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}{% include 'src/questions/02-what-data.html.j2' %}{% include 'src/questions/04-quality-control.html.j2' %}")
         def render(t, replies, profile):
             return BeautifulSoup(t.render(repliesMap=replies, output_profile=profile), 'html.parser')
+
+        publication = path('preservingCUuid', 'producedDataQUuid', 'dataset-1', 'isPublishedDataQUuid')
+        reason = path(publication, 'isPublishedDataNoAUuid', 'notPublishedReasonQUuid')
+        archive = path('preservingCUuid', 'archivedAfterQUuid')
+        period = path(archive, 'archivedAfterYesAUuid', 'archivedAfterPeriodQUuid')
+        for filename, base, detail, fact in [
+                ('preservation-publication-reason', {reason: IDS['notPublishedReasonOtherAUuid']},
+                 path(reason, 'notPublishedReasonOtherAUuid', 'notPublishedReasonOtherQUuid'), 'nonpublication-reason'),
+                ('post-project-archive', {archive: IDS['archivedAfterYesAUuid'], period: IDS['archivedAfterPeriodOtherAUuid']},
+                 path(period, 'archivedAfterPeriodOtherAUuid', 'archivedAfterPeriodOtherQUuid'), 'archive-minimum-period')]:
+            section = env.from_string(prefix + "{% set isPublishedDataPath = '"+publication+"' %}{% include 'src/"+filename+".html.j2' %}")
+            for value, profile in itertools.product([None, '', ' \t\n\u3000', AUTHORED], ['review', 'submission']):
+                replies = dict(base)
+                if value is not None: replies[detail] = value
+                soup = render(section, replies, profile)
+                filled = bool((value or '').strip())
+                assert len(soup.select('.answer-lead')) == int(filled or profile == 'review')
+                body = soup.select_one('.answer-detail[data-fact-id="'+fact+'"]')
+                assert bool(body) == filled
+                if body: assert body.decode_contents() == AUTHORED
+                assert bool(soup.select('.data-gap[data-fact-id="'+fact+'"]')) == (not filled and profile == 'review')
+                if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
+                counts['missing_detail_cases'] += 1
+
+        resources = env.from_string(prefix + "{% include 'src/questions/15-required-resources.html.j2' %}")
+        expertise = path('adminDetailsCUuid', 'additionalExpertiseQUuid')
+        hardware = path('adminDetailsCUuid', 'additionalHWSWQUuid')
+        for parent, choice, leaf, fact, gap in [
+                (expertise, 'additionalExpertiseYesTrainAUuid', 'additionalExpertiseYesTrainTrainingQUuid', 'specialist-expertise', 'specialist-expertise-detail'),
+                (expertise, 'additionalExpertiseYesHireAUuid', 'additionalExpertiseYesHireExpertiseQUuid', 'specialist-expertise', 'specialist-expertise-detail'),
+                (hardware, 'additionalHWSWYesAUuid', 'additionalHWSWYesWhatQUuid', 'hardware-software', 'hardware-software-detail')]:
+            for value, profile in itertools.product([None, '', ' \t\n\u3000', AUTHORED], ['review', 'submission']):
+                replies = {parent: IDS[choice]}
+                if value is not None: replies[path(parent, choice, leaf)] = value
+                soup = render(resources, replies, profile)
+                filled = bool((value or '').strip())
+                assert soup.select_one('[data-fact-id="'+fact+'"]')['data-status'] == ('complete' if filled else 'partial')
+                assert bool(soup.select('.answer-detail')) == filled
+                assert bool(soup.select('.data-gap[data-fact-id="'+gap+'"]')) == (not filled and profile == 'review')
+                if filled:
+                    assert AUTHORED in str(soup)
+                    if choice == 'additionalExpertiseYesHireAUuid' and language == 'zh-Hant':
+                        assert soup.select_one('.answer-detail strong').get_text() == '擬聘人員所需專長'
+                else:
+                    empty = dict(replies); empty[path(parent, choice, leaf)] = ''
+                    assert str(soup) == str(render(resources, empty, profile))
+                if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
+                counts['missing_detail_cases'] += 1
 
         reference = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}{% include 'src/questions/08-copyright-ipr.html.j2' %}")
         for kind, choice, name, source, profile in itertools.product(

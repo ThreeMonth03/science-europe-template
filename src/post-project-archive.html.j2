@@ -33,8 +33,10 @@
     {% set archiveDuration %}{{ macros.quantity(years, 'years') }}{% endset %}
     <p data-fact-id="archive-minimum-period" data-status="complete">The archive will be kept for at least {{ archiveDuration }}.</p>
   {% elif period == uuids.archivedAfterPeriodOtherAUuid %}
-    <div class="answer-lead"><p>Other arrangements for the archive's minimum lifetime:</p></div>
     {% set arrangement = repliesMap[[periodPath, uuids.archivedAfterPeriodOtherAUuid, uuids.archivedAfterPeriodOtherQUuid]|reply_path]|reply_str_value %}
+    {% if arrangement|trim or output_profile|default('review') != 'submission' %}
+      <div class="answer-lead"><p>Other arrangements for the archive's minimum lifetime:</p></div>
+    {% endif %}
     {% if arrangement|trim %}
       <div class="answer-detail" data-fact-id="archive-minimum-period" data-status="complete">{{ arrangement|markdown }}</div>
     {% else %}

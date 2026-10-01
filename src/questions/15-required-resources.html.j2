@@ -12,26 +12,26 @@
     {%- elif expertiseAUuid == uuids.additionalExpertiseYesTrainAUuid -%}
       {%- set expertiseTrainPath = [expertisePath, uuids.additionalExpertiseYesTrainAUuid, uuids.additionalExpertiseYesTrainTrainingQUuid]|reply_path -%}
       {%- set expertiseTrainText = repliesMap[expertiseTrainPath]|reply_str_value -%}
-      <div class="answer-lead"><p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseTrainText else 'partial' }}">Additional specialist expertise is required. Existing staff will receive training.</p></div>
-      {% if expertiseTrainText %}
+      <div class="answer-lead"><p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseTrainText|trim else 'partial' }}">Additional specialist expertise is required. Existing staff will receive training.</p></div>
+      {% if expertiseTrainText|trim %}
         <div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete">
           {{ expertiseTrainText|markdown }}
         </div>
       {% endif %}
-      {%- if not expertiseTrainText -%}
+      {%- if not expertiseTrainText|trim -%}
         {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise-detail" data-status="missing"><strong>Information not provided:</strong> the training that existing staff will receive.</p>{% endif %}
       {%- endif -%}
     {%- elif expertiseAUuid == uuids.additionalExpertiseYesHireAUuid -%}
       {%- set expertiseHirePath = [expertisePath, uuids.additionalExpertiseYesHireAUuid, uuids.additionalExpertiseYesHireExpertiseQUuid]|reply_path -%}
       {%- set expertiseHireText = repliesMap[expertiseHirePath]|reply_str_value -%}
-      <p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseHireText else 'partial' }}">Additional specialist expertise is required. New staff will be recruited.</p>
-      {% if expertiseHireText %}
+      <p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseHireText|trim else 'partial' }}">Additional specialist expertise is required. New staff will be recruited.</p>
+      {% if expertiseHireText|trim %}
         <div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete">
           <p><strong>Expertise to recruit</strong></p>
           {{ expertiseHireText|markdown }}
         </div>
       {% endif %}
-      {%- if not expertiseHireText -%}
+      {%- if not expertiseHireText|trim -%}
         {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise-detail" data-status="missing"><strong>Information not provided:</strong> the expertise for which new staff will be hired.</p>{% endif %}
       {%- endif -%}
     {%- else -%}
@@ -47,7 +47,7 @@
     {%- elif additionalHWSWAUuid == uuids.additionalHWSWYesAUuid -%}
       {%- set additionalHWSWWhatPath = [additionalHWSWPath, uuids.additionalHWSWYesAUuid, uuids.additionalHWSWYesWhatQUuid]|reply_path -%}
       {%- set additionalHWSWWhat = repliesMap[additionalHWSWWhatPath]|reply_str_value -%}
-      {%- if additionalHWSWWhat -%}
+      {%- if additionalHWSWWhat|trim -%}
         <div class="answer-detail" data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="complete">
           <p><strong>Additional hardware or software required</strong></p>
           {{ additionalHWSWWhat|markdown }}
