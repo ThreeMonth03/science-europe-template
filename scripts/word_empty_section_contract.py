@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import subprocess
+from current_repairs_contract import historical_version
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = 'ff6eea886d27f5bca4682cd3f3c59e1701a83f10'
@@ -27,7 +28,7 @@ def project_source(sources=None, metadata=None):
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None:
         metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] == '0.3.51':
+    if historical_version(metadata['version']) == '0.3.51':
         from q3_policy_prose_contract import project_source as before_q3
         sources, metadata = before_q3(sources, metadata)
     recipe = load('recipe'); before = recipe.baseline_sources(ROOT)

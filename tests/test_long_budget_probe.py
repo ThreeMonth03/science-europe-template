@@ -3,13 +3,26 @@ import sys
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from probe_long_budget_word import cases,units,expand_expected
+from probe_long_budget_word import cases,current_cases,units,expand_expected
 
 
 class LongBudgetProbeTests(unittest.TestCase):
     def test_guard_fixture_coverage(self):
         rows=cases(); self.assertEqual(28,len(rows)); self.assertEqual(9,sum(r[2] for r in rows))
         self.assertEqual(len(rows),len({r[0] for r in rows}))
+
+    def test_current_long_text_cases_extend_without_rewriting_history(self):
+        for grouped, count in [(False,31),(True,40)]:
+            original=cases(grouped=grouped); current=current_cases(grouped=grouped)
+            self.assertEqual(count,len(current))
+            self.assertEqual(len(current),len({r[0] for r in current}))
+            self.assertEqual([(name,html) for name,html,_ in original],
+                             [(name,html) for name,html,_ in current[:len(original)]])
+            for name,_,selected in current:
+                if name=='wide-paragraph' or name.startswith('single-'):
+                    self.assertTrue(selected)
+        self.assertFalse(next(ok for name,_,ok in cases() if name=='wide-paragraph'))
+        self.assertEqual(13,sum(r[2] for r in current_cases()))
 
     def test_units_preserve_all_wrappers_and_inline_content(self):
         para={'t':'Para','c':[{'t':'Code','c':[['',[],[]],'Cost-2027.csv']}]}

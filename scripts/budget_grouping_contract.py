@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+from current_repairs_contract import historical_version
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = '200fac5239051e1a877493c7d52c3a199964c718'
@@ -65,7 +66,7 @@ def historical(name): return subprocess.check_output(['git', '-C', str(ROOT), 's
 def project_source():
     sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] in ['0.3.44', '0.3.45', '0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
+    if historical_version(metadata['version']) in ['0.3.44', '0.3.45', '0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
         from submission_preview_contract import project_source as project_submission
         sources, metadata = project_submission(sources, metadata)
     previous = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()

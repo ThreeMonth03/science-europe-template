@@ -280,8 +280,9 @@ local function keep_short_budget_overview(div)
 end
 
 -- Long Q15 purposes get full-width paragraph rows and a repeating identity
--- header. Validate all rows first; unknown/nested/oversized units keep the old
--- layout. Reuse translated headers and original blocks; never synthesize prose.
+-- header. A single long authored paragraph needs this layout too: restricting
+-- eligibility to paragraph count leaves it in a very tall narrow Word cell.
+-- Validate all rows first; reuse original blocks, never split/synthesize prose.
 local function expand_long_budget_tables(div)
   local function width(value)
     local total = 0
@@ -297,23 +298,24 @@ local function expand_long_budget_tables(div)
     return true
   end
   local units
-  units = function(blocks, allow_list)
+  units = function(blocks, allow_list, paragraph_limit)
+    paragraph_limit = paragraph_limit or 800
     local result = pandoc.List()
     for _, block in ipairs(blocks) do
       if block.t == "Para" or block.t == "Plain" then
-        if width(block) > 800 or not inline_ok(block.content) then return nil end
+        if width(block) > paragraph_limit or not inline_ok(block.content) then return nil end
         result:insert(block:clone())
       elseif block.t == "Div" then
         local style = block.attributes["custom-style"]
         if block.identifier ~= "" or (style and style ~= "Pilot Label" and style ~= "Pilot Lead" and style ~= "Pilot List Lead") then return nil end
-        local children = units(block.content, allow_list)
+        local children = units(block.content, allow_list, paragraph_limit)
         if not children then return nil end
         for _, child in ipairs(children) do
           local wrapper = block:clone(); wrapper.content = {child}; result:insert(wrapper)
         end
       elseif block.t == "BulletList" and allow_list and #block.content <= 8 and width(block) <= 800 then
         for _, item in ipairs(block.content) do
-          local children = units(item, false)
+          local children = units(item, false, paragraph_limit)
           if not children or #children ~= 1 then return nil end
         end
         result:insert(block:clone())
@@ -348,9 +350,12 @@ local function expand_long_budget_tables(div)
       end
       local rest = pandoc.List()
       for i = 2, #first do rest:insert(first[i]) end
-      local parts = units(rest, true)
+      -- A long inline-only purpose remains one naturally splittable full-width
+      -- row. Header/metadata/list limits stay unchanged; no prose-length cap,
+      -- cantSplit, or keepNext sends an ordinary long answer back to narrow cells.
+      local parts = units(rest, true, math.huge)
       if not parts or #parts > 160 then return tbl end
-      local long = #parts >= 12
+      local long = #parts >= 12 or width(rest) > 800
       plans[index] = {long=long, parts=parts}; any_long = any_long or long
     end
     if not any_long then return tbl end

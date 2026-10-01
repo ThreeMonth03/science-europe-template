@@ -59,6 +59,17 @@ def cases(grouped=False):
     return result
 
 
+def current_cases(grouped=False):
+    """Extend the unchanged historical matrix for the current long-text rule."""
+    result = [(name, html, selected or name == 'wide-paragraph')
+              for name, html, selected in cases(grouped=grouped)]
+    return result + [
+        ('single-long-en',example(n=1,cell='Original retained purpose. '*60),True),
+        ('single-long-zh',example(n=1,cell='保留研究紀錄、進行資料驗證並維護長期儲存。'*28),True),
+        ('single-over-eight-thousand',example(n=1,cell='保留原始資料。'*1000),True),
+    ]
+
+
 def units(blocks):
     """Preserve each original block plus every ancestor Div's attributes."""
     result=[]
@@ -69,6 +80,17 @@ def units(blocks):
     return result
 
 
+def purpose_width(node):
+    """Inline text width only: AST attributes are not authored purpose text."""
+    if isinstance(node,list): return sum(purpose_width(x) for x in node)
+    if not isinstance(node,dict): return 0
+    if node.get('t') in ['Str','Code']:
+        value=node['c'] if node['t']=='Str' else node['c'][1]
+        return sum(2 if ord(char)>=0x2e80 else 1 for char in value)
+    if node.get('t') in ['Space','SoftBreak']: return 1
+    return purpose_width(node.get('c'))
+
+
 def expand_expected(table, grouped=False):
     c=table['c']; result=[]; pending=[]
     def flush():
@@ -76,7 +98,7 @@ def expand_expected(table, grouped=False):
             item=copy.deepcopy(table); item['c'][4][0][3]=copy.deepcopy(pending); result.append(item); pending.clear()
     for row in c[4][0][3]:
         parts=units(row[1][0][4][1:])
-        if len(parts)<12:
+        if len(parts)<12 and purpose_width(parts)<=800:
             if grouped and len(pending)==32: flush()
             pending.append(row); continue
         flush(); item=copy.deepcopy(table); out=item['c']
@@ -111,7 +133,7 @@ def main():
     lua=lua.replace(ROW_CALL,HEADING_CALL)
     from budget_grouping_contract import WORD_BATCHED
     grouped = WORD_BATCHED in lua
-    tests=cases(grouped=grouped); html=''.join('<div id="'+name+'">'+body+'</div>' for name,body,_ in tests)
+    tests=current_cases(grouped=grouped); html=''.join('<div id="'+name+'">'+body+'</div>' for name,body,_ in tests)
     command=['docker','exec','-i',a.container,'python'] if a.container else ['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE]
     results=[]
     for variant in [lua.replace(HANDLER,''),lua]:

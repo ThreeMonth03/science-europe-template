@@ -30,7 +30,7 @@ class Q3IntegrationTests(unittest.TestCase):
 
     def test_rejects_metadata_and_format_drift(self):
         metadata=json.loads((ROOT/'template.json').read_text())
-        for mutate in [lambda m:m.update(version='0.3.52'),lambda m:m.update(templateId='prototype'),
+        for mutate in [lambda m:m.update(version='999.0.0'),lambda m:m.update(templateId='prototype'),
                        lambda m:m['formats'][-1]['steps'].pop(),lambda m:m['formats'][0].update(uuid='wrong')]:
             bad=copy.deepcopy(metadata);mutate(bad)
             with self.assertRaises(AssertionError):project_source(metadata=bad)

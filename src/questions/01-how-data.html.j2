@@ -44,7 +44,9 @@
             {%- else -%}
               {% if output_profile|default('review') != 'submission' %}<p>No instruments for this dataset have been specified.</p>{% endif %}
             {%- endif -%}
-            {% include "src/quality-control.html.j2" with context %}
+            {% with qualityNameAlreadyRendered = true %}
+              {% include "src/quality-control.html.j2" with context %}
+            {% endwith %}
           </li>
         {%- endfor -%}
       </ul>
@@ -163,11 +165,11 @@
             <div class="dataset-policy">
             <p>
             {%- if refDataReproduceReply == uuids.refDataReproduceProviderAUuid -%}
-              The provider will keep this dataset available in the long term.
+              {% if sharedReferencePolicy %}Each dataset will remain available from its provider in the long term.{% else %}The provider will keep this dataset available in the long term.{% endif %}
             {%- elif refDataReproduceReply == uuids.refDataReproduceCopyAUuid  -%}
-              We will retain a copy of this dataset and provide it alongside the research results.
+              {% if sharedReferencePolicy %}We will retain a copy of each dataset and provide these copies alongside the research results.{% else %}We will retain a copy of this dataset and provide it alongside the research results.{% endif %}
             {%- elif refDataReproduceReply == uuids.refDataReproduceBothAUuid -%}
-              The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results.
+              {% if sharedReferencePolicy %}Each dataset will remain available from its provider in the long term. We will also retain a copy of each dataset and provide these copies alongside the research results.{% else %}The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results.{% endif %}
             {%- endif -%}
             </p>
 
@@ -178,9 +180,9 @@
             {%- set refDataConditionsOtherReply = repliesMap[refDataConditionsOther]|reply_str_value -%}
             {%- if refDataConditionsReply %}
               {%- if refDataConditionsReply == uuids.refDataConditionsCC0AUuid -%}
-                <p>This dataset is freely available for any use.</p>
+                <p>{% if sharedReferencePolicy %}These datasets are freely available for any use.{% else %}This dataset is freely available for any use.{% endif %}</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsCCBYAUuid -%}
-                <p>This dataset is freely available with an obligation to cite the source.</p>
+                <p>{% if sharedReferencePolicy %}These datasets are freely available with an obligation to cite their sources.{% else %}This dataset is freely available with an obligation to cite the source.{% endif %}</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsOtherAUuid -%}
                   {%- if refDataConditionsOtherReply|trim -%}
                     <div class="answer-detail"><p><strong>Conditions of use</strong></p>{{refDataConditionsOtherReply|markdown}}</div>
@@ -229,7 +231,7 @@
       {# Non-reference Data #}
       {% if sharedReferencePolicy %}
         <div class="shared-reference-policy">
-          <p><strong>Shared arrangements</strong></p>
+          <p class="answer-lead"><strong>Shared arrangements</strong></p>
           <p>The following arrangements apply to all reference datasets selected for re-use above.</p>
           {{ referencePolicies.content }}
         </div>
@@ -316,11 +318,11 @@
           {%- set nrefDataEthicalApproval = [nrefDataUsedPrefix, uuids.nrefDataEthicalApprovalQUuid]|reply_path -%}
           {%- set nrefDataEthicalApprovalReply = repliesMap[nrefDataEthicalApproval]|reply_str_value -%}
           {%- if nrefDataEthicalApprovalReply == uuids.nrefDataEthicalApprovalCoversAUuid -%}
-            <p>The existing ethical approval under research ethics laws of this non-reference data covers our reuse.</p>
+            <p>The existing ethical approval under research ethics laws covers our re-use of this dataset.</p>
           {%- elif nrefDataEthicalApprovalReply == uuids.nrefDataEthicalApprovalExtensionAUuid -%}
-            <p>An extension of existing ethical approval under research ethics laws of this non-reference data will be needed.</p>
+            <p>The existing ethical approval under research ethics laws will need to be extended to cover our re-use of this dataset.</p>
           {%- elif nrefDataEthicalApprovalReply == uuids.nrefDataEthicalApprovalNewAUuid -%}
-            <p>New ethical approval under research ethics laws of this non-reference data will be needed to cover our usage of the data.</p>
+            <p>New ethical approval under research ethics laws will be needed for our re-use of this dataset.</p>
           {%- endif -%}
 
         {# Non-reference data set that will NOT be used #}

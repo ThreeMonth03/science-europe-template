@@ -5,6 +5,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+from current_repairs_contract import historical_version
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = json.loads((ROOT / 'requirements/submission-flow-delta.json').read_text())
@@ -38,7 +39,7 @@ def project_source(sources=None, metadata=None):
     if sources is None:
         sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT / 'src').rglob('*') if p.is_file()}
     if metadata is None: metadata = json.loads((ROOT / 'template.json').read_text())
-    if metadata['version'] in ['0.3.48', '0.3.49', '0.3.50', '0.3.51']:
+    if historical_version(metadata['version']) in ['0.3.48', '0.3.49', '0.3.50', '0.3.51']:
         from empty_section_spacing_contract import project_source as before_sections
         sources, metadata = before_sections(sources, metadata)
     hashes = lambda values: {n: hashlib.sha256(v).hexdigest() for n,v in values.items()}

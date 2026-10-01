@@ -45,6 +45,11 @@ class CurrentBehaviorTests(unittest.TestCase):
 
 
 class CurrentRepairContractTests(unittest.TestCase):
+    def test_registered_version_routes_without_accepting_unknown_versions(self):
+        from current_repairs_contract import CONTRACT, historical_version
+        self.assertEqual(CONTRACT['baseline_version'], historical_version(CONTRACT['candidate_version']))
+        self.assertEqual('999.0.0', historical_version('999.0.0'))
+
     def test_exact_candidate_projects_and_any_source_drift_fails(self):
         import json
         current = source_tree()
@@ -63,7 +68,11 @@ class CurrentRepairContractTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             project_source(added, metadata)
 
-        changed_metadata = dict(metadata, version='0.3.52')
+        changed_metadata = dict(metadata, version='999.0.0')
+        with self.assertRaises(AssertionError):
+            project_source(current, changed_metadata)
+
+        changed_metadata = dict(metadata, name='Unreviewed template name')
         with self.assertRaises(AssertionError):
             project_source(current, changed_metadata)
 

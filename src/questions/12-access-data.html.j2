@@ -89,8 +89,8 @@
                 {% for swItem in visibleSoftwareItems %}
                   {% set swNameReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatNameQUuid]|reply_path]|reply_str_value %}
                   {% set swPIDReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path]|reply_str_value %}
-                  <li data-item-id="{{ swItem|e }}"><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}(no name given){% endif %}</strong>
-                    {% if swPIDReply|trim %}<div>Available at: {{ swPIDReply|e }}</div>
+                  <li data-item-id="{{ swItem|e }}"><p><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}(no name given){% endif %}</strong></p>
+                    {% if swPIDReply|trim %}<div class="software-location">Available at: {{ swPIDReply|e }}</div>
                     {% elif output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="software-location" data-status="missing">An access location for this tool has not been provided.</p>{% endif %}
                     {{ softwareDetailsByItem[swItem] }}
                   </li>

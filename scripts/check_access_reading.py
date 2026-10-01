@@ -168,9 +168,11 @@ def check(root, language):
             named, located = bool((name or '').strip()), bool((location or '').strip())
             assert bool(tool) == (profile == 'review' or named or located)
             if tool:
+                assert tool.select_one('p > strong.item-label'), 'Software name needs a real paragraph for Word label pagination'
                 if named: assert tool.strong.get_text() == name
                 elif profile == 'submission': assert '1' in tool.strong.get_text()
-                if located: assert location in tool.get_text()
+                if located:
+                    assert location in tool.select_one('.software-location').get_text()
                 assert bool(tool.select('.data-gap')) == (not located and profile == 'review')
             else:
                 assert NEEDS_TOOLS[language] in soup.get_text() and NO_TOOLS[language] not in soup.get_text()

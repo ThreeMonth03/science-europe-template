@@ -54,5 +54,5 @@
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">Other quality control methods were selected for <strong>{{ qualityName }}</strong>, but the details have not been provided.</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">Other quality control methods are planned for <strong>{{ qualityName }}</strong>.</p>{% endif %}
   {% endif %}{% endif %}
 {% else %}
-  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-control" data-status="missing">It has not been specified whether quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>{% else %}<p class="quality-context"><strong>{{ qualityName }}</strong></p>{% endif %}
+  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-control" data-status="missing">It has not been specified whether quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>{% elif not qualityNameAlreadyRendered|default(false) %}<p class="quality-context"><strong>{{ qualityName }}</strong></p>{% endif %}
 {% endif %}

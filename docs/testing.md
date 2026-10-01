@@ -1,7 +1,7 @@
 # Maintaining the current bilingual repairs
 
-The working `fix/answer-mapping` changes are not a new release. The last committed
-package identity is still 0.3.51. English Jinja remains the shared source; Chinese
+The `fix/answer-mapping` repairs are packaged as experimental candidate 0.3.52,
+not a deployed release. English Jinja remains the shared source; Chinese
 is produced by the existing translation pipeline, not a second Jinja fork.
 
 ## One current-behaviour entry point
@@ -40,14 +40,14 @@ standalone command-line entry points have been replaced by `check_current.py`.
 
 | Suite | Repair covered | Cases per language |
 | --- | --- | ---: |
-| `answer_mapping` | Q1 rights holders; Q4 verification choices and active ancestors | 1,086 |
-| `sentence_layout` | Non-reuse sentences, authored blocks and inline emphasis | 476 |
+| `answer_mapping` | Q1 rights holders; Q4 verification choices and active ancestors | 1,266 |
+| `sentence_layout` | Non-reuse sentences, authored blocks and inline emphasis | 1,884 |
 | `responsibility_reading` | Responsibilities grouped by contributor without merging identities | 560 |
-| `access_reading` | Specific-software decisions; identifier assignment and resolution | 1,368 |
-| `project_acronym` | Acronym-only, partial and inactive projects; scoped table rules | 156 |
+| `access_reading` | Specific-software decisions; identifier assignment and resolution | 1,924 |
+| `project_acronym` | Acronym-only, partial and inactive projects; scoped table rules | 1,724 |
 | `ethics_reading` | Independent ethical flags and partial approval records | 1,288 |
 | `publication_reading` | Publication summary, independent timing, stale No-branch children and partial identifier records | 2,136 |
-| `repository_profiles` | Review-only repository notices; retained facts, links and numbering | 2,256 |
+| `repository_profiles` | Review-only repository notices; retained facts, links and numbering | 2,688 |
 
 Counts describe deterministic combinations, not distinct real projects or proof
 of every possible input. The suites cover review/submission, missing/unknown/No
@@ -85,7 +85,7 @@ do not substitute a floating branch or skip a missing runner.
 
 Historical frozen-source/reference gates remain enabled. The development-only
 `current-repairs-delta.json` verifies the complete candidate tree, changed/added
-path scope, support files and unchanged 0.3.51 identity before projecting the
+path scope, support files and registered 0.3.52 identity before projecting the
 committed parent to those gates. It is explicitly not release approval. In the prior batch,
 all 297 English and 482 Chinese unit tests, TDK validation, and the commands from
 both workflows pass. The current bilingual runner passes 17,980 combinations;
@@ -98,9 +98,13 @@ affected pages were also inspected visually. All 96 active nonempty free-text
 answers in these cases were retained. This is representative evidence, not
 exhaustive input coverage or Microsoft Word acceptance. Local command results
 do not establish GitHub Actions success; check the exact pushed commits there.
-Review the release candidate in
-the target Word environment before creating a new package identity and Chinese
-lock. Do not publish changed assets under the old 0.3.51 identity.
+The latest local acceptance covers 26,940 bilingual current-behaviour cases,
+4,000 unchanged seeded omission renders and 28 native output groups; all 185
+submission PDF/LibreOffice preview pages were visually reviewed. That evidence
+is tied to the tested source hashes, not to an arbitrary later version label.
+Verify that the clean paired candidate preserves those rendering inputs. Review
+the candidate in the target Word environment before promoting it as a fully
+Word-tested submission release. Do not publish changed assets under 0.3.51.
 
 Triage shared causes first: multiple historical failures can come from one
 unregistered source layer rather than independent output defects. Old prose or

@@ -21,6 +21,10 @@ html body .answer-detail { margin: .3em 0 .75em; }
 html body .answer-detail > p:first-child { break-after: avoid; }
 html body .answer-lead { break-after: avoid; }
 html body a { overflow-wrap: anywhere; word-break: break-word; color: #185778; }
+/* Q12 also accepts plain access locations, not only linked URLs. */
+html body .software-location { overflow-wrap: anywhere; word-break: break-word; }
+/* Q8's direct record-name blocks lead their licence text, not authored lists. */
+html body #q-copyright-ipr > .answer > ul > li > div:first-child { break-after: avoid; }
 html body table { border-collapse: collapse; width: 100%; margin: .6em 0; }
 html body th, html body td { border: 1px solid #bcc6cc; padding: .4em .5em; vertical-align: top; }
 html body th { background: #eef2f4; text-align: left; }

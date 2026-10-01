@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+from current_repairs_contract import historical_version
 from bs4 import BeautifulSoup, Comment, NavigableString
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,7 +23,7 @@ def project_source():
     old = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()
     current = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
     metadata = json.loads((ROOT/'template.json').read_text())
-    if metadata['version'] in ['0.3.41','0.3.42','0.3.43','0.3.44','0.3.45','0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
+    if historical_version(metadata['version']) in ['0.3.41','0.3.42','0.3.43','0.3.44','0.3.45','0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
         from resource_prose_contract import project_source as project_prose
         current, metadata = project_prose()
     assert set(current)-set(old) == {HELPER} and not set(old)-set(current)
@@ -49,7 +50,7 @@ def project_prepared(root, hashes):
     assert (root/ENTRY).read_bytes() == stable[ENTRY], 'PDF entry must remain identical'
     projected = dict(hashes)
     helper = stable[HELPER].decode()
-    if json.loads((ROOT/'template.json').read_text())['version'] in ['0.3.41','0.3.42','0.3.43','0.3.44','0.3.45','0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
+    if historical_version(json.loads((ROOT/'template.json').read_text())['version']) in ['0.3.41','0.3.42','0.3.43','0.3.44','0.3.45','0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
         from resource_prose_contract import prior_pdf
         helper = prior_pdf(helper)
     assert projected.pop(HELPER) == hashlib.sha256(helper.encode()).hexdigest()

@@ -90,18 +90,18 @@
       {%- set metadataOpenFormAUuid = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenFormQUuid]|reply_path]|reply_str_value -%}
       <p>
       {%- if metadataOpenInstrAUuid == uuids.metadataOpenInstrYesAUuid %}
-        Metadata will be openly available including instructions how to get access to the data.
+        Metadata will be openly available, including instructions on how to access the data.
       {%- elif metadataOpenInstrAUuid == uuids.metadataOpenInstrNoAUuid %}
-        Metadata will be openly available without instructions how to get access to the data.
+        Metadata will be openly available without instructions on how to access the data.
       {%- else %}
         Metadata will be openly available.
       {%- endif %}
       {%- if metadataOpenFormAUuid == uuids.metadataOpenFormNoAUuid %}
-        Metadata will not be available in a form that can be harvested and indexed.
+        It will not be provided in a form that can be harvested and indexed.
       {%- elif metadataOpenFormAUuid == uuids.metadataOpenFormYesRepoAUuid %}
-        Metadata will be available in a form that can be harvested and indexed (managed by the used repository / repositories).
+        The selected repository or repositories will provide it in a form that can be harvested and indexed.
       {%- elif metadataOpenFormAUuid == uuids.metadataOpenFormYesCareAUuid %}
-        Metadata will be available in a form that can be harvested and indexed.
+        It will also be provided in a form that can be harvested and indexed.
       {%- endif %}
       </p>
       {%- set instructionKnown = metadataOpenInstrAUuid in [uuids.metadataOpenInstrYesAUuid, uuids.metadataOpenInstrNoAUuid] -%}

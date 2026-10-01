@@ -3,6 +3,7 @@ import hashlib
 import json
 from pathlib import Path
 import subprocess
+from current_repairs_contract import historical_version
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = 'ede928f4950e2d382cd38041d2430765c22aea4e'
@@ -46,7 +47,7 @@ def prior_pdf(source):
 def project_source():
     sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
     metadata = json.loads((ROOT/'template.json').read_text())
-    if metadata['version'] in ['0.3.42', '0.3.43', '0.3.44', '0.3.45', '0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
+    if historical_version(metadata['version']) in ['0.3.42', '0.3.43', '0.3.44', '0.3.45', '0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
         from short_resource_rows_contract import project_source as project_rows
         sources, metadata = project_rows()
     old = subprocess.check_output(['git','-C',str(ROOT),'ls-tree','-r','--name-only',BASELINE,'src'],text=True).splitlines()

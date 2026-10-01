@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+from current_repairs_contract import historical_version
 import tempfile
 import zipfile
 from lxml import etree as E
@@ -31,7 +32,7 @@ def source_delta():
     old = subprocess.check_output(['git', '-C', str(ROOT), 'ls-tree', '-r', '--name-only', BASELINE, 'src'], text=True).splitlines()
     sources = {str(p.relative_to(ROOT)): p.read_bytes() for p in (ROOT/'src').rglob('*') if p.is_file()}
     after = json.loads((ROOT/'template.json').read_text())
-    if after['version'] in ['0.3.40', '0.3.41', '0.3.42', '0.3.43', '0.3.44', '0.3.45', '0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
+    if historical_version(after['version']) in ['0.3.40', '0.3.41', '0.3.42', '0.3.43', '0.3.44', '0.3.45', '0.3.46', '0.3.47', '0.3.48', '0.3.49', '0.3.50', '0.3.51']:
         # The following PDF-only slice must prove its exact delta first.
         from short_resources_contract import project_source
         sources, after = project_source()

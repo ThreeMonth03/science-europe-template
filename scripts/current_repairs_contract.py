@@ -1,7 +1,7 @@
 """Exact development delta projected to the committed 0.3.51 historical view.
 
 This is provenance plumbing, not a release approval or a fuzzy hash exception.
-Every current source byte, path, support file and the unchanged package identity
+Every current source byte, path, support file and the registered package identity
 must match before an older contract receives the committed baseline bytes.
 """
 from functools import lru_cache
@@ -12,6 +12,15 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = json.loads((ROOT / 'requirements/current-repairs-delta.json').read_text())
+
+
+def historical_version(version):
+    """Route only the registered candidate to its baseline; do not validate it.
+
+    Historical callers still have to pass the exact source/metadata seal before
+    receiving any old bytes. Unknown versions keep their value and fail there.
+    """
+    return CONTRACT['baseline_version'] if version == CONTRACT['candidate_version'] else version
 
 
 def sha(value):
@@ -72,8 +81,13 @@ def _verify(sources, metadata):
 
     current_metadata = json.loads((ROOT / 'template.json').read_text())
     baseline_metadata = json.loads(verify_support('template.json'))
-    assert metadata == current_metadata == baseline_metadata, 'Candidate identity or format step changed'
-    assert metadata['version'] == CONTRACT['candidate_version'] == CONTRACT['baseline_version']
+    assert metadata == current_metadata, 'Candidate metadata differs from the registered checkout'
+    assert metadata['version'] == CONTRACT['candidate_version'], 'Unregistered candidate version'
+    assert baseline_metadata['version'] == CONTRACT['baseline_version']
+    # A new package identity is version-only; old source gates still receive
+    # exactly the sealed baseline metadata, never a relaxed format-step view.
+    assert current_metadata == dict(baseline_metadata, version=CONTRACT['candidate_version']), \
+        'Candidate identity or format step changed'
     for name in ('scripts/prepare_layout.py', 'PACKAGE_README.md', 'LICENSE'):
         verify_support(name)
     return before, baseline_metadata

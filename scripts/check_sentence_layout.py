@@ -264,7 +264,10 @@ def check(root, language):
                 assert ('Instrument 2' if language == 'en' else '儀器 2') in rows[-2].strong.get_text()
             assert len(soup.select('[data-fact-id="instrument-details"]')) == (1 + int(not visible) if profile == 'review' else 0)
             empty = render(template, {measured: IDS['measuredYesAUuid'], listing: ['dataset-1'], instruments: ['empty']}, profile)
-            if profile == 'submission': assert not empty.select('#q-how-data [data-item-id] > ul')
+            if profile == 'submission':
+                assert not empty.select('#q-how-data [data-item-id] > ul')
+                assert len(empty.select('#q-how-data h5')) == 1
+                assert not empty.select('#q-how-data .quality-context'), 'Dataset label repeated beneath its existing Q1 heading'
             counts['instrument_cases'] += 1
 
         quality = [env.from_string(prefix + "{% include 'src/questions/" + name + ".html.j2' %}")

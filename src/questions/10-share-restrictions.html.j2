@@ -84,7 +84,7 @@
                                 {%- do repositorySentences.append(repositoryDestinationSentence) -%}
                                 {# Contact the repository #}
                                 {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid %}
-                                  {%- set repositoryContactSentence -%}We don't need to contact the repository because it is a routine for us.{%- endset -%}
+                                  {%- set repositoryContactSentence -%}We do not need to contact the repository in advance because depositing data there is routine for us.{%- endset -%}
                                   {%- do repositorySentences.append(repositoryContactSentence) -%}
                                 {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesAlreadyAUuid %}
                                   {%- set repositoryContactSentence -%}We have already contacted the repository.{%- endset -%}
@@ -312,14 +312,14 @@
     {%- set collabPath = [uuids.creatingCUuid, uuids.collabQUuid]|reply_path -%}
     {%- set collabAUuid = repliesMap[collabPath]|reply_str_value -%}
     {%- if collabAUuid == uuids.collabNoAUuid -%}
-      <p>We are not running the project in a collaboration between different groups nor institutes. Therefore, no collaboration agreement related to data access is needed.</p>
+      <p>This project does not involve collaboration between different groups or institutions. Therefore, no collaboration agreement for data access is needed.</p>
     {%- elif collabAUuid == uuids.collabYesAUuid -%}
       {%- set collabAgreePath = [collabPath, collabAUuid, uuids.collabAgreeQUuid]|reply_path -%}
       {%- set collabAgreeAUuid = repliesMap[collabAgreePath]|reply_str_value -%}
       {%- if collabAgreeAUuid == uuids.collabAgreeNoAUuid -%}
-        <p>We are running the project in a collaboration between different groups and institutes. However, there is no collaboration agreement in the project that describes who can have access to what data.</p>
+        <p>This project involves collaboration between different groups and institutions. However, no collaboration agreement is in place to specify who can access which project data.</p>
       {%- elif collabAgreeAUuid == uuids.collabAgreeYesAUuid -%}
-        <p>We are running the project in a collaboration between different groups and institutes. A collaboration agreement that describes who can have access to what data in the project is set.</p>
+        <p>This project involves collaboration between different groups and institutions. A collaboration agreement is in place to specify who can access which project data.</p>
       {%- endif -%}
     {%- endif -%}
     {% endset %}

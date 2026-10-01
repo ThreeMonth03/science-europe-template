@@ -1,7 +1,15 @@
 # Science Europe DMP
 
-For the current uncommitted repairs, see the [shared testing guide](docs/testing.md).
+For the current candidate repairs, see the [shared testing guide](docs/testing.md).
 It replaces eight per-round development notes; the release history below is unchanged.
+
+Candidate 0.3.52 packages the reviewed answer-retention, bilingual prose and
+bounded PDF/Word layout repairs. It keeps the shared English source and exact
+Chinese commit pairing; submission still retains the 15 original questions,
+neutral unnamed-record labels and authored answers without internal gap prompts.
+The source seal allows only this registered version change and preserves the
+frozen 0.3.51 metadata for historical gates. This is not a deployed release or
+Microsoft Word compatibility certification.
 
 > **Local experiment:** this repository is based on the official
 > `dsw:science-europe:1.30.1` template and is testing an explicit completeness
