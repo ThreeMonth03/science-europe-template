@@ -192,7 +192,7 @@
             {%- set refDataConditionsAUuid = repliesMap[refDataConditionsPath]|reply_str_value -%}
             {%- if refDataConditionsAUuid -%}
               <li>
-                {%- if refDataNameReply -%}
+                {%- if refDataNameReply|trim -%}
                   <div>{{ refDataNameReply }}</div>
                 {%- else -%}
                   {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(i) + 1) }}</div>{% else %}<div>(no name given)</div>{% endif %}
@@ -219,7 +219,7 @@
             {%- set nrefDataConditionsAUuid = repliesMap[nrefDataConditionsPath]|reply_str_value -%}
             {%- if nrefDataConditionsAUuid -%}
               <li>
-                {%- if nrefDataNameReply -%}
+                {%- if nrefDataNameReply|trim -%}
                   <div>{{ nrefDataNameReply }}</div>
                 {%- else -%}
                   {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(i) + 1) }}</div>{% else %}<div>(no name given)</div>{% endif %}

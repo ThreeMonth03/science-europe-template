@@ -819,7 +819,15 @@ function Div(div)
     return div
   end
   if (div.classes:includes("answer-detail") or div.classes:includes("answer")) and #div.content > 1 and div.content[1].t == "Para" then
-    div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+    -- Only a short opening may act as a lead. Binding a long authored paragraph
+    -- to the next block can strand its heading on an otherwise empty page.
+    local units = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(div.content[1])) do
+      units = units + (code >= 0x2E80 and 2 or 1)
+    end
+    if units <= 160 then
+      div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+    end
     return div
   end
   if div.identifier == "dmp-content" and FORMAT == "docx" then

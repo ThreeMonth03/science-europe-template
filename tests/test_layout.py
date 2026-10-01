@@ -18,6 +18,55 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_generic_word_leads_are_bounded_without_changing_authored_content(self):
+        import base64
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from probe_q8_word import IMAGE, RUNNER
+        cases = []
+        for cls in ['answer', 'answer-detail', 'unowned']:
+            for value, long in [('x' * 160, False), ('x' * 161, True),
+                                ('中' * 80, False), ('中' * 81, True),
+                                ('<em>Original.csv</em> ' * 80, True)]:
+                name = 'case-' + str(len(cases))
+                body = '<div class="'+cls+'"><p>'+value+'</p><p>Original second paragraph.</p></div>'
+                cases.append((name, body, int(long and cls != 'unowned')))
+        lua = (ROOT / 'src/word/pilot.lua').read_text()
+        guard = 'if units <= 160 then'
+        self.assertEqual(lua.count(guard), 1)
+        html = ''.join('<div id="'+name+'">'+body+'</div>' for name, body, _ in cases)
+        results = []
+        for variant in [lua.replace(guard, 'if true then'), lua]:
+            raw = subprocess.check_output(['docker', 'run', '--rm', '--network', 'none', '-i',
+                '--entrypoint', 'python', IMAGE, '-c', RUNNER], input=json.dumps(dict(
+                    lua=variant, html=html,
+                    reference=base64.b64encode((ROOT/'src/word/reference.docx').read_bytes()).decode())).encode(), timeout=180)
+            results.append(json.loads(raw))
+        def removed_leads(before, after):
+            if before == after: return 0
+            if isinstance(before, dict) and isinstance(after, dict):
+                if before.get('t') == 'Div' and after.get('t') == 'Para':
+                    self.assertEqual(before['c'], [['', [], [['custom-style', 'Pilot Lead']]], [after]])
+                    return 1
+                self.assertEqual(before.keys(), after.keys())
+                return sum(removed_leads(before[k], after[k]) for k in before)
+            self.assertIsInstance(before, list); self.assertIsInstance(after, list)
+            self.assertEqual(len(before), len(after))
+            return sum(removed_leads(a, b) for a, b in zip(before, after))
+        for (name, _, expected), before, after in zip(cases, results[0]['ast']['blocks'], results[1]['ast']['blocks']):
+            with self.subTest(case=name): self.assertEqual(removed_leads(before, after), expected)
+        # The actual DOCX paragraphs preserve text and every non-style XML property.
+        self.assertEqual(len(results[0]['paragraphs']), len(results[1]['paragraphs']))
+        changed = 0
+        for before, after in zip(results[0]['paragraphs'], results[1]['paragraphs']):
+            self.assertEqual(before['text'], after['text'])
+            self.assertEqual(before['other_xml'], after['other_xml'])
+            if before['style'] != after['style']:
+                self.assertEqual(before['style'], 'PilotLead')
+                self.assertIn(after['style'], [None, 'BodyText', 'FirstParagraph'])
+                changed += 1
+        self.assertEqual(changed, sum(expected for _, _, expected in cases))
+
     def test_authorization_keep_changes_only_the_fixed_word_lead(self):
         import sys
         from lxml import etree as E

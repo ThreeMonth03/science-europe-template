@@ -23,19 +23,21 @@
             {# Instruments #}
             {%- set measuredDataInstrPath = [pathPrefix, uuids.measuredDataInstrQUuid]|reply_path -%}
             {%- set measuredDataInstrItems = repliesMap[measuredDataInstrPath]|reply_items -%}
-            {%- if measuredDataInstrItems|length > 0 -%}
+            {%- set instrumentRows = [] -%}
+            {%- for instrItem in measuredDataInstrItems -%}
+              {%- set instrPathPrefix = [measuredDataInstrPath, instrItem]|reply_path -%}
+              {%- set name = repliesMap[[instrPathPrefix, uuids.measuredDataInstrNameQUuid]|reply_path]|reply_str_value -%}
+              {%- set description = repliesMap[[instrPathPrefix, uuids.measuredDataInstrDescQUuid]|reply_path]|reply_str_value -%}
+              {%- if name|trim or description|trim or output_profile|default('review') != 'submission' -%}
+                {%- do instrumentRows.append([loop.index, name, description]) -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if instrumentRows -%}
               <p>For this dataset, we are using the following instruments:</p>
               <ul>
-                {%- for instrItem in measuredDataInstrItems -%}
-                  {%- set instrPathPrefix = [measuredDataInstrPath, instrItem]|reply_path -%}
+                {%- for index, measuredDataInstrName, measuredDataInstrDesc in instrumentRows -%}
                   <li>
-                    {%- set measuredDataInstrNamePath = [instrPathPrefix, uuids.measuredDataInstrNameQUuid]|reply_path -%}
-                    {%- set measuredDataInstrName = repliesMap[measuredDataInstrNamePath]|reply_str_value -%}
-                    {%- set measuredDataInstrDescPath = [instrPathPrefix, uuids.measuredDataInstrDescQUuid]|reply_path -%}
-                    {%- set measuredDataInstrDesc = repliesMap[measuredDataInstrDescPath]|reply_str_value -%}
-                    <strong>{{ measuredDataInstrName }}</strong>
-                    {% if measuredDataInstrName and measuredDataInstrDesc -%}<span class="separator">&ndash;</span>{%- endif %}
-                    {{ measuredDataInstrDesc }}
+                    {{ macros.instrumentEntry(index, measuredDataInstrName, measuredDataInstrDesc) }}
                   </li>
                 {%- endfor -%}
               </ul>
@@ -76,7 +78,7 @@
         {% set conditions = repliesMap[[usedPath, uuids.refDataConditionsQUuid]|reply_path]|reply_str_value %}
         {% set format = repliesMap[[usedPath, uuids.refDataFormatQUuid]|reply_path]|reply_str_value %}
         {% set name = repliesMap[[itemPath, uuids.refDataNameQUuid]|reply_path]|reply_str_value %}
-        {% set known = name and reproduction in [uuids.refDataReproduceProviderAUuid, uuids.refDataReproduceCopyAUuid, uuids.refDataReproduceBothAUuid] and conditions in [uuids.refDataConditionsCC0AUuid, uuids.refDataConditionsCCBYAUuid] and format in [uuids.refDataFormatConvertAUuid, uuids.refDataFormatUseAUuid] %}
+        {% set known = name|trim and reproduction in [uuids.refDataReproduceProviderAUuid, uuids.refDataReproduceCopyAUuid, uuids.refDataReproduceBothAUuid] and conditions in [uuids.refDataConditionsCC0AUuid, uuids.refDataConditionsCCBYAUuid] and format in [uuids.refDataFormatConvertAUuid, uuids.refDataFormatUseAUuid] %}
         {% do referencePolicies.signatures.append([reproduction, conditions, format] if known else [item]) %}
         {% do referencePolicies.names.append(name) %}
       {% endif %}
@@ -98,7 +100,7 @@
 
           {%- set refDataWhere = repliesMap[[refDataPrefix, uuids.refDataWhereQUuid]|reply_path]|reply_str_value -%}
 
-          {%- if refDataNameReply -%}
+          {%- if refDataNameReply|trim -%}
             <h5>{{ refDataNameReply }}</h5>
           {%- else -%}
             {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(refDataItem) + 1) }}</strong>{% else %}<strong class="item-label">(no name given)</strong>{% endif %}
@@ -109,7 +111,7 @@
             {{ reuseRightsholder.render(refDataUsedPrefix.split('.') + [uuids.refDataOwnerQUuid]) }}
             {# identification #}
             <div data-fact-id="reuse-decision" data-status="complete">
-            {% if refDataWhere %}
+            {% if refDataWhere|trim %}
               {% if refDataWhere.startswith("https://") or refDataWhere.startswith("http://") or refDataWhere.startswith("ftp://") %}
               <p class="dataset-source" data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ refDataWhere }}">{{ refDataWhere }}</a></p>
             {% else %}
@@ -217,7 +219,8 @@
             {{ nonreuse.render(refDataWhere, refDataUseNoReply, refDataUseNoOtherReasonReply,
                 uuids.refDataUseNoDataAUuid, uuids.refDataUseNoAspectAUuid, uuids.refDataUseNoQualityAUuid,
                 uuids.refDataUseNoCondAUuid, uuids.refDataUseNoReasonAUuid) }}
-
+          {% else %}
+            {{ nonreuse.undecided(refDataWhere) }}
           {%- endif -%}
         </li>
       {%- endfor -%}
@@ -241,7 +244,7 @@
         {%- set nrefDataNameReply = repliesMap[[nrefDataPrefix, uuids.nrefDataNameQUuid]|reply_path]|reply_str_value-%}
         {%- set nrefDataWhere = repliesMap[[nrefDataPrefix, uuids.nrefDataWhereQUuid]|reply_path]|reply_str_value -%}
 
-        {%- if nrefDataNameReply -%}
+        {%- if nrefDataNameReply|trim -%}
           <h5>{{ nrefDataNameReply }}</h5>
         {%- else -%}
           {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(nrefDataItem) + 1) }}</strong>{% else %}<strong class="item-label">(no name given)</strong>{% endif %}
@@ -252,7 +255,7 @@
           {{ reuseRightsholder.render(nrefDataUsedPrefix.split('.') + [uuids.nrefDataOwnerQUuid]) }}
           {# identification #}
           <p data-fact-id="reuse-decision" data-status="complete">This dataset will be re-used.</p>
-          {% if nrefDataWhere %}
+          {% if nrefDataWhere|trim %}
             {% if nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("ftp://") %}
               <p data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ nrefDataWhere }}">{{ nrefDataWhere }}</a></p>
             {% else %}
@@ -339,7 +342,7 @@
               uuids.nrefDataUseNoDataAUuid, uuids.nrefDataUseNoAspectAUuid, uuids.nrefDataUseNoQualityAUuid,
               uuids.nrefDataUseNoCondAUuid, uuids.nrefDataUseNoReasonAUuid) }}
         {% else %}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-decision" data-status="missing"><strong>Information not provided:</strong> whether this dataset will be re-used.</p>{% endif %}
+          {{ nonreuse.undecided(nrefDataWhere) }}
         {%- endif -%}
       </li>
       {%- endfor -%}

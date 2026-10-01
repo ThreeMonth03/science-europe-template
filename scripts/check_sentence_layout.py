@@ -36,7 +36,8 @@ def folder_replies():
 
 
 def check(root, language):
-    counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0, missing_name_cases=0, quality_other_cases=0)
+    counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0, missing_name_cases=0, quality_other_cases=0,
+                  reference_identity_cases=0, instrument_cases=0)
     css = (root / 'src/layout.css').read_text()
     assert 'html body li > strong:first-child {' not in css
     assert 'html body li > strong.item-label { display: block; break-after: avoid; }' in css
@@ -48,6 +49,61 @@ def check(root, language):
         names = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}{% include 'src/questions/02-what-data.html.j2' %}{% include 'src/questions/04-quality-control.html.j2' %}")
         def render(t, replies, profile):
             return BeautifulSoup(t.render(repliesMap=replies, output_profile=profile), 'html.parser')
+
+        reference = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}{% include 'src/questions/08-copyright-ipr.html.j2' %}")
+        for kind, choice, name, source, profile in itertools.product(
+                ['ref', 'nref'], ['Yes', 'No', None, 'obsolete'], ['', ' \t\n\u3000', 'Dataset A'],
+                ['', ' \t\n\u3000', 'https://example.org/source?a=1&b=2', 'Local archive.'], ['review', 'submission']):
+            parent = path('reusingCUuid', 'preexistingQUuid')
+            listing = path(parent, 'preexistingYesAUuid', kind + 'DataQUuid')
+            item = path(listing, 'dataset-1'); use = path(item, kind + 'DataUseQUuid')
+            replies = {parent: IDS['preexistingYesAUuid'], listing: ['dataset-1'],
+                       path(item, kind + 'DataNameQUuid'): name, path(item, kind + 'DataWhereQUuid'): source,
+                       path(use, kind + 'DataUseYesAUuid', kind + 'DataUsageQUuid'): 'ACTIVE-USE-PURPOSE',
+                       path(use, kind + 'DataUseYesAUuid', kind + 'DataConditionsQUuid'): IDS[kind + 'DataConditionsCCBYAUuid']}
+            if choice: replies[use] = IDS.get(kind + 'DataUse' + choice + 'AUuid', choice)
+            soup = render(reference, replies, profile)
+            q1 = soup.select_one('#q-how-data')
+            locations = q1.select('[data-fact-id="dataset-source"][data-status="complete"]')
+            assert len(locations) == int(bool(source.strip()))
+            if source.strip():
+                assert source in locations[0].get_text()
+                if source.startswith('https://'): assert locations[0].a['href'] == source
+            assert ('ACTIVE-USE-PURPOSE' in soup.get_text()) == (choice == 'Yes')
+            assert all(n.get_text(strip=True) for n in q1.select('h5,strong.item-label'))
+            if not name.strip() and profile == 'submission':
+                assert q1.select_one('.dataset-label[data-list-index="1"]')
+                if choice == 'Yes': assert soup.select_one('#q-copyright-ipr .dataset-label[data-list-index="1"]')
+            if choice in [None, 'obsolete']:
+                decisions = q1.select('[data-fact-id="reuse-decision"]')
+                assert len(decisions) == int(profile == 'review')
+                assert all(n['data-status'] == 'missing' for n in decisions)
+            if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
+            counts['reference_identity_cases'] += 1
+
+        measured = path('creatingCUuid', 'measuredQUuid')
+        listing = path(measured, 'measuredYesAUuid', 'measuredDataQUuid')
+        instruments = path(listing, 'dataset-1', 'measuredDataInstrQUuid')
+        base = {measured: IDS['measuredYesAUuid'], listing: ['dataset-1'],
+                instruments: ['empty', 'partial', 'complete'],
+                path(instruments, 'complete', 'measuredDataInstrNameQUuid'): 'Sensor C'}
+        for name, description, profile in itertools.product(['', ' \t\n\u3000', 'Sensor B'], ['', ' \t\n\u3000', 'Original detail.'], ['review', 'submission']):
+            replies = dict(base)
+            replies[path(instruments, 'partial', 'measuredDataInstrNameQUuid')] = name
+            replies[path(instruments, 'partial', 'measuredDataInstrDescQUuid')] = description
+            soup = render(template, replies, profile)
+            rows = soup.select('#q-how-data [data-item-id] > ul > li')
+            visible = bool(name.strip() or description.strip())
+            assert len(rows) == (3 if profile == 'review' else 1 + int(visible))
+            assert all(n.get_text(strip=True) and n.strong.get_text(strip=True) for n in rows)
+            assert len(soup.select('span.separator')) == int(bool(description.strip()))
+            assert ('Original detail.' in soup.get_text()) == bool(description.strip())
+            if not name.strip() and (visible or profile == 'review'):
+                assert ('Instrument 2' if language == 'en' else '儀器 2') in rows[-2].strong.get_text()
+            assert len(soup.select('[data-fact-id="instrument-details"]')) == (1 + int(not visible) if profile == 'review' else 0)
+            empty = render(template, {measured: IDS['measuredYesAUuid'], listing: ['dataset-1'], instruments: ['empty']}, profile)
+            if profile == 'submission': assert not empty.select('#q-how-data [data-item-id] > ul')
+            counts['instrument_cases'] += 1
 
         quality = [env.from_string(prefix + "{% include 'src/questions/" + name + ".html.j2' %}")
                    for name in ['01-how-data', '04-quality-control']]

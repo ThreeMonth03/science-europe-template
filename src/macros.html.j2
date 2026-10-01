@@ -151,3 +151,11 @@
 {%- macro softwareLabel(index) -%}Software tool {{ index }}{%- endmacro -%}
 
 {%- macro contributorLabel(index) -%}Contributor {{ index }}{%- endmacro -%}
+
+{# Original list indices remain stable when submission omits entirely empty rows. #}
+{%- macro instrumentEntry(index, name, description) -%}
+  <strong>{% if name|trim %}{{ name }}{% else %}Instrument {{ index }}{% endif %}</strong>
+  {% if description|trim -%}<span class="separator">&ndash;</span>{%- endif %}
+  {{ description }}
+  {% if not name|trim and not description|trim %}<span class="data-gap" data-fact-id="instrument-details" data-status="missing">Information not provided: instrument name and description.</span>{% endif %}
+{%- endmacro -%}

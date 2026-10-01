@@ -18,6 +18,17 @@
     {%- do nonreuseSentences.append(reasonSentence) -%}
   {%- endif -%}
   <p class="nonreuse-summary" data-fact-id="reuse-decision" data-status="explicit-no">{{ nonreuseSentences|join(" ") }}</p>
+  {{ location(source) }}
+  {% if reason == other and detail|trim %}
+    <div class="answer-detail" data-fact-id="nonreuse-reason" data-status="complete"><p><strong>Reason for not re-using this dataset</strong></p>{{ detail|markdown }}</div>
+  {% elif reason not in [noData, noAspect, noQuality, noConditions] and output_profile|default('review') != 'submission' %}
+    {% set reasonStatus = 'needs-review' if reason and reason != other else 'missing' %}
+    <p class="data-gap" data-fact-id="nonreuse-reason" data-status="{{ reasonStatus }}"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>
+  {% endif %}
+{%- endmacro -%}
+
+{# Independent metadata survives an unanswered re-use decision. #}
+{%- macro location(source) -%}
   {% if source|trim %}
     {% if source.startswith('https://') or source.startswith('http://') or source.startswith('ftp://') %}
       <p class="dataset-source" data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ source }}">{{ source }}</a></p>
@@ -25,10 +36,9 @@
       <p class="dataset-source" data-fact-id="dataset-source" data-status="complete">Source: {{ source }}</p>
     {% endif %}
   {% endif %}
-  {% if reason == other and detail|trim %}
-    <div class="answer-detail" data-fact-id="nonreuse-reason" data-status="complete"><p><strong>Reason for not re-using this dataset</strong></p>{{ detail|markdown }}</div>
-  {% elif reason not in [noData, noAspect, noQuality, noConditions] and output_profile|default('review') != 'submission' %}
-    {% set reasonStatus = 'needs-review' if reason and reason != other else 'missing' %}
-    <p class="data-gap" data-fact-id="nonreuse-reason" data-status="{{ reasonStatus }}"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>
-  {% endif %}
+{%- endmacro -%}
+
+{%- macro undecided(source) -%}
+  {{ location(source) }}
+  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-decision" data-status="missing"><strong>Information not provided:</strong> whether this dataset will be re-used.</p>{% endif %}
 {%- endmacro -%}
