@@ -37,18 +37,19 @@
   {% set otherPath = [mdqPrefix, uuids.mdQualityOtherQUuid]|reply_path %}
   {% set otherAnswer = repliesMap[otherPath]|reply_str_value %}
   {% set otherText = repliesMap[[otherPath, uuids.mdQualityOtherYesAUuid, uuids.mdQualityOtherWhatQUuid]|reply_path]|reply_str_value if otherAnswer == uuids.mdQualityOtherYesAUuid else '' %}
-{% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}Quality control measures planned for <strong>{{ qualityName }}</strong>: <span data-fact-id="quality-methods" data-status="complete">{{ qualityMethods|join(", ") }}</span> and other quality control methods.{% else %}Other quality control methods are planned for <strong>{{ qualityName }}</strong>.{% endif %}</p>{% else %}  {% if qualityMethods %}
+{% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText|trim %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}Quality control measures planned for <strong>{{ qualityName }}</strong>: <span data-fact-id="quality-methods" data-status="complete">{{ qualityMethods|join(", ") }}</span> and other quality control methods.{% else %}Other quality control methods are planned for <strong>{{ qualityName }}</strong>.{% endif %}</p>{% else %}  {% if qualityMethods %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">Quality control measures for <strong>{{ qualityName }}</strong>: {{ qualityMethods|join(", ") }}.</p>
-  {% elif not otherText %}
+  {% elif not otherText|trim %}
     {% if output_profile|default('review') == 'submission' %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="partial">Quality control is planned for <strong>{{ qualityName }}</strong>.</p>
     {% else %}
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-methods" data-status="missing">Quality control is planned for <strong>{{ qualityName }}</strong>, but the methods have not been specified.</p>{% endif %}
     {% endif %}
   {% endif %}
-  {% if otherText %}
+  {% if otherText|trim %}
     <div class="answer-lead"><p>Additional quality control details for <strong>{{ qualityName }}</strong>:</p></div>
-    <div class="answer-detail" data-fact-id="quality-other" data-status="complete">{{ otherText|markdown }}</div>
+    {# Let long authored paragraphs split; do not bind the first two paragraphs. #}
+    <div class="answer-detail" data-fact-id="quality-other" data-status="complete"><div>{{ otherText|markdown }}</div></div>
   {% elif otherAnswer == uuids.mdQualityOtherYesAUuid %}
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">Other quality control methods were selected for <strong>{{ qualityName }}</strong>, but the details have not been provided.</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">Other quality control methods are planned for <strong>{{ qualityName }}</strong>.</p>{% endif %}
   {% endif %}{% endif %}

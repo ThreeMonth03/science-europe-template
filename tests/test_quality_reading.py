@@ -73,7 +73,7 @@ class QualityReadingTests(unittest.TestCase):
         for template in (Q1, Q4):
             soup = BeautifulSoup(render_question(template, values), 'html.parser')
             detail = soup.select_one('[data-fact-id="quality-other"]')
-            self.assertEqual(authored, detail.decode_contents())
+            self.assertEqual(authored, detail.div.decode_contents())
             self.assertEqual(2, len(detail.select('p')))
             self.assertFalse(detail.find_parent('p'))
             self.assertFalse(soup.select('[data-fact-id="quality-methods"][data-status="missing"]'))

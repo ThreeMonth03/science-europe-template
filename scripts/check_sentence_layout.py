@@ -36,7 +36,7 @@ def folder_replies():
 
 
 def check(root, language):
-    counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0, missing_name_cases=0)
+    counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0, missing_name_cases=0, quality_other_cases=0)
     css = (root / 'src/layout.css').read_text()
     assert 'html body li > strong:first-child {' not in css
     assert 'html body li > strong.item-label { display: block; break-after: avoid; }' in css
@@ -48,6 +48,56 @@ def check(root, language):
         names = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}{% include 'src/questions/02-what-data.html.j2' %}{% include 'src/questions/04-quality-control.html.j2' %}")
         def render(t, replies, profile):
             return BeautifulSoup(t.render(repliesMap=replies, output_profile=profile), 'html.parser')
+
+        quality = [env.from_string(prefix + "{% include 'src/questions/" + name + ".html.j2' %}")
+                   for name in ['01-how-data', '04-quality-control']]
+        measured = path('creatingCUuid', 'measuredQUuid')
+        listing = path(measured, 'measuredYesAUuid', 'measuredDataQUuid')
+        item = path(listing, 'dataset-1')
+        control = path(item, 'measuredDataQualityQUuid')
+        methods = path(control, 'measuredDataQualityYesAUuid')
+        other = path(methods, 'mdQualityOtherQUuid')
+        detail = path(other, 'mdQualityOtherYesAUuid', 'mdQualityOtherWhatQUuid')
+        base = {measured: IDS['measuredYesAUuid'], listing: ['dataset-1'],
+                path(item, 'measuredDataNameQUuid'): 'Dataset A', control: IDS['measuredDataQualityYesAUuid']}
+        for choice, value, fixed, profile in itertools.product(
+                ['Yes', 'No', None, 'obsolete'], [None, '', ' \t\n\u3000', AUTHORED],
+                [False, True], ['review', 'submission']):
+            replies = dict(base)
+            if choice: replies[other] = IDS.get('mdQualityOther' + choice + 'AUuid', choice)
+            if value is not None: replies[detail] = value
+            if fixed: replies[path(methods, 'mdQualityCalibratingQUuid')] = IDS['mdQualityCalibratingYesAUuid']
+            facts = []
+            for question in quality:
+                soup = render(question, replies, profile)
+                node = soup.select_one('[data-fact-id="quality-other"]')
+                has_detail = choice == 'Yes' and bool((value or '').strip())
+                assert bool(node) == (choice == 'Yes')
+                assert bool(soup.select('.answer-detail[data-fact-id="quality-other"]')) == has_detail
+                assert bool(soup.select('.answer-lead')) == has_detail
+                if node:
+                    assert node['data-status'] == ('complete' if has_detail else 'partial' if profile == 'submission' else 'missing')
+                    assert node.get_text(strip=True)
+                    if has_detail:
+                        assert len(node.find_all(recursive=False)) == 1 and node.div is not None
+                        assert node.div.decode_contents() == AUTHORED
+                assert ('Original.csv' in soup.get_text()) == has_detail
+                if fixed: assert soup.select_one('[data-fact-id="quality-methods"][data-status="complete"]')
+                if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
+                facts.append([str(n) for n in soup.select('[data-fact-id^="quality-"]')])
+                if value and not value.strip():
+                    empty = dict(replies); empty[detail] = ''
+                    assert str(soup) == str(render(question, empty, profile))
+            assert facts[0] == facts[1]
+            counts['quality_other_cases'] += 1
+        for parent, profile in itertools.product([None, IDS['measuredDataQualityNoAUuid'], 'obsolete'], ['review', 'submission']):
+            replies = dict(base, **{other: IDS['mdQualityOtherYesAUuid'], detail: AUTHORED})
+            if parent: replies[control] = parent
+            else: replies.pop(control)
+            for question in quality:
+                soup = render(question, replies, profile)
+                assert not soup.select('[data-fact-id="quality-other"]') and 'Original.csv' not in soup.get_text()
+            counts['quality_other_cases'] += 1
 
         for name, profile in itertools.product([None, '', ' \t\n\u3000', 'Survey A'], ['review', 'submission']):
             measured = path('creatingCUuid', 'measuredQUuid')
