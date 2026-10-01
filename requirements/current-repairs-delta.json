@@ -4,7 +4,7 @@
   "candidate_version": "0.3.51",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "6c015ad91b0d310a4c6676fdca823143b2952130437c6942366f1dfc65057aff",
+  "candidate_tree_sha256": "9495dcdde756027bd152449a9449325e415f49e0f010ec16e2d83a167f6e5e71",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
@@ -14,6 +14,7 @@
     "src/pdf/index.html.j2",
     "src/pdf/short-resources.html.j2",
     "src/projects.html.j2",
+    "src/quality-control.html.j2",
     "src/questions/01-how-data.html.j2",
     "src/questions/02-what-data.html.j2",
     "src/questions/03-docs-metadata.html.j2",

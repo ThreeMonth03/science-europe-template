@@ -3,7 +3,7 @@
    Do not join user-provided paragraphs or append punctuation to list entries. #}
 {% set measuredDataQualityPath = [pathPrefix, uuids.measuredDataQualityQUuid]|reply_path %}
 {% set qualityAnswer = repliesMap[measuredDataQualityPath]|reply_str_value %}
-{% if measuredDataName %}
+{% if measuredDataName|trim %}
   {% set qualityName = measuredDataName|e %}
 {% else %}
   {% set qualityName %}{% if output_profile|default('review') == 'submission' %}<span>{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}</span>{% else %}<span>(no name given)</span>{% endif %}{% endset %}

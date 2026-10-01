@@ -19,7 +19,7 @@
           <li data-item-id="{{ pathPrefix }}">
             {%- set measuredDataNamePath = [pathPrefix, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataName = repliesMap[measuredDataNamePath]|reply_str_value -%}
-            <h5>{% if output_profile|default('review') == 'submission' and not measuredDataName %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}{% else %}{{ measuredDataName if measuredDataName else "(no name given)" }}{% endif %}</h5>
+            <h5>{% if output_profile|default('review') == 'submission' and not measuredDataName|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}{% else %}{{ measuredDataName if measuredDataName|trim else "(no name given)" }}{% endif %}</h5>
             {# Instruments #}
             {%- set measuredDataInstrPath = [pathPrefix, uuids.measuredDataInstrQUuid]|reply_path -%}
             {%- set measuredDataInstrItems = repliesMap[measuredDataInstrPath]|reply_items -%}

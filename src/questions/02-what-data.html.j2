@@ -20,7 +20,7 @@
             {%- set measuredDataWhoAUuid = repliesMap[measuredDataWhoPath]|reply_str_value -%}
             {%- set measuredDataEquipPath = [pathPrefix, uuids.measuredDataEquipQUuid]|reply_path -%}
             {%- set measuredDataEquipAUuid = repliesMap[measuredDataEquipPath]|reply_str_value -%}
-            {%- set collectionName -%}{% if measuredDataName %}{{ measuredDataName|e }}{% else %}{% if output_profile|default('review') == 'submission' %}<span>{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}</span>{% else %}<span>(no name given)</span>{% endif %}{% endif %}{%- endset -%}
+            {%- set collectionName -%}{% if measuredDataName|trim %}{{ measuredDataName|e }}{% else %}{% if output_profile|default('review') == 'submission' %}<span>{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}</span>{% else %}<span>(no name given)</span>{% endif %}{% endif %}{%- endset -%}
             {%- set collectionSentences = [] -%}
             {%- set ownershipOther = "" -%}
             {%- set ownershipMissing = false -%}
@@ -124,8 +124,9 @@
             {%- set neqDataSetsName = repliesMap[[pathPrefix, uuids.neqDataSetsNameQUuid]|reply_path]|reply_str_value -%}
             {%- set neqDataSetsDesc = repliesMap[[pathPrefix, uuids.neqDataSetsDescQUuid]|reply_path]|reply_str_value -%}
             <li>
-              <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ neqDataSetsName if neqDataSetsName else "(no name given)" }}{% endif %}</strong>
-              {% if neqDataSetsDesc -%}<div class="answer-detail">{{ neqDataSetsDesc|markdown }}</div>{%- endif -%}
+              {% if neqDataSetsDesc|trim %}<div class="answer-lead"><p>{% endif %}
+              <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName|trim %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ neqDataSetsName if neqDataSetsName|trim else "(no name given)" }}{% endif %}</strong>
+              {% if neqDataSetsDesc|trim %}</p></div><div class="answer-detail">{{ neqDataSetsDesc|markdown }}</div>{% endif %}
             </li>
           {%- endfor -%}
           </ul>
@@ -181,7 +182,7 @@
             {% if formatName|striptags|trim %}
               <p>Data format: <strong>{{ formatName }}</strong>.</p>
             {% else %}
-              <p>Unnamed data format {{ loop.index }}.</p>
+              {% if output_profile|default('review') == 'submission' %}<p>Data format {{ loop.index }}.</p>{% else %}<p>Unnamed data format {{ loop.index }}.</p>{% endif %}
             {% endif %}
             {# standard? #}
             {%- if formatsIsStandardAUuid == uuids.formatsIsStandardYesAUuid and formatsIsLTSuitableAUuid == uuids.formatsIsLTSuitableYesAUuid %}

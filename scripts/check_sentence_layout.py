@@ -36,7 +36,7 @@ def folder_replies():
 
 
 def check(root, language):
-    counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0)
+    counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0, missing_name_cases=0)
     css = (root / 'src/layout.css').read_text()
     assert 'html body li > strong:first-child {' not in css
     assert 'html body li > strong.item-label { display: block; break-after: avoid; }' in css
@@ -45,8 +45,62 @@ def check(root, language):
         prefix = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}"
         template = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}")
         folder = env.from_string(prefix + "{% include 'src/questions/03-docs-metadata.html.j2' %}")
+        names = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}{% include 'src/questions/02-what-data.html.j2' %}{% include 'src/questions/04-quality-control.html.j2' %}")
         def render(t, replies, profile):
             return BeautifulSoup(t.render(repliesMap=replies, output_profile=profile), 'html.parser')
+
+        for name, profile in itertools.product([None, '', ' \t\n\u3000', 'Survey A'], ['review', 'submission']):
+            measured = path('creatingCUuid', 'measuredQUuid')
+            instruments = path(measured, 'measuredYesAUuid', 'measuredDataQUuid')
+            other = path('creatingCUuid', 'neqDataQUuid')
+            datasets = path(other, 'neqDataYesAUuid', 'neqDataSetsQUuid')
+            formats = path('creatingCUuid', 'formatsQUuid')
+            replies = {measured: IDS['measuredYesAUuid'], other: IDS['neqDataYesAUuid']}
+            for listing, field in [(instruments, 'measuredDataNameQUuid'), (datasets, 'neqDataSetsNameQUuid'), (formats, 'formatsNameQUuid')]:
+                replies[listing] = ['first', 'second']
+                for item in replies[listing]:
+                    base = path(listing, item)
+                    if name is not None:
+                        replies[path(base, field)] = {'value': {'value': {'type': 'PlainType', 'value': name}}} if listing == formats else name
+                    if listing == instruments:
+                        replies[path(base, 'measuredDataWhoQUuid')] = IDS['measuredDataWhoExpertsOwnAUuid']
+                        replies[path(base, 'measuredDataQualityQUuid')] = IDS['measuredDataQualityNoAUuid']
+                    elif listing == datasets:
+                        replies[path(base, 'neqDataSetsDescQUuid')] = '<p>Original '+item+' description.</p>'
+                    else:
+                        volume = path(base, 'formatsVolumeQUuid')
+                        replies[volume] = IDS['formatsVolumeTotalAUuid']
+                        replies[path(volume, 'formatsVolumeTotalAUuid', 'formatsVolumeTotalGBQUuid')] = '0' if item == 'first' else '120'
+            soup = render(names, replies, profile)
+            for node in soup.select('h5,.collection-summary strong,.quality-summary strong,strong.item-label'):
+                assert node.get_text(strip=True), (language, profile, repr(name), 'Blank dataset label')
+            assert 'Original first description.' in soup.get_text() and 'Original second description.' in soup.get_text()
+            for label in soup.select('#q-what-data strong.item-label'):
+                assert label.parent.name == 'p'
+                assert label.parent.parent.get('class') == ['answer-lead']
+                detail = label.parent.parent.find_next_sibling('div')
+                assert detail.get('class') == ['answer-detail']
+                assert detail.decode_contents() in ['<p>Original first description.</p>', '<p>Original second description.</p>']
+            summaries = soup.select('.format-summary')
+            assert len(summaries) == 2
+            for index, summary in enumerate(summaries, 1):
+                assert ('0\xa0GB' if index == 1 else '120\xa0GB') in summary.get_text()
+                if not (name or '').strip() and profile == 'submission':
+                    assert summary.p.get_text() == (f'Data format {index}.' if language == 'en' else f'資料格式 {index}。')
+            if profile == 'submission':
+                assert not soup.select('.data-gap,.data-review,.empty-value')
+                labels = soup.select('.dataset-label')
+                assert len(labels) == (0 if (name or '').strip() else 10)
+                assert all(n['data-list-index'] in ['1', '2'] for n in labels)
+            else:
+                assert len(soup.select('[data-fact-id="format-name"][data-status="missing"]')) == (0 if (name or '').strip() else 2)
+            for description in ['', ' \n ']:
+                partial = dict(replies)
+                for item in ['first', 'second']: partial[path(datasets, item, 'neqDataSetsDescQUuid')] = description
+                empty = render(names, partial, profile).select_one('#q-what-data')
+                assert len(empty.select('strong.item-label')) == 2
+                assert not empty.select('li > .answer-lead, li > .answer-detail')
+            counts['missing_name_cases'] += 1
 
         for kind, reason, source, named, profile in itertools.product(
                 ['ref', 'nref'], ['Data', 'Aspect', 'Quality', 'Cond', 'Reason', '', 'unknown'],
