@@ -269,8 +269,9 @@
 
       {%- set legalReasonsAuthenticatedPath = [pathPrefix, uuids.notOpenLegalReasonsQUuid, uuids.notOpenLegalReasonsYesAUuid, uuids.legalReasonsAuthenticatedQUuid]|reply_path -%}
       {%- set legalReasonsAuthenticatedAUuid = repliesMap[legalReasonsAuthenticatedPath]|reply_str_value -%}
-      {%- if legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthenticatedYesAUuid -%}
-        <p>
+      {%- set legalReasonsPath = [pathPrefix, uuids.notOpenLegalReasonsQUuid]|reply_path -%}
+      {%- if repliesMap[legalReasonsPath]|reply_str_value == uuids.notOpenLegalReasonsYesAUuid and legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthenticatedYesAUuid -%}
+        <p data-fact-id="authenticated-access">
           A data sharing agreement will be required.
           {%- set legalReasonsAuthorizePath = [legalReasonsAuthenticatedPath, uuids.legalReasonsAuthenticatedYesAUuid, uuids.legalReasonsAuthorizeQUuid]|reply_path -%}
           {%- set legalReasonsAuthorizeAUuid = repliesMap[legalReasonsAuthorizePath]|reply_str_value -%}

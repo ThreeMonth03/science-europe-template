@@ -9,7 +9,7 @@ import traceback
 from current_support import ROOT
 
 SUITES = {
-    'answer_mapping': dict(research_combinations=1024, inactive_branches=10, owner_cases=48, full_documents=4),
+    'answer_mapping': dict(research_combinations=1024, inactive_branches=10, owner_cases=48, full_documents=4, authorization_cases=108),
     'sentence_layout': dict(nonreuse_cases=448, inactive_cases=24, inline_cases=4),
     'responsibility_reading': dict(role_subsets=512, identity_cases=32, missing_name_cases=12, full_documents=4),
     'access_reading': dict(access_cases=384, software_cases=64, software_followups=128, inactive_software=32,

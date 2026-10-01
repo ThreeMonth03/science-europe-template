@@ -70,13 +70,54 @@ def owner_fixture(kind):
 
 
 def check(root, language="en"):
-    counts = dict(research_combinations=0, inactive_branches=0, owner_cases=0, full_documents=0)
+    counts = dict(research_combinations=0, inactive_branches=0, owner_cases=0, full_documents=0, authorization_cases=0)
     for escape in (False, True):
         env = environment(root, escape)
         wrap = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}"
         quality = env.from_string(wrap + "{% include 'src/questions/04-quality-control.html.j2' %}")
         reuse = env.from_string(wrap + "{% include 'src/questions/01-how-data.html.j2' %}")
         full = env.from_string(WRAPPER)
+
+        legal = env.from_string(wrap + "{% include 'src/questions/08-copyright-ipr.html.j2' %}{% include 'src/questions/10-share-restrictions.html.j2' %}")
+        parent = path('accessCUuid', 'openImmediatelyQUuid')
+        reason = path(parent, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
+        authenticated = path(reason, 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid')
+        authorization = path(authenticated, 'legalReasonsAuthenticatedYesAUuid', 'legalReasonsAuthorizeQUuid')
+        detail = path(authorization, 'legalReasonsAuthorizeOtherAUuid', 'legalReasonsAuthorizeOtherQUuid')
+        base = {parent: IDS['openImmediatelyNoAUuid'], reason: IDS['notOpenLegalReasonsYesAUuid'],
+                authenticated: IDS['legalReasonsAuthenticatedYesAUuid']}
+        authored = '<p>Access office: <em>Coast A</em>.</p><p>Retain original notes.</p>'
+        for choice, value, profile in itertools.product(
+                ['Member', 'NewCommittee', 'OldCommittee', 'Other', None, 'obsolete'],
+                ['', '  \n ', authored], ['review', 'submission']):
+            replies = dict(base); replies[detail] = value
+            if choice: replies[authorization] = IDS.get('legalReasonsAuthorize'+choice+'AUuid', choice)
+            soup = BeautifulSoup(legal.render(repliesMap=replies, output_profile=profile), 'html.parser')
+            q8 = soup.select_one('#q-copyright-ipr')
+            known = choice in ['Member', 'NewCommittee', 'OldCommittee', 'Other']
+            assert len(q8.select('[data-fact-id="authorization-arrangements"]')) == int(known)
+            assert len(q8.select('[data-fact-id="authorization-details"]')) == int(choice == 'Other' and not value.strip() and profile == 'review')
+            assert '尚未決定授權安排' not in q8.get_text() and 'not yet decided on the authorization' not in q8.get_text()
+            assert ('Access office:' in q8.get_text()) == (choice == 'Other' and bool(value.strip()))
+            if choice == 'Other':
+                if value.strip():
+                    for p in BeautifulSoup(value, 'html.parser').select('p'): assert str(p) in str(q8)
+                else:
+                    expected = 'We will make other arrangements for authorizing potential users.' if language == 'en' else '本計畫將採用其他方式，辦理潛在資料使用者的授權。'
+                    assert expected in q8.get_text()
+            if profile == 'submission': assert not q8.select('.data-gap,.data-review')
+            counts['authorization_cases'] += 1
+        negatives = {parent: IDS['openImmediatelyYesAUuid'], reason: IDS['notOpenLegalReasonsNoAUuid'],
+                     authenticated: 'da8b25a9-8865-4ce8-a2ba-d592c42daa4c'}  # KM 2.7.0: authenticated access = No
+        for key, value, profile in itertools.product([parent, reason, authenticated],
+                [None, 'negative', 'obsolete-option'], ['review', 'submission']):
+            replies = dict(base); replies[authorization] = IDS['legalReasonsAuthorizeOtherAUuid']; replies[detail] = authored
+            if value is None: replies.pop(key)
+            else: replies[key] = negatives[key] if value == 'negative' else value
+            soup = BeautifulSoup(legal.render(repliesMap=replies, output_profile=profile), 'html.parser')
+            assert not soup.select('[data-fact-id="authorization-arrangements"],[data-fact-id="authorization-details"],[data-fact-id="authenticated-access"]')
+            assert 'Access office:' not in soup.get_text()
+            counts['authorization_cases'] += 1
 
         def render(template, km, replies, profile):
             return BeautifulSoup(template.render(km=km, repliesMap=replies, output_profile=profile,

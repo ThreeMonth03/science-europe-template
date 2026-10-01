@@ -78,11 +78,13 @@
       {# Authentication and authorization of users #}
 
       {%- if notOpenLegalReasonsAUuid  == uuids.notOpenLegalReasonsYesAUuid -%}
+        {%- set authenticationPath = [notOpenLegalReasonsPath, uuids.notOpenLegalReasonsYesAUuid, uuids.legalReasonsAuthenticatedQUuid]|reply_path -%}
+        {%- set authenticationReply = repliesMap[authenticationPath]|reply_str_value -%}
         {%- set legalReasonsAuthenticatedQUuid = [notOpenLegalReasonsPath, uuids.notOpenLegalReasonsYesAUuid, uuids.legalReasonsAuthenticatedQUuid, uuids.legalReasonsAuthenticatedYesAUuid, uuids.legalReasonsAuthorizeQUuid ]|reply_path -%}
         {%- set legalReasonsAuthenticatedAUuid = repliesMap[legalReasonsAuthenticatedQUuid]|reply_str_value -%}
         
-        {%- if legalReasonsAuthenticatedAUuid -%}
-          <h4>Authentication and Authorization of Users</h4>
+        {%- if authenticationReply == uuids.legalReasonsAuthenticatedYesAUuid and legalReasonsAuthenticatedAUuid in [uuids.legalReasonsAuthorizeMemberAUuid, uuids.legalReasonsAuthorizeNewCommitteeAUuid, uuids.legalReasonsAuthorizeOldCommitteeAUuid, uuids.legalReasonsAuthorizeOtherAUuid] -%}
+          <h4 data-fact-id="authorization-arrangements">Authentication and Authorization of Users</h4>
           {%- if legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthorizeMemberAUuid -%}
             <p>One of the project members will authorize potential users of the data.</p>
           {%- elif legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthorizeNewCommitteeAUuid -%}
@@ -101,10 +103,11 @@
             {%- set legalReasonsAuthenticatedOtherQUuid = [legalReasonsAuthenticatedQUuid, uuids.legalReasonsAuthorizeOtherAUuid, uuids.legalReasonsAuthorizeOtherQUuid]|reply_path  -%}
             {%- set legalReasonsAuthenticatedOtherReply = repliesMap[legalReasonsAuthenticatedOtherQUuid]|reply_str_value -%}
 
-            {%- if legalReasonsAuthenticatedOtherReply  -%}
+            {%- if legalReasonsAuthenticatedOtherReply|trim -%}
               <div class="answer-detail">We will use the following authorization arrangements: {{legalReasonsAuthenticatedOtherReply|markdown}}</div>
             {%- else -%}
-              <p>We have not yet decided on the authorization arrangements.</p>
+              <p>We will make other arrangements for authorizing potential users.</p>
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="authorization-details" data-status="missing"><strong>Information not provided:</strong> details of the authorization arrangements.</p>{% endif %}
             {%- endif -%}
           {%- endif -%}
  
