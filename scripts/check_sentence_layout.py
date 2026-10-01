@@ -80,7 +80,8 @@ def check(root, language):
                 assert label.parent.parent.get('class') == ['answer-lead']
                 detail = label.parent.parent.find_next_sibling('div')
                 assert detail.get('class') == ['answer-detail']
-                assert detail.decode_contents() in ['<p>Original first description.</p>', '<p>Original second description.</p>']
+                assert len(detail.find_all(recursive=False)) == 1 and detail.div is not None
+                assert detail.div.decode_contents() in ['<p>Original first description.</p>', '<p>Original second description.</p>']
             summaries = soup.select('.format-summary')
             assert len(summaries) == 2
             for index, summary in enumerate(summaries, 1):

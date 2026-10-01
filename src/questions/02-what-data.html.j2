@@ -126,7 +126,8 @@
             <li>
               {% if neqDataSetsDesc|trim %}<div class="answer-lead"><p>{% endif %}
               <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName|trim %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ neqDataSetsName if neqDataSetsName|trim else "(no name given)" }}{% endif %}</strong>
-              {% if neqDataSetsDesc|trim %}</p></div><div class="answer-detail">{{ neqDataSetsDesc|markdown }}</div>{% endif %}
+              {# Keep the authored body out of automatic first-paragraph lead styling. #}
+              {% if neqDataSetsDesc|trim %}</p></div><div class="answer-detail"><div>{{ neqDataSetsDesc|markdown }}</div></div>{% endif %}
             </li>
           {%- endfor -%}
           </ul>
