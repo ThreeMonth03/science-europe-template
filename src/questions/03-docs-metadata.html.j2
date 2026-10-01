@@ -186,7 +186,7 @@
               {%- set scFSysSubjFoldersConvs = repliesMap[[scFSysSubjFoldersPath, uuids.scFSysSubjFoldersYesAUuid, uuids.scFSysSubjFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
                 There will be a <strong>folder for each sample/subject</strong>.
-                {% if scFSysSubjFoldersConvs %}
+                {% if scFSysSubjFoldersConvs|trim %}
                   <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ scFSysSubjFoldersConvs|markdown }}</div>
                 {%- endif -%}
               </li>
@@ -195,7 +195,7 @@
               {%- set scFSysAnalysisFoldersConvs = repliesMap[[scFSysAnalysisFoldersPath, uuids.scFSysAnalysisFoldersYesAUuid, uuids.scFSysAnalysisFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
                 There will be  a <strong>(sub)folder for each (repeated) analysis</strong>. 
-                {% if scFSysAnalysisFoldersConvs %}
+                {% if scFSysAnalysisFoldersConvs|trim %}
                   <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ scFSysAnalysisFoldersConvs|markdown }}</div>
                 {%- endif -%}
               </li>
@@ -204,7 +204,7 @@
               {%- set scFSysWorkflowStepFoldersConvs = repliesMap[[scFSysWorkflowStepFoldersPath, uuids.scFSysWorkflowStepFoldersYesAUuid, uuids.scFSysWorkflowStepFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
                 There will be a <strong>(sub)folder for each step in the analysis workflow</strong>.
-                {% if scFSysWorkflowStepFoldersConvs %}
+                {% if scFSysWorkflowStepFoldersConvs|trim %}
                   <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ scFSysWorkflowStepFoldersConvs|markdown }}</div>
                 {%- endif -%}
               </li>
@@ -222,7 +222,7 @@
         {# Other appointments #}
         {%- set scFSysAppointmentsPath = [scFSysPrefix, uuids.scFSysAppointmentsQUuid]|reply_path -%}
         {%- set scFSysAppointments = repliesMap[scFSysAppointmentsPath]|reply_str_value -%}
-        {%- if scFSysAppointments %}
+        {%- if scFSysAppointments|trim %}
           <div class="answer-detail" data-fact-id="file-naming"><div class="answer-lead"><p>File naming conventions:</p></div>{{ scFSysAppointments|markdown }}</div>
         {%- endif -%}
       {%- endif -%}
@@ -233,7 +233,7 @@
         {%- set scObjStoreNamingQUuid = [storageConvObjStorePath, uuids.storageConvObjStoreYesAUuid, uuids.scObjStoreNamingQUuid]|reply_path -%}
         {%- set scObjStoreNaming = repliesMap[scObjStoreNamingQUuid]|reply_str_value -%}
         <p>We will be storing data in an "object/document store" system.</p>
-        {%- if scObjStoreNaming -%}
+        {%- if scObjStoreNaming|trim -%}
           <div class="answer-detail" data-fact-id="object-naming"><div class="answer-lead"><p>Object naming conventions:</p></div>{{ scObjStoreNaming|markdown }}</div>
         {%- endif -%}
       {%- endif -%}

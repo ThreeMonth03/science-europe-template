@@ -80,7 +80,7 @@
                                 {%- set domainSpecificRepoContactBeforePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoContactBeforeQUuid]|reply_path -%}
                                 {%- set domainSpecificRepoContactBeforeAUuid = repliesMap[domainSpecificRepoContactBeforePath]|reply_str_value -%}
                                 {%- set repositorySentences = [] -%}
-                                {%- set repositoryDestinationSentence -%}Domain-specific repository{%- if domainSpecificRepoNameReply %}: {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.{%- else %}.{%- endif -%}{%- endset -%}
+                                {%- set repositoryDestinationSentence -%}Domain-specific repository{%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim %}: {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.{%- else %}.{%- endif -%}{%- endset -%}
                                 {%- do repositorySentences.append(repositoryDestinationSentence) -%}
                                 {# Contact the repository #}
                                 {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid %}
@@ -99,7 +99,7 @@
                                 {{- repositorySentences|join(" ") -}}
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}General-purpose repository{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                                 {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
-                                {%- if generalPurposeRepoNameReply -%}
+                                {%- if macros.integrationFairSharing(generalPurposeRepoNameReply)|striptags|trim -%}
                                     : {{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}.
                                 {%- else -%}.
                                 {%- endif -%}
@@ -125,7 +125,7 @@
                                 {%- set licenseStartPath = [licensePrefix, uuids.publishedDataLicenseStartQUuid]|reply_path -%}
                                 {%- set licenseStart = repliesMap[licenseStartPath]|reply_str_value -%}
                                 {% set licenseSummary %}
-                                {% if licenseStart %}
+                                {% if licenseStart|trim %}
                                     {% set licenseDate = macros.calendarDate(licenseStart) %}
                                     <p>Licence start date: {{ licenseDate }}.</p>
                                 {% endif %}
@@ -152,7 +152,7 @@
                                     {%- set licenseRestrictMetadataPath = [publishedDataLicensePath, uuids.publishedDataLicenseRestrictAUuid, uuids.licenseRestrictMetadataQUuid]|reply_path -%}
                                     {%- set licenseRestrictMetadataAUuid = repliesMap[licenseRestrictMetadataPath]|reply_str_value %}
                                     
-                                    {% if licenseRestrictConditions %}
+                                    {% if licenseRestrictConditions|trim %}
                                       <div class="answer-detail">{{ licenseRestrictConditions|markdown }}</div>
                                     {% else %}
                                       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">The conditions of restricted access have not been provided.</p>{% endif %}
@@ -166,7 +166,7 @@
                                     {%- set licenseRestrictAccessAnotherPath = [licenseRestrictAccessPath, uuids.licenseRestrictAccessAnotherAUuid, uuids.licenseRestrictAccessAnotherQUuid]|reply_path -%}
                                     {%- set licenseRestrictAccessAnother = repliesMap[licenseRestrictAccessAnotherPath]|reply_str_value %}
                                     <p>Access requests will follow a specialized process.</p>
-                                    {% if licenseRestrictAccessAnother %}
+                                    {% if licenseRestrictAccessAnother|trim %}
                                       <div class="answer-detail" data-fact-id="restriction-custom-process" data-status="complete">{{ licenseRestrictAccessAnother|markdown }}</div>
                                     {% else %}
                                       <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-custom-process" data-status="missing">The specialized access process has not been described.</p>{% endif %}</div>
@@ -181,7 +181,7 @@
                                     {% else %}
                                       <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-metadata-publication" data-status="missing">It has not been specified whether the access conditions will be included in open metadata.</p>{% endif %}</div>
                                     {%- endif -%}
-                                    {% if licenseRestrictLink %}
+                                    {% if licenseRestrictLink|trim %}
                                     {% set restrictionLink %}<a href="{{ licenseRestrictLink|e }}" target="_blank">{{ licenseRestrictLink|e }}</a>{% endset %}
                                     <p>Restriction details: {{ restrictionLink }}.</p>
                                     {% endif %}
@@ -219,7 +219,7 @@
                 {%- for item in publishedQReferencesItems -%}
                     {%- set refId = repliesMap[[publishedQReferencesItemsPath, item, uuids.publishedQReferenceIdQUuid]|reply_path]|reply_str_value|e -%}
                     {%- set refRel = repliesMap[[publishedQReferencesItemsPath, item, uuids.publishedQReferenceRelQUuid]|reply_path]|reply_str_value|e -%}
-                    {%- if refId and refRel -%}
+                    {%- if refId|trim or refRel|trim -%}
                     {%- do qreferences.append({
                         'id': refId,
                         'relation': refRel,
@@ -228,10 +228,10 @@
                 {%- endfor -%}
             {%- endif -%}
             {%- if qreferences|length > 0 -%}
-                <p>The following qualified references to other data sets will be included:</p>
+                <p>References to other datasets:</p>
                 <ul>
                     {%- for qref in qreferences -%}
-                    <li><em>{{ qref.id|e }}</em> &ndash; {{ qref.relation|markdown }}</li>
+                    <li>{% if qref.id|trim %}<em>{{ qref.id|e }}</em>{% endif %}{% if qref.id|trim and qref.relation|trim %} &ndash; {% endif %}{% if qref.relation|trim %}{{ qref.relation|markdown }}{% endif %}</li>
                     {%- endfor -%}
                 </ul>
             {%- endif -%}
@@ -261,7 +261,7 @@
         {%- set embargoPeriod = repliesMap[embargoPeriodPath]|reply_str_value -%}
         <p>
           Data cannot be completely open due to legal reasons. But data that is not legally restrained will be released after a fixed time period.
-          {%- if embargoPeriod %}
+          {%- if embargoPeriod|trim %}
             The embargo period will be {{ embargoPeriod|dot }}
           {%- endif %}
         </p>

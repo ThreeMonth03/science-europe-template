@@ -35,14 +35,128 @@ def folder_replies():
     return result
 
 
+# Public KM paths for the audited blank-value regressions; no project answers.
+BLANK_FIELDS = [
+    ('adminDetailsCUuid projectsQUuid ITEM costQUuid ITEM', 'costTitleQUuid costDescriptionQUuid costCurrencyQUuid costAmountQUuid'),
+    ('adminDetailsCUuid projectsQUuid ITEM costQUuid ITEM costCoverQUuid costCoverGrantAUuid', 'costCoverGrantIdQUuid'),
+    ('adminDetailsCUuid projectsQUuid ITEM costQUuid ITEM costCoverQUuid costCoverOtherAUuid', 'costCoverOtherHowQUuid'),
+    ('adminDetailsCUuid policiesProceduresQUuid ITEM', 'policiesProceduresNameQUuid policiesProceduresLinkQUuid'),
+    ('reusingCUuid preexistingQUuid preexistingYesAUuid refDataQUuid ITEM refDataUseQUuid refDataUseYesAUuid refDataConditionsQUuid refDataConditionsOtherAUuid', 'refDataConditionsOtherQUuid'),
+    ('reusingCUuid preexistingQUuid preexistingYesAUuid refDataQUuid ITEM refDataUseQUuid refDataUseYesAUuid refDataVersionedQUuid refDataVersionedYesAUuid', 'refDataVersionedWhichQUuid'),
+    ('reusingCUuid preexistingQUuid preexistingYesAUuid refDataQUuid ITEM refDataUseQUuid refDataUseYesAUuid', 'refDataUsageQUuid'),
+    ('reusingCUuid preexistingQUuid preexistingYesAUuid nrefDataQUuid ITEM nrefDataUseQUuid nrefDataUseYesAUuid nrefDataConditionsQUuid nrefDataConditionsOtherAUuid', 'nrefDataConditionsOtherQUuid'),
+    ('reusingCUuid preexistingQUuid preexistingYesAUuid nrefDataQUuid ITEM nrefDataUseQUuid nrefDataUseYesAUuid', 'nrefDataUsageQUuid'),
+    ('reusingCUuid preexistingQUuid preexistingYesAUuid dataCompReadQUuid dataCompReadYesAUuid dataCompReadOthersQUuid dataCompReadOthersYesAUuid dataCompReadOthersYesStandardsQUuid ITEM', 'dataCompReadOthersYesStandardQUuid'),
+    ('creatingCUuid metadataQUuid metadataExploreAUuid provenanceQUuid provenanceOtherAUuid', 'provenanceOtherQUuid'),
+    ('creatingCUuid measuredQUuid measuredYesAUuid measuredDataQUuid ITEM measuredDataWhoQUuid measuredDataWhoExternalAUuid mdExternalOwnershipQUuid mdExternalOwnershipOtherAUuid', 'mdExternalOwnershipOtherQUuid'),
+    ('creatingCUuid collectPersonalQUuid collectPersonalYesAUuid cpersGdprQUuid cpersGdprExploreAUuid cpersGdprLegalBasisQUuid cpersGdprLegalBasisAskAUuid', 'cpersExplainInformedQUuid cpersDescribeProcedureQUuid'),
+    ('creatingCUuid collectPersonalQUuid collectPersonalYesAUuid cpersGdprQUuid cpersGdprExploreAUuid', 'cpersGdprPurposeQUuid'),
+    ('creatingCUuid ownershipQUuid ownershipOtherAUuid', 'ownershipOtherQUuid'),
+    ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvFSysQUuid storageConvFSysYesAUuid scFSysSubjFoldersQUuid scFSysSubjFoldersYesAUuid', 'scFSysSubjFoldersConvsQUuid'),
+    ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvFSysQUuid storageConvFSysYesAUuid scFSysAnalysisFoldersQUuid scFSysAnalysisFoldersYesAUuid', 'scFSysAnalysisFoldersConvsQUuid'),
+    ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvFSysQUuid storageConvFSysYesAUuid scFSysWorkflowStepFoldersQUuid scFSysWorkflowStepFoldersYesAUuid', 'scFSysWorkflowStepFoldersConvsQUuid'),
+    ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvFSysQUuid storageConvFSysYesAUuid', 'scFSysAppointmentsQUuid'),
+    ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvObjStoreQUuid storageConvObjStoreYesAUuid', 'scObjStoreNamingQUuid'),
+    ('processingCUuid risksQUuid risksExploreAUuid risksPersonalDataQUuid risksPersonalDataPseudoAUuid risksPseudonymizationQUuid risksPseudonymizationAnotherAUuid', 'risksPseudonymizationAnotherQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedDistrosQUuid ITEM publishedDataRepositoryKindQUuid publishedDataRepositoryDomainSpecificAUuid', 'domainSpecificRepoNameQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedDistrosQUuid ITEM publishedDataRepositoryKindQUuid publishedDataRepositoryGeneralPurposeAUuid', 'generalPurposeRepoNameQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedDistrosQUuid ITEM publishedDataLicensesQUuid ITEM publishedDataLicenseQUuid publishedDataLicenseRestrictAUuid', 'licenseRestrictConditionsQUuid licenseRestrictLinkQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedDistrosQUuid ITEM publishedDataLicensesQUuid ITEM publishedDataLicenseQUuid publishedDataLicenseRestrictAUuid licenseRestrictAccessQUuid licenseRestrictAccessAnotherAUuid', 'licenseRestrictAccessAnotherQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedDistrosQUuid ITEM publishedDataLicensesQUuid ITEM', 'publishedDataLicenseStartQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedQReferencesQUuid publishedQReferencesYesAUuid publishedQReferencesItemQUuid ITEM', 'publishedQReferenceIdQUuid publishedQReferenceRelQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM publishedDataHowLongQUuid publishedDataHowLongFixedAUuid', 'publishedDataHowLongFixedQUuid'),
+    ('preservingCUuid repoChargesQUuid repoChargesYesAUuid repoChargesHowPayQUuid repoChargesHowPayOtherAUuid', 'repoChargesHowPayOtherQUuid'),
+    ('accessCUuid openImmediatelyQUuid openImmediatelyNoAUuid notOpenLegalReasonsQUuid notOpenLegalReasonsYesAUuid notOpenLegalReasonsPrivacyQUuid notOpenLegalReasonsPrivacyYesAUuid', 'notOpenLegalReasonsPrivacyAccessQUuid'),
+    ('accessCUuid openImmediatelyQUuid openImmediatelyNoAUuid notOpenLegalReasonsQUuid notOpenLegalReasonsYesAUuid legalReasonsAuthenticatedQUuid legalReasonsAuthenticatedYesAUuid legalReasonsAuthorizeQUuid legalReasonsAuthorizeOldCommitteeAUuid', 'legalReasonsAuthorizeOldCommitteeQUuid'),
+    ('accessCUuid openImmediatelyQUuid openImmediatelyNoAUuid notOpenBusinessReasonsQUuid notOpenBusinessReasonsOtherAUuid', 'notOpenBusinessReasonsOtherQUuid'),
+    ('accessCUuid openImmediatelyQUuid openImmediatelyNoAUuid notOpenOtherReasonsQUuid notOpenOtherReasonsOtherAUuid', 'notOpenOtherReasonsOtherQUuid'),
+    ('accessCUuid limitedEmbargoQUuid limitedEmbargoYesAUuid', 'limitedEmbargoPeriodQUuid'),
+]
+
+
+def partial_fixture(chain):
+    from check_answer_mapping import chapter, question, schema
+    parts = chain.split(); km = schema(); children = chapter(km, IDS[parts[0]]); replies = {}
+    for i, part in enumerate(parts[1:], 1):
+        if part == 'ITEM':
+            replies[path(*parts[:i])] = ['ITEM']
+            children = node['itemTemplateQuestionUuids']
+        elif part.endswith('AUuid'):
+            replies[path(*parts[:i])] = IDS[part]
+            children = km['entities']['answers'][IDS[part]]['followUpUuids']
+        else:
+            following = parts[i+1] if i+1 < len(parts) else ''
+            kind = 'ListQuestion' if following == 'ITEM' else 'OptionsQuestion' if following.endswith('AUuid') else 'ValueQuestion'
+            node = question(km, children, IDS[part], kind, [IDS[following]] if kind == 'OptionsQuestion' else [])
+    return km, replies, path(*parts)
+
+
+def check_partial_answers(env, language):
+    from current_support import PREFIX
+    template = env.from_string(PREFIX + "{% include 'src/content.html.j2' %}")
+    counts = dict(blank_field_cases=0, partial_record_cases=0, personal_sentence_cases=0)
+    norm = lambda text: ' '.join(text.split())
+    def render(km, replies, profile):
+        soup = BeautifulSoup(template.render(km=km, repliesMap=replies, output_profile=profile), 'html.parser')
+        assert len(soup.select('.question')) == 15
+        if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
+        return soup
+    def signature(soup):
+        return (norm(soup.get_text()), [(n.get('data-fact-id'), n.get('data-status'), norm(n.get_text())) for n in soup.select('[data-status]')])
+    for prefix, fields in BLANK_FIELDS:
+        for field in fields.split():
+            km, base, key = partial_fixture(prefix + ' ' + field)
+            integration = field in ['costCurrencyQUuid', 'dataCompReadOthersYesStandardQUuid', 'domainSpecificRepoNameQUuid', 'generalPurposeRepoNameQUuid']
+            token = '0' if field == 'costAmountQUuid' else '2026-10-01' if field == 'publishedDataLicenseStartQUuid' else 'Original-UNIQUE-value'
+            for profile in ['review', 'submission']:
+                missing = signature(render(km, base, profile))
+                for value in [None, '', ' \t\n\u3000', token]:
+                    replies = dict(base)
+                    if value is not None:
+                        replies[key] = {'value': {'value': {'type':'PlainType', 'value':value}}} if integration else value
+                    soup = render(km, replies, profile)
+                    assert 'only.We use' not in soup.get_text(), (language, field, 'Missing sentence space')
+                    if value != token: assert signature(soup) == missing, (language, profile, field, repr(value))
+                    else: assert token in soup.get_text(), (language, profile, field, 'Filled value lost')
+                    counts['blank_field_cases'] += 1
+    for chain, fields in [
+            ('adminDetailsCUuid policiesProceduresQUuid ITEM', ['policiesProceduresNameQUuid', 'policiesProceduresLinkQUuid', 'policiesProceduresDescriptionQUuid']),
+            ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedQReferencesQUuid publishedQReferencesYesAUuid publishedQReferencesItemQUuid ITEM', ['publishedQReferenceIdQUuid', 'publishedQReferenceRelQUuid'])]:
+        km, base, _ = partial_fixture(chain + ' ' + fields[0])
+        for mask, profile in itertools.product(range(2 ** len(fields)), ['review', 'submission']):
+            replies = dict(base)
+            for i, field in enumerate(fields): replies[path(*(chain + ' ' + field).split())] = 'Retain-FIELD-'+str(i) if mask & (1 << i) else ' \n '
+            soup = render(km, replies, profile)
+            for i in range(len(fields)): assert ('Retain-FIELD-'+str(i) in soup.get_text()) == bool(mask & (1 << i)), (language, mask, fields)
+            assert not any(not li.get_text(strip=True) for li in soup.select('#q-access-security li,#q-share-restrictions li'))
+            counts['partial_record_cases'] += 1
+    chain = 'reusingCUuid preexistingQUuid preexistingYesAUuid nrefDataQUuid ITEM nrefDataUseQUuid nrefDataUseYesAUuid nrefDataPersonalQUuid nrefDataPersonalYesAUuid nrefDataPersonalLegalBasisQUuid'
+    km, base, key = partial_fixture(chain)
+    for basis, child, profile in itertools.product([None, 'PubInterest', 'Consent', 'Other'], [None, 'Yes', 'No'], ['review', 'submission']):
+        replies = dict(base)
+        if basis: replies[key] = IDS['nrefDataPersonalLebalBasisOtherAUuid' if basis == 'Other' else 'nrefDataPersonalLegalBasis'+basis+'AUuid']
+        if child: replies[path(key, 'nrefDataPersonalLegalBasisConsentAUuid', 'nrefDataPersonalLegalBasisConsentReuseQUuid')] = IDS['nrefDataPersonalLegalBasisConsentReuse'+child+'AUuid']
+        soup = render(km, replies, profile)
+        text = soup.select_one('#q-how-data').get_text(' ', strip=True)
+        assert 'legaly' not in text and 'This data include' not in text
+        assert not re.search(r'based on(?:\s|$)', text)
+        assert ('This dataset contains personal data.' if language == 'en' else '此資料集含個人資料。') in text
+        consent = 'The consent also covers our reuse.' if language == 'en' else '該同意亦涵蓋本計畫的資料再利用。'
+        assert (consent in text) == (basis == 'Consent' and child == 'Yes')
+        counts['personal_sentence_cases'] += 1
+    return counts
+
+
 def check(root, language):
     counts = dict(nonreuse_cases=0, inactive_cases=0, inline_cases=0, missing_name_cases=0, quality_other_cases=0,
-                  reference_identity_cases=0, instrument_cases=0, missing_detail_cases=0)
+                  reference_identity_cases=0, instrument_cases=0, missing_detail_cases=0,
+                  blank_field_cases=0, partial_record_cases=0, personal_sentence_cases=0)
     css = (root / 'src/layout.css').read_text()
     assert 'html body li > strong:first-child {' not in css
     assert 'html body li > strong.item-label { display: block; break-after: avoid; }' in css
     for escape in [False, True]:
         env = environment(root, escape)
+        for name, count in check_partial_answers(env, language).items(): counts[name] += count
         prefix = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}"
         template = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}")
         folder = env.from_string(prefix + "{% include 'src/questions/03-docs-metadata.html.j2' %}")

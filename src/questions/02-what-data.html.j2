@@ -41,7 +41,7 @@
                   {%- set mdExternalOwnershipOtherPath = [mdExternalOwnershipPath, uuids.mdExternalOwnershipOtherAUuid, uuids.mdExternalOwnershipOtherQUuid]|reply_path -%}
                   {%- set mdExternalOwnershipOther = repliesMap[mdExternalOwnershipOtherPath]|reply_str_value -%}
                   {%- set ownershipOther = mdExternalOwnershipOther -%}
-                  {%- set ownershipMissing = not mdExternalOwnershipOther -%}
+                  {%- set ownershipMissing = not mdExternalOwnershipOther|trim -%}
                 {%- else -%}
                   {%- set ownershipMissing = true -%}
                 {%- endif -%}
@@ -63,7 +63,7 @@
             {% if measuredDataEquipAUuid not in [uuids.measuredDataEquipDescribedAUuid, uuids.measuredDataEquipCareAUuid] %}
               {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="equipment-documentation" data-status="missing">Information not provided: whether the equipment is adequately documented or needs additional process documentation.</p>{% endif %}
             {% endif %}
-            {% if ownershipOther %}
+            {% if ownershipOther|trim %}
               <div class="answer-detail" data-fact-id="external-ownership" data-status="complete">
                 <div class="answer-lead"><p>Data ownership arrangements:</p></div>
                 {{ ownershipOther|markdown }}

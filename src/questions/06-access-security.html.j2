@@ -147,6 +147,7 @@
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationAnotherAUuid -%}
           {%- set risksPseudonymizationAnotherQUuid = [risksPseudonymizationPath, uuids.risksPseudonymizationAnotherAUuid, uuids.risksPseudonymizationAnotherQUuid]|reply_path -%}
           {%- set risksPseudonymizationAnother = repliesMap[risksPseudonymizationAnotherQUuid]|reply_str_value %}
+          {%- set risksPseudonymizationAnother = risksPseudonymizationAnother if risksPseudonymizationAnother|trim else '' %}
           We use a specific pseudonymization method{{ ": " ~ risksPseudonymizationAnother|markdown if risksPseudonymizationAnother else "." }}
         {%- endif -%}
       </p>
@@ -180,31 +181,31 @@
     {%- set policiesProceduresQUuid = [uuids.adminDetailsCUuid, uuids.policiesProceduresQUuid]|reply_path -%}
     {%- set policiesProceduresItems = repliesMap [policiesProceduresQUuid]|reply_items -%}
     {%- if policiesProceduresItems|length > 0 -%}
-      <h4>Policies and Procedures</h4>
-      <p>We will use the following policies and procedures:</p>
-      <ul>
+      {% set policyEntries %}
         {%- for policiesProceduresItem in policiesProceduresItems -%}
           {%- set policiesProceduresPathPrefix =  [policiesProceduresQUuid, policiesProceduresItem ]|reply_path -%}
-          <li>
             {%- set policiesProceduresItemNameQUuid = [policiesProceduresPathPrefix, uuids.policiesProceduresNameQUuid]|reply_path -%}
             {%- set policiesProceduresItemNameReply = repliesMap[policiesProceduresItemNameQUuid]|reply_str_value -%}
             {%- set policiesProceduresItemLinkQUuid = [policiesProceduresPathPrefix, uuids.policiesProceduresLinkQUuid]|reply_path  -%}
             {%- set policiesProceduresItemLinkReply = repliesMap[policiesProceduresItemLinkQUuid]|reply_str_value -%}
             {%- set policiesProceduresItemDescriptionQUuid = [policiesProceduresPathPrefix, uuids.policiesProceduresDescriptionQUuid]|reply_path -%}
             {%- set policiesProceduresItemDescriptionReply = repliesMap[policiesProceduresItemDescriptionQUuid]|reply_str_value  -%}
-              {%- if policiesProceduresItemNameReply -%}
-                <strong>{{ policiesProceduresItemNameReply }}</strong>
-                {% if policiesProceduresItemLinkReply -%}<span class="separator">&ndash;</span>{%- endif %}
-                {{policiesProceduresItemLinkReply}}
-
-                {%- if policiesProceduresItemDescriptionReply -%}
-                  {{policiesProceduresItemDescriptionReply|markdown}}
-                {%- endif -%}
-
-              {%- endif -%}
+          {# A missing name must not hide an independent link or description. #}
+          {% if policiesProceduresItemNameReply|trim or policiesProceduresItemLinkReply|trim or policiesProceduresItemDescriptionReply|trim %}
+          <li>
+            {% if policiesProceduresItemNameReply|trim %}<strong>{{ policiesProceduresItemNameReply|e }}</strong>{% endif %}
+            {% if policiesProceduresItemNameReply|trim and policiesProceduresItemLinkReply|trim %}<span class="separator">&ndash;</span>{% endif %}
+            {% if policiesProceduresItemLinkReply|trim %}{{ policiesProceduresItemLinkReply|e }}{% endif %}
+            {% if policiesProceduresItemDescriptionReply|trim %}{{ policiesProceduresItemDescriptionReply|markdown }}{% endif %}
           </li>
+          {% endif %}
         {%- endfor -%}
-      </ul>
+      {% endset %}
+      {% if policyEntries|trim %}
+      <h4>Policies and Procedures</h4>
+      <p>We will use the following policies and procedures:</p>
+      <ul>{{ policyEntries }}</ul>
+      {% endif %}
     {%- endif -%}
   {% endset %}
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}

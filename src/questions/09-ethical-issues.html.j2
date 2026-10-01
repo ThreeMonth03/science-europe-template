@@ -141,7 +141,7 @@
 
             {%- set cpersExplainInformedPath = [legalBasePath, legalBaseAUuid, uuids.cpersExplainInformedQUuid]|reply_path -%}
             {%- set cpersExplainInformed = repliesMap[cpersExplainInformedPath]|reply_str_value -%}
-            {%- if cpersExplainInformed -%}
+            {%- if cpersExplainInformed|trim -%}
               {%- do sentences.append('The data subjects will be informed as follows:') -%}
               {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersExplainInformed|markdown) -%}
             {%- endif -%}
@@ -156,7 +156,7 @@
 
             {%- set cpersDescribeProcedurePath = [legalBasePath, legalBaseAUuid, uuids.cpersDescribeProcedureQUuid]|reply_path -%}
             {%- set cpersDescribeProcedure = repliesMap[cpersDescribeProcedurePath]|reply_str_value -%}
-            {%- if cpersDescribeProcedure -%}
+            {%- if cpersDescribeProcedure|trim -%}
               {%- do sentences.append('The procedure for obtaining consent from data subjects is as follows:') -%}
               {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersDescribeProcedure|markdown) -%}
             {%- endif -%}
@@ -184,7 +184,7 @@
           {# purpose  #}
           {%- set cpersGdprPurposePath = [cpersGdprPath, cpersGdprAUuid, uuids.cpersGdprPurposeQUuid]|reply_path -%}
           {%- set cpersGdprPurpose = repliesMap[cpersGdprPurposePath]|reply_str_value -%}
-          {%- if cpersGdprPurpose -%}
+          {%- if cpersGdprPurpose|trim -%}
             {%- do sentences.append('The purpose of processing the personal data can be described as follows:') -%}
             {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersGdprPurpose|markdown) -%}
           {%- endif -%}

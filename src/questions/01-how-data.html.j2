@@ -122,7 +122,7 @@
             {% endif %}
             {%- set refDataUsageQ = [refDataUsedPrefix, uuids.refDataUsageQUuid]|reply_path -%}
             {%- set refDataUsageReply = repliesMap[refDataUsageQ]|reply_str_value -%}
-            {% if refDataUsageReply %}
+            {% if refDataUsageReply|trim %}
               <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
                 {{ refDataUsageReply|markdown }}
               </div>
@@ -138,7 +138,7 @@
               {%- set refDataVersionedWhich = repliesMap[refDataVersionedWhichPath]|reply_str_value -%}
               {%- set refDataVersionedChangePath = [refDataVersionedPath, uuids.refDataVersionedYesAUuid, uuids.refDataVersionedChangeQUuid]|reply_path -%}
               {%- set refDataVersionedChangeAUuid = repliesMap[refDataVersionedChangePath]|reply_str_value -%}
-              {% if refDataVersionedWhich %}
+              {% if refDataVersionedWhich|trim %}
                 <table class="dataset-version" data-fact-id="dataset-version" data-status="complete">
                   <tbody><tr><th scope="row">Version</th><td>{{ refDataVersionedWhich|markdown }}</td></tr></tbody>
                 </table>
@@ -182,7 +182,7 @@
               {%- elif refDataConditionsReply == uuids.refDataConditionsCCBYAUuid -%}
                 <p>This dataset is freely available with an obligation to cite the source.</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsOtherAUuid -%}
-                  {%- if refDataConditionsOtherReply -%}
+                  {%- if refDataConditionsOtherReply|trim -%}
                     <div class="answer-detail"><p><strong>Conditions of use</strong></p>{{refDataConditionsOtherReply|markdown}}</div>
                   {%- else -%}
                     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">Restrictions apply, but the conditions of use are not yet described.</p>{% else %}<p data-fact-id="reuse-restrictions" data-status="partial">Restrictions apply to this dataset.</p>{% endif %}
@@ -266,7 +266,7 @@
           {% endif %}
           {%- set nrefDataUsageQ = [nrefDataUsedPrefix, uuids.nrefDataUsageQUuid]|reply_path -%}
           {%- set nrefDataUsageReply = repliesMap[nrefDataUsageQ]|reply_str_value -%}
-          {% if nrefDataUsageReply %}
+          {% if nrefDataUsageReply|trim %}
             <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
               <p><strong>Purpose of re-use</strong></p>
               {{ nrefDataUsageReply|markdown }}
@@ -281,42 +281,34 @@
           {%- set nrefDataPersonal = [nrefDataUsedPrefix, uuids.nrefDataPersonalQUuid]|reply_path -%}
           {%- set nrefDataPersonalReply = repliesMap[nrefDataPersonal]|reply_str_value -%}
           {%- if nrefDataPersonalReply == uuids.nrefDataPersonalYesAUuid %}
-          <p>
-            This data include personal data
-            {%- set nrefDataPersonalLegalBasis = [nrefDataPersonal, uuids.nrefDataPersonalYesAUuid, uuids.nrefDataPersonalLegalBasisQUuid]|reply_path -%}
-            {%- set nrefDataPersonalLegalBasisReply = repliesMap[nrefDataPersonalLegalBasis]|reply_str_value -%}
-            {%- if nrefDataPersonalLegalBasisReply -%}
-              , legaly based on{{+" "}}
-              {%- if nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLegalBasisPubInterestAUuid -%}
-                public interest for processing the data under GDPR.
-              {%- elif nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLegalBasisConsentAUuid -%}
-                consent given by the research subject for processing the data under GDPR
-                {%- set nrefDataPersonalLegalBasisReuse = [nrefDataPersonalLegalBasis, uuids.nrefDataPersonalLegalBasisConsentAUuid, uuids.nrefDataPersonalLegalBasisConsentReuseQUuid]|reply_path -%}
-                {%- set nrefDataPersonalLegalBasisReuseReply = repliesMap[nrefDataPersonalLegalBasisReuse]|reply_str_value -%}
-                {%- if nrefDataPersonalLegalBasisReuseReply -%}
-                  , which{{+" "}}
-                  {%- if nrefDataPersonalLegalBasisReuseReply == uuids.nrefDataPersonalLegalBasisConsentReuseYesAUuid -%}
-                    covers also our reuse.
-                  {%- elif nrefDataPersonalLegalBasisReuseReply == uuids.nrefDataPersonalLegalBasisConsentReuseNoAUuid -%}
-                    does not cover our reuse; therefore, new consent will be needed.
-                  {%- endif -%}
-                {%- else -%}
-                .
-                {%- endif -%}
-              {%- elif nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLebalBasisOtherAUuid -%}
-                {%- set nrefDataPersonalLegalBasisOther = [nrefDataPersonalLegalBasis, uuids.nrefDataPersonalLebalBasisOtherAUuid, uuids.nrefDataPersonalLegalBasisOtherQUuid]|reply_path -%}
-                {%- set nrefDataPersonalLegalBasisOtherReply = repliesMap[nrefDataPersonalLegalBasisOther]|reply_str_value -%}
-                {%- if nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherLegalAUuid -%}
-                  a legal requirement (meaning a legal obligation to do this data processing).
-                {%- elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherVitalAUuid -%}
-                  a vital interest (meaning it needs to be done to protect the vital interests of the data subject).
-                {%- elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherLegitAUuid -%}
-                  a legitimate interest (meaning data subjects all expect us to do this data processing because of who we are).
-                {%- elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherContractAUuid -%}
-                  a requirement to fulfill our contract with the data subjects.
-                {%- endif -%}
-              {%- endif -%} 
-            {%- endif -%}
+          {%- set nrefDataPersonalLegalBasis = [nrefDataPersonal, uuids.nrefDataPersonalYesAUuid, uuids.nrefDataPersonalLegalBasisQUuid]|reply_path -%}
+          {%- set nrefDataPersonalLegalBasisReply = repliesMap[nrefDataPersonalLegalBasis]|reply_str_value -%}
+          {# Each selected fact is a complete sentence, including partial replies. #}
+          <p>This dataset contains personal data.
+            {% if nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLegalBasisPubInterestAUuid %}
+              The stated legal basis for processing these data under the GDPR is public interest.
+            {% elif nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLegalBasisConsentAUuid %}
+              The stated legal basis for processing these data under the GDPR is consent from the data subjects.
+              {% set nrefDataPersonalLegalBasisReuse = [nrefDataPersonalLegalBasis, uuids.nrefDataPersonalLegalBasisConsentAUuid, uuids.nrefDataPersonalLegalBasisConsentReuseQUuid]|reply_path %}
+              {% set nrefDataPersonalLegalBasisReuseReply = repliesMap[nrefDataPersonalLegalBasisReuse]|reply_str_value %}
+              {% if nrefDataPersonalLegalBasisReuseReply == uuids.nrefDataPersonalLegalBasisConsentReuseYesAUuid %}
+                The consent also covers our reuse.
+              {% elif nrefDataPersonalLegalBasisReuseReply == uuids.nrefDataPersonalLegalBasisConsentReuseNoAUuid %}
+                The consent does not cover our reuse; new consent will be needed.
+              {% endif %}
+            {% elif nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLebalBasisOtherAUuid %}
+              {% set nrefDataPersonalLegalBasisOther = [nrefDataPersonalLegalBasis, uuids.nrefDataPersonalLebalBasisOtherAUuid, uuids.nrefDataPersonalLegalBasisOtherQUuid]|reply_path %}
+              {% set nrefDataPersonalLegalBasisOtherReply = repliesMap[nrefDataPersonalLegalBasisOther]|reply_str_value %}
+              {% if nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherLegalAUuid %}
+                The stated legal basis for processing these data is a legal obligation.
+              {% elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherVitalAUuid %}
+                The stated legal basis for processing these data is the protection of vital interests of the data subjects.
+              {% elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherLegitAUuid %}
+                The stated legal basis for processing these data is legitimate interests.
+              {% elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherContractAUuid %}
+                The stated legal basis for processing these data is performance of a contract with the data subjects.
+              {% endif %}
+            {% endif %}
           </p>
           {%- endif -%}
 
@@ -388,14 +380,16 @@
       {%- if dataCompReadOthersReply == uuids.dataCompReadOthersYesAUuid -%}
         {%- set dataCompReadWhichMetadataStandardPath = [dataCompReadOthers, uuids.dataCompReadOthersYesAUuid, uuids.dataCompReadOthersYesStandardsQUuid]|reply_path -%}
         {%- set dataCompReadMetadataStandardItems = repliesMap[dataCompReadWhichMetadataStandardPath]|reply_items -%}
-        {%- if dataCompReadMetadataStandardItems|length > 0 -%}
-          {{+" "}}We will provide others with standardized, machine-readable metadata and we will use the following metadata standards:{{+" "}}
-          {%- for dataCompReadMetadataStandardItem in dataCompReadMetadataStandardItems -%}
+        {%- set namedMetadataStandards = [] -%}
+        {%- for dataCompReadMetadataStandardItem in dataCompReadMetadataStandardItems -%}
             {%- set dataCompReadMetadataStandardPrefix = [dataCompReadWhichMetadataStandardPath, dataCompReadMetadataStandardItem]|reply_path -%}
             {%- set dataCompReadMetadataStandard = [dataCompReadMetadataStandardPrefix, uuids.dataCompReadOthersYesStandardQUuid]|reply_path -%}
             {%- set dataCompReadMetadataStandardReply = repliesMap[dataCompReadMetadataStandard] -%}
-            {{ macros.integrationFairSharing(dataCompReadMetadataStandardReply) }}{{ ", " if not loop.last else "." }}
-          {%- endfor -%}
+            {%- set standardName = macros.integrationFairSharing(dataCompReadMetadataStandardReply) -%}
+            {%- if standardName|striptags|trim -%}{%- do namedMetadataStandards.append(standardName) -%}{%- endif -%}
+        {%- endfor -%}
+        {%- if namedMetadataStandards -%}
+          {{+" "}}We will provide others with standardized, machine-readable metadata and we will use the following metadata standards:{{+" "}}{{ namedMetadataStandards|join(", ") }}.
         {%- else -%}
           {{+" "}}We will provide others with standardized, machine-readable metadata.
         {%- endif -%}
@@ -425,7 +419,7 @@
         {%- elif provenanceAUuid == uuids.provenanceOtherAUuid -%}
           {%- set provenanceOtherPath = [provenancePath, uuids.provenanceOtherAUuid, uuids.provenanceOtherQUuid]|reply_path -%}
           {%- set provenanceOther = repliesMap[provenanceOtherPath]|reply_str_value -%}
-          {%- if provenanceOther -%}
+          {%- if provenanceOther|trim -%}
             <div class="answer-detail" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">
               {{ macros.provenanceReading(provenanceOther) }}
             </div>

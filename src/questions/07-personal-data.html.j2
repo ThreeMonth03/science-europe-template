@@ -108,7 +108,7 @@
                 {%- set personalDataManagedAccessQUuid = [notOpenLegalReasonsPrivacyQUuid, uuids.notOpenLegalReasonsPrivacyYesAUuid, uuids.notOpenLegalReasonsPrivacyAccessQUuid ]|reply_path -%}
                 {%- set personalDataManagedAccessReply = repliesMap[personalDataManagedAccessQUuid]|reply_str_value -%}
                 
-                {%- if personalDataManagedAccessReply -%}
+                {%- if personalDataManagedAccessReply|trim -%}
                     <h4>Access procedure to personal data</h4>
                     <p>There is a procedure for users to access private data as follows: {{personalDataManagedAccessReply}}</p>
                 {%- endif -%}

@@ -107,13 +107,13 @@
                         {%- set budgetRow = namespace(id=projectCostItem, title='', purpose='', budget='', funding='', original='') -%}
                         {%- set budgetRow.original -%}
                         <tr data-item-id="{{ projectCostItem }}"><td>
-                        {% set budgetRow.title %}<p><strong>{% if output_profile|default('review') == 'submission' and not projectCostItemTitleReply %}{{ macros.resourceLabel(projectCostItems.index(j) + 1) }}{% else %}{{ projectCostItemTitleReply if projectCostItemTitleReply else "(no resource name given)" }}{% endif %}</strong></p>{% endset %}{{ budgetRow.title }}
+                        {% set budgetRow.title %}<p><strong>{% if output_profile|default('review') == 'submission' and not projectCostItemTitleReply|trim %}{{ macros.resourceLabel(projectCostItems.index(j) + 1) }}{% else %}{{ projectCostItemTitleReply if projectCostItemTitleReply|trim else "(no resource name given)" }}{% endif %}</strong></p>{% endset %}{{ budgetRow.title }}
                         {%- set budgetRow.purpose -%}
                         
                         {%- set projectCostItemDescriptionQUuid = [projectCostItem, uuids.costDescriptionQUuid]|reply_path -%}
                         {%- set projectCostItemDescriptionReply = repliesMap[projectCostItemDescriptionQUuid]|reply_str_value  -%}
                         
-                        {%- if projectCostItemDescriptionReply -%}
+                        {%- if projectCostItemDescriptionReply|trim -%}
                           <div class="answer-detail" data-fact-id="resource-justification" data-status="complete">{{ projectCostItemDescriptionReply|markdown }}</div>
                         {%- else -%}
                           {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-justification" data-status="missing"><strong>Information not provided:</strong> why this resource is needed to deliver FAIR data.</p>{% endif %}
@@ -121,22 +121,23 @@
 
                         {%- set projectCostItemCurrencyQUuid = [projectCostItem, uuids.costCurrencyQUuid]|reply_path  -%}
                         {%- set projectCostItemCurrencyReply = repliesMap[projectCostItemCurrencyQUuid] -%}
+                        {%- set hasCurrency = macros.integrationCurrency(projectCostItemCurrencyReply)|striptags|trim != '' -%}
 
 
                         {%- set projectCostItemAmountQUuid = [projectCostItem, uuids.costAmountQUuid]|reply_path   -%}
                         {%- set projectCostItemAmountReply = repliesMap[projectCostItemAmountQUuid]|reply_str_value -%}
 
                         {%- set budgetRow.budget -%}
-                        {%- if  projectCostItemAmountReply and projectCostItemCurrencyReply -%}
+                        {%- if projectCostItemAmountReply|trim and hasCurrency -%}
                             <p>{{projectCostItemAmountReply}} {{macros.integrationCurrency(projectCostItemCurrencyReply) }}</p>
                         {%- else -%}
-                            {% if projectCostItemAmountReply %}
+                            {% if projectCostItemAmountReply|trim %}
                               <p data-fact-id="resource-amount-value" data-status="complete">{{ projectCostItemAmountReply }}</p>
                             {% endif %}
-                            {% if projectCostItemCurrencyReply %}
+                            {% if hasCurrency %}
                               <p data-fact-id="resource-currency" data-status="complete">Currency: {{ macros.integrationCurrency(projectCostItemCurrencyReply) }}.</p>
                             {% endif %}
-                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing"><strong>Information not provided:</strong> {% if projectCostItemAmountReply %}currency.{% elif projectCostItemCurrencyReply %}budgeted amount.{% else %}budgeted amount and currency.{% endif %}</p>{% endif %}
+                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing"><strong>Information not provided:</strong> {% if projectCostItemAmountReply|trim %}currency.{% elif hasCurrency %}budgeted amount.{% else %}budgeted amount and currency.{% endif %}</p>{% endif %}
                         {%- endif -%}
                         {%- endset -%}
 
@@ -186,7 +187,7 @@
                           {%- set costCoverGrantIdQUuid = [projectCostItemCoverQUuid, uuids.costCoverGrantAUuid, uuids.costCoverGrantIdQUuid]|reply_path -%}
                           {%- set costCoverGrantIdReply = repliesMap[costCoverGrantIdQUuid]|reply_str_value -%}
                           <p data-fact-id="cost-coverage" data-status="complete">This cost will be covered by a funding grant.</p>
-                          {% if costCoverGrantIdReply %}
+                          {% if costCoverGrantIdReply|trim %}
                             <p>Grant number: {{ costCoverGrantIdReply }}.</p>
                           {% else %}
                             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="grant-number" data-status="missing"><strong>Information not provided:</strong> the grant number.</p>{% endif %}
@@ -194,7 +195,7 @@
                         {%- elif projectCostItemCoverReply == uuids.costCoverOtherAUuid -%}
                           {%- set costCoverOtherHowQUuid = [projectCostItemCoverQUuid,uuids.costCoverOtherAUuid, uuids.costCoverOtherHowQUuid]|reply_path  -%}
                           {%- set costCoverOtherHowReply = repliesMap[costCoverOtherHowQUuid]|reply_str_value -%}
-                          {%- if costCoverOtherHowReply -%}
+                          {%- if costCoverOtherHowReply|trim -%}
                             <div class="answer-detail">{{costCoverOtherHowReply|markdown}}</div>
                           {%- else -%}
                             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>{% endif %}

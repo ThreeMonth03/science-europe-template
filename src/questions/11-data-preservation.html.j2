@@ -41,12 +41,12 @@
             {%- elif publishedDataHowLongAUuid == uuids.publishedDataHowLongFixedAUuid -%}
               {%- set publishedDataHowLongFixedPath = [publishedDataHowLongPath, uuids.publishedDataHowLongFixedAUuid, uuids.publishedDataHowLongFixedQUuid]|reply_path -%}
               {%- set publishedDataHowLongFixed = repliesMap[publishedDataHowLongFixedPath]|reply_str_value -%}
-              {% if publishedDataHowLongFixed %}
+              {% if publishedDataHowLongFixed|trim %}
                 <p>Retention period (prepaid): {{ publishedDataHowLongFixed|e }}.</p>
               {% else %}
                 <p>This data set will be kept available for a fixed period (prepaid).</p>
               {% endif %}
-              {% if not publishedDataHowLongFixed %}
+              {% if not publishedDataHowLongFixed|trim %}
                 <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="missing-output">The retention period has not been provided.</p>{% endif %}</div>
               {% elif (publishedDataHowLongFixed|string|trim).replace('.', '', 1).isdigit() %}
                 <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="needs-review">Please specify a time unit for the retention period.</p>{% endif %}</div>
@@ -100,7 +100,7 @@
                   {% if distrosItems|length > 1 %}<span class="repository-label">Distribution {{ loop.index }}:</span> {% endif %}
                   {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}Domain-specific repository{%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
                     {%- set domainSpecificRepoNameReply = repliesMap[domainSpecificRepoNamePath] -%}
-                    {%- if domainSpecificRepoNameReply -%}
+                    {%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim -%}
                       : {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.
                     {%- else -%}.
                     {% endif -%}
@@ -127,7 +127,7 @@
                     {%- endif -%}
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}<em>General-purpose repository</em>{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                     {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
-                    {%- if generalPurposeRepoNameReply -%}
+                    {%- if macros.integrationFairSharing(generalPurposeRepoNameReply)|striptags|trim -%}
                       : {{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}.
                     {%- else -%}.
                     {% endif -%}
@@ -189,7 +189,7 @@
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayOtherAUuid -%}
         {%- set repoChargesHowPayOtherPath = [repoChargesHowPayPath, uuids.repoChargesHowPayOtherAUuid, uuids.repoChargesHowPayOtherQUuid]|reply_path -%}
         {%- set repoChargesHowPayOther = repliesMap[repoChargesHowPayOtherPath]|reply_str_value -%}
-        {%- if repoChargesHowPayOther -%}
+        {%- if repoChargesHowPayOther|trim -%}
           <div class="answer-lead"><p>Other arrangements for paying repository costs:</p></div>
           <div class="answer-detail">{{ repoChargesHowPayOther|markdown }}</div>
         {%- endif -%}

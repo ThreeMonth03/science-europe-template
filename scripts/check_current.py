@@ -11,7 +11,8 @@ from current_support import ROOT
 SUITES = {
     'answer_mapping': dict(research_combinations=1024, inactive_branches=10, owner_cases=48, full_documents=4, authorization_cases=180),
     'sentence_layout': dict(nonreuse_cases=448, inactive_cases=24, inline_cases=4, missing_name_cases=16, quality_other_cases=140,
-                            reference_identity_cases=384, instrument_cases=36, missing_detail_cases=80),
+                            reference_identity_cases=384, instrument_cases=36, missing_detail_cases=80,
+                            blank_field_cases=656, partial_record_cases=48, personal_sentence_cases=48),
     'responsibility_reading': dict(role_subsets=512, identity_cases=32, missing_name_cases=12, full_documents=4),
     'access_reading': dict(access_cases=384, software_cases=64, software_followups=128, inactive_software=32,
                           identifier_cases=960, reuse_cases=300, inactive_reuse=44, reuse_identity=4,

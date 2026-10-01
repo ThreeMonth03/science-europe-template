@@ -26,8 +26,10 @@
       {%- set notOpenOtherReasonsAUuid = repliesMap[notOpenOtherReasonsPath]|reply_str_value -%}
       {%- set notOpenBusinessReasonsOtherPath = [notOpenBusinessReasonsPath, uuids.notOpenBusinessReasonsOtherAUuid, uuids.notOpenBusinessReasonsOtherQUuid]|reply_path -%}
       {%- set notOpenBusinessReasonsOther = repliesMap[notOpenBusinessReasonsOtherPath]|reply_str_value -%}
+      {%- set notOpenBusinessReasonsOther = notOpenBusinessReasonsOther if notOpenBusinessReasonsOther|trim else '' -%}
       {%- set notOpenOtherReasonsOtherPath = [notOpenOtherReasonsPath, uuids.notOpenOtherReasonsOtherAUuid, uuids.notOpenOtherReasonsOtherQUuid]|reply_path -%}
       {%- set notOpenOtherReasonsOther = repliesMap[notOpenOtherReasonsOtherPath]|reply_str_value -%}
+      {%- set notOpenOtherReasonsOther = notOpenOtherReasonsOther if notOpenOtherReasonsOther|trim else '' -%}
 
       {%- set legalReasons = notOpenLegalReasonsAUuid == uuids.notOpenLegalReasonsYesAUuid -%}
       {%- set businessReasonsPatents = notOpenBusinessReasonsAUuid == uuids.notOpenBusinessReasonsPatentsAUuid -%}
@@ -93,7 +95,7 @@
             {%- set legalReasonsAuthenticatedCommitteeQUuid = [legalReasonsAuthenticatedQUuid, uuids.legalReasonsAuthorizeOldCommitteeAUuid, uuids.legalReasonsAuthorizeOldCommitteeQUuid]|reply_path -%}
             {%- set legalReasonsAuthenticatedCommitteeReply = repliesMap[legalReasonsAuthenticatedCommitteeQUuid]|reply_str_value -%}
             
-            {%- if legalReasonsAuthenticatedCommitteeReply -%}
+            {%- if legalReasonsAuthenticatedCommitteeReply|trim -%}
               <div class="answer-detail">We will make use of an existing data committee: {{legalReasonsAuthenticatedCommitteeReply|markdown}}</div>
             {%- else -%}
               <p>We will make use of an existing data committee.</p>
@@ -130,7 +132,7 @@
     {%- elif embargoAUuid == uuids.limitedEmbargoYesAUuid -%}
       {%- set embargoPeriodPath = [embargoPath, embargoAUuid, uuids.limitedEmbargoPeriodQUuid]|reply_path -%}
       {%- set embargoPeriod = repliesMap[embargoPeriodPath]|reply_str_value -%}
-      {%- if embargoPeriod -%}
+      {%- if embargoPeriod|trim -%}
         <p>Data not subject to legal restrictions will be released unconditionally after a fixed period ({{ embargoPeriod }}).</p>
       {%- else -%}
         <p>Data not subject to legal restrictions will be released unconditionally after a fixed period.</p>
@@ -151,7 +153,7 @@
     {%- elif ownershipAUuid == uuids.ownershipOtherAUuid -%}
       {%- set ownershipOtherPath = [ownershipPath, uuids.ownershipOtherAUuid, uuids.ownershipOtherQUuid]|reply_path -%}
       {%- set ownershipOther = repliesMap[ownershipOtherPath]|reply_str_value -%}
-      {%- if ownershipOther -%}
+      {%- if ownershipOther|trim -%}
         <div class="answer-detail">We have made the following arrangements regarding data ownership: {{ ownershipOther|markdown }}</div>
       {%- endif -%}
     {%- endif -%}
@@ -205,6 +207,7 @@
                 {%- elif refDataConditionsAUuid == uuids.refDataConditionsOtherAUuid -%}
                   {%- set refDataConditionsOtherPath = [refDataConditionsPath, uuids.refDataConditionsOtherAUuid, uuids.refDataConditionsOtherQUuid]|reply_path -%}
                   {%- set refDataConditionsOther = repliesMap[refDataConditionsOtherPath]|reply_str_value -%}
+                  {%- set refDataConditionsOther = refDataConditionsOther if refDataConditionsOther|trim else '' -%}
                   It is available under specific restrictions, which we will follow in our project{{ ": " ~ refDataConditionsOther|markdown if refDataConditionsOther else "." }}
                 {%- endif -%}
               </li>
@@ -231,6 +234,7 @@
                 {%- elif nrefDataConditionsAUuid == uuids.nrefDataConditionsOtherAUuid -%}
                   {%- set nrefDataConditionsOtherPath = [nrefDataConditionsPath, uuids.nrefDataConditionsOtherAUuid, uuids.nrefDataConditionsOtherQUuid]|reply_path -%}
                   {%- set nrefDataConditionsOther = repliesMap[nrefDataConditionsOtherPath]|reply_str_value -%}
+                  {%- set nrefDataConditionsOther = nrefDataConditionsOther if nrefDataConditionsOther|trim else '' -%}
                   It is available under specific restrictions, which we will follow in our project{{ ": " ~ nrefDataConditionsOther|markdown if nrefDataConditionsOther else "." }}
                 {%- endif -%}
               </li>
