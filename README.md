@@ -3,8 +3,11 @@
 For the current candidate repairs, see the [shared testing guide](docs/testing.md).
 It replaces eight per-round development notes; the release history below is unchanged.
 
-Candidate 0.3.53 adds bounded Q8/Q10 list-lead protection and Q11 shared
-preservation policies to the 0.3.52 reading repairs. Q11 shares only three or
+Candidate 0.3.54 carries the verified Word long-budget repair: short final
+full-width rows remain intact, and compact separators prevent adjacent generated
+resource tables from merging. Long or complex final rows remain splittable.
+It retains the 0.3.53 bounded Q8/Q10 list-lead protection and Q11 shared
+preservation policies. Q11 shares only three or
 more complete, identical active fixed-choice policies; authored context,
 repositories, contacts and incomplete policies remain per record. It keeps the
 shared English source and exact Chinese commit pairing; submission still retains the 15 original questions,

@@ -1,6 +1,6 @@
 # Maintaining the current bilingual repairs
 
-The `fix/answer-mapping` repairs are packaged as experimental candidate 0.3.53,
+The `fix/answer-mapping` repairs are packaged as experimental candidate 0.3.54,
 not a deployed release. English Jinja remains the shared source; Chinese
 is produced by the existing translation pipeline, not a second Jinja fork.
 
@@ -85,7 +85,7 @@ do not substitute a floating branch or skip a missing runner.
 
 Historical frozen-source/reference gates remain enabled. The development-only
 `current-repairs-delta.json` verifies the complete candidate tree, changed/added
-path scope, support files and registered 0.3.53 identity before projecting the
+path scope, support files and registered 0.3.54 identity before projecting the
 committed parent to those gates. It is explicitly not release approval. In the prior batch,
 all 297 English and 482 Chinese unit tests, TDK validation, and the commands from
 both workflows pass. The current bilingual runner passes 17,980 combinations;
@@ -105,6 +105,15 @@ is tied to the tested source hashes, not to an arbitrary later version label.
 Verify that the clean paired candidate preserves those rendering inputs. Review
 the candidate in the target Word environment before promoting it as a fully
 Word-tested submission release. Do not publish changed assets under 0.3.51.
+
+The 0.3.54 Word repair was verified locally on 52 bilingual review/submission
+groups and all 356 preview pages, including consecutive long-resource tables,
+14–18-paragraph boundaries, omitted fields and long-answer controls. Only the
+owned long-table separator and bounded short final-row rules change; English
+and Chinese prose, translation units, PDF assets and historical oracles stay
+unchanged. The 334 English and 492 Chinese unit tests pass on that repair.
+This bounded evidence is not arbitrary-input or Microsoft Word certification;
+new package identities must still reproduce the verified rendering inputs.
 
 Triage shared causes first: multiple historical failures can come from one
 unregistered source layer rather than independent output defects. Old prose or

@@ -8,6 +8,8 @@ import subprocess
 from probe_budget_word import IMAGE, ROOT, RUNNER, fixture, ROW_CALL, HEADING_CALL
 
 HANDLER='  if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end'
+TAIL_MARKER={'t':'RawBlock','c':['openxml','<!--DSW:SE:long-budget-tail:v1-->']}
+SEPARATOR={'t':'RawBlock','c':['openxml','<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/><w:keepNext w:val="0"/><w:snapToGrid w:val="0"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>']}
 
 
 def example(n=20,cell='Purpose.',rows=1,projects=1):
@@ -67,6 +69,8 @@ def current_cases(grouped=False):
         ('single-long-en',example(n=1,cell='Original retained purpose. '*60),True),
         ('single-long-zh',example(n=1,cell='保留研究紀錄、進行資料驗證並維護長期儲存。'*28),True),
         ('single-over-eight-thousand',example(n=1,cell='保留原始資料。'*1000),True),
+        ('long-final-paragraph',example().replace('<p>Findability.</p>','<p>'+'Keep original. '*80+'</p>'),True),
+        ('wrapped-final-paragraph',example().replace('<p>Findability.</p>','<div class="answer-detail"><p>Keep original.</p></div>'),True),
     ]
 
 
@@ -91,7 +95,7 @@ def purpose_width(node):
     return purpose_width(node.get('c'))
 
 
-def expand_expected(table, grouped=False):
+def expand_expected(table, grouped=False, *, current_tail=False, current_separator=False):
     c=table['c']; result=[]; pending=[]
     def flush():
         if pending:
@@ -108,18 +112,24 @@ def expand_expected(table, grouped=False):
         for part in parts:
             cell=copy.deepcopy(row[1][0]); cell[3]=3; cell[4]=[part]
             out[4][0][3].append([copy.deepcopy(row[0]),[cell]])
+        last=out[4][0][3][-1][1][0][4][0]
+        if current_tail and last['t'] in ['Para','Plain'] and 0<purpose_width(last)<=160:
+            out[4][0][3][-1][1][0][4].insert(0,copy.deepcopy(TAIL_MARKER))
         result.append(item)
-    flush(); return result
+    flush()
+    if current_separator:
+        for index in range(len(result)-1,0,-1): result.insert(index,copy.deepcopy(SEPARATOR))
+    return result
 
 
-def expected(node, grouped=False):
+def expected(node, grouped=False, *, current_tail=False, current_separator=False):
     if isinstance(node,list):
         result=[]
         for value in node:
-            if isinstance(value,dict) and value.get('t')=='Table': result.extend(expand_expected(value,grouped))
-            else: result.append(expected(value,grouped))
+            if isinstance(value,dict) and value.get('t')=='Table': result.extend(expand_expected(value,grouped,current_tail=current_tail,current_separator=current_separator))
+            else: result.append(expected(value,grouped,current_tail=current_tail,current_separator=current_separator))
         return result
-    if isinstance(node,dict): return {k:expected(v,grouped) for k,v in node.items()}
+    if isinstance(node,dict): return {k:expected(v,grouped,current_tail=current_tail,current_separator=current_separator) for k,v in node.items()}
     return node
 
 
@@ -142,7 +152,7 @@ def main():
     rows=[]
     for name,_,eligible in tests:
         before,after=[r[name] for r in results]
-        assert after==(expected(before,grouped) if eligible else before),(name,'Unexpected AST change')
+        assert after==(expected(before,grouped,current_tail=True,current_separator=True) if eligible else before),(name,'Unexpected AST change')
         assert (before!=after)==eligible,name
         rows.append({'case':name,'eligible':eligible,'passed':True})
     digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()

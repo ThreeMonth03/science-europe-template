@@ -84,6 +84,72 @@ class BudgetProbeTests(unittest.TestCase):
         for broken in [after.replace('0 TWD','100 TWD'),after.replace('<w:p>','<w:p><w:pPr><w:keepNext/></w:pPr>')]:
             with self.assertRaises(AssertionError): verify_row_xml(before,broken,1)
 
+    @staticmethod
+    def tail_xml_pair(text='This resource supports findability of data.'):
+        from probe_budget_word import TAIL_MARKER
+        start='<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:tbl><w:tblPr><w:tblStyle w:val="PilotLongBudget"/></w:tblPr>'
+        header='<w:tr><w:trPr><w:tblHeader/></w:trPr><w:tc><w:p><w:r><w:t>0 TWD</w:t></w:r></w:p></w:tc></w:tr>'
+        tail='<w:tr><w:tc><w:tcPr><w:gridSpan w:val="3"/></w:tcPr>'+TAIL_MARKER+'<w:p><w:r><w:t>'+text+'</w:t></w:r></w:p></w:tc></w:tr>'
+        before=start+header+tail+'</w:tbl></w:body></w:document>'
+        after=before.replace(TAIL_MARKER,'').replace('<w:tr><w:tc>','<w:tr><w:trPr><w:cantSplit/></w:trPr><w:tc>',1)
+        return before,after
+
+    def test_current_tail_is_explicit_and_does_not_relax_old_oracle(self):
+        before,after=self.tail_xml_pair()
+        verify_row_xml(before,after,0,current_tail=True)
+        with self.assertRaises(AssertionError): verify_row_xml(before,after,0)
+        for text in ['x'*160, '中'*80]:
+            verify_row_xml(*self.tail_xml_pair(text),0,current_tail=True)
+        from probe_budget_word import TAIL_MARKER
+        plain=before.replace(TAIL_MARKER,'')
+        verify_row_xml(plain,plain,0,current_tail=True)
+        verify_row_xml(plain,plain,0)
+        # Two owned tails still preserve their independent record identities.
+        two_before=before.replace('</w:body>',before.split('<w:body>',1)[1].split('</w:body>',1)[0].replace('0 TWD','5000 TWD')+'</w:body>')
+        two_after=after.replace('</w:body>',after.split('<w:body>',1)[1].split('</w:body>',1)[0].replace('0 TWD','5000 TWD')+'</w:body>')
+        verify_row_xml(two_before,two_after,0,current_tail=True)
+        # The independent short-row count remains exact after undoing the tail.
+        short='<w:tbl><w:tr><w:tc><w:p><w:r><w:t>Keep.</w:t></w:r></w:p></w:tc></w:tr></w:tbl>'
+        kept=short.replace('<w:tr>','<w:tr><w:trPr><w:cantSplit/></w:trPr>')
+        mixed_before=before.replace('<w:body>','<w:body>'+short)
+        mixed_after=after.replace('<w:body>','<w:body>'+kept)
+        verify_row_xml(mixed_before,mixed_after,1,current_tail=True)
+        with self.assertRaises(AssertionError): verify_row_xml(mixed_before,mixed_after,0,current_tail=True)
+
+    def test_current_tail_rejects_forged_or_unbounded_marker_rows(self):
+        from probe_budget_word import TAIL_MARKER
+        before,after=self.tail_xml_pair()
+        malformed=[
+            before.replace('PilotLongBudget','Table'),
+            before.replace('<w:gridSpan w:val="3"/>','<w:gridSpan w:val="2"/>'),
+            before.replace('<w:gridSpan w:val="3"/>',''),
+            before.replace('<w:gridSpan w:val="3"/>','<w:gridSpan w:val="3"/><w:vMerge/>'),
+            before.replace('<w:tr><w:tc>','<w:tr><w:trPr><w:tblHeader/></w:trPr><w:tc>'),
+            before.replace('</w:tbl>','<w:tr><w:tc><w:p/></w:tc></w:tr></w:tbl>'),
+            before.replace(TAIL_MARKER,TAIL_MARKER*2),
+            before.replace('</w:tc></w:tr></w:tbl>','<w:p/></w:tc></w:tr></w:tbl>'),
+            before.replace('</w:r></w:p></w:tc></w:tr></w:tbl>','<w:drawing/></w:r></w:p></w:tc></w:tr></w:tbl>'),
+            before.replace(TAIL_MARKER,'').replace('<w:body>','<w:body>'+TAIL_MARKER),
+            self.tail_xml_pair('')[0],self.tail_xml_pair('x'*161)[0],self.tail_xml_pair('中'*81)[0],
+        ]
+        for source in malformed:
+            with self.subTest(source=source):
+                with self.assertRaises(AssertionError): verify_row_xml(source,after,0,current_tail=True)
+
+    def test_current_tail_rejects_text_style_and_unrelated_row_changes(self):
+        before,after=self.tail_xml_pair()
+        for changed in [
+            after.replace('0 TWD','5000 TWD'),
+            after.replace('findability','reusability'),
+            after.replace('<w:p>','<w:p><w:pPr><w:keepNext/></w:pPr>',1),
+            after.replace('<w:cantSplit/>','<w:cantSplit w:val="1"/>'),
+            after.replace('<w:cantSplit/>','<w:cantSplit/>'*2),
+            after.replace('<w:cantSplit/>',''),
+            after.replace('<w:tblHeader/>','<w:tblHeader/><w:cantSplit/>'),
+        ]:
+            with self.subTest(changed=changed):
+                with self.assertRaises(AssertionError): verify_row_xml(before,changed,0,current_tail=True)
+
     def test_row_xml_rejects_forged_marker_outside_a_valid_row(self):
         from jinja2 import Environment,FileSystemLoader,StrictUndefined,UndefinedError
         root=Path(__file__).resolve().parents[1]

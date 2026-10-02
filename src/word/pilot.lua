@@ -382,10 +382,28 @@ local function expand_long_budget_tables(div)
           local line = row:clone(); local cell = line.cells[1]
           cell.contents = {part}; cell.col_span = 3; line.cells = {cell}; detail:insert(line)
         end
+        -- A short final row must not split its trailing whitespace onto a new
+        -- page with only a repeated header. Long/complex paragraphs still split
+        -- naturally; the enrich step consumes this owned one-cell row marker.
+        local tail = detail[#detail].cells[1].contents
+        local last = tail[1]
+        if #tail == 1 and (last.t == "Para" or last.t == "Plain") and
+           width(last) > 0 and width(last) <= 160 and inline_ok(last.content) then
+          table.insert(tail, 1, pandoc.RawBlock("openxml", "<!--DSW:SE:long-budget-tail:v1-->"))
+        end
         expanded.bodies[1].body = detail; output:insert(expanded)
       end
     end
-    flush(); return output
+    flush()
+    -- Keep separation between generated tables from wasting a normal text
+    -- line at a page boundary. Never alter authored inter-table paragraphs.
+    for index = #output, 2, -1 do
+      output:insert(index, pandoc.RawBlock("openxml",
+        '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/>' ..
+        '<w:keepNext w:val="0"/><w:snapToGrid w:val="0"/>' ..
+        '<w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>'))
+    end
+    return output
   end
   return div:walk({Table=expand})
 end

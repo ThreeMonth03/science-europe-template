@@ -70,6 +70,7 @@ def allowed_changes(before,after):
 HEADING_CALL = 'attach_budget_headings(keep_short_budget_overview(div))'
 ROW_CALL = 'keep_short_budget_rows(' + HEADING_CALL + ')'
 ROW_MARKER = '<!--DSW:SE:budget-row:v1-->'
+TAIL_MARKER = '<!--DSW:SE:long-budget-tail:v1-->'
 
 
 def overview_cases():
@@ -145,10 +146,51 @@ def short_row_cases():
     ]
 
 
-def verify_row_xml(before, after, count):
+def verify_row_xml(before, after, count, *, current_tail=False):
     from lxml import etree as E
     ns={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
     left,right=E.fromstring(before.encode()),E.fromstring(after.encode())
+    if current_tail:
+        # Undo only the independently owned current tail delta. The historical
+        # default and the strict short-row oracle below remain unchanged.
+        assert TAIL_MARKER not in after, 'Current tail marker must be consumed'
+        rows=left.findall('.//w:tr',ns); targets=[]
+        markers=left.xpath('//comment()[.="DSW:SE:long-budget-tail:v1"]')
+        assert before.count(TAIL_MARKER)==len(markers), 'Malformed current tail marker'
+        W='{'+ns['w']+'}'
+        for marker in markers:
+            cell=marker.getparent()
+            assert cell is not None and cell.tag==W+'tc'
+            row=cell.getparent(); assert row is not None and row.tag==W+'tr'
+            table=row.getparent(); assert table is not None and table.tag==W+'tbl'
+            style=table.find('w:tblPr/w:tblStyle',ns)
+            assert style is not None and style.get(W+'val')=='PilotLongBudget'
+            assert row is table.findall('w:tr',ns)[-1] and row.find('w:trPr/w:tblHeader',ns) is None
+            span=cell.find('w:tcPr/w:gridSpan',ns)
+            assert len(row.findall('w:tc',ns))==1 and span is not None and span.get(W+'val')=='3'
+            assert cell.find('w:tcPr/w:vMerge',ns) is None and len(cell)==3
+            assert cell[0].tag==W+'tcPr' and cell[1] is marker and cell[2].tag==W+'p'
+            assert not cell.xpath('.//w:tbl|.//w:drawing|.//w:pict|.//w:object|.//w:fldChar|.//w:instrText',namespaces=ns)
+            text=''.join(node.text or '' for node in cell[2].findall('.//w:t',ns))
+            assert 0 < sum(2 if ord(char)>=0x2e80 else 1 for char in text) <= 160
+            assert row.find('w:trPr/w:cantSplit',ns) is None
+            targets.append(rows.index(row))
+        assert len(targets)==len(set(targets)), 'Duplicate current tail marker'
+        # String removal retains the exact surrounding serialization whitespace.
+        left=E.fromstring(before.replace(TAIL_MARKER,'').encode())
+        restored_rows=left.findall('.//w:tr',ns); actual_rows=right.findall('.//w:tr',ns)
+        assert len(restored_rows)==len(actual_rows), 'Current tail changed row inventory'
+        for index in targets:
+            original,actual=restored_rows[index],actual_rows[index]
+            properties=actual.find('w:trPr',ns)
+            assert properties is not None and len(properties.findall('w:cantSplit',ns))==1
+            node=properties.find('w:cantSplit',ns)
+            assert not node.attrib and len(node)==0, 'Exact current tail row property required'
+            properties.remove(node)
+            if original.find('w:trPr',ns) is None:
+                assert len(properties)==0, 'Unexpected current tail row property'
+                actual.remove(properties)
+            assert E.tostring(original)==E.tostring(actual), 'Only the current tail marker/property may change'
     added=right.findall('.//w:cantSplit',ns)
     assert len(added)==count and not left.findall('.//w:cantSplit',ns)
     for node in added:
@@ -183,7 +225,7 @@ print(json.dumps(results))
         after=templates[0].render(content=marked)
         assert templates[1].render(content=marked)==after,(name,'Escaping changed XML')
         assert ROW_MARKER not in after
-        verify_row_xml(before,after,count)
+        verify_row_xml(before,after,count,current_tail=True)
         rows.append(dict(case=name,kept_rows=count,passed=True))
     return dict(passed=True,cases=len(rows),rows=rows)
 

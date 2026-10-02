@@ -4,6 +4,31 @@
 {%- macro require(ok) -%}
   {%- if not ok -%}{{ short_table_xml_contract_mismatch.raise_error() }}{%- endif -%}
 {%- endmacro -%}
+{# Only a Lua-validated short final full-width budget row may not split.
+   This is independent of ordinary three-cell row keeps; do not relax those
+   guards or prevent a long authored paragraph from spanning pages. #}
+{%- set tail_marker = '<!--DSW:SE:long-budget-tail:v1-->' -%}
+{%- if tail_marker in content -%}
+  {%- set tail_rows = content.split('<w:tr>') -%}
+  {{- require(tail_marker not in tail_rows[0]) -}}
+  {%- set content -%}
+    {{- tail_rows[0]|safe -}}
+    {%- for chunk in tail_rows[1:] -%}
+      <w:tr>
+      {%- if tail_marker not in chunk -%}{{- chunk|safe -}}{%- else -%}
+        {%- set parts = chunk.split('</w:tr>', 1) -%}
+        {{- require(parts|length == 2 and parts[0].count(tail_marker) == 1 and tail_marker not in parts[1]) -}}
+        {%- set row = parts[0] -%}
+        {%- set prefix = row.split(tail_marker)[0] -%}
+        {{- require(row.startswith('<w:tc>') and prefix.rstrip().endswith('</w:tcPr>') and '<w:p>' not in prefix) -}}
+        {{- require(row.count('<w:tc>') == 1 and row.count('</w:tc>') == 1 and row.count('<w:p>') == 1) -}}
+        {{- require(row.count('<w:gridSpan w:val="3" />') == 1 and '<w:vMerge' not in row and '<w:tbl' not in row and '<w:trPr' not in row) -}}
+        {{- require(parts[1].lstrip().startswith('</w:tbl>')) -}}
+        <w:trPr><w:cantSplit/></w:trPr>{{- row.replace(tail_marker, '', 1)|safe -}}</w:tr>{{- parts[1]|safe -}}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endset -%}
+{%- endif -%}
 {# Only Lua-validated short Q15 rows receive this marker. Preserve every cell,
    paragraph and run; long/complex rows and other tables remain unchanged. #}
 {%- set budget_marker = '<!--DSW:SE:budget-row:v1-->' -%}
