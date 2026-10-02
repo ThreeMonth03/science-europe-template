@@ -1,6 +1,6 @@
 # Maintaining the current bilingual repairs
 
-The `fix/answer-mapping` repairs are packaged as experimental candidate 0.3.52,
+The `fix/answer-mapping` repairs are packaged as experimental candidate 0.3.53,
 not a deployed release. English Jinja remains the shared source; Chinese
 is produced by the existing translation pipeline, not a second Jinja fork.
 
@@ -85,7 +85,7 @@ do not substitute a floating branch or skip a missing runner.
 
 Historical frozen-source/reference gates remain enabled. The development-only
 `current-repairs-delta.json` verifies the complete candidate tree, changed/added
-path scope, support files and registered 0.3.52 identity before projecting the
+path scope, support files and registered 0.3.53 identity before projecting the
 committed parent to those gates. It is explicitly not release approval. In the prior batch,
 all 297 English and 482 Chinese unit tests, TDK validation, and the commands from
 both workflows pass. The current bilingual runner passes 17,980 combinations;
@@ -98,7 +98,7 @@ affected pages were also inspected visually. All 96 active nonempty free-text
 answers in these cases were retained. This is representative evidence, not
 exhaustive input coverage or Microsoft Word acceptance. Local command results
 do not establish GitHub Actions success; check the exact pushed commits there.
-The latest local acceptance covers 26,940 bilingual current-behaviour cases,
+The 0.3.52 local acceptance covers 26,940 bilingual current-behaviour cases,
 4,000 unchanged seeded omission renders and 28 native output groups; all 185
 submission PDF/LibreOffice preview pages were visually reviewed. That evidence
 is tied to the tested source hashes, not to an arbitrary later version label.

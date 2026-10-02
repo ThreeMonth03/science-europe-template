@@ -18,6 +18,51 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_fixed_list_leads_keep_only_the_intro_without_changing_list_xml(self):
+        import base64
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from probe_q8_word import IMAGE, RUNNER
+        questions = [
+            ('q-copyright-ipr', '08-copyright-ipr',
+             'The following conditions apply to the reference and non-reference datasets that we reuse:',
+             '此計畫再利用的參考及非參考資料集須遵守以下條件：'),
+            ('q-share-restrictions', '10-share-restrictions',
+             'The dataset has the following identifiers:', '此資料集具有以下識別碼：'),
+        ]
+        bodies = []
+        for qid, filename, english, chinese in questions:
+            source = (ROOT / ('src/questions/' + filename + '.html.j2')).read_text()
+            self.assertEqual(1, source.count('<div class="answer-lead"><p>' + english + '</p></div>'))
+            for lead in (english, chinese):
+                for count in (1, 8):
+                    # A long first item must stay free to paginate, not pull the
+                    # entire list into an unbreakable chain with its short lead.
+                    permission = '<p>' + ('Original answer。 ' * 160 if count == 8 else 'Original answer.') + '</p>'
+                    items = ''.join('<li><div>Dataset ' + str(i) + '</div>' + permission +
+                                    '<p><a href="https://example.org/item/' + str(i) + '">Original link</a></p></li>'
+                                    for i in range(count))
+                    bodies.append('<div id="' + qid + '"><div class="answer"><p>Earlier fixed paragraph.</p>'
+                                  '<div class="answer-lead"><p>' + lead + '</p></div><ul>' + items + '</ul></div></div>')
+        marked = ''.join(bodies)
+        results = []
+        for html in (marked.replace('<div class="answer-lead">', '<div>'), marked):
+            raw = subprocess.check_output(['docker', 'run', '--rm', '--network', 'none', '-i',
+                '--entrypoint', 'python', IMAGE, '-c', RUNNER], input=json.dumps(dict(
+                    lua=(ROOT / 'src/word/pilot.lua').read_text(), html=html,
+                    reference=base64.b64encode((ROOT / 'src/word/reference.docx').read_bytes()).decode())).encode(), timeout=180)
+            results.append(json.loads(raw)['paragraphs'])
+        self.assertEqual(len(results[0]), len(results[1]))
+        changed = 0
+        for before, after in zip(*results):
+            self.assertEqual(before['text'], after['text'])
+            self.assertEqual(before['other_xml'], after['other_xml'])
+            if before['style'] != after['style']:
+                self.assertEqual('PilotLead', after['style'])
+                self.assertIn(after['text'], [lead for _, _, english, chinese in questions for lead in (english, chinese)])
+                changed += 1
+        self.assertEqual(len(bodies), changed)
+
     def test_generic_word_leads_are_bounded_without_changing_authored_content(self):
         import base64
         import sys

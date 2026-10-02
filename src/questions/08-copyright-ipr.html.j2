@@ -183,7 +183,7 @@
         {%- endif -%}
       {%- endfor -%}
       {%- if (answeredRefData|length + answeredNRefData|length) > 0 -%}
-        <p>The following conditions apply to the reference and non-reference datasets that we reuse:</p>
+        <div class="answer-lead"><p>The following conditions apply to the reference and non-reference datasets that we reuse:</p></div>
         <ul>
           {%- for i in answeredRefData -%}
             {%- set refDataPrefix = [refDataPath, i]|reply_path -%}

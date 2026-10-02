@@ -22,6 +22,30 @@ def plain(case='preservation-complete'):
 def render(replies): return BeautifulSoup(render_question(Q11, replies, km=preservation_schema()), 'html.parser')
 
 
+def grouping_fixture(count=3):
+    """Local complete-choice schema; do not broaden the existing fixtures."""
+    from check_answer_mapping import question
+    km = preservation_schema()
+    children = km['entities']['questions'][IDS['producedDataQUuid']]['itemTemplateQuestionUuids']
+    question(km, children, IDS['publishedDataHowLongQUuid'], 'OptionsQuestion',
+             [IDS['publishedDataHowLong' + option + 'AUuid'] for option in ('Technical', 'Deleted', 'Fixed')])
+    data = path('preservingCUuid', 'producedDataQUuid')
+    replies = {data: ['group-' + str(i) for i in range(1, count + 1)]}
+    for item in replies[data]:
+        base = path(data, item)
+        replies.update({path(base, 'producedDataNameQUuid'): 'Same dataset name',
+            path(base, 'isPublishedDataQUuid'): IDS['isPublishedDataYesAUuid'],
+            path(base, 'publishedDataHowLongQUuid'): IDS['publishedDataHowLongTechnicalAUuid'],
+            path(base, 'publishedDataMetadataPersistentQUuid'): IDS['publishedDataMetadataPersistentYesAUuid'],
+            path(base, 'isPublishedDataQUuid', 'isPublishedDataYesAUuid', 'publishedDataCatalogueQUuid'):
+                IDS['publishedDataCatalogueYesAUuid']})
+    return km, replies
+
+
+def render_grouping(replies, km, profile):
+    return BeautifulSoup(render_question(Q11, replies, km=km, output_profile=profile), 'html.parser')
+
+
 def archive_matrix():
     base = plain(); ap = path('preservingCUuid', 'archivedAfterQUuid', 'archivedAfterYesAUuid')
     for period, payer in itertools.product(
@@ -38,6 +62,154 @@ def archive_matrix():
 
 
 class PreservationCoverageTests(unittest.TestCase):
+    def test_shared_policy_requires_three_complete_records_in_both_profiles(self):
+        for profile, count in itertools.product(('review', 'submission'), (1, 2, 3, 4)):
+            with self.subTest(profile=profile, count=count):
+                km, replies = grouping_fixture(count)
+                replies[path('preservingCUuid', 'repoChargesQUuid')] = IDS['repoChargesNoAUuid']
+                soup = render_grouping(replies, km, profile)
+                shared = soup.select('.preservation-shared-policy')
+                self.assertEqual(int(count >= 3), len(shared))
+                self.assertEqual(count if count >= 3 else 0, len(soup.select('.preservation-policy-reference')))
+                self.assertEqual(1 if count >= 3 else count, soup.get_text().count('This dataset will be published.'))
+                self.assertEqual(replies[path('preservingCUuid', 'producedDataQUuid')],
+                                 [node['data-item-id'] for node in soup.select('.dataset-section')])
+                if shared:
+                    resources = soup.select_one('.preservation-resources')
+                    self.assertFalse(resources.find_parent(class_='preservation-shared-policy'))
+                    self.assertEqual('Repository costs and publication preparation',
+                                     resources.find_previous('h4').get_text())
+                    self.assertEqual(' '.join(replies[path('preservingCUuid', 'producedDataQUuid')]), shared[0]['data-member-ids'])
+                    self.assertEqual(4, len(shared[0].select('.dataset-policy > p')))
+                    for ref in soup.select('.preservation-policy-reference a'):
+                        self.assertEqual([shared[0]], soup.select(ref['href']))
+        for profile in ('review', 'submission'):
+            km, replies = grouping_fixture(4)
+            replies.pop(path('preservingCUuid', 'producedDataQUuid', 'group-2', 'publishedDataMetadataPersistentQUuid'))
+            soup = render_grouping(replies, km, profile)
+            shared = soup.select('.preservation-shared-policy')
+            self.assertEqual(1, len(shared))
+            self.assertEqual('group-1 group-3 group-4', shared[0]['data-member-ids'])
+            self.assertEqual(3, len(soup.select('.preservation-policy-reference')))
+            self.assertFalse(soup.select('.dataset-section[data-item-id="group-2"] .preservation-policy-reference'))
+            self.assertEqual(['group-1', 'group-2', 'group-3', 'group-4'],
+                             [node['data-item-id'] for node in soup.select('.dataset-section')])
+
+    def test_incomplete_inactive_and_custom_policies_never_share(self):
+        fields = ('isPublishedDataQUuid', 'publishedDataHowLongQUuid',
+                  'publishedDataMetadataPersistentQUuid', 'publishedDataCatalogueQUuid')
+        variants = [(field, state) for field in fields for state in
+                    ('missing', 'unknown', 'question-filtered', 'answer-filtered', 'answer-deleted', 'wrong-type')]
+        variants += [('publishedDataHowLongQUuid', 'custom'), ('isPublishedDataQUuid', 'explicit-no')]
+        for profile, (field, state) in itertools.product(('review', 'submission'), variants):
+            with self.subTest(profile=profile, field=field, state=state):
+                km, replies = grouping_fixture()
+                keys = [key for key in replies if key.endswith(IDS[field])]
+                selected = replies[keys[0]]
+                if state in ('question-filtered', 'answer-filtered', 'answer-deleted', 'wrong-type'):
+                    question = km['entities']['questions'][IDS[field]]
+                    if state == 'question-filtered':
+                        children = (km['entities']['answers'][IDS['isPublishedDataYesAUuid']]['followUpUuids']
+                                    if field == 'publishedDataCatalogueQUuid' else
+                                    km['entities']['questions'][IDS['producedDataQUuid']]['itemTemplateQuestionUuids'])
+                        children.remove(IDS[field])
+                    elif state == 'answer-filtered': question['answerUuids'].remove(selected)
+                    elif state == 'answer-deleted': km['entities']['answers'].pop(selected)
+                    else: question['questionType'] = 'ValueQuestion'
+                else:
+                    for key in keys:
+                        if state == 'missing': replies.pop(key)
+                        elif state == 'unknown': replies[key] = 'obsolete-choice'
+                        elif state == 'custom':
+                            replies[key] = IDS['publishedDataHowLongFixedAUuid']
+                            replies[path(key, 'publishedDataHowLongFixedAUuid', 'publishedDataHowLongFixedQUuid')] = '7 years'
+                        else:
+                            replies[key] = IDS['isPublishedDataNoAUuid']
+                            replies[path(key, 'isPublishedDataNoAUuid', 'notPublishedReasonQUuid')] = IDS['notPublishedReasonCostAUuid']
+                soup = render_grouping(replies, km, profile)
+                self.assertFalse(soup.select('.preservation-shared-policy, .preservation-policy-reference'))
+                self.assertEqual(3, len(soup.select('.dataset-section')))
+                if field != 'publishedDataHowLongQUuid':
+                    self.assertEqual(3, soup.get_text().count('as long as technically possible.'))
+                if state == 'custom': self.assertEqual(3, soup.get_text().count('Retention period (prepaid): 7 years.'))
+                if state == 'explicit-no': self.assertEqual(3, soup.get_text().count('The stated reason for not publishing is the cost.'))
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review'))
+
+    def test_distinct_policy_keys_keep_interleaved_members_and_all_choices(self):
+        choices = list(itertools.product(('Technical', 'Deleted'), ('Yes', 'No'), ('Yes', 'No', 'Prime')))
+        km, replies = grouping_fixture(3 * len(choices))
+        data = path('preservingCUuid', 'producedDataQUuid')
+        for index, item in enumerate(replies[data]):
+            duration, metadata, catalogue = choices[index % len(choices)]
+            base = path(data, item)
+            replies[path(base, 'publishedDataHowLongQUuid')] = IDS['publishedDataHowLong' + duration + 'AUuid']
+            replies[path(base, 'publishedDataMetadataPersistentQUuid')] = IDS['publishedDataMetadataPersistent' + metadata + 'AUuid']
+            replies[path(base, 'isPublishedDataQUuid', 'isPublishedDataYesAUuid', 'publishedDataCatalogueQUuid')] = IDS['publishedDataCatalogue' + catalogue + 'AUuid']
+        from check_repository_profiles import PRESERVATION
+        for profile in ('review', 'submission'):
+            soup = render_grouping(replies, km, profile)
+            groups = soup.select('.preservation-shared-policy')
+            self.assertEqual(len(choices), len(groups))
+            self.assertEqual(replies[data], [node['data-item-id'] for node in soup.select('.dataset-section')])
+            for index, (group, (duration, metadata, catalogue)) in enumerate(zip(groups, choices)):
+                members = replies[data][index::len(choices)]
+                self.assertEqual(members, group['data-member-ids'].split())
+                self.assertIn('technically possible' if duration == 'Technical' else 'legal, contractual or regulatory reasons', group.get_text())
+                for field, value in [('metadata', metadata), ('catalogue', catalogue)]:
+                    self.assertIn(PRESERVATION['en'][field][value], group.get_text())
+                self.assertEqual(members, [ref.find_parent(class_='dataset-section')['data-item-id']
+                    for ref in soup.select('.preservation-policy-reference a[href="#' + group['id'] + '"]')])
+
+    def test_grouping_preserves_authored_context_papers_and_contact_anchors(self):
+        km, replies = grouping_fixture(4)
+        data = path('preservingCUuid', 'producedDataQUuid')
+        paper = 'https://example.org/same-paper'
+        for index, item in enumerate(replies[data], 1):
+            base = path(data, item)
+            replies[path(base, 'producedDataNameQUuid')] = 'Same dataset name' if index < 3 else ' \n '
+            replies[path(base, 'producedDataDescriptionQUuid')] = AUTHORED
+            stage = path(base, 'producedDataStageQUuid')
+            replies[stage] = IDS['producedDataStagePublishedAUuid' if index < 4 else 'producedDataStageRawAUuid']
+            replies[path(stage, 'producedDataStagePublishedAUuid', 'producedDataPaperQUuid')] = paper
+            listing = path(base, 'isPublishedDataQUuid', 'isPublishedDataYesAUuid', 'publishedDistrosQUuid')
+            replies[listing] = ['repo-first', 'repo-gap', 'repo-contact']
+            replies[path(listing, 'repo-first', 'publishedDataRepositoryKindQUuid')] = IDS['publishedDataRepositoryNationalAUuid']
+            kind = path(listing, 'repo-contact', 'publishedDataRepositoryKindQUuid')
+            replies[kind] = IDS['publishedDataRepositoryDomainSpecificAUuid']
+            replies[path(kind, 'publishedDataRepositoryDomainSpecificAUuid', 'domainSpecificRepoNameQUuid')] = {
+                'value': {'value': {'type': 'PlainType', 'value': 'Repository ' + str(index)}}}
+            contact = path(kind, 'publishedDataRepositoryDomainSpecificAUuid', 'domainSpecificRepoContactBeforeQUuid')
+            replies[contact] = IDS['domainSpecificRepoContactBeforeOtherAUuid']
+            replies[path(contact, 'domainSpecificRepoContactBeforeOtherAUuid', 'domainSpecificRepoContactBeforeOtherQUuid')] = AUTHORED if index < 3 else ''
+        for profile in ('review', 'submission'):
+            soup = render_grouping(replies, km, profile)
+            self.assertEqual(1, len(soup.select('.preservation-shared-policy')))
+            self.assertEqual(3, len(soup.select('.paper-reference-value')))
+            self.assertEqual([paper] * 3, [node.get_text() for node in soup.select('.paper-reference-value')])
+            self.assertFalse(soup.select('.preservation-shared-policy .answer-detail, .preservation-shared-policy .paper-reference, .preservation-shared-policy .repository-destinations'))
+            q10 = BeautifulSoup(render_question('src/questions/10-share-restrictions.html.j2', replies, km=km, output_profile=profile), 'html.parser')
+            for index, dataset in enumerate(soup.select('.dataset-section'), 1):
+                self.assertEqual('group-' + str(index), dataset['data-item-id'])
+                self.assertEqual(str(index), dataset.h5.select_one('.dataset-label')['data-list-index'])
+                self.assertEqual(index < 3, 'Same dataset name' in dataset.h5.get_text())
+                self.assertEqual(index >= 3 and profile == 'review',
+                                 '(no name given)' in dataset.h5.get_text())
+                self.assertEqual(AUTHORED, dataset.select_one('[data-fact-id="preservation-dataset-description"]').decode_contents())
+                self.assertIn('published results' if index < 4 else 'raw data', dataset.select_one('[data-fact-id="preservation-data-stage"]').get_text())
+                self.assertEqual(index < 4, bool(dataset.select('.paper-reference')))
+                ids = ['repo-first', 'repo-gap', 'repo-contact'] if profile == 'review' else ['repo-first', 'repo-contact']
+                self.assertEqual(ids, [node['data-item-id'] for node in dataset.select('.repository-distribution')])
+                self.assertEqual(['Distribution ' + str(i) + ':' for i in ([1, 2, 3] if profile == 'review' else [1, 3])], [node.get_text() for node in dataset.select('.repository-label')])
+                target = dataset.select_one('#repository-contact-' + str(index) + '-3')
+                self.assertIsNotNone(target)
+                self.assertIn('Repository ' + str(index), target.find_parent(class_='repository-distribution').get_text())
+                detail = target.select_one('.answer-detail')
+                if index < 3: self.assertEqual(AUTHORED, detail.decode_contents())
+                else: self.assertIsNone(detail)
+                self.assertEqual(int(index >= 3 and profile == 'review'), len(target.select('.data-gap')))
+                self.assertEqual(1, len(q10.select('.repository-contact-reference a[href="#repository-contact-' + str(index) + '-3"]')))
+            self.assertFalse(soup.select('p p, p div, p ul, p table, ul:empty, li:empty'))
+
     def test_compiled_bilingual_binding_contract_has_same_paths_and_valid_options(self):
         contract = json.loads((ROOT / 'requirements/preservation-bindings-2.7.0.json').read_text())['knowledge_models']
         en, zh = [contract[l]['selected_questions'] for l in ('en','zh-Hant')]

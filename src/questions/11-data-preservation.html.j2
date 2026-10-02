@@ -8,19 +8,30 @@
     {# Produced datasets #}
     {%- set producedDataPath = [uuids.preservingCUuid, uuids.producedDataQUuid]|reply_path -%}
     {%- set producedDataItems = repliesMap[producedDataPath]|reply_items -%}
+    {%- set preservationRecords = [] -%}
+    {%- set preservationGroups = {} -%}
     {%- if producedDataItems|length > 0 -%}
       {%- for i in producedDataItems -%}
         {%- set repositoryDatasetIndex = loop.index -%}
         {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
         {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
-        {% set preservationDatasetContent %}
-          <div class="preservation-summary dataset-policy">
+        {# These values are shared by the three captures and the identity check;
+           assignments inside a captured block do not escape its Jinja scope. #}
+        {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
+        {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
+        {%- set publishedDataHowLongPath = [pathPrefix, uuids.publishedDataHowLongQUuid]|reply_path -%}
+        {%- set publishedDataHowLongAUuid = repliesMap[publishedDataHowLongPath]|reply_str_value -%}
+        {%- set publishedDataMetadataPersistentPath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.publishedDataMetadataPersistentQUuid], 'OptionsQuestion') -%}
+        {%- set publishedDataMetadataPersistentAUuid = repliesMap[publishedDataMetadataPersistentPath]|reply_str_value -%}
+        {%- set publishedDataCataloguePath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid], 'OptionsQuestion') -%}
+        {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
+        {% set preservationContext %}
           {# One owned prose run for dataset context and preservation arrangements.
              Authored answer-detail and reading-gap blocks remain hard boundaries. #}
           {% include "src/preservation-dataset.html.j2" %}
+        {% endset %}
+        {% set preservationPolicy %}
           {# If will be published #}
-          {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
-          {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
           {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
             <p>This dataset will not be published.</p>
             {% include "src/preservation-publication-reason.html.j2" %}
@@ -30,10 +41,6 @@
             <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="preservation-publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}</div>
           {% endif -%}
           {# How long will be stored + Metadata FAIRness #}
-          {%- set publishedDataHowLongPath = [pathPrefix, uuids.publishedDataHowLongQUuid]|reply_path -%}
-          {%- set publishedDataHowLongAUuid = repliesMap[publishedDataHowLongPath]|reply_str_value -%}
-          {%- set publishedDataMetadataPersistentPath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.publishedDataMetadataPersistentQUuid], 'OptionsQuestion') -%}
-          {%- set publishedDataMetadataPersistentAUuid = repliesMap[publishedDataMetadataPersistentPath]|reply_str_value -%}
             {% if publishedDataHowLongAUuid == uuids.publishedDataHowLongTechnicalAUuid -%}
               <p>This data set will be kept available as long as technically possible.</p>
             {%- elif publishedDataHowLongAUuid == uuids.publishedDataHowLongDeletedAUuid -%}
@@ -64,8 +71,6 @@
           {%- endif -%}
           {# Catalogue decisions are fixed prose in the same preservation summary,
              not a detached paragraph after repository or authored detail blocks. #}
-          {%- set publishedDataCataloguePath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedDataCatalogueQUuid], 'OptionsQuestion') -%}
-          {%- set publishedDataCatalogueAUuid = repliesMap[publishedDataCataloguePath]|reply_str_value -%}
           {%- if publishedDataCataloguePath and publishedDataCatalogueAUuid in km.entities.questions[uuids.publishedDataCatalogueQUuid].answerUuids and publishedDataCatalogueAUuid in km.entities.answers -%}
             {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
               <p data-fact-id="preservation-catalogue" data-status="complete">We will add a reference to the published data in at least one data catalogue.</p>
@@ -75,7 +80,8 @@
               <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field.</p>
             {%- endif -%}
           {%- endif -%}
-          </div>
+        {% endset %}
+        {% set preservationTail %}
           {% include "src/preservation-paper.html.j2" %}
            {# Distributions #}
           {% set distrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
@@ -161,13 +167,67 @@
             {% endif %}
           {%- endif -%}
         {% endset %}
-        {% if output_profile|default('review') != 'submission' or preservationDatasetContent|striptags|trim or '<img' in preservationDatasetContent or '<table' in preservationDatasetContent %}
-        <div class="dataset-section" data-item-id="{{ i }}">
-          <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</h5>
-          {{ preservationDatasetContent }}
-        </div>
+        {# Share only complete, active fixed choices. Never use rendered text,
+           names, descriptions or repository/contact answers as an identity key.
+           Custom periods, nonpublication reasons and missing/unknown states
+           retain their original per-record policy and review notices. #}
+        {% set durationActivePath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.publishedDataHowLongQUuid], 'OptionsQuestion') %}
+        {% set policyKey = '' %}
+        {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and durationActivePath and
+              publishedDataHowLongAUuid in [uuids.publishedDataHowLongTechnicalAUuid, uuids.publishedDataHowLongDeletedAUuid] and
+              publishedDataHowLongAUuid in km.entities.questions[uuids.publishedDataHowLongQUuid].answerUuids and
+              publishedDataHowLongAUuid in km.entities.answers and
+              publishedDataMetadataPersistentPath and publishedDataMetadataPersistentAUuid in [uuids.publishedDataMetadataPersistentYesAUuid, uuids.publishedDataMetadataPersistentNoAUuid] and
+              publishedDataMetadataPersistentAUuid in km.entities.questions[uuids.publishedDataMetadataPersistentQUuid].answerUuids and
+              publishedDataMetadataPersistentAUuid in km.entities.answers and
+              publishedDataCataloguePath and publishedDataCatalogueAUuid in [uuids.publishedDataCatalogueYesAUuid, uuids.publishedDataCatalogueNoAUuid, uuids.publishedDataCataloguePrimeAUuid] and
+              publishedDataCatalogueAUuid in km.entities.questions[uuids.publishedDataCatalogueQUuid].answerUuids and
+              publishedDataCatalogueAUuid in km.entities.answers %}
+          {% set policyKey = [isPublishedDataAUuid, publishedDataHowLongAUuid, publishedDataMetadataPersistentAUuid, publishedDataCatalogueAUuid]|join(':') %}
+        {% endif %}
+        {% set record = {'id': i, 'index': repositoryDatasetIndex, 'name': producedDataName, 'context': preservationContext, 'policy': preservationPolicy, 'tail': preservationTail, 'key': policyKey} %}
+        {% do preservationRecords.append(record) %}
+        {% if policyKey %}
+          {% if policyKey not in preservationGroups %}{% do preservationGroups.update({policyKey: {'members': [], 'policy': preservationPolicy, 'number': 0}}) %}{% endif %}
+          {% do preservationGroups[policyKey].members.append(record) %}
         {% endif %}
       {%- endfor -%}
+      {# Three or more repetitions justify a common block and explicit references.
+         Record order and original list ordinals do not change. #}
+      {% set sharedPolicies = namespace(count=0) %}
+      {% for group in preservationGroups.values() %}
+        {% if group.members|length >= 3 %}
+          {% set sharedPolicies.count = sharedPolicies.count + 1 %}
+          {% do group.update({'number': sharedPolicies.count}) %}
+        {% endif %}
+      {% endfor %}
+      {% for record in preservationRecords %}
+        {% set group = preservationGroups[record.key] if record.key else none %}
+        {% set recordContent = record.context ~ record.policy ~ record.tail %}
+        {% if output_profile|default('review') != 'submission' or recordContent|striptags|trim or '<img' in recordContent or '<table' in recordContent %}
+        <div class="dataset-section" data-item-id="{{ record.id }}">
+          <h5>{% if sharedPolicies.count %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% if record.name|trim %}: {{ record.name|e }}{% elif output_profile|default('review') != 'submission' %}: {{ "(no name given)" }}{% endif %}{% elif output_profile|default('review') == 'submission' and not record.name|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% else %}{{ record.name|e if record.name|trim else "(no name given)" }}{% endif %}</h5>
+          <div class="preservation-summary dataset-policy">
+            {{ record.context }}
+            {% if group and group.number %}
+              {% set policyReference %}<a href="#preservation-policy-{{ group.number }}">Shared preservation policy {{ group.number }}</a>{% endset %}
+              <p class="preservation-policy-reference">Preservation policy: see {{ policyReference }}.</p>
+            {% else %}{{ record.policy }}{% endif %}
+          </div>
+          {{ record.tail }}
+        </div>
+        {% endif %}
+      {% endfor %}
+      {% for group in preservationGroups.values() %}
+        {% if group.number %}
+        {% set policyMemberIndices = group.members|map(attribute='index')|join(', ') %}
+        <div class="preservation-shared-policy" id="preservation-policy-{{ group.number }}" data-member-ids="{{ group.members|map(attribute='id')|join(' ') }}">
+          <h4>Shared preservation policy {{ group.number }}</h4>
+          <div class="answer-lead"><p>This policy applies separately to produced datasets {{ policyMemberIndices }}.</p></div>
+          <div class="dataset-policy">{{ group.policy }}</div>
+        </div>
+        {% endif %}
+      {% endfor %}
     {%- endif -%}
     {% set archiveChoice = repliesMap[[uuids.preservingCUuid, uuids.archivedAfterQUuid]|reply_path]|reply_str_value %}
     {% set resourceContent %}
@@ -204,7 +264,7 @@
     </div>
     {% endset %}
     {% if resourceContent|striptags|trim or '<img' in resourceContent or '<table' in resourceContent %}
-      {% if archiveChoice in [uuids.archivedAfterYesAUuid, uuids.archivedAfterNoAUuid] %}
+      {% if (sharedPolicies is defined and sharedPolicies.count) or archiveChoice in [uuids.archivedAfterYesAUuid, uuids.archivedAfterNoAUuid] %}
         <h4>Repository costs and publication preparation</h4>
       {% endif %}
       {{ resourceContent }}

@@ -1,10 +1,10 @@
 {
   "baseline_commit": "bff774569148d925aa08fd0d5bea85acae24a73d",
   "baseline_version": "0.3.51",
-  "candidate_version": "0.3.52",
+  "candidate_version": "0.3.53",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "5af89f121a10fbc8c63c8a39a040ba7d12fcabab475f453a6deea0b15f9319aa",
+  "candidate_tree_sha256": "6128e6e53392ba9f4947c6b9a522fbba9a206bfc2ea3fb289d3170dd1e9a8834",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
@@ -66,7 +66,7 @@
     },
     "template.json": {
       "before_sha256": "04346ff2c6f7be9ccc9c05b629ebdce3e66d42dedb16d372453d0794554ee84a",
-      "after_sha256": "5c888f72ee6630b1b546fe9a3672eb05fc07e9a07b8db96840d9815e1025f7d7"
+      "after_sha256": "d1ac0f63cd3c84b5d94bc99fafae5127a95444444f74312b7f1de803f31d9e7b"
     }
   }
 }

@@ -3,9 +3,11 @@
 For the current candidate repairs, see the [shared testing guide](docs/testing.md).
 It replaces eight per-round development notes; the release history below is unchanged.
 
-Candidate 0.3.52 packages the reviewed answer-retention, bilingual prose and
-bounded PDF/Word layout repairs. It keeps the shared English source and exact
-Chinese commit pairing; submission still retains the 15 original questions,
+Candidate 0.3.53 adds bounded Q8/Q10 list-lead protection and Q11 shared
+preservation policies to the 0.3.52 reading repairs. Q11 shares only three or
+more complete, identical active fixed-choice policies; authored context,
+repositories, contacts and incomplete policies remain per record. It keeps the
+shared English source and exact Chinese commit pairing; submission still retains the 15 original questions,
 neutral unnamed-record labels and authored answers without internal gap prompts.
 The source seal allows only this registered version change and preserves the
 frozen 0.3.51 metadata for historical gates. This is not a deployed release or
