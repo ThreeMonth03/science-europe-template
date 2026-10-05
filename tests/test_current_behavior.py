@@ -21,7 +21,8 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
             helper = environment(ROOT, escape).get_template('src/budget-reading.html.j2').module
             for word in [False, True]:
                 render = helper.word_table if word else helper.render
-                for purpose in ['', '<p>Keep data.</p>', '<table><tbody><tr><td>ROW-01</td><td>10</td></tr></tbody></table>']:
+                for purpose in ['', '<p>Keep data.</p>', '<p><img src="diagram.png" alt="Allocation chart"></p>',
+                                '<table><tbody><tr><td>ROW-01</td><td>10</td></tr></tbody></table>']:
                     first = dict(id='original-first', title=Markup('<p>Resource 1</p>'),
                                  purpose=Markup(purpose), budget=Markup(''), funding=funding)
                     second = dict(id='original-second', title=Markup('<p>A&lt;B&amp;C&gt;D</p>'),

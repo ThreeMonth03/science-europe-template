@@ -80,7 +80,7 @@
     {%- if '<table' in row.funding -%}
       {%- if pending -%}{{ funding_fallback(header, pending, word) }}{%- do pending.clear() -%}{%- endif -%}
       <table class="{{ 'word' if word else 'pdf' }}-rich-funding-metadata" data-item-id="{{ row.id }}"><colgroup><col class="resource-purpose"><col class="resource-budget"></colgroup><thead><tr>{{ metadataHeader }}</tr></thead><tbody><tr data-item-id="{{ row.id }}"><td>{{ row.title }}</td><td>{{ row.budget }}</td></tr></tbody></table>
-      {%- if row.purpose|striptags|trim -%}
+      {%- if row.purpose|trim -%}
         <div class="{{ 'word-rich-resource-purpose' if word else 'pdf-rich-funding-purpose' }}" data-item-id="{{ row.id }}">{{ row.purpose }}</div>
       {%- endif -%}
       <div class="{{ 'word-rich-resource-funding' if word else 'pdf-rich-funding-detail' }}" data-item-id="{{ row.id }}"><div class="answer-lead"><p><strong>{{ fundingLabel }}</strong></p></div>{{ row.funding }}</div>
