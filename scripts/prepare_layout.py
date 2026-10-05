@@ -80,6 +80,11 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item = document.styles[f"Heading {level}"]
             item.font.size, item.font.bold = Pt(size), True
             item.font.italic = False
+            if language == "zh-Hant" and level == 1:
+                # A wrapped CJK cover title otherwise inherits relative font
+                # metrics from Normal, leaving excessive space between lines.
+                item.paragraph_format.line_spacing = Pt(26.25)
+                item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
             if level == 3:
                 item.font.bold = False
                 item.font.color.rgb = RGBColor.from_string("47565C")
@@ -89,6 +94,18 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item.paragraph_format.page_break_before = False
             item.paragraph_format.space_before = Pt(8 if level >= 4 else 12)
             item.paragraph_format.space_after = Pt(3 if level >= 4 else 4 if level == 3 else 6)
+    # Source metadata is secondary text, not another body paragraph. A short
+    # owned pair is one block so its final source line cannot become a page.
+    provenance = document.styles.add_style("Pilot Provenance", WD_STYLE_TYPE.PARAGRAPH)
+    provenance.base_style = document.styles["Body Text"]
+    provenance.font.size = Pt(9)
+    provenance.font.color.rgb = RGBColor.from_string("526169")
+    provenance.paragraph_format.line_spacing = Pt(12)
+    provenance.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
+    provenance.paragraph_format.space_before = Pt(0)
+    provenance.paragraph_format.space_after = Pt(2)
+    provenance.paragraph_format.keep_together = True
+    provenance.paragraph_format.keep_with_next = False
     label = document.styles.add_style("Pilot Label", WD_STYLE_TYPE.PARAGRAPH)
     label.base_style = document.styles["Body Text"]
     label.paragraph_format.keep_with_next = True

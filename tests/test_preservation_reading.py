@@ -18,7 +18,26 @@ class PreservationReadingTests(unittest.TestCase):
         self.assertEqual(source_delta()['version'], '0.3.39')
 
     def test_one_new_style_and_no_existing_reference_change(self):
+        # Verify the registered support bytes and exact later provenance style
+        # before projecting just that addition to the unchanged Q11 oracle.
+        from current_repairs_contract import project_support
+        project_support('scripts/prepare_layout.py')
         before, after = old_reference(ROOT, 'en'), reference(ROOT)
+        with zipfile.ZipFile(io.BytesIO(after)) as archive:
+            parts = {n: archive.read(n) for n in archive.namelist()}
+        styles = E.fromstring(parts['word/styles.xml'])
+        provenance = [s for s in styles if s.get(W+'styleId') == 'PilotProvenance']
+        self.assertEqual(1, len(provenance))
+        expected = E.fromstring(('<w:style xmlns:w="'+W[1:-1]+'" w:type="paragraph" w:customStyle="1" w:styleId="PilotProvenance">'
+            '<w:name w:val="Pilot Provenance"/><w:basedOn w:val="BodyText"/><w:pPr><w:keepNext w:val="0"/><w:keepLines/>'
+            '<w:spacing w:line="240" w:lineRule="atLeast" w:before="0" w:after="40"/></w:pPr>'
+            '<w:rPr><w:color w:val="526169"/><w:sz w:val="18"/></w:rPr></w:style>').encode())
+        self.assertEqual(E.tostring(expected, method='c14n', exclusive=True), E.tostring(provenance[0], method='c14n', exclusive=True))
+        styles.remove(provenance[0]); parts['word/styles.xml'] = E.tostring(styles)
+        data = io.BytesIO()
+        with zipfile.ZipFile(data, 'w') as target:
+            for name, value in parts.items(): target.writestr(name, value)
+        after = data.getvalue()
         prior_reference(before, after)
         with zipfile.ZipFile(io.BytesIO(after)) as archive:
             projected = {n: archive.read(n) for n in archive.namelist()}

@@ -277,6 +277,7 @@
             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
           {% endif %}
 
+          {{ reuseRightsholder.nonReferenceArrangements(nrefDataUsedPrefix.split('.')) }}
           {% include 'src/reuse-summary.html.j2' with context %}
 
           {# Personal Data #}

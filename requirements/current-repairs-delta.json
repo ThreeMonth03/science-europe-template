@@ -4,7 +4,7 @@
   "candidate_version": "0.3.54",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "38e2585d3ce32352387295e77fafbb282a27b1f91494f03c4b756eaafc8e0ed2",
+  "candidate_tree_sha256": "9934463769157bc2399fc8d9ed6fadc5f8a418c3f1870a84a554bce9ee4fa159",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
@@ -34,6 +34,7 @@
     "src/questions/14-dm-responsible.html.j2",
     "src/questions/15-required-resources.html.j2",
     "src/uuids.j2",
+    "src/word/index.html.j2",
     "src/word/pilot.lua",
     "src/word/question-spacing.xml",
     "src/word/short-tables.lua",
@@ -55,7 +56,7 @@
   "support": {
     "scripts/prepare_layout.py": {
       "before_sha256": "a47b9631e638d8f693adb99186c280754be9f7bde7105f4d40467099dc96de5a",
-      "after_sha256": "d85f51d4df42807122f86c5eacbeac74f4c5776d088ada80cb1afc2fe1d20c1f"
+      "after_sha256": "169ed4163f90e654214abc617eaa7b7eb3d1174cbf35bd75cb4dac212cc4a16e"
     },
     "PACKAGE_README.md": {
       "before_sha256": "47fee033565ab06a3527a46b3f133083bed109a513235730d717bc2a738d65ae",

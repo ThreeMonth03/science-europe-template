@@ -683,7 +683,34 @@ local function align_budget_cells(div)
   return div
 end
 
+local function provenance_text(inlines)
+  for _, inline in ipairs(inlines) do
+    if inline.t == "Link" then
+      if not provenance_text(inline.content) then return false end
+    elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then
+      return false
+    end
+  end
+  return true
+end
+
 function Div(div)
+  -- Pandoc discards <aside>; the Word entry supplies this owned wrapper.
+  -- Join only the short two-paragraph provenance, retaining every inline/link.
+  -- Long or structurally different metadata stays free to paginate.
+  if div.identifier == "dmp-provenance" and #div.classes == 1 and
+     div.classes:includes("document-provenance") and #div.attributes == 0 and
+     #div.content == 2 and div.content[1].t == "Para" and div.content[2].t == "Para" and
+     provenance_text(div.content[1].content) and provenance_text(div.content[2].content) and
+     utf8.len(pandoc.utils.stringify(div)) <= 240 then
+    local inlines = pandoc.List()
+    inlines:extend(div.content[1].content)
+    inlines:insert(pandoc.LineBreak())
+    inlines:extend(div.content[2].content)
+    div.content = {pandoc.Para(inlines)}
+    div.attributes["custom-style"] = "Pilot Provenance"
+    return div
+  end
   if div.identifier == "q-store-backup" then return keep_q5_context(div) end
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end

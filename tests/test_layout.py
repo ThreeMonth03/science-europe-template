@@ -18,6 +18,69 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_word_provenance_keeps_only_the_owned_short_pair_and_all_inlines(self):
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from probe_budget_word import IMAGE
+        env = Environment(loader=FileSystemLoader(ROOT), autoescape=True)
+        provenance = env.get_template('src/document-provenance.html.j2').render(dc=dict(
+            pkg=dict(name='Coastal KM', version='2.7.0', organization_id='dsw', km_id='root'),
+            config=dict(service_name='DMP service', service_url='https://example.org/?a=1&b=2')))
+        def owned(body, attrs='id="dmp-provenance" class="document-provenance"'):
+            return '<div '+attrs+'>'+body+'</div>'
+        cases = [
+            ('real-include', owned(provenance), True),
+            ('chinese', owned('<aside><p>問卷知識模型：沿岸觀測。</p><p>由 <a href="https://example.org/">資料服務</a> 產生。</p></aside>'), True),
+            ('limit', owned('<p>'+'x'*239+'</p><p>y</p>'), True),
+            ('over-limit', owned('<p>'+'x'*240+'</p><p>y</p>'), False),
+            ('unicode-over-limit', owned('<p>'+'中'*240+'</p><p>文</p>'), False),
+            ('aside-only', provenance, False),
+            ('wrong-id', owned(provenance, 'id="other" class="document-provenance"'), False),
+            ('wrong-class', owned(provenance, 'id="dmp-provenance" class="other"'), False),
+            ('extra-class', owned(provenance, 'id="dmp-provenance" class="document-provenance other"'), False),
+            ('extra-attribute', owned(provenance, 'id="dmp-provenance" class="document-provenance" data-extra="x"'), False),
+            ('three-paragraphs', owned(provenance+'<p>Original third paragraph.</p>'), False),
+            ('nested-paragraph', owned('<div><p>Original first.</p></div><p>Original second.</p>'), False),
+            ('image', owned('<p><img src="unfetched.png"></p><p>Original source.</p>'), False),
+            ('styled-text', owned('<p><em>Original first.</em></p><p>Original source.</p>'), False),
+        ]
+        lua = (ROOT/'src/word/pilot.lua').read_text()
+        anchor = 'if div.identifier == "dmp-provenance"'
+        self.assertEqual(lua.count(anchor), 1)
+        runner = '''import json,sys,tempfile,subprocess
+from pathlib import Path
+p=json.load(sys.stdin);results=[]
+with tempfile.TemporaryDirectory() as tmp:
+ f=Path(tmp)/'pilot.lua'
+ for lua in p['variants']:
+  f.write_text(lua)
+  results.append(json.loads(subprocess.check_output(
+   ['pandoc','--from=html','--to=json','--lua-filter='+str(f)],input=p['html'].encode())))
+print(json.dumps(results))
+'''
+        raw = subprocess.check_output(['docker','run','--rm','--network','none','-i',
+            '--entrypoint','python',IMAGE,'-c',runner], input=json.dumps(dict(
+                variants=[lua.replace(anchor, 'if false and div.identifier == "dmp-provenance"', 1), lua],
+                html=''.join('<div id="case-'+str(i)+'">'+body+'</div>' for i, (_, body, _) in enumerate(cases)))).encode(), timeout=180)
+        before, after = json.loads(raw)
+        self.assertEqual(before['meta'], after['meta'])
+        self.assertEqual(len(before['blocks']), len(cases))
+        self.assertEqual(len(after['blocks']), len(cases))
+        for (name, _, changed), old, new in zip(cases, before['blocks'], after['blocks']):
+            with self.subTest(case=name):
+                if not changed:
+                    self.assertEqual(old, new)
+                    continue
+                self.assertEqual(old['c'][0], new['c'][0])
+                old_div, new_div = old['c'][1][0], new['c'][1][0]
+                self.assertEqual(old_div['c'][0], ['dmp-provenance', ['document-provenance'], []])
+                self.assertEqual(new_div['c'][0], ['dmp-provenance', ['document-provenance'], [['custom-style', 'Pilot Provenance']]])
+                first, second = old_div['c'][1]
+                self.assertEqual([first['t'], second['t']], ['Para', 'Para'])
+                self.assertEqual(new_div['c'][1], [{'t':'Para', 'c':first['c']+[{'t':'LineBreak'}]+second['c']}])
+                self.assertEqual(len(old['c'][1]), 1)
+                self.assertEqual(len(new['c'][1]), 1)
+
     def test_fixed_list_leads_keep_only_the_intro_without_changing_list_xml(self):
         import base64
         import sys
@@ -390,6 +453,19 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 references.append((folder / "src/word/reference.docx").read_bytes())
                 document = Document(folder / "src/word/reference.docx")
                 self.assertFalse(document.styles["Heading 2"].paragraph_format.page_break_before)
+                title = document.styles["Heading 1"].paragraph_format
+                self.assertEqual(26.25, title.line_spacing.pt)
+                self.assertEqual(WD_LINE_SPACING.AT_LEAST, title.line_spacing_rule)
+                provenance = document.styles["Pilot Provenance"]
+                self.assertEqual('Body Text', provenance.base_style.name)
+                self.assertEqual(9, provenance.font.size.pt)
+                self.assertEqual('526169', str(provenance.font.color.rgb))
+                self.assertEqual(12, provenance.paragraph_format.line_spacing.pt)
+                self.assertEqual(WD_LINE_SPACING.AT_LEAST, provenance.paragraph_format.line_spacing_rule)
+                self.assertEqual(0, provenance.paragraph_format.space_before.pt)
+                self.assertEqual(2, provenance.paragraph_format.space_after.pt)
+                self.assertTrue(provenance.paragraph_format.keep_together)
+                self.assertFalse(provenance.paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Label"].paragraph_format.keep_with_next)
                 budget_label = document.styles["Pilot Budget Label"]
                 self.assertEqual('Body Text', budget_label.base_style.name)

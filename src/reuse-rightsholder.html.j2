@@ -9,3 +9,43 @@
     </div>
   {%- endif -%}
 {%- endmacro -%}
+
+{%- macro nonReferenceArrangements(parts) -%}
+  {# Keep dataset-specific facts separate from project-wide collaboration or
+     licence statements. A stale No follow-up is not an access requirement. #}
+  {%- set sentences = [] -%}
+  {%- set ownersPath = activeAnswer.path(parts + [uuids.nrefDataOwnersQUuid], 'OptionsQuestion') -%}
+  {%- set owners = repliesMap[ownersPath]|reply_str_value if ownersPath else '' -%}
+  {%- if ownersPath and owners in km.entities.questions[uuids.nrefDataOwnersQUuid].answerUuids and owners in km.entities.answers -%}
+    {%- if owners == uuids.nrefDataOwnersYesAUuid -%}
+      {%- do sentences.append('The rights holder will collaborate with us on this research.') -%}
+    {%- elif owners == uuids.nrefDataOwnersWeAUuid -%}
+      {%- do sentences.append('We are the rights holder of this dataset.') -%}
+    {%- elif owners == uuids.nrefDataOwnersNoAUuid -%}
+      {%- do sentences.append('The rights holder will not collaborate with us on this research.') -%}
+      {%- set requestPath = activeAnswer.path(parts + [uuids.nrefDataOwnersQUuid, uuids.nrefDataOwnersNoAUuid, uuids.nrefDataOwnersNoReqQUuid], 'OptionsQuestion') -%}
+      {%- set request = repliesMap[requestPath]|reply_str_value if requestPath else '' -%}
+      {%- if requestPath and request in km.entities.questions[uuids.nrefDataOwnersNoReqQUuid].answerUuids and request in km.entities.answers -%}
+        {%- if request == uuids.nrefDataOwnersNoReqYesAUuid -%}
+          {%- do sentences.append('We need to apply for access to this dataset.') -%}
+        {%- elif request == uuids.nrefDataOwnersNoReqNoAUuid -%}
+          {%- do sentences.append('No application for data access is required.') -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- set accessPath = activeAnswer.path(parts + [uuids.nrefDataAccessQUuid], 'OptionsQuestion') -%}
+  {%- set access = repliesMap[accessPath]|reply_str_value if accessPath else '' -%}
+  {%- if accessPath and access in km.entities.questions[uuids.nrefDataAccessQUuid].answerUuids and access in km.entities.answers -%}
+    {%- if access == uuids.nrefDataAccessHaveCopyAUuid -%}
+      {%- do sentences.append('We already have a copy of this dataset.') -%}
+    {%- elif access == uuids.nrefDataAccessWillDownloadAUuid -%}
+      {%- do sentences.append('We will download or obtain a copy of this dataset.') -%}
+    {%- elif access == uuids.nrefDataAccessWillOnlineAUuid -%}
+      {%- do sentences.append('We will use this dataset online.') -%}
+    {%- endif -%}
+  {%- endif -%}
+  {%- if sentences -%}
+    <p class="dataset-policy" data-fact-id="reuse-access-arrangements" data-status="complete">{{ sentences|join(' ') }}</p>
+  {%- endif -%}
+{%- endmacro -%}

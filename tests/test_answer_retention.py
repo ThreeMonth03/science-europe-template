@@ -1,8 +1,11 @@
 """Small counterexamples: related unanswered questions must not erase facts."""
 
+import copy
 import sys
 import unittest
 from pathlib import Path
+
+from bs4 import BeautifulSoup
 
 from test_science_europe_contract import render_question
 
@@ -13,6 +16,92 @@ from current_support import IDS, path
 
 
 class AnswerRetentionTests(unittest.TestCase):
+    def nonreference_access_fixture(self):
+        from check_answer_mapping import owner_fixture, question
+        km, replies, (parent, listing, use, _) = owner_fixture('nref')
+        km['entities']['questions'][IDS['preexistingQUuid']]['answerUuids'].append(IDS['preexistingNoAUuid'])
+        km['entities']['answers'][IDS['preexistingNoAUuid']] = {'followUpUuids': []}
+        followups = km['entities']['answers'][IDS['nrefDataUseYesAUuid']]['followUpUuids']
+        question(km, followups, IDS['nrefDataOwnersQUuid'], 'OptionsQuestion',
+                 [IDS['nrefDataOwners'+state+'AUuid'] for state in ('Yes', 'No', 'We')])
+        question(km, km['entities']['answers'][IDS['nrefDataOwnersNoAUuid']]['followUpUuids'],
+                 IDS['nrefDataOwnersNoReqQUuid'], 'OptionsQuestion',
+                 [IDS['nrefDataOwnersNoReqYesAUuid'], IDS['nrefDataOwnersNoReqNoAUuid']])
+        question(km, followups, IDS['nrefDataAccessQUuid'], 'OptionsQuestion',
+                 [IDS['nrefDataAccess'+state+'AUuid'] for state in ('HaveCopy', 'WillDownload', 'WillOnline')])
+        owners = path(use, 'nrefDataUseYesAUuid', 'nrefDataOwnersQUuid')
+        request = path(owners, 'nrefDataOwnersNoAUuid', 'nrefDataOwnersNoReqQUuid')
+        access = path(use, 'nrefDataUseYesAUuid', 'nrefDataAccessQUuid')
+        replies.update({owners: IDS['nrefDataOwnersNoAUuid'], request: IDS['nrefDataOwnersNoReqNoAUuid'],
+                        access: IDS['nrefDataAccessWillDownloadAUuid']})
+        return km, replies, (parent, listing, use, owners, request, access)
+
+    def test_nonreference_access_facts_stay_in_one_owned_paragraph(self):
+        km, base, (_, listing, _, owners, request, access) = self.nonreference_access_fixture()
+        for owner, req, method, expected in (
+            ('No', 'No', 'WillDownload', 'The rights holder will not collaborate with us on this research. No application for data access is required. We will download or obtain a copy of this dataset.'),
+            ('No', 'Yes', 'WillOnline', 'The rights holder will not collaborate with us on this research. We need to apply for access to this dataset. We will use this dataset online.'),
+            ('Yes', 'Yes', 'HaveCopy', 'The rights holder will collaborate with us on this research. We already have a copy of this dataset.'),
+            ('We', 'No', 'HaveCopy', 'We are the rights holder of this dataset. We already have a copy of this dataset.'),
+        ):
+            for profile in ('review', 'submission'):
+                with self.subTest(owner=owner, request=req, method=method, profile=profile):
+                    replies = {**base, owners: IDS['nrefDataOwners'+owner+'AUuid'],
+                               request: IDS['nrefDataOwnersNoReq'+req+'AUuid'], access: IDS['nrefDataAccess'+method+'AUuid']}
+                    soup = BeautifulSoup(render_question('src/questions/01-how-data.html.j2', replies,
+                        km=km, output_profile=profile), 'html.parser')
+                    facts = soup.select('[data-fact-id="reuse-access-arrangements"]')
+                    self.assertEqual(1, len(facts))
+                    self.assertEqual('p', facts[0].name)
+                    self.assertEqual(expected, facts[0].get_text())
+                    self.assertEqual('dataset-1', facts[0].find_parent('li')['data-item-id'])
+                    self.assertFalse(facts[0].select('.data-gap, .data-review'))
+        replies = {**base, listing: ['dataset-2', 'dataset-1']}
+        prefix = path(listing, 'dataset-1')
+        replies.update({key.replace(prefix, path(listing, 'dataset-2'), 1): value
+                        for key, value in base.items() if key.startswith(prefix+'.')})
+        replies[access.replace(prefix, path(listing, 'dataset-2'), 1)] = IDS['nrefDataAccessWillOnlineAUuid']
+        soup = BeautifulSoup(render_question('src/questions/01-how-data.html.j2', replies,
+            km=km, output_profile='submission'), 'html.parser')
+        facts = soup.select('[data-fact-id="reuse-access-arrangements"]')
+        self.assertEqual(['dataset-2', 'dataset-1'], [f.find_parent('li')['data-item-id'] for f in facts])
+        self.assertIn('We will use this dataset online.', facts[0].get_text())
+        self.assertNotIn('download', facts[0].get_text())
+        self.assertIn('We will download or obtain a copy', facts[1].get_text())
+
+    def test_nonreference_access_unknown_or_inactive_fields_do_not_invent_facts(self):
+        km, base, (parent, listing, use, owners, request, access) = self.nonreference_access_fixture()
+        for state in ('missing', 'unknown', 'no-reuse', 'no-existing', 'deleted-item', 'filtered-access',
+                      'unknown-owner', 'missing-request', 'unknown-request', 'removed-owner-answer'):
+            with self.subTest(state=state):
+                current, replies = copy.deepcopy(km), dict(base)
+                if state == 'missing':
+                    replies.pop(owners); replies.pop(access)
+                if state == 'unknown':
+                    replies[owners] = replies[access] = 'obsolete-option'
+                if state == 'no-reuse': replies[use] = IDS['nrefDataUseNoAUuid']
+                if state == 'no-existing': replies[parent] = IDS['preexistingNoAUuid']
+                if state == 'deleted-item': replies[listing] = []
+                if state == 'filtered-access':
+                    current['entities']['answers'][IDS['nrefDataUseYesAUuid']]['followUpUuids'].remove(IDS['nrefDataAccessQUuid'])
+                if state == 'unknown-owner': replies[owners] = 'obsolete-option'
+                if state == 'missing-request': replies.pop(request)
+                if state == 'unknown-request': replies[request] = 'obsolete-option'
+                if state == 'removed-owner-answer':
+                    current['entities']['questions'][IDS['nrefDataOwnersQUuid']]['answerUuids'].remove(IDS['nrefDataOwnersNoAUuid'])
+                for profile in ('review', 'submission'):
+                    soup = BeautifulSoup(render_question('src/questions/01-how-data.html.j2', replies,
+                        km=current, output_profile=profile), 'html.parser')
+                    facts = soup.select('[data-fact-id="reuse-access-arrangements"]')
+                    if state == 'filtered-access':
+                        self.assertEqual('The rights holder will not collaborate with us on this research. No application for data access is required.', facts[0].get_text())
+                    elif state in ('unknown-owner', 'removed-owner-answer'):
+                        self.assertEqual('We will download or obtain a copy of this dataset.', facts[0].get_text())
+                    elif state in ('missing-request', 'unknown-request'):
+                        self.assertEqual('The rights holder will not collaborate with us on this research. We will download or obtain a copy of this dataset.', facts[0].get_text())
+                    else:
+                        self.assertEqual([], facts)
+
     def test_file_naming_answer_keeps_case_sensitive_names(self):
         parent = path('processingCUuid', 'storageConvQUuid')
         filesystem = path(parent, 'storageConvExploreAUuid', 'storageConvFSysQUuid')
