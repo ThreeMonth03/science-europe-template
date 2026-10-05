@@ -11,6 +11,42 @@ from current_support import environment
 
 
 class CurrentBudgetLayoutTests(unittest.TestCase):
+    def test_word_without_authored_table_keeps_exact_existing_fallback(self):
+        from markupsafe import Markup
+        for escape in [False, True]:
+            helper = environment(ROOT, escape).get_template('src/budget-reading.html.j2').module
+            for purpose in ['', '<p>Keep data.</p>', '<p>&lt;table&gt; is literal text.</p>',
+                            '<ul><li>Keep data</li></ul>', '<p>' + 'Long text. ' * 100 + '</p>']:
+                row = dict(id='original-id', title=Markup('<p>Resource 1</p>'),
+                           purpose=Markup(purpose), budget=Markup(''), funding=Markup(''))
+                original = Markup('<table class="resource-table"><tbody><tr><td>Unchanged</td></tr></tbody></table>')
+                self.assertEqual(str(helper.word_table(original, Markup(''), [row])),
+                                 str(helper.short_table(original, [row], True)))
+            self.assertEqual(str(helper.word_table(Markup('unchanged'), Markup(''), [])), 'unchanged')
+
+    def test_word_authored_table_keeps_every_resource_fragment_and_identity(self):
+        from lxml import html
+        from markupsafe import Markup
+        for escape in [False, True]:
+            helper = environment(ROOT, escape).get_template('src/budget-reading.html.j2').module
+            rows = [dict(id='first', title=Markup('<p>Resource 1</p>'),
+                         purpose=Markup('<table><tbody><tr><td>A&lt;B&amp;C&gt;D</td></tr></tbody></table>'),
+                         budget=Markup(''), funding=Markup('')),
+                    dict(id='second', title=Markup('<p>Named resource</p>'),
+                         purpose=Markup('<ol><li>Keep original</li></ol>'),
+                         budget=Markup('<p>0 TWD</p>'), funding=Markup('<p>Institution</p>'))]
+            header = Markup('<tr><th>Resource</th><th>Budget</th><th>Funding</th></tr>')
+            document = html.fragment_fromstring(str(helper.word_table(Markup('old table'), header, rows)), create_parent=True)
+            self.assertEqual([node.tag for node in document], ['table', 'div', 'table', 'div'])
+            for index, row in enumerate(rows):
+                table, purpose = document[index * 2:index * 2 + 2]
+                self.assertEqual(table.xpath('./tbody/tr/@data-item-id'), [row['id']])
+                self.assertEqual(purpose.get('data-item-id'), row['id'])
+                self.assertEqual(table.xpath('./thead/tr/th/text()'), ['Resource', 'Budget', 'Funding'])
+                for cell, key in zip(table.xpath('./tbody/tr/td'), ['title', 'budget', 'funding']):
+                    self.assertEqual(''.join(html.tostring(child, encoding='unicode') for child in cell), str(row[key]))
+                self.assertEqual(''.join(html.tostring(child, encoding='unicode') for child in purpose), str(row['purpose']))
+
     def test_bounded_table_hint_preserves_question_grouping_and_rejections(self):
         from markupsafe import Markup
         from probe_short_resources import cases

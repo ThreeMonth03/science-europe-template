@@ -8,6 +8,76 @@ from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_current_rich_metadata_keeps_and_separators_are_owned_and_exact(self):
+        import copy
+        from probe_budget_word import ROOT, IMAGE, RUNNER, ROW_CALL, ROW_MARKER, fixture
+        lua = (ROOT/'src/word/pilot.lua').read_text()
+        call = 'keep_rich_resource_leads(align_budget_cells('+ROW_CALL+'))'
+        guard = 'if div.classes:includes("word-rich-resource-purpose") then'
+        self.assertEqual(lua.count(call), 1)
+        self.assertEqual(lua.count(guard), 1)
+        disabled = lua.replace(call, 'align_budget_cells('+ROW_CALL+')').replace(guard, 'if false then')
+        table = '<table><thead><tr><th>Record</th><th>Retention</th></tr></thead><tbody><tr><td>ROW-01</td><td>10</td></tr></tbody></table>'
+        purpose = '<p>Keep <code>Cost.csv</code> and <a href="https://example.org/qa?a=1&amp;b=2">source</a>.</p>'+table
+        base = fixture(rows=1).replace('<div class="answer-detail"><p>Purpose.</p></div><p>Findability.</p>', '')
+        base = base.replace('class="resource-table"', 'class="resource-table word-rich-budget-metadata"')
+        def owned(content):
+            return base.replace('</table>', '</table><div class="word-rich-resource-purpose">'+content+'</div>')
+        full = owned(purpose)
+        rows = [
+            ('filled', full, True, True),
+            ('empty-metadata', full.replace('0 TWD', '').replace('Institute.', ''), True, True),
+            ('terminal-table', owned(table), True, True),
+            ('unbounded-no-marker', full.replace('Institute.', 'F'*161), False, True),
+            ('other-question', full.replace('q-required-resources', 'q-other'), False, True),
+            ('unowned-project', full.replace('project-resources', 'authored-content'), False, True),
+            ('unowned-table', full.replace('resource-table word-rich-budget-metadata', 'resource-table'), False, True),
+            ('ordinary-purpose', full.replace('word-rich-resource-purpose', 'answer-detail'), True, False),
+        ]
+        html = ''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_,_ in rows)
+        results = []
+        for source in (disabled, lua):
+            raw = subprocess.check_output(['docker','run','--rm','--network','none','--log-driver','none','-i','--entrypoint','python',IMAGE,'-c',RUNNER],
+                input=json.dumps(dict(html=html, lua=source)).encode(), timeout=180)
+            results.append({b['c'][0][0]: b for b in json.loads(raw)['blocks']})
+        def walk(node):
+            if isinstance(node, dict):
+                yield node
+                yield from walk(node.get('c'))
+            elif isinstance(node, list):
+                for value in node:
+                    yield from walk(value)
+        def attach_last(blocks):
+            for index in range(len(blocks)-1, -1, -1):
+                block = blocks[index]
+                if block['t'] in ('Para', 'Plain'):
+                    blocks[index] = {'t':'Div','c':[['',[],[['custom-style','Pilot Lead']]],[{'t':'Para','c':block['c']}]]}
+                    return True
+                if block['t'] == 'Div' and attach_last(block['c'][1]):
+                    return True
+            return False
+        def separator(keep):
+            return {'t':'RawBlock','c':['openxml','<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/><w:keepNext w:val="'+str(keep)+'"/><w:snapToGrid w:val="0"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>']}
+        for name,_,kept,separated in rows:
+            with self.subTest(case=name):
+                before, after = [result['case-'+name] for result in results]
+                expected = copy.deepcopy(before)
+                metadata = [node for node in walk(expected) if node['t'] == 'Table' and 'word-rich-budget-metadata' in node['c'][0][1]]
+                purposes = [node for node in walk(expected) if node['t'] == 'Div' and 'word-rich-resource-purpose' in node['c'][0][1]]
+                self.assertEqual(len(metadata), 0 if name == 'unowned-table' else 1)
+                self.assertEqual(len(purposes), int(separated))
+                for node in metadata:
+                    cells = node['c'][4][0][3][0][1]
+                    markers = [n for n in walk(cells[0][4]) if n['t'] == 'RawBlock' and n['c'] == ['openxml', ROW_MARKER]]
+                    self.assertEqual(len(markers), int(kept))
+                    if kept:
+                        for cell in cells:
+                            if not attach_last(cell[4]):
+                                cell[4].append({'t':'RawBlock','c':['openxml','<w:p><w:pPr><w:keepNext/></w:pPr></w:p>']})
+                for node in purposes:
+                    node['c'][1] = [separator(1)]+node['c'][1]+[separator(0)]
+                self.assertEqual(after, expected, 'Only owned Pilot Lead wrappers and exact beginning/terminal separators may change')
+
     def test_owned_budget_first_lines_align_without_touching_other_content(self):
         from probe_budget_word import ROOT, IMAGE, RUNNER, ROW_CALL, fixture
         lua=(ROOT/'src/word/pilot.lua').read_text()

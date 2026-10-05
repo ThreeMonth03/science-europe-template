@@ -72,6 +72,23 @@
   {%- else -%}{{ original }}{%- endif -%}
 {%- endmacro -%}
 
+{%- macro word_table(original, header, rows) -%}
+  {# Word readers mispaginate tables nested in a resource row. Keep authored
+     table purposes as standalone blocks; reuse all captured text unchanged.
+     Ordinary purposes retain their existing table and pagination path. #}
+  {%- set selection = namespace(table=false) -%}
+  {%- for row in rows -%}
+    {%- set selection.table = selection.table or '<table' in row.purpose -%}
+  {%- endfor -%}
+  {%- if not selection.table -%}{{ short_table(original, rows, true) }}
+  {%- else -%}
+    {%- for row in rows -%}
+      <table class="resource-table word-rich-budget-metadata"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody><tr data-item-id="{{ row.id }}"><td>{{ row.title }}</td><td>{{ row.budget }}</td><td>{{ row.funding }}</td></tr></tbody></table>
+      <div class="word-rich-resource-purpose" data-item-id="{{ row.id }}">{{ row.purpose }}</div>
+    {%- endfor -%}
+  {%- endif -%}
+{%- endmacro -%}
+
 {%- macro ordinary(header, rows) -%}
 {%- if rows|length > 32 -%}
   {%- for group in rows|batch(32) -%}{{ ordinary(header, group) }}{%- endfor -%}

@@ -91,6 +91,10 @@ html body .resource-table col.resource-purpose { width: 57%; }
 html body .resource-table col.resource-budget { width: 17%; }
 html body .resource-table col.resource-funding { width: 26%; }
 html body .resource-table tr { break-inside: auto; }
+/* Only a resource without both metadata fields needs a kept neutral/name
+   label. Filled cells fragment independently; moving their title alone would
+   leave the amount/funding on the previous page without its identity. */
+html body #q-required-resources .resource-table > tbody > tr[data-item-id]:has(> td:nth-child(2):not(:has(*))):has(> td:nth-child(3):not(:has(*))) > td:first-child > p:first-child:has(+ .answer-detail[data-fact-id="resource-justification"]) { break-after: avoid; }
 /* Only the bounded-content classifier can keep a small budget together.
    Few rows can still contain pages of text, even in a single paragraph. */
 html body .resource-table.pdf-bounded-budget, html body .resource-table.pdf-short-budget { break-inside: avoid; }

@@ -695,6 +695,44 @@ local function align_budget_cells(div)
   return div
 end
 
+-- Only the existing bounded-row marker can attach an owned metadata table
+-- to its first purpose block. Long/complex metadata remain splittable.
+local function keep_rich_resource_leads(div)
+  local function last_paragraph(blocks)
+    for index = #blocks, 1, -1 do
+      local block = blocks[index]
+      if block.t == "Para" or block.t == "Plain" then
+        blocks[index] = pandoc.Div({pandoc.Para(block.content)},
+          pandoc.Attr("", {}, {["custom-style"]="Pilot Lead"}))
+        return true
+      elseif block.t == "Div" and last_paragraph(block.content) then return true end
+    end
+    return false
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      for _, project in ipairs(answer.content) do
+        if project.t == "Div" and project.classes:includes("project-resources") then
+          for _, tbl in ipairs(project.content) do
+            if tbl.t == "Table" and tbl.classes:includes("word-rich-budget-metadata") and #tbl.bodies == 1 and #tbl.bodies[1].body == 1 then
+              local row = tbl.bodies[1].body[1]
+              local marker = row.cells[1].contents[1]
+              if marker and marker.t == "RawBlock" and marker.text == "<!--DSW:SE:budget-row:v1-->" then
+                for _, cell in ipairs(row.cells) do
+                  if not last_paragraph(cell.contents) then
+                    cell.contents:insert(pandoc.RawBlock("openxml", '<w:p><w:pPr><w:keepNext/></w:pPr></w:p>'))
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
 local function provenance_text(inlines)
   for _, inline in ipairs(inlines) do
     if inline.t == "Link" then
@@ -707,6 +745,21 @@ local function provenance_text(inlines)
 end
 
 function Div(div)
+  -- Adjacent DOCX tables are joined by readers even when they came from
+  -- separate HTML tables. A tiny real paragraph keeps the owned metadata
+  -- table separate from a purpose that starts with an authored table.
+  -- Also close a terminal authored table without an empty painted tail page.
+  if div.classes:includes("word-rich-resource-purpose") then
+    local function separator(keep)
+      return pandoc.RawBlock("openxml",
+        '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/>' ..
+        '<w:keepNext w:val="' .. (keep and "1" or "0") .. '"/><w:snapToGrid w:val="0"/>' ..
+        '<w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>')
+    end
+    div.content:insert(1, separator(true))
+    div.content:insert(separator(false))
+    return div
+  end
   -- Pandoc discards <aside>; the Word entry supplies this owned wrapper.
   -- Join only the short two-paragraph provenance, retaining every inline/link.
   -- Long or structurally different metadata stays free to paginate.
@@ -728,7 +781,7 @@ function Div(div)
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
-  if div.identifier == "q-required-resources" then return align_budget_cells(keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div)))) end
+  if div.identifier == "q-required-resources" then return keep_rich_resource_leads(align_budget_cells(keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div))))) end
   if div.classes:includes("identifier-heading") then
     -- Q13 only: combine the existing distribution number and repository type.
     -- Para may already wrap all-Strong labels. Reject unexpected/free blocks;
