@@ -11,6 +11,61 @@ from current_support import environment
 
 
 class CurrentBudgetLayoutTests(unittest.TestCase):
+    def test_funding_tables_are_full_width_owned_and_preserve_exact_fragments(self):
+        from lxml import html
+        from markupsafe import Markup
+        header = Markup('<tr><th>Resource</th><th>Budget</th><th>Funding</th></tr>')
+        metadata = Markup('<th>Resource</th><th>Budget</th>')
+        funding = Markup('<p>Original funding.</p><table><tbody><tr><td>FUND-01</td><td>10</td></tr></tbody></table><p>Original tail.</p>')
+        for escape in [False, True]:
+            helper = environment(ROOT, escape).get_template('src/budget-reading.html.j2').module
+            for word in [False, True]:
+                render = helper.word_table if word else helper.render
+                for purpose in ['', '<p>Keep data.</p>', '<table><tbody><tr><td>ROW-01</td><td>10</td></tr></tbody></table>']:
+                    first = dict(id='original-first', title=Markup('<p>Resource 1</p>'),
+                                 purpose=Markup(purpose), budget=Markup(''), funding=funding)
+                    second = dict(id='original-second', title=Markup('<p>A&lt;B&amp;C&gt;D</p>'),
+                                  purpose=Markup('<ul><li>Original purpose.</li></ul>'),
+                                  budget=Markup('<p>0 TWD</p>'), funding=Markup('<p>Institution.</p>'))
+                    second['original'] = Markup('<tr data-item-id="original-second"><td>'+str(second['title'])+str(second['purpose'])+'</td><td>'+str(second['budget'])+'</td><td>'+str(second['funding'])+'</td></tr>')
+                    markup = str(render(Markup('must not use nested original'), header,
+                                        [first, second], metadata, Markup('Funding')))
+                    document = html.fragment_fromstring(markup, create_parent=True)
+                    self.assertEqual([n.tag for n in document], ['table']+(['div'] if purpose else [])+['div','table'])
+                    table = document[0]
+                    self.assertEqual(table.get('class'), ('word' if word else 'pdf')+'-rich-funding-metadata')
+                    self.assertEqual(table.xpath('./tbody/tr/@data-item-id'), ['original-first'])
+                    self.assertEqual(table.xpath('./thead/tr/th/text()'), ['Resource','Budget'])
+                    cells = table.xpath('./tbody/tr/td')
+                    self.assertEqual(len(cells), 2)
+                    self.assertEqual(''.join(html.tostring(n, encoding='unicode') for n in cells[0]), str(first['title']))
+                    self.assertFalse(''.join(cells[1].itertext()))
+                    if purpose:
+                        self.assertEqual(document[1].get('data-item-id'), 'original-first')
+                        self.assertEqual(''.join(html.tostring(n, encoding='unicode') for n in document[1]), purpose)
+                    detail = document[-2]
+                    self.assertEqual(detail.get('data-item-id'), 'original-first')
+                    self.assertEqual(detail.get('class'), 'word-rich-resource-funding' if word else 'pdf-rich-funding-detail')
+                    self.assertEqual(''.join(html.tostring(n, encoding='unicode') for n in list(detail)[1:]), str(funding))
+                    self.assertEqual(document[-1].xpath('./tbody/tr/@data-item-id'), ['original-second'])
+                    for cell, fragment in zip(document[-1].xpath('./tbody/tr/td'),
+                                              [str(second['title'])+str(second['purpose']), str(second['budget']), str(second['funding'])]):
+                        self.assertEqual(''.join(html.tostring(n, encoding='unicode') for n in cell), fragment)
+
+    def test_added_labels_leave_all_non_funding_table_routes_byte_exact(self):
+        from markupsafe import Markup
+        header = Markup('<tr><th>Resource</th><th>Budget</th><th>Funding</th></tr>')
+        original = Markup('<table class="resource-table"><tbody><tr><td>Original exact output.</td></tr></tbody></table>')
+        for escape in [False, True]:
+            helper = environment(ROOT, escape).get_template('src/budget-reading.html.j2').module
+            for purpose in ['', '<p>Keep data.</p>', '<table><tbody><tr><td>ROW-01</td><td>10</td></tr></tbody></table>', '<p>Keep data.</p>'*20]:
+                row = dict(id='original-id', title=Markup('<p>Resource 1</p>'),
+                           purpose=Markup(purpose), budget=Markup('<p>0 TWD</p>'),
+                           funding=Markup('<p>Literal &lt;table&gt; text.</p>'), original=Markup('<tr><td>Exact row.</td></tr>'))
+                for render in [helper.word_table, helper.render]:
+                    self.assertEqual(str(render(original, header, [row], Markup('<th>Resource</th><th>Budget</th>'), Markup('Funding'))),
+                                     str(render(original, header, [row])))
+
     def test_word_without_authored_table_keeps_exact_existing_fallback(self):
         from markupsafe import Markup
         for escape in [False, True]:

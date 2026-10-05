@@ -94,11 +94,11 @@
                 {%- set projectCostItems = repliesMap[projectCostPath]|reply_items -%}
 
                 {%- if projectCostItems|length > 0  -%}
-                    {%- set budgetLayout = namespace(header='', rows=[]) -%}
+                    {%- set budgetLayout = namespace(header='', rows=[], metadataHeader='', fundingLabel='') -%}
                     {%- set originalBudgetTable -%}
                     <table class="resource-table">
                       <colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup>
-                      <thead>{% set budgetLayout.header %}<tr><th scope="col">Resource and purpose</th><th scope="col">Budget</th><th scope="col">Funding source</th></tr>{% endset %}{{ budgetLayout.header }}</thead>
+                      <thead>{% set budgetLayout.header %}<tr>{% set budgetLayout.metadataHeader %}<th scope="col">Resource and purpose</th><th scope="col">Budget</th>{% endset %}{{ budgetLayout.metadataHeader }}<th scope="col">{% set budgetLayout.fundingLabel %}Funding source{% endset %}{{ budgetLayout.fundingLabel }}</th></tr>{% endset %}{{ budgetLayout.header }}</thead>
                       <tbody>
                     {%- for j in projectCostItems -%}
                         {%- set projectCostItem = [projectCostPath, j]|reply_path -%}
@@ -214,10 +214,10 @@
                     {%- endset -%}
                     {%- if pdf_budget_reading|default(false) -%}
                       {%- import 'src/budget-reading.html.j2' as budgetReading -%}
-                      {{ budgetReading.render(originalBudgetTable, budgetLayout.header, budgetLayout.rows) }}
+                      {{ budgetReading.render(originalBudgetTable, budgetLayout.header, budgetLayout.rows, budgetLayout.metadataHeader, budgetLayout.fundingLabel) }}
                     {%- elif word_budget_reading|default(false) -%}
                       {%- import 'src/budget-reading.html.j2' as budgetReading -%}
-                      {{ budgetReading.word_table(originalBudgetTable, budgetLayout.header, budgetLayout.rows) }}
+                      {{ budgetReading.word_table(originalBudgetTable, budgetLayout.header, budgetLayout.rows, budgetLayout.metadataHeader, budgetLayout.fundingLabel) }}
                     {%- else -%}{{ originalBudgetTable }}{%- endif -%}
                 {%- else -%}
                     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project.</p>{% endif %}

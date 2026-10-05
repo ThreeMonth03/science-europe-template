@@ -102,6 +102,14 @@ html body .resource-table p { margin-bottom: .3em; }
 html body .resource-table ul { padding-left: 1.2em; }
 html body .resource-table .answer-detail { margin: .25em 0; }
 html body .resource-table .data-gap { padding: .2em .35em; }
+/* Authored funding tables get full width, never a table inside a narrow cell.
+   Only the short identity/budget metadata attach to their next actual body. */
+html body #q-required-resources .pdf-rich-funding-metadata { font-size: 10pt; table-layout: fixed; break-after: avoid; }
+html body .pdf-rich-funding-metadata col.resource-purpose { width: 75%; }
+html body .pdf-rich-funding-metadata col.resource-budget { width: 25%; }
+html body .pdf-rich-funding-metadata td { overflow-wrap: anywhere; word-break: break-word; }
+html body #q-required-resources .pdf-rich-funding-purpose,
+html body #q-required-resources .pdf-rich-funding-detail { break-before: avoid; }
 /* BEGIN short-budget panel: PDF-only, <=3 bounded rows with a budget gap. */
 html body .pdf-short-budget col.resource-purpose { width: 49%; }
 html body .pdf-short-budget col.resource-budget { width: 25%; }

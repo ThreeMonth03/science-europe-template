@@ -8,6 +8,106 @@ from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_funding_metadata_ast_is_scoped_and_preserves_authored_blocks(self):
+        import copy
+        from probe_budget_word import ROOT, IMAGE, RUNNER
+        lua = (ROOT/'src/word/pilot.lua').read_text()
+        call = '  if div.identifier == "q-required-resources" then div = keep_funding_metadata_leads(div) end'
+        guard = 'if div.classes:includes("word-rich-resource-funding") then'
+        self.assertEqual(lua.count(call), 1); self.assertEqual(lua.count(guard), 1)
+        disabled = lua.replace(call, '').replace(guard, 'if false then')
+        marker = '<!--DSW:SE:funding-metadata-row:v1-->'
+        table = '<table><thead><tr><th>Funding line</th><th>Amount (TWD)</th></tr></thead><tbody><tr><td>FUND-01</td><td>10</td></tr></tbody></table>'
+        def fixture(kind='funding', amount='<p>0 TWD</p>', body=None):
+            body = '<div class="answer-detail"><p>Keep original '+kind+'.</p>'+table+'</div>' if body is None else body
+            if kind == 'funding' and body: body = '<div class="answer-lead"><p><strong>Funding source</strong></p></div>'+body
+            return '<div id="q-required-resources"><div class="answer"><h4 class="word-budget-heading">Budget</h4><div class="project-resources"><table class="word-rich-funding-metadata" data-item-id="cost-1"><thead><tr><th>Resource and purpose</th><th>Budget</th></tr></thead><tbody><tr><td><p><strong>Resource 1</strong></p></td><td>'+amount+'</td></tr></tbody></table><div class="word-rich-resource-'+kind+'" data-item-id="cost-1">'+body+'</div></div></div></div>'
+        base = fixture()
+        rows = [
+            ('funding', base, True, True), ('purpose', fixture('purpose'), True, True),
+            ('empty-budget', fixture(amount=''), True, True),
+            ('other-question', base.replace('q-required-resources', 'q-other'), False, False),
+            ('unowned-project', base.replace('project-resources', 'authored-content'), False, False),
+            ('unowned-table', base.replace('word-rich-funding-metadata', 'authored-table'), False, False),
+            ('no-id', base.replace(' data-item-id="cost-1"', ''), False, False),
+            ('empty-id', base.replace('data-item-id="cost-1"', 'data-item-id=""'), False, False),
+            ('wrong-id', base.replace('class="word-rich-resource-funding" data-item-id="cost-1"', 'class="word-rich-resource-funding" data-item-id="cost-2"'), False, False),
+            ('empty-body', fixture(body=''), False, False),
+            ('complex-metadata', fixture(amount='<ul><li>Keep this list.</li></ul>'), True, False),
+            ('image-metadata', fixture(amount='<p><img src="unused.png" alt="Keep"></p>'), True, False),
+            ('long-title', base.replace('Resource 1</strong>', 'X'*161+'</strong>'), True, False),
+            ('long-budget', fixture(amount='<p>'+'X'*81+'</p>'), True, False),
+        ]
+        html = ''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_,_ in rows)
+        # One container, two batched Pandoc ASTs; no native artifact rendering.
+        runner = 'import contextlib,io,json,sys\npayload=json.load(sys.stdin)\nresults=[]\nfor source in payload["sources"]:\n sys.stdin=io.StringIO(json.dumps(dict(html=payload["html"],lua=source)))\n output=io.StringIO()\n with contextlib.redirect_stdout(output): exec('+repr(RUNNER)+',{})\n results.append(json.loads(output.getvalue()))\nprint(json.dumps(results))'
+        raw = subprocess.check_output(['docker','run','--rm','--network','none','--log-driver','none','-i','--entrypoint','python',IMAGE,'-c',runner], input=json.dumps(dict(html=html,sources=[disabled,lua])).encode(), timeout=180)
+        results = [{b['c'][0][0]:b for b in result['blocks']} for result in json.loads(raw)]
+        def walk(node):
+            if isinstance(node, dict):
+                yield node; yield from walk(node.get('c'))
+            elif isinstance(node, list):
+                for child in node: yield from walk(child)
+        def attach_last(blocks):
+            for index in range(len(blocks)-1, -1, -1):
+                block = blocks[index]
+                if block['t'] in ('Para', 'Plain'):
+                    blocks[index] = {'t':'Div','c':[['',[],[['custom-style','Pilot Lead']]],[{'t':'Para','c':block['c']}]]}; return True
+                if block['t'] == 'Div' and attach_last(block['c'][1]): return True
+            return False
+        def separator(keep):
+            return {'t':'RawBlock','c':['openxml','<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/><w:keepNext w:val="'+str(keep)+'"/><w:snapToGrid w:val="0"/><w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>']}
+        for name,_,resized,kept in rows:
+            with self.subTest(case=name):
+                before, after = [result['case-'+name] for result in results]
+                expected = copy.deepcopy(before)
+                metadata = [n for n in walk(expected) if n['t']=='Table' and 'word-rich-funding-metadata' in n['c'][0][1]]
+                for node in metadata:
+                    self.assertEqual(len(node['c'][2]), 2)
+                    if name not in ('other-question', 'unowned-project'):
+                        self.assertEqual(node['c'][3][1][0][1][0][3], 2, 'Owned budget caption spans exactly two columns')
+                        self.assertEqual([n['c'] for n in walk(node['c'][3][1][0][1][0][4]) if n['t']=='Str'], ['Budget'])
+                    if resized: node['c'][2] = [[{'t':'AlignLeft'},{'t':'ColWidth','c':0.75}],[{'t':'AlignLeft'},{'t':'ColWidth','c':0.25}]]
+                    cells = node['c'][4][0][3][0][1]
+                    if kept:
+                        for cell in cells:
+                            if not attach_last(cell[4]): cell[4].append({'t':'RawBlock','c':['openxml','<w:p><w:pPr><w:keepNext/></w:pPr></w:p>']})
+                        cells[0][4].insert(0, {'t':'RawBlock','c':['openxml',marker]})
+                for node in list(walk(expected)):
+                    if node.get('t')=='Div' and 'word-rich-resource-funding' in node['c'][0][1]:
+                        node['c'][1] = [separator(1)]+node['c'][1]+[separator(0)]
+                self.assertEqual(after, expected, 'Only bounded metadata keeps/widths and owned funding separators may change')
+                self.assertEqual(sum(n['t']=='RawBlock' and n['c']==['openxml',marker] for n in walk(after)), int(kept))
+
+    def test_funding_metadata_xml_contract_is_independent_and_fail_closed(self):
+        from jinja2 import Environment, FileSystemLoader, StrictUndefined, UndefinedError
+        root = Path(__file__).resolve().parents[1]
+        templates = [Environment(loader=FileSystemLoader(root),undefined=StrictUndefined,autoescape=escape).get_template('src/word/short-tables.xml') for escape in (False, True)]
+        marker = '<!--DSW:SE:funding-metadata-row:v1-->'
+        old = '<!--DSW:SE:budget-row:v1-->'
+        cell = lambda text: '<w:tc><w:tcPr /><w:p><w:r><w:t>'+text+'</w:t></w:r></w:p></w:tc>'
+        row = cell('Resource &amp; 1').replace('<w:tcPr />', '<w:tcPr />'+marker, 1)+cell('0 TWD')
+        before = '<w:document><w:body><w:tbl><w:tr>'+row+'</w:tr></w:tbl></w:body></w:document>'
+        expected = before.replace(marker, '').replace('<w:tr>', '<w:tr><w:trPr><w:cantSplit/></w:trPr>', 1)
+        for template in templates:
+            self.assertEqual(template.render(content=before), expected)
+            self.assertEqual(template.render(content=before.replace(marker, '')), before.replace(marker, ''))
+            three = before.replace('</w:tr>', cell('Funder')+'</w:tr>')
+            old_three = three.replace(marker, old)
+            self.assertEqual(template.render(content=old_three), old_three.replace(old, '').replace('<w:tr>', '<w:tr><w:trPr><w:cantSplit/></w:trPr>', 1))
+            malformed = [
+                three, before.replace('</w:tc>'+cell('0 TWD'), '</w:tc>'),
+                before.replace('<w:tcPr />', '<w:tcPr><w:vMerge/></w:tcPr>', 1),
+                before.replace('<w:tcPr />', '<w:tcPr><w:gridSpan w:val="2"/></w:tcPr>', 1),
+                before.replace(marker, marker*2), before.replace(marker, old),
+                before.replace(marker, '').replace('<w:body>', '<w:body>'+marker),
+                before.replace('</w:tc>', '<w:tbl><w:tr>'+cell('Nested')+'</w:tr></w:tbl></w:tc>', 1),
+                before.replace('<w:tr>', '<w:tr><w:trPr><w:tblHeader/></w:trPr>', 1),
+            ]
+            for source in malformed:
+                with self.subTest(source=source, autoescape=template.environment.autoescape):
+                    with self.assertRaises(UndefinedError): template.render(content=source)
+
     def test_current_rich_metadata_keeps_and_separators_are_owned_and_exact(self):
         import copy
         from probe_budget_word import ROOT, IMAGE, RUNNER, ROW_CALL, ROW_MARKER, fixture

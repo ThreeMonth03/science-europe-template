@@ -526,8 +526,11 @@ local function attach_budget_headings(div)
             position = 2
           else label = nil end
           local tbl = project.content[position]
-          if tbl and tbl.t == "Table" and tbl.classes:includes("resource-table") and
-             #tbl.colspecs == 3 and #tbl.head.rows > 0 and #tbl.head.rows[1].cells == 3 and
+          local columns = tbl and tbl.t == "Table" and #tbl.colspecs or 0
+          local owned_table = tbl and tbl.t == "Table" and
+            ((columns == 3 and tbl.classes:includes("resource-table")) or
+             (columns == 2 and tbl.classes:includes("word-rich-funding-metadata")))
+          if owned_table and #tbl.head.rows > 0 and #tbl.head.rows[1].cells == columns and
              #tbl.bodies == 1 and #tbl.bodies[1].body > 0 and
              (label or index == heading_index + 1) then
             local blocks = pandoc.List()
@@ -538,7 +541,7 @@ local function attach_budget_headings(div)
             if label then blocks:insert(label:clone()) end
             local row = tbl.head.rows[1]:clone()
             row.cells = {row.cells[1]}
-            row.cells[1].col_span = 3
+            row.cells[1].col_span = columns
             row.cells[1].row_span = 1
             row.cells[1].contents = blocks
             local headers = pandoc.List({row})
@@ -744,21 +747,101 @@ local function provenance_text(inlines)
   return true
 end
 
+-- Only generated Q15 two-cell funding metadata, followed by its own real body.
+-- Never mark an authored table or make a long funding/purpose block unbreakable.
+local function keep_funding_metadata_leads(div)
+  local function inlines(values)
+    for _, value in ipairs(values) do
+      if value.t == "Strong" or value.t == "Emph" then
+        if not inlines(value.content) then return false end
+      elseif value.t ~= "Str" and value.t ~= "Space" and value.t ~= "SoftBreak" and value.t ~= "Code" then return false end
+    end
+    return true
+  end
+  local function paragraphs(blocks)
+    local count = 0
+    for _, block in ipairs(blocks) do
+      if block.t == "Para" or block.t == "Plain" then
+        if not inlines(block.content) then return nil end
+        count = count + 1
+      elseif block.t == "Div" and block.identifier == "" then
+        local style = block.attributes["custom-style"]
+        if style and style ~= "Pilot Label" and style ~= "Pilot Lead" then return nil end
+        local children = paragraphs(block.content)
+        if not children then return nil end
+        count = count + children
+      else return nil end
+    end
+    return count
+  end
+  local function attach_last(blocks)
+    for index = #blocks, 1, -1 do
+      local block = blocks[index]
+      if block.t == "Para" or block.t == "Plain" then
+        blocks[index] = pandoc.Div({pandoc.Para(block.content)}, pandoc.Attr("", {}, {["custom-style"]="Pilot Lead"}))
+        return true
+      elseif block.t == "Div" and attach_last(block.content) then return true end
+    end
+    return false
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      for _, project in ipairs(answer.content) do
+        if project.t == "Div" and project.classes:includes("project-resources") then
+          for index, tbl in ipairs(project.content) do
+            local next_block = project.content[index + 1]
+            if tbl.t == "Table" and #tbl.classes == 1 and tbl.classes:includes("word-rich-funding-metadata") and
+               #tbl.colspecs == 2 and #tbl.bodies == 1 and #tbl.bodies[1].head == 0 and #tbl.bodies[1].body == 1 and
+               #tbl.foot.rows == 0 and #tbl.caption.long == 0 and next_block and next_block.t == "Div" and
+               (next_block.classes:includes("word-rich-resource-purpose") or next_block.classes:includes("word-rich-resource-funding")) and
+               tbl.attributes["item-id"] and tbl.attributes["item-id"] ~= "" and
+               tbl.attributes["item-id"] == next_block.attributes["item-id"] and
+               pandoc.utils.stringify(next_block):match("%S") then
+              tbl.colspecs = {{pandoc.AlignLeft, 0.75}, {pandoc.AlignLeft, 0.25}}
+              local row, eligible = tbl.bodies[1].body[1], true
+              if #row.cells ~= 2 then eligible = false end
+              for column, cell in ipairs(row.cells) do
+                local count, width = paragraphs(cell.contents), 0
+                for _, code in utf8.codes(pandoc.utils.stringify(cell.contents)) do width = width + (code >= 0x2E80 and 2 or 1) end
+                if cell.row_span ~= 1 or cell.col_span ~= 1 or not count or count > 3 or width > (column == 1 and 160 or 80) then eligible = false end
+              end
+              if eligible then
+                for _, cell in ipairs(row.cells) do
+                  if not attach_last(cell.contents) then cell.contents:insert(pandoc.RawBlock("openxml", '<w:p><w:pPr><w:keepNext/></w:pPr></w:p>')) end
+                end
+                row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:funding-metadata-row:v1-->"))
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
+local function separate_authored_resource_tables(div)
+  local function separator(keep)
+    return pandoc.RawBlock("openxml",
+      '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/>' ..
+      '<w:keepNext w:val="' .. (keep and "1" or "0") .. '"/><w:snapToGrid w:val="0"/>' ..
+      '<w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>')
+  end
+  div.content:insert(1, separator(true))
+  div.content:insert(separator(false))
+  return div
+end
+
 function Div(div)
   -- Adjacent DOCX tables are joined by readers even when they came from
   -- separate HTML tables. A tiny real paragraph keeps the owned metadata
   -- table separate from a purpose that starts with an authored table.
   -- Also close a terminal authored table without an empty painted tail page.
   if div.classes:includes("word-rich-resource-purpose") then
-    local function separator(keep)
-      return pandoc.RawBlock("openxml",
-        '<w:p><w:pPr><w:spacing w:before="0" w:after="0" w:line="20" w:lineRule="exact"/>' ..
-        '<w:keepNext w:val="' .. (keep and "1" or "0") .. '"/><w:snapToGrid w:val="0"/>' ..
-        '<w:rPr><w:sz w:val="2"/><w:szCs w:val="2"/></w:rPr></w:pPr></w:p>')
-    end
-    div.content:insert(1, separator(true))
-    div.content:insert(separator(false))
-    return div
+    return separate_authored_resource_tables(div)
+  end
+  if div.classes:includes("word-rich-resource-funding") then
+    return separate_authored_resource_tables(div)
   end
   -- Pandoc discards <aside>; the Word entry supplies this owned wrapper.
   -- Join only the short two-paragraph provenance, retaining every inline/link.
@@ -781,6 +864,7 @@ function Div(div)
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
+  if div.identifier == "q-required-resources" then div = keep_funding_metadata_leads(div) end
   if div.identifier == "q-required-resources" then return keep_rich_resource_leads(align_budget_cells(keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div))))) end
   if div.classes:includes("identifier-heading") then
     -- Q13 only: combine the existing distribution number and repository type.

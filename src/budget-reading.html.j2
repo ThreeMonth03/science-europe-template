@@ -72,15 +72,39 @@
   {%- else -%}{{ original }}{%- endif -%}
 {%- endmacro -%}
 
-{%- macro word_table(original, header, rows) -%}
+{%- macro funding_records(header, rows, metadataHeader, fundingLabel, word=false) -%}
+  {# A funding table must not be nested in the narrow third budget cell.
+     Keep each original fragment and ordinal; only its presentation changes. #}
+  {%- set pending = [] -%}
+  {%- for row in rows -%}
+    {%- if '<table' in row.funding -%}
+      {%- if pending -%}{{ funding_fallback(header, pending, word) }}{%- do pending.clear() -%}{%- endif -%}
+      <table class="{{ 'word' if word else 'pdf' }}-rich-funding-metadata" data-item-id="{{ row.id }}"><colgroup><col class="resource-purpose"><col class="resource-budget"></colgroup><thead><tr>{{ metadataHeader }}</tr></thead><tbody><tr data-item-id="{{ row.id }}"><td>{{ row.title }}</td><td>{{ row.budget }}</td></tr></tbody></table>
+      {%- if row.purpose|striptags|trim -%}
+        <div class="{{ 'word-rich-resource-purpose' if word else 'pdf-rich-funding-purpose' }}" data-item-id="{{ row.id }}">{{ row.purpose }}</div>
+      {%- endif -%}
+      <div class="{{ 'word-rich-resource-funding' if word else 'pdf-rich-funding-detail' }}" data-item-id="{{ row.id }}"><div class="answer-lead"><p><strong>{{ fundingLabel }}</strong></p></div>{{ row.funding }}</div>
+    {%- else -%}{%- do pending.append(row) -%}{%- endif -%}
+  {%- endfor -%}
+  {%- if pending -%}{{ funding_fallback(header, pending, word) }}{%- endif -%}
+{%- endmacro -%}
+
+{%- macro funding_fallback(header, rows, word) -%}
+  {%- set original -%}<table class="resource-table"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody>{% for row in rows %}{{ row.original }}{% endfor %}</tbody></table>{%- endset -%}
+  {{- word_table(original, header, rows) if word else render(original, header, rows) -}}
+{%- endmacro -%}
+
+{%- macro word_table(original, header, rows, metadataHeader='', fundingLabel='') -%}
   {# Word readers mispaginate tables nested in a resource row. Keep authored
      table purposes as standalone blocks; reuse all captured text unchanged.
      Ordinary purposes retain their existing table and pagination path. #}
-  {%- set selection = namespace(table=false) -%}
+  {%- set selection = namespace(table=false, funding=false) -%}
   {%- for row in rows -%}
     {%- set selection.table = selection.table or '<table' in row.purpose -%}
+    {%- set selection.funding = selection.funding or '<table' in row.funding -%}
   {%- endfor -%}
-  {%- if not selection.table -%}{{ short_table(original, rows, true) }}
+  {%- if selection.funding and metadataHeader and fundingLabel -%}{{ funding_records(header, rows, metadataHeader, fundingLabel, true) }}
+  {%- elif not selection.table -%}{{ short_table(original, rows, true) }}
   {%- else -%}
     {%- for row in rows -%}
       <table class="resource-table word-rich-budget-metadata"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody><tr data-item-id="{{ row.id }}"><td>{{ row.title }}</td><td>{{ row.budget }}</td><td>{{ row.funding }}</td></tr></tbody></table>
@@ -99,15 +123,17 @@
 {%- endif -%}
 {%- endmacro -%}
 
-{%- macro render(original, header, rows) -%}
-  {%- set selection = namespace(any=false, eligible=[]) -%}
+{%- macro render(original, header, rows, metadataHeader='', fundingLabel='') -%}
+  {%- set selection = namespace(any=false, eligible=[], funding=false) -%}
   {%- for row in rows -%}
     {%- set result = namespace(long=false) -%}
     {{ classify(row, result) }}
     {%- do selection.eligible.append(result.long) -%}
     {%- set selection.any = selection.any or result.long -%}
+    {%- set selection.funding = selection.funding or '<table' in row.funding -%}
   {%- endfor -%}
-  {%- if not selection.any -%}
+  {%- if selection.funding and metadataHeader and fundingLabel -%}{{ funding_records(header, rows, metadataHeader, fundingLabel) }}
+  {%- elif not selection.any -%}
     {%- import 'src/pdf/short-resource-rows.html.j2' as shortRows -%}
     {{- short_table(shortRows.table(original, rows), rows) -}}
   {%- else -%}
