@@ -8,21 +8,22 @@ The template renders questionnaire replies; no runtime LLM invents missing answe
 Review the complete document and resolve missing information before using it.
 PDF/Word pagination and Markdown-table support depend on the target renderer.
 
-Version 0.3.38 adds an experimental submission-preview profile alongside internal
-review outputs. Only the documented Q3/Q5/Q11, funding-overview and mixed quality
-notices are optional in this first pilot. Other notices/placeholders remain.
-This is NOT an approved, comprehensive or ready-to-submit output. Selecting a
-profile does not complete answers or approve the DMP. Existing format UUIDs are
-retained; the new submission formats share the same questionnaire logic.
+Choose the HTML, PDF or Word format labeled **Internal review** while preparing
+the plan. These outputs show template-generated missing-answer and review notices.
+Use the formats labeled **Submission preview (pilot)** to omit those internal
+notices. Both profiles share the same questionnaire logic and retain filled answers
+from applicable questionnaire branches; inactive follow-up answers are not included.
 
-Version 0.3.39 adds a bounded Word-only Q11 reading unit: a short dataset name
-becomes a bold lead joined to its short fixed preservation summary. Question
-headings and link anchors are retained. Long, missing or authored summaries
-keep their existing structure. PDF and the scope of optional notices do not change.
+Submission previews retain all fifteen question headings, with compact spacing
+for unanswered questions. Unnamed records with presentable content retain neutral
+labels based on their original list positions. The preview does not fill missing
+answers, correct irrelevant free-text answers or approve the DMP. Review the
+content for completeness and accuracy before submission.
 
-Version 0.3.40 adds a PDF-entry-only keep hint for a single, short resource plan
-with one or two simple budget rows. Long, missing, complex and unknown structures
-retain their existing pagination. This changes no answers or optional notices.
+The profile names retain their experimental labels. Neither selecting a profile
+nor successfully generating a document guarantees funder approval or compatibility
+with every PDF/Word renderer. Version history and bounded layout changes are
+documented in the source repository, rather than in this package description.
 
 Build reviewed bilingual packages through the companion Chinese repository.
 The bare upstream packaging command does not prepare the reviewed bilingual fonts
