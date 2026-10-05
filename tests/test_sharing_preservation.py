@@ -9,6 +9,7 @@ from generate_sharing_fixtures import sharing_cases
 from generate_storage_fixtures import storage_cases
 from generate_pilot_fixtures import IDS, path
 from check_repository_profiles import preservation_schema
+from check_publication_reading import DATASETS, publication_replies
 
 Q10 = 'src/questions/10-share-restrictions.html.j2'
 Q11 = 'src/questions/11-data-preservation.html.j2'
@@ -31,6 +32,76 @@ def matrix_cases():
 
 
 class SharingPreservationTests(unittest.TestCase):
+    def test_identifier_siblings_survive_unpublished_or_missing_decision(self):
+        for publication, profile in itertools.product(['Yes', 'No', None, 'obsolete'], ['review', 'submission']):
+            replies = publication_replies(publication, None, None, name=None)
+            listing = path(DATASETS, 'dataset-a', 'producedDataIdentifiersQUuid')
+            ark = path(listing, 'type-only', 'dataIdentifierTypeQUuid')
+            value = path(listing, 'with-value', 'dataIdentifierIdentifierQUuid')
+            distribution = path(DATASETS, 'dataset-a', 'isPublishedDataQUuid', 'isPublishedDataYesAUuid', 'publishedDistrosQUuid')
+            replies.update({listing: ['type-only', 'with-value'], ark: IDS['dataIdentifierTypeArkAUuid'],
+                path(listing, 'type-only', 'dataIdentifierIdentifierQUuid'): ' \n ',
+                path(ark, 'dataIdentifierTypeOtherAUuid', 'dataIdentifierTypeOtherTypeQUuid'): 'Stale custom type',
+                path(listing, 'with-value', 'dataIdentifierTypeQUuid'): IDS['dataIdentifierTypeDoiAUuid'],
+                value: '10.1234/retained',
+                path(listing, 'deleted', 'dataIdentifierIdentifierQUuid'): 'Stale deleted identifier',
+                distribution: ['distro-a'],
+                path(distribution, 'distro-a', 'publishedDistroShareQUuid'): IDS['publishedDistroShareOpenAUuid']})
+            with self.subTest(publication=publication, profile=profile):
+                soup = BeautifulSoup(render_question(Q10, replies, output_profile=profile), 'html.parser')
+                dataset = soup.select_one('.dataset-section[data-item-id="dataset-a"]')
+                entries = dataset.select(':scope > ul > li')
+                self.assertEqual(['ARK', 'DOI: 10.1234/retained'], [entry.get_text() for entry in entries])
+                self.assertFalse(entries[0].select('strong, a, .data-gap'))
+                self.assertEqual('https://doi.org/10.1234/retained', entries[1].a['href'])
+                self.assertIn('Identifier information for this dataset:', dataset.get_text())
+                self.assertNotIn('has the following identifiers', dataset.get_text())
+                self.assertNotIn('Stale', dataset.get_text())
+                self.assertEqual(publication == 'Yes', bool(dataset.select('.distribution-section')))
+                if profile == 'submission':
+                    self.assertTrue(dataset.select_one('.dataset-label[data-list-index="1"]'))
+                    self.assertFalse(soup.select('.data-gap, .data-review'))
+            replies[DATASETS] = []
+            soup = BeautifulSoup(render_question(Q10, replies, output_profile=profile), 'html.parser')
+            self.assertFalse(soup.select('.dataset-section'))
+            self.assertNotIn('10.1234/retained', soup.get_text())
+
+    def test_authenticated_access_does_not_invent_sharing_agreement(self):
+        parent = path('accessCUuid', 'openImmediatelyQUuid')
+        reason = path(parent, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
+        auth = path(reason, 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid')
+        who = path(auth, 'legalReasonsAuthenticatedYesAUuid', 'legalReasonsAuthorizeQUuid')
+        base = {parent: IDS['openImmediatelyNoAUuid'], reason: IDS['notOpenLegalReasonsYesAUuid'],
+                auth: IDS['legalReasonsAuthenticatedYesAUuid']}
+        choices = {'Member': 'People can apply to one of the project members.',
+                   'NewCommittee': 'People can apply to the data access committee that we will set up.',
+                   'OldCommittee': 'People can apply to the following data access committee:',
+                   'Other': 'For the authorization of potential users, we will make special arrangements:'}
+        for choice, profile in itertools.product([*choices, None], ['review', 'submission']):
+            replies = dict(base)
+            for detail in ('OldCommittee', 'Other'):
+                replies[path(who, 'legalReasonsAuthorize'+detail+'AUuid', 'legalReasonsAuthorize'+detail+'QUuid')] = AUTHORED
+            if choice:
+                replies[who] = IDS['legalReasonsAuthorize'+choice+'AUuid']
+            soup = BeautifulSoup(render_question(Q10, replies, output_profile=profile), 'html.parser')
+            lead = soup.select_one('[data-fact-id="authenticated-access"]')
+            text = ' '.join(lead.get_text().split())
+            self.assertEqual('We will permit authenticated access to the data.' +
+                             (' ' + choices[choice] if choice else ''), text)
+            self.assertNotIn('sharing agreement', text)
+            detail = soup.select_one('.authorization-details')
+            self.assertEqual(choice in ('OldCommittee', 'Other'), bool(detail))
+            if detail:
+                self.assertEqual(AUTHORED, detail.decode_contents())
+            self.assertFalse(soup.select('p p, p div, p ul, p table'))
+        for key in (parent, reason, auth):
+            replies = {**base, who: IDS['legalReasonsAuthorizeOtherAUuid'],
+                       path(who, 'legalReasonsAuthorizeOtherAUuid', 'legalReasonsAuthorizeOtherQUuid'): AUTHORED}
+            del replies[key]
+            soup = BeautifulSoup(render_question(Q10, replies, output_profile='submission'), 'html.parser')
+            self.assertFalse(soup.select('[data-fact-id="authenticated-access"], .authorization-details'))
+            self.assertNotIn('Access-2027-12-31.csv', soup.get_text())
+
     def test_date_hint_is_scoped_and_does_not_rewrite_free_text(self):
         env = Environment(loader=FileSystemLoader(ROOT), extensions=['jinja2.ext.do'])
         env.filters['markdown'] = lambda v: v

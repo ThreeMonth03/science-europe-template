@@ -3,6 +3,7 @@
 
   <div class="answer">
   {% set answerContent %}
+    {%- import 'src/active-answer.j2' as activeAnswer with context -%}
     {% include 'src/project-file-naming.html.j2' %}
 
     {# Metadata #}
@@ -214,10 +215,16 @@
           <p>We will use a filesystem with files and folders.</p>
         {%- endif -%}
         {# Versioning #}
-        {%- set scDocumentVersioningPath = [scFSysPrefix, uuids.scDocumentVersioningQUuid]|reply_path -%}
-        {%- set scDocumentVersioningAUuid = repliesMap[scDocumentVersioningPath]|reply_str_value -%}
+        {%- set scDocumentVersioningParts = [uuids.processingCUuid, uuids.storageConvQUuid, uuids.storageConvExploreAUuid, uuids.storageConvFSysQUuid, uuids.storageConvFSysYesAUuid, uuids.scDocumentVersioningQUuid] -%}
+        {%- set scDocumentVersioningPath = activeAnswer.path(scDocumentVersioningParts, 'OptionsQuestion') if km is defined else scDocumentVersioningParts|reply_path -%}
+        {%- set scDocumentVersioningAUuid = repliesMap[scDocumentVersioningPath]|reply_str_value if scDocumentVersioningPath else '' -%}
+        {%- if km is defined and scDocumentVersioningPath and (scDocumentVersioningAUuid not in km.entities.questions[uuids.scDocumentVersioningQUuid].answerUuids or scDocumentVersioningAUuid not in km.entities.answers) -%}
+          {%- set scDocumentVersioningAUuid = '' -%}
+        {%- endif -%}
         {%- if scDocumentVersioningAUuid == uuids.scDocumentVersioningYesAUuid %}
           <p>We document how we manage file versioning for files and folders.</p>
+        {%- elif scDocumentVersioningAUuid == uuids.scDocumentVersioningNoAUuid %}
+          <p>We have not documented how we manage file versioning for files and folders.</p>
         {%- endif -%}
         {# Other appointments #}
         {%- set scFSysAppointmentsPath = [scFSysPrefix, uuids.scFSysAppointmentsQUuid]|reply_path -%}

@@ -52,16 +52,43 @@ def cases():
         ('long-permission', fixture(permission='p'*321), 0), ('thirty-three', fixture(count=33), 0),
         ('empty-name', fixture(label=''), 0), ('empty-permission', fixture(permission=''), 0),
         ('hard-break', fixture(label='First<br>Second'), 0),
-        ('authored-paragraphs', fixture(permission='<p>First.</p><p>Second.</p>'), 0),
-        ('nested-list', fixture(extra='<ul><li>Original.</li></ul>'), 0),
-        ('nested-table', fixture(extra='<table><tr><td>Original.</td></tr></table>'), 0),
+        # Keep only label -> first paragraph; the oracle preserves every later
+        # authored paragraph/list/table AST without modification.
+        ('authored-paragraphs', fixture(permission='<p>First.</p><p>Second.</p>'), 2),
+        ('nested-list', fixture(extra='<ul><li>Original.</li></ul>'), 2),
+        ('nested-table', fixture(extra='<table><tr><td>Original.</td></tr></table>'), 2),
         ('image', fixture(label='<img src="never-fetch.png" alt="Original">'), 0),
         ('link', fixture(label='<a href="https://example.org/dataset">Original</a>'), 0),
         ('strong', fixture(label='<strong>Original</strong>'), 0),
         ('attributed-label', fixture().replace('<li><div>', '<li><div data-author="original">'), 0),
         ('nested-authored-list', fixture().replace('<ul>', '<div class="answer-detail"><ul>', 1).replace('</ul></div></div>', '</ul></div></div></div>'), 0),
         ('other-question', fixture(qid='q-data-preservation'), 0),
-        ('mixed', '<div id="q-copyright-ipr"><div class="answer"><ul><li><div>Short</div>Permission.</li><li><div>Long</div><p>First.</p><p>Second.</p></li></ul></div></div>', 1),
+        ('mixed', '<div id="q-copyright-ipr"><div class="answer"><ul><li><div>Short</div>Permission.</li><li><div>Long</div><p>First.</p><p>Second.</p></li></ul></div></div>', 2),
+    ]
+
+
+def neutral_label_cases():
+    label = '<span class="dataset-label" data-list-kind="non-reference" data-list-index="1">Non-reference dataset 1</span>'
+    return [
+        ('neutral', fixture(label=label), 2),
+        ('neutral-reference', fixture(label=label.replace('non-reference', 'reference').replace('Non-reference', 'Reference')), 2),
+        ('neutral-chinese', fixture(label=label.replace('Non-reference dataset 1', '非參考資料集 1')), 2),
+        ('neutral-id', fixture(label=label.replace('<span ', '<span id="authored" ')), 0),
+        ('neutral-extra-class', fixture(label=label.replace('class="dataset-label"', 'class="dataset-label authored"')), 0),
+        ('neutral-extra-attribute', fixture(label=label.replace('<span ', '<span data-author="original" ')), 0),
+        ('neutral-missing-attribute', fixture(label=label.replace(' data-list-index="1"', '')), 0),
+        ('neutral-other-kind', fixture(label=label.replace('non-reference', 'produced')), 0),
+        ('neutral-zero-index', fixture(label=label.replace('data-list-index="1"', 'data-list-index="0"')), 0),
+        ('neutral-negative-index', fixture(label=label.replace('data-list-index="1"', 'data-list-index="-1"')), 0),
+        ('neutral-text-index', fixture(label=label.replace('data-list-index="1"', 'data-list-index="1a"')), 0),
+        ('neutral-leading-zero-index', fixture(label=label.replace('data-list-index="1"', 'data-list-index="01"')), 0),
+        ('neutral-link', fixture(label=label.replace('Non-reference dataset 1', '<a href="https://example.org/dataset">Original</a>')), 0),
+        ('neutral-long-label', fixture(label=label.replace('Non-reference dataset 1', 'x'*81)), 0),
+        ('arbitrary-span', fixture(label='<span class="authored">Original</span>'), 0),
+        ('neutral-permission-span', fixture(permission=label), 0),
+        ('neutral-long-permission', fixture(label=label, permission='p'*321), 0),
+        ('neutral-authored-tail', fixture(label=label, extra='<div class="answer-detail"><p>'+'Original. '*100+'</p></div>'), 2),
+        ('neutral-nested-authored-list', fixture(label=label).replace('<ul>', '<div class="answer-detail"><ul>', 1).replace('</ul></div></div>', '</ul></div></div></div>'), 0),
     ]
 
 
@@ -109,7 +136,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__); p.add_argument('--output', type=Path, required=True)
     a = p.parse_args(); assert not a.output.exists()
     source = ROOT/'src/word/pilot.lua'; lua = source.read_text(); assert lua.count(HANDLER) == 1
-    matrix = cases(); html = ''.join('<div id="'+name+'"><h2>CASE: '+name+'</h2>'+body+'</div>' for name, body, _ in matrix)
+    matrix = cases() + neutral_label_cases(); html = ''.join('<div id="'+name+'"><h2>CASE: '+name+'</h2>'+body+'</div>' for name, body, _ in matrix)
     results = []
     for variant in [lua.replace(HANDLER, ''), lua]:
         raw = subprocess.check_output(['docker', 'run', '--rm', '--network', 'none', '-i', '--entrypoint', 'python', IMAGE, '-c', RUNNER],

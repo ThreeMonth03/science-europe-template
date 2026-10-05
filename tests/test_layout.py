@@ -96,7 +96,7 @@ print(json.dumps(results))
              'The following conditions apply to the reference and non-reference datasets that we reuse:',
              '此計畫再利用的參考及非參考資料集須遵守以下條件：'),
             ('q-share-restrictions', '10-share-restrictions',
-             'The dataset has the following identifiers:', '此資料集具有以下識別碼：'),
+             'Identifier information for this dataset:', '此資料集的識別碼資訊：'),
             ('q-share-restrictions', '10-share-restrictions',
              'References to other datasets:', '其他資料集的參照資訊：'),
         ]
@@ -235,7 +235,7 @@ print(json.dumps(results))
                 old_style = oldp.find('w:pPr/w:pStyle',ns)
                 if old_style is not None:
                     self.assertEqual(old_style.get('{'+ns['w']+'}val'),'FirstParagraph')
-                self.assertIn('A data sharing agreement will be required.', ''.join(newp.itertext()))
+                self.assertIn('We will permit authenticated access to the data.', ''.join(newp.itertext()))
                 prop = style.getparent()
                 if old_style is None: prop.remove(style)
                 else: style.set('{'+ns['w']+'}val','FirstParagraph')

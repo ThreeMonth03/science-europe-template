@@ -117,7 +117,7 @@ def check(root, language="en"):
                 assert lead.get_text().strip().endswith('.' if language == 'en' else '。')
             if language == 'en' and choice == 'OldCommittee' and not value.strip():
                 lead = q10.select_one('[data-fact-id="authenticated-access"]')
-                assert 'required. People can apply' in ' '.join(lead.get_text().split())
+                assert 'We will permit authenticated access to the data. People can apply to an existing data access committee.' == ' '.join(lead.get_text().split())
             if choice == 'Other':
                 if value.strip():
                     for p in BeautifulSoup(value, 'html.parser').select('p'): assert str(p) in str(q8)

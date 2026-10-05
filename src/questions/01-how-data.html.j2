@@ -4,6 +4,7 @@
   <div class="answer">
   {%- import 'src/reuse-rightsholder.html.j2' as reuseRightsholder with context -%}
   {%- import 'src/nonreuse.html.j2' as nonreuse with context -%}
+  {%- import 'src/active-answer.j2' as activeAnswer with context -%}
   
   {%- set measuredPath = [uuids.creatingCUuid, uuids.measuredQUuid]|reply_path -%}
   {%- set measuredAUuid = repliesMap[measuredPath]|reply_str_value -%}
@@ -368,8 +369,12 @@
     {%- if dataCompReadReply == uuids.dataCompReadYesAUuid -%}
       {%- set dataCompReadItself = [dataCompRead, uuids.dataCompReadYesAUuid, uuids.dataCompReadItselfQUuid]|reply_path -%}
       {%- set dataCompReadItselfReply = repliesMap[dataCompReadItself]|reply_str_value -%}
-      {%- set dataCompReadOthers = [dataCompRead, uuids.dataCompReadYesAUuid, uuids.dataCompReadOthersQUuid]|reply_path -%}
-      {%- set dataCompReadOthersReply = repliesMap[dataCompReadOthers]|reply_str_value -%}
+      {%- set dataCompReadOthersParts = [uuids.reusingCUuid, uuids.preexistingQUuid, uuids.preexistingYesAUuid, uuids.dataCompReadQUuid, uuids.dataCompReadYesAUuid, uuids.dataCompReadOthersQUuid] -%}
+      {%- set dataCompReadOthers = activeAnswer.path(dataCompReadOthersParts, 'OptionsQuestion') if km is defined else dataCompReadOthersParts|reply_path -%}
+      {%- set dataCompReadOthersReply = repliesMap[dataCompReadOthers]|reply_str_value if dataCompReadOthers else '' -%}
+      {%- if km is defined and dataCompReadOthers and (dataCompReadOthersReply not in km.entities.questions[uuids.dataCompReadOthersQUuid].answerUuids or dataCompReadOthersReply not in km.entities.answers) -%}
+        {%- set dataCompReadOthersReply = '' -%}
+      {%- endif -%}
       <p>
       {%- if dataCompReadItselfReply == uuids.dataCompReadItselfYesAUuid -%}
         Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others through a standard repository.
@@ -396,6 +401,8 @@
         {%- else -%}
           {{+" "}}We will provide others with standardized, machine-readable metadata.
         {%- endif -%}
+      {%- elif dataCompReadOthersReply == uuids.dataCompReadOthersNoAUuid -%}
+        {{+" "}}We will not provide others with standardized, machine-readable metadata.
       {%- endif -%}
       </p>
     {%- endif -%}

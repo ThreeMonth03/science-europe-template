@@ -28,7 +28,7 @@ class Q8WordProbeTests(unittest.TestCase):
 
     def test_matrix_has_bounded_and_rejected_shapes(self):
         rows = cases(); self.assertEqual(26, len(rows))
-        self.assertEqual(10, sum(count > 0 for _, _, count in rows))
+        self.assertEqual(13, sum(count > 0 for _, _, count in rows))
         self.assertEqual(len(rows), len({name for name, _, _ in rows}))
 
     def test_docx_oracle_rejects_text_or_unrelated_style_change(self):

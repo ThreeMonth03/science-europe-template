@@ -18,8 +18,7 @@
             {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
             {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
             {% include 'src/publication-summary.html.j2' %}
-            {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
-                {# Identifiers #}
+                {# Identifiers are produced-data siblings, not publication follow-ups. #}
                 {% set identifiersPath = [pathPrefix, uuids.producedDataIdentifiersQUuid]|reply_path -%}
                 {%- set identifiersItems = repliesMap[identifiersPath]|reply_items -%}
                 {%- set identifierEntries -%}
@@ -50,10 +49,11 @@
                     {%- endfor -%}
                 {%- endset -%}
                 {%- if identifierEntries|trim -%}
-                    <div class="answer-lead"><p>The dataset has the following identifiers:</p></div>
+                    <div class="answer-lead"><p>Identifier information for this dataset:</p></div>
                     <ul>{{ identifierEntries }}</ul>
                 {%- endif -%}
-                {# Distributions #}
+            {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
+                {# Distributions remain publication follow-ups. #}
                 {% set distrosPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedDistrosQUuid]|reply_path -%}
                 {%- set distrosItems = repliesMap[distrosPath]|reply_items -%}
                 {%- if distrosItems|length > 0 -%}
@@ -289,7 +289,7 @@
         {%- set hasAuthorizationDetails = authorizationDetails|trim != '' -%}
         {% set authorizationLead %}
         <p data-fact-id="authenticated-access">
-          A data sharing agreement will be required.
+          We will permit authenticated access to the data.
           {%- if legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeMemberAUuid %}
             People can apply to one of the project members.
           {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeNewCommitteeAUuid %}

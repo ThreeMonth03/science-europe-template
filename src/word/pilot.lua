@@ -124,6 +124,18 @@ local function keep_q8_reference_labels(div)
     end
     return width(block) > 0
   end
+  local function label_text(block)
+    if plain(block) then return true end
+    if (block.t ~= "Para" and block.t ~= "Plain") or #block.content ~= 1 or block.content[1].t ~= "Span" then return false end
+    local span = block.content[1]
+    if span.identifier ~= "" or #span.classes ~= 1 or span.classes[1] ~= "dataset-label" or #span.attributes ~= 2 then return false end
+    -- Pandoc's HTML reader removes the data- prefix from these two attributes.
+    local kind, index = span.attributes["list-kind"], span.attributes["list-index"]
+    if (kind ~= "reference" and kind ~= "non-reference") or not index or not index:match("^[1-9]%d*$") then return false end
+    -- Only the generated neutral label may contain this Span. Permissions and
+    -- authored nested blocks retain the plain-only predicate above.
+    return plain(pandoc.Plain(span.content))
+  end
   for _, answer in ipairs(div.content) do
     if answer.t == "Div" and answer.classes:includes("answer") then
       for _, list in ipairs(answer.content) do
@@ -140,7 +152,7 @@ local function keep_q8_reference_labels(div)
                 linked_permission = true
               end
               if label.t == "Div" and label.identifier == "" and #label.classes == 0 and #label.attributes == 0 and
-                 #label.content == 1 and plain(label.content[1]) and width(label) <= 80 and
+                 #label.content == 1 and label_text(label.content[1]) and width(label) <= 80 and
                  plain(permission) and width(permission) <= 320 then
                 -- The generic short-list rule linked this permission to the
                 -- next item. Q8 needs only label -> permission; otherwise all
