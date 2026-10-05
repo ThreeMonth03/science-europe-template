@@ -67,6 +67,62 @@ class PersonalDataFollowupTests(unittest.TestCase):
         self.assertNotIn('consent-based:', ethical)
         self.assertNotIn('not subject to ethical legislation', ethical)
 
+    def test_empty_safeguards_keep_original_question_without_submission_subheading(self):
+        for blank in (None, '', ' \t\n\u3000'):
+            values = replies('personal-followups-empty')
+            for field in ('identifiability', 'additional', 'transfer'):
+                if blank is not None:
+                    values[PATHS[field]] = blank if field == 'additional' else ''
+            for profile in ('review', 'submission'):
+                with self.subTest(blank=blank, profile=profile):
+                    soup = BeautifulSoup(render_question(QUESTION, values, output_profile=profile), 'html.parser')
+                    self.assertTrue(soup.select_one('#q-personal-data > h3').get_text().startswith('7. '))
+                    heading = soup.find('h4', string='Technical and procedural measures')
+                    if profile == 'submission':
+                        self.assertIsNone(heading)
+                        self.assertFalse(soup.select('.data-gap, .data-review, .empty-value'))
+                    else:
+                        self.assertIsNotNone(heading)
+                        self.assertEqual(4, len(soup.select('[data-status="missing"]')))
+
+    def test_single_safeguard_fact_keeps_subheading_and_known_answer(self):
+        facts = [('identifiability', 'cpersGdprSafeguardsIdentifAnonymAUuid', 'The stored data are irrevocably anonymized.'),
+                 ('identifiability', 'cpersGdprSafeguardsIdentifPseudoAUuid', 'The stored data are pseudonymized.'),
+                 ('identifiability', 'cpersGdprSafeguardsIdentifIdentifiableAUuid', 'The stored data are identifiable.'),
+                 ('transfer', 'cpersGdprSafeguardsTransferNoAUuid', 'We do not plan to transfer data outside the EU/EEA.'),
+                 ('transfer', 'cpersGdprSafeguardsTransferYesAUuid', 'We plan to transfer data outside the EU/EEA.')]
+        for field, choice, expected in facts:
+            values = replies('personal-followups-empty')
+            values[PATHS[field]] = UUIDS[choice]
+            if choice.endswith('NoAUuid'):
+                values[PATHS['measures']] = 'STALE-MEASURES'
+            for profile in ('review', 'submission'):
+                with self.subTest(choice=choice, profile=profile):
+                    soup = BeautifulSoup(render_question(QUESTION, values, output_profile=profile), 'html.parser')
+                    self.assertIsNotNone(soup.find('h4', string='Technical and procedural measures'))
+                    self.assertIn(expected, soup.get_text())
+                    self.assertNotIn('STALE-', soup.get_text())
+
+    def test_media_and_authored_safeguards_survive_unknown_siblings_not_inactive_parents(self):
+        for body, tags in [('<p>Original.</p><ul><li>Keep order.</li></ul>', ['p', 'ul']),
+                           ('<IMG src="https://example.org/measures.png">', ['img']),
+                           ('<table><tr><td></td></tr></table>', ['table'])]:
+            values = replies('personal-followups-empty')
+            values[PATHS['additional']] = body
+            values[PATHS['identifiability']] = values[PATHS['transfer']] = 'UNKNOWN-CHOICE'
+            for profile in ('review', 'submission'):
+                with self.subTest(body=body, profile=profile):
+                    soup = BeautifulSoup(render_question(QUESTION, values, output_profile=profile), 'html.parser')
+                    self.assertIsNotNone(soup.find('h4', string='Technical and procedural measures'))
+                    detail = soup.select_one('[data-fact-id="personal-data-additional-safeguards"][data-status="complete"]')
+                    self.assertEqual(tags, [n.name for n in detail.find_all(recursive=False)])
+                    for parent in ('parent', 'gdpr', 'safeguards'):
+                        inactive = dict(values)
+                        inactive[PATHS[parent]] = ''
+                        hidden = BeautifulSoup(render_question(QUESTION, inactive, output_profile=profile), 'html.parser')
+                        self.assertIsNone(hidden.select_one('[data-fact-id="personal-data-additional-safeguards"]'))
+                        self.assertIsNone(hidden.find('h4', string='Technical and procedural measures'))
+
     def test_transfer_yes_keeps_intent_when_measures_missing(self):
         values = replies('personal-transfer-missing')
         self.assertEqual({'personal-data-legal-basis', 'personal-data-transfer-measures'}, self.facts(values))

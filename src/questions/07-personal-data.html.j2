@@ -46,7 +46,8 @@
 
                 {%- if personalDataSafeguardReply == uuids.cpersGdprSafeguardsAUuid -%}
 
-                    <h4>Technical and procedural measures</h4>
+                    {% set personalDataSafeguardsHeading %}<h4>Technical and procedural measures</h4>{% endset %}
+                    {% set personalDataSafeguardsContent %}
 
                     {%- set personalDataSafeguardLvlIdentifQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardsIdentifQUuid]|reply_path -%}
                     {%- set personalDataSafeguardLvlIdentifReply = repliesMap[personalDataSafeguardLvlIdentifQUuid]|reply_str_value -%}
@@ -88,6 +89,11 @@
                     {%- elif not personalDataSafeguardTransferReply -%}
                         {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer" data-status="missing"><strong>Information not provided:</strong> whether data will be transferred outside the EU/EEA.</p>{% endif %}
                     {%- endif -%}
+                    {% endset %}
+                    {% if personalDataSafeguardsContent|striptags|trim or '<img' in personalDataSafeguardsContent|lower or '<table' in personalDataSafeguardsContent|lower %}
+                      {{ personalDataSafeguardsHeading }}
+                      {{ personalDataSafeguardsContent }}
+                    {% endif %}
                 {%- elif not personalDataSafeguardReply -%}
                     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-safeguards" data-status="missing"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>{% endif %}
                 {%- endif -%}
