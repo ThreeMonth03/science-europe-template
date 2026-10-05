@@ -4,6 +4,35 @@
 {%- macro require(ok) -%}
   {%- if not ok -%}{{ short_table_xml_contract_mismatch.raise_error() }}{%- endif -%}
 {%- endmacro -%}
+{# Independent Q15 authored-row contract. Lua has bounded each ordinary cell;
+   preserve its two paragraphs/cells exactly and keep only this one body row. #}
+{%- set authored_marker = '<!--DSW:SE:authored-resource-row:v1-->' -%}
+{%- if authored_marker in content -%}
+  {%- set authored_rows = content.split('<w:tr>') -%}
+  {{- require(authored_marker not in authored_rows[0]) -}}
+  {%- set content -%}
+    {{- authored_rows[0]|safe -}}
+    {%- for chunk in authored_rows[1:] -%}
+      <w:tr>
+      {%- if authored_marker not in chunk -%}{{- chunk|safe -}}{%- else -%}
+        {%- set parts = chunk.split('</w:tr>', 1) -%}
+        {{- require(parts|length == 2 and parts[0].count(authored_marker) == 1 and authored_marker not in parts[1]) -}}
+        {%- set row = parts[0] -%}
+        {%- set prefix = row.split(authored_marker)[0] -%}
+        {{- require(row.startswith('<w:tc>') and prefix.count('<w:tc>') == 1 and '<w:p>' not in prefix and prefix.rstrip().endswith(('</w:tcPr>', '<w:tcPr />'))) -}}
+        {{- require(row.count('<w:tc>') == 2 and row.count('</w:tc>') == 2 and row.count('<w:p>') == 2) -}}
+        {{- require('<w:tbl' not in row and '<w:trPr' not in row and '<w:cantSplit' not in row and '<w:gridSpan' not in row and '<w:vMerge' not in row) -}}
+        {%- for cell in row.split('<w:tc>')[1:] -%}
+          {{- require(cell.split('</w:tc>', 1)[0].count('<w:p>') == 1) -}}
+        {%- endfor -%}
+        {%- for paragraphToken in row.split('<w:p')[1:] -%}
+          {{- require(paragraphToken.startswith('>') or paragraphToken.startswith('Pr>') or paragraphToken.startswith('Style ')) -}}
+        {%- endfor -%}
+        <w:trPr><w:cantSplit/></w:trPr>{{- row.replace(authored_marker, '', 1)|safe -}}</w:tr>{{- parts[1]|safe -}}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endset -%}
+{%- endif -%}
 {# Independent two-cell contract; never relax the historical three-cell marker.
    Only the scoped Lua metadata guard may emit this marker, not authored text. #}
 {%- set funding_marker = '<!--DSW:SE:funding-metadata-row:v1-->' -%}

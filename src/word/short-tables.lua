@@ -54,10 +54,90 @@ local function bounded(tbl)
   return rows
 end
 
+-- Q15 authored tables may be long, but an individually short two-cell row
+-- should not leave a blank row fragment on the next page. Keep no prose or
+-- neighbouring row with it; long/complex cells retain their original AST.
+local function keep_authored_resource_rows(div)
+  local marker = "<!--DSW:SE:authored-resource-row:v1-->"
+  local function owned_id(tbl)
+    if tbl.t ~= "Table" or tbl.identifier ~= "" or #tbl.bodies ~= 1 or #tbl.bodies[1].head ~= 0 or
+       #tbl.bodies[1].body ~= 1 or #tbl.foot.rows ~= 0 or #tbl.caption.long ~= 0 or tbl.caption.short ~= nil then return nil end
+    local row = tbl.bodies[1].body[1]
+    if row.identifier ~= "" or #row.classes ~= 0 or #row.attributes ~= 1 then return nil end
+    for _, cell in ipairs(row.cells) do
+      if cell.row_span ~= 1 or cell.col_span ~= 1 then return nil end
+    end
+    if #tbl.colspecs == 2 and #tbl.classes == 1 and #tbl.attributes == 1 and
+       #row.cells == 2 and tbl.classes:includes("word-rich-funding-metadata") and
+       row.attributes["item-id"] == tbl.attributes["item-id"] then
+      return tbl.attributes["item-id"]
+    end
+    if #tbl.colspecs == 3 and #tbl.classes == 2 and #tbl.attributes == 0 and
+       #row.cells == 3 and
+       tbl.classes:includes("resource-table") and tbl.classes:includes("word-rich-budget-metadata") then
+      return row.attributes["item-id"]
+    end
+    return nil
+  end
+  local function short_row(row)
+    if not empty_attr(row) or #row.cells ~= 2 then return false end
+    for _, cell in ipairs(row.cells) do
+      if not empty_attr(cell) or cell.row_span ~= 1 or cell.col_span ~= 1 or
+         #cell.contents ~= 1 or width(cell.contents) == 0 or width(cell.contents) > 80 then return false end
+      local block = cell.contents[1]
+      if (block.t ~= "Plain" and block.t ~= "Para") or not simple(block.content) then return false end
+      for token in pandoc.utils.stringify(block):gmatch("%S+") do
+        if token:match("^[%z\1-\127]+$") and #token > 40 then return false end
+      end
+    end
+    return true
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.identifier == "" and #answer.classes == 1 and
+       answer.classes:includes("answer") and #answer.attributes == 0 then
+      for _, project in ipairs(answer.content) do
+        if project.t == "Div" and project.identifier == "" and #project.classes == 1 and
+           project.classes:includes("project-resources") then
+          local ids = {}
+          for _, block in ipairs(project.content) do
+            local id = owned_id(block)
+            if id and id ~= "" then ids[id] = true end
+          end
+          for _, resource in ipairs(project.content) do
+            if resource.t == "Div" and resource.identifier == "" and #resource.classes == 1 and
+               (resource.classes:includes("word-rich-resource-purpose") or resource.classes:includes("word-rich-resource-funding")) and
+               #resource.attributes == 1 and ids[resource.attributes["item-id"]] then
+              for _, detail in ipairs(resource.content) do
+                local attrs_ok = detail.t == "Div" and (#detail.attributes == 0 or
+                  (resource.classes:includes("word-rich-resource-purpose") and #detail.attributes == 2 and
+                   detail.attributes["fact-id"] == "resource-justification" and detail.attributes["status"] == "complete"))
+                if detail.t == "Div" and detail.identifier == "" and attrs_ok and
+                   #detail.classes == 1 and detail.classes:includes("answer-detail") then
+                  for _, tbl in ipairs(detail.content) do
+                    if tbl.t == "Table" and empty_attr(tbl) and #tbl.colspecs == 2 and #tbl.head.rows <= 1 and
+                       #tbl.foot.rows == 0 and #tbl.bodies == 1 and #tbl.bodies[1].head == 0 and
+                       tbl.bodies[1].row_head_columns == 0 and #tbl.caption.long == 0 and tbl.caption.short == nil then
+                      for _, row in ipairs(tbl.bodies[1].body) do
+                        if short_row(row) then row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", marker)) end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
 local function question(div)
   if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end
   if div.classes:includes("answer") or div.classes:includes("answer-detail") or
      div.classes:includes("abstract") then return div, false end
+  if div.identifier == "q-required-resources" then return keep_authored_resource_rows(div), false end
   if div.identifier ~= "q-ethical-issues" then
     if div.classes:includes("question") then return div, false end
     return nil

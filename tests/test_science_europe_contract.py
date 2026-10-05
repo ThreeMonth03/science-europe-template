@@ -95,6 +95,12 @@ class ScienceEuropeContractTests(unittest.TestCase):
             return re.search(rf'set {name} = "([^"]+)"', source)[1]
         output = render_question("src/questions/01-how-data.html.j2", replies)
         self.assertEqual(1, output.count('class="shared-reference-policy"'))
+        from lxml import html as dom
+        shared = dom.fromstring(output).xpath('//div[@class="shared-reference-policy"]')[0]
+        self.assertEqual([node.tag for node in shared[:2]], ['p', 'div'])
+        self.assertEqual(shared[1].get('class'), 'answer-lead')
+        self.assertEqual(shared[1].text_content(), 'The following arrangements apply to all reference datasets selected for re-use above.')
+        self.assertNotEqual(shared[2].get('class'), 'answer-lead', 'Keep only the owned scope sentence, not the whole policy')
         self.assertEqual(1, output.count("We will retain a copy"))
         self.assertEqual(2, output.count('data-fact-id="reuse-purpose"'))
         self.assertEqual(2, output.count('data-fact-id="dataset-version"'))

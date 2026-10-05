@@ -8,6 +8,78 @@ from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_authored_resource_rows_keep_only_bounded_owned_cells(self):
+        import copy
+        from probe_budget_word import ROOT, IMAGE, RUNNER
+        source = (ROOT/'src/word/short-tables.lua').read_text()
+        call = 'return keep_authored_resource_rows(div), false'
+        self.assertEqual(source.count(call), 1)
+        marker = '<!--DSW:SE:authored-resource-row:v1-->'
+        data = ''.join('<tr><td>ROW-%02d</td><td>10</td></tr>' % n for n in range(1, 49))
+        def fixture(kind='purpose', rows=data, metadata=2):
+            meta = ('<table class="word-rich-funding-metadata" data-item-id="cost-1">' if metadata == 2 else '<table class="resource-table word-rich-budget-metadata">')
+            meta += '<thead><tr><th>Resource</th><th>Budget</th>'+('<th>Funding</th>' if metadata == 3 else '')+'</tr></thead><tbody><tr data-item-id="cost-1"><td><p><strong>Resource 1</strong></p></td><td>0 TWD</td>'+('<td>Institute.</td>' if metadata == 3 else '')+'</tr></tbody></table>'
+            table = '<table><thead><tr><th>Record</th><th>Retention</th></tr></thead><tbody>'+rows+'</tbody></table>'
+            attrs = ' data-fact-id="resource-justification" data-status="complete"' if kind == 'purpose' else ''
+            return '<div id="q-required-resources"><div class="answer"><h4 class="word-budget-heading">Budget</h4><div class="project-resources">'+meta+'<div class="word-rich-resource-'+kind+'" data-item-id="cost-1"><div class="answer-detail"'+attrs+'>'+table+'</div></div></div></div></div>'
+        base = fixture()
+        mixed = ''.join('<tr><td>'+value+'</td><td>10</td></tr>' for value in ['Short.', '中'*40, '中'*41, 'X'*41, 'long word '*12, 'A<br>B', '<ul><li>Keep list.</li></ul>', '<img src="unused.png" alt="Keep">'])
+        cases = [('purpose', base, 48), ('funding', fixture('funding'), 48), ('three-cell-metadata', fixture(metadata=3), 48), ('mixed', fixture(rows=mixed), 2)]
+        cases += [(name, value, 0) for name,value in [
+            ('other-question', base.replace('q-required-resources', 'q-other')),
+            ('unowned-project', base.replace('project-resources', 'unowned')),
+            ('unowned-wrapper', base.replace('word-rich-resource-purpose', 'unowned')),
+            ('wrong-id', base.replace('word-rich-resource-purpose" data-item-id="cost-1', 'word-rich-resource-purpose" data-item-id="cost-2')),
+            ('empty-id', base.replace('cost-1', '')),
+            ('no-metadata', base.replace('word-rich-funding-metadata', 'unowned-table')),
+            ('nested-detail', base.replace('<table><thead><tr><th>Record', '<div><table><thead><tr><th>Record').replace('</table></div></div>', '</table></div></div></div>')),
+            ('unknown-detail-attr', base.replace('data-status="complete"', 'data-status="complete" data-extra="unknown"')),
+            ('wrong-fact', base.replace('resource-justification', 'unowned-fact')),
+            ('empty-cell', fixture(rows='<tr><td></td><td>10</td></tr>')),
+            ('merged', fixture(rows='<tr><td colspan="2">Keep merged.</td></tr>')),
+            ('two-paragraphs', fixture(rows='<tr><td><p>First.</p><p>Second.</p></td><td>10</td></tr>')),
+            ('styled', fixture(rows='<tr><td><div custom-style="Other"><p>Keep.</p></div></td><td>10</td></tr>')),
+            ('nested-table', fixture(rows='<tr><td><table><tr><td>Keep nested.</td></tr></table></td><td>10</td></tr>')),
+        ]]
+        # Exercise the real filter order in one offline container; compare the
+        # complete AST, allowing only one generated marker per eligible row.
+        native = RUNNER.replace('f.write_text(p["lua"])', 'f.write_text(p["lua"]);g=Path(tmp)/"before.lua";g.write_text(p["pilot"])').replace('"--lua-filter="+str(f)', '"--lua-filter="+str(g),"--lua-filter="+str(f)')
+        runner = 'import contextlib,io,json,sys\np=json.load(sys.stdin)\nresults=[]\nfor source in p["sources"]:\n sys.stdin=io.StringIO(json.dumps(dict(html=p["html"],lua=source,pilot=p["pilot"])))\n out=io.StringIO()\n with contextlib.redirect_stdout(out): exec('+repr(native)+',{})\n results.append(json.loads(out.getvalue()))\nprint(json.dumps(results))'
+        payload = dict(html=''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases), pilot=(ROOT/'src/word/pilot.lua').read_text(), sources=[source.replace(call, 'return div, false'), source])
+        raw = subprocess.check_output(['docker','run','--rm','--network','none','--log-driver','none','-i','--entrypoint','python',IMAGE,'-c',runner], input=json.dumps(payload).encode(), timeout=180)
+        results = [{b['c'][0][0]:b for b in r['blocks']} for r in json.loads(raw)]
+        def remove_markers(node):
+            if isinstance(node, dict): return sum(remove_markers(value) for value in node.values())
+            if isinstance(node, list):
+                kept = [v for v in node if v != {'t':'RawBlock','c':['openxml',marker]}]
+                count = len(node)-len(kept); node[:] = kept
+                return count+sum(remove_markers(v) for v in node)
+            return 0
+        for name,_,count in cases:
+            with self.subTest(case=name):
+                before, after = [r['case-'+name] for r in results]
+                cleaned = copy.deepcopy(after)
+                self.assertEqual(remove_markers(cleaned), count)
+                self.assertEqual(cleaned, before, 'All authored rows, header, paragraph styles and separator keeps must remain exact')
+
+    def test_authored_resource_row_xml_contract_is_exact_and_fail_closed(self):
+        from jinja2 import Environment, FileSystemLoader, StrictUndefined, UndefinedError
+        root = Path(__file__).resolve().parents[1]
+        marker = '<!--DSW:SE:authored-resource-row:v1-->'
+        cell = lambda text: '<w:tc><w:tcPr /><w:p><w:pPr><w:pStyle w:val="Compact" /></w:pPr><w:r><w:t>'+text+'</w:t></w:r></w:p></w:tc>'
+        row = cell('ROW-01').replace('<w:tcPr />', '<w:tcPr />'+marker, 1)+cell('10')
+        header = '<w:tr><w:trPr><w:tblHeader/></w:trPr>'+cell('Record')+cell('Retention')+'</w:tr>'
+        before = '<w:document><w:body><w:tbl>'+header+'<w:tr>'+row+'</w:tr></w:tbl></w:body></w:document>'
+        expected = before.replace(marker, '').replace('<w:tr>'+row.replace(marker, ''), '<w:tr><w:trPr><w:cantSplit/></w:trPr>'+row.replace(marker, ''))
+        malformed = [before.replace(marker, marker*2), before.replace('</w:tr></w:tbl>', cell('Extra')+'</w:tr></w:tbl>'), before.replace('<w:tcPr />', '<w:tcPr><w:gridSpan w:val="2"/></w:tcPr>'), before.replace('<w:tcPr />', '<w:tcPr><w:vMerge/></w:tcPr>'), before.replace(marker+'<w:p>', marker+'<w:p><w:p/>'), before.replace(marker+'<w:p>', '<w:p>'+marker), before.replace('<w:tr>'+row, '<w:tr><w:trPr/>'+row), before.replace('<w:body>', '<w:body>'+marker)]
+        for escape in (False, True):
+            template = Environment(loader=FileSystemLoader(root),undefined=StrictUndefined,autoescape=escape).get_template('src/word/short-tables.xml')
+            self.assertEqual(template.render(content=before), expected)
+            self.assertEqual(template.render(content=before.replace(marker, '')), before.replace(marker, ''))
+            for value in malformed:
+                with self.subTest(autoescape=escape, source=value):
+                    with self.assertRaises(UndefinedError): template.render(content=value)
+
     def test_funding_metadata_ast_is_scoped_and_preserves_authored_blocks(self):
         import copy
         from probe_budget_word import ROOT, IMAGE, RUNNER
