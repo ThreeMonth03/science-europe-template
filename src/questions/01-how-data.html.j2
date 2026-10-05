@@ -411,7 +411,7 @@
       {%- set provenancePath = [metadataPath, uuids.metadataExploreAUuid, uuids.provenanceQUuid]|reply_path -%}
       {%- set provenanceAUuid = repliesMap[provenancePath]|reply_str_value -%}
       {%- if provenanceAUuid %}
-        <h4>Provenance</h4>
+        {% set provenanceContent %}
         {%- if provenanceAUuid == uuids.provenanceLabNotebooksAUuid -%}
           <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We will use lab notebooks to document the provenance of the data analysis.</p>
         {%- elif provenanceAUuid == uuids.provenanceELabNotebookAUuid -%}
@@ -429,6 +429,11 @@
             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance-detail" data-status="missing"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>{% endif %}
           {%- endif -%}
         {%- endif -%}
+        {% endset %}
+        {% if output_profile|default('review') != 'submission' or provenanceContent|striptags|trim or '<img' in provenanceContent|lower or '<table' in provenanceContent|lower %}
+          <h4>Provenance</h4>
+          {{ provenanceContent }}
+        {% endif %}
       {%- else -%}
         {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>{% endif %}
       {%- endif -%}

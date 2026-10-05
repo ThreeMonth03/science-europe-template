@@ -1,4 +1,4 @@
-"""Bounded many-budget PDF rows: source-byte, independent grammar and engine checks."""
+"""Bounded ordinary PDF budget rows: source-byte, grammar and engine checks."""
 import argparse
 import copy
 import hashlib
@@ -36,8 +36,16 @@ def cases():
     result = []
     def add(name, count=4, language='en', changes=None, selected=True):
         source, rows = fixture(count,language,changes)
-        result.append((name,source,rows,list(range(count)) if selected and 4<=count<=32 else []))
-    for n in [0,1,3,4,8,32,33]: add('rows-'+str(n),n)
+        result.append((name,source,rows,list(range(count)) if selected and 1<=count<=32 else []))
+    for n in [0,1,2,3,4,8,32,33]: add('rows-'+str(n),n)
+    for count in [1,2,3]:
+        for kind,purpose in [('long','<p>'+'Original text. '*150+'</p>'),
+                             ('empty',''), ('unknown','<p>Original<br>Text</p>')]:
+            source,rows=fixture(count)
+            prior=rows[-1]['original']; changed=rows[-1]
+            changed['original']=prior.replace(changed['purpose'],purpose,1)
+            changed['purpose']=purpose; source=source.replace(prior,changed['original'],1)
+            result.append((f'small-{count}-{kind}',source,rows,list(range(count-1))))
     add('chinese',language='zh')
     add('inline',changes={'purpose':'<p><strong>Exact.</strong> <em>Original.</em> <code>0.csv</code></p>'})
     add('authored-warning',changes={'purpose':'<p>尚待補充：保留原文。 Information not provided: keep.</p>'})
@@ -79,7 +87,7 @@ def check(root):
         for name,source,rows,selected in cases():
             for i,row in enumerate(rows):
                 if name.startswith('id-') or name=='duplicate-row': continue
-                assert eligible(row)==(i in selected or len(rows) not in range(4,33)),(name,i,'Independent grammar disagrees')
+                assert eligible(row)==(i in selected or len(rows) not in range(1,33)),(name,i,'Independent grammar disagrees')
             values=[{k:(Markup(v) if escaped and k!='id' else v) for k,v in r.items()} for r in rows]
             actual=str(helper.table(Markup(source) if escaped else source,values))
             expected=source
@@ -87,7 +95,7 @@ def check(root):
                 start='<tr data-item-id="'+rows[i]['id']+'">'
                 expected=expected.replace(start,start[:-1]+' class="pdf-short-resource-row" style="break-inside: avoid">',1)
             assert actual==expected,(name,escaped,'Unexpected source-byte change')
-            assert project_hints(actual)==source,(name,'Projection differs')
+            assert project_hints(actual,current_small=True)==source,(name,'Projection differs')
             results.append(dict(case=name,autoescape=escaped,selected=[rows[i]['id'] for i in selected],before=source,after=actual))
     return results
 
@@ -140,10 +148,11 @@ def main():
         contract_sha256=hashlib.sha256((ROOT/'scripts/short_resource_rows_contract.py').read_bytes()).hexdigest(),
         source_sha256={n:hashlib.sha256((a.source_dir/n).read_bytes()).hexdigest() for n in [HELPER,'src/budget-reading.html.j2','src/layout.css']},
         rows=[{k:v for k,v in r.items() if k not in ['before','after']} for r in rows],
-        limits=['PDF-only; ordinary 4..32-row tables with no expanded long row','Unsupported rows retain prior pagination','Engine fixtures are not native DSW acceptance'])
+        limits=['PDF-only; individual bounded rows in ordinary 1..32-row tables','Unsupported rows retain prior pagination','Engine fixtures are not native DSW acceptance'])
     if a.engine:
-        names=['rows-4','rows-8','chinese','missing-purpose','missing-budget','zero-missing-currency','missing-funding','missing-grant',
+        names=['rows-1','rows-2','rows-3','rows-4','rows-8','chinese','missing-purpose','missing-budget','zero-missing-currency','missing-funding','missing-grant',
                'short-and-long','long-purpose','purpose-cjk-240','purpose-units-240','funding-token-21','break']
+        names += [f'small-{count}-{kind}' for count in [1,2,3] for kind in ['long','empty','unknown']]
         payload=dict(css=prepared_css(a.source_dir),cases=[(r['case'],r['before'],r['after'],r['selected']) for r in rows if not r['autoescape'] and r['case'] in names])
         result=subprocess.run(['docker','run','--rm','--network','none','-i','--entrypoint','python',IMAGE,'-c',RUNNER],input=json.dumps(payload).encode(),capture_output=True)
         assert result.returncode==0,result.stderr.decode()

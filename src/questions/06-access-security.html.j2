@@ -159,12 +159,15 @@
     
 
     {# Access controls remain here; archival/backup facts are owned by Q5. #}
-    {%- set sharedWorkspacePrefix = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid, uuids.sharedWorkspaceYesAUuid]|reply_path -%}
+    {%- import 'src/active-answer.j2' as activeAnswer with context -%}
+    {%- set sharedWorkspacePath = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid]|reply_path -%}
+    {%- set sharedWorkspaceAUuid = repliesMap[sharedWorkspacePath]|reply_str_value -%}
 
     {# Access control in shared workspace #}
-    {%- set sharedAccessControlPath = [sharedWorkspacePrefix, uuids.sharedAccessControlQUuid]|reply_path -%}
-    {%- set sharedAccessControlAUuid = repliesMap[sharedAccessControlPath]|reply_str_value -%}
-    {%- if sharedAccessControlAUuid -%}
+    {%- set sharedAccessControlParts = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid, uuids.sharedWorkspaceYesAUuid, uuids.sharedAccessControlQUuid] -%}
+    {%- set sharedAccessControlPath = activeAnswer.path(sharedAccessControlParts, 'OptionsQuestion') if km is defined else sharedAccessControlParts|reply_path -%}
+    {%- set sharedAccessControlAUuid = repliesMap[sharedAccessControlPath]|reply_str_value if sharedAccessControlPath else '' -%}
+    {%- if sharedWorkspaceAUuid == uuids.sharedWorkspaceYesAUuid and sharedAccessControlAUuid in [uuids.sharedAccessControlMembersRWAUuid, uuids.sharedAccessControlInstituteRAUuid, uuids.sharedAccessControlMembersRAUuid, uuids.sharedAccessControlMembersRequestAUuid] and (km is not defined or (sharedAccessControlAUuid in km.entities.questions[uuids.sharedAccessControlQUuid].answerUuids and sharedAccessControlAUuid in km.entities.answers)) -%}
       <h4>Access to data during research</h4>
       {%- if sharedAccessControlAUuid == uuids.sharedAccessControlMembersRWAUuid -%}
         <p>All project members have read and write access to the data.</p>
@@ -203,7 +206,7 @@
       {% endset %}
       {% if policyEntries|trim %}
       <h4>Policies and Procedures</h4>
-      <p>We will use the following policies and procedures:</p>
+      <div class="answer-lead"><p>We will use the following policies and procedures:</p></div>
       <ul>{{ policyEntries }}</ul>
       {% endif %}
     {%- endif -%}

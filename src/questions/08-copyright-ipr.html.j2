@@ -41,21 +41,20 @@
 
       {%- if nReasons > 0 -%}
         <div class="answer-detail">
-        The data cannot be made fully open because
         {%- if nReasons == 1 -%}
           {%- if legalReasons %}
-            of legal restrictions.
+            The data cannot be made fully open because of legal restrictions.
           {%- elif businessReasonsPatents %}
-            of patent-related commercial considerations.
+            The data cannot be made fully open because of patent-related commercial considerations.
           {%- elif businessReasonsOther %}
-            of commercial considerations unrelated to patents{{  ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "." }}
+            The data cannot be made fully open because of commercial considerations unrelated to patents{{ ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "." }}
           {%- elif otherReasonsPapers %}
-            we intend to publish a paper first.
+            The data cannot be made fully open because papers need to be submitted first.
           {%- elif otherReasonsOther %}
-            of reasons other than publishing a paper{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "." }}
+            The data cannot be made fully open because of reasons other than publishing a paper{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "." }}
           {%- endif -%}
         {%- else %}
-          of:
+          <div class="answer-lead"><p>The data cannot be made fully open for the following reasons:</p></div>
           <ul>
             {%- if legalReasons %}
               <li>legal restrictions</li>
@@ -66,7 +65,7 @@
               <li>commercial considerations unrelated to patents{{ ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "" }}</li>
             {%- endif -%}
             {%- if otherReasonsPapers %}
-              <li>we intend to publish a paper first</li>
+              <li>papers need to be submitted first</li>
             {%- elif otherReasonsOther -%}
               <li>reasons other than publishing a paper{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "" }}</li>
             {%- endif -%}
@@ -106,7 +105,7 @@
             {%- set legalReasonsAuthenticatedOtherReply = repliesMap[legalReasonsAuthenticatedOtherQUuid]|reply_str_value -%}
 
             {%- if legalReasonsAuthenticatedOtherReply|trim -%}
-              <div class="answer-detail">We will use the following authorization arrangements: {{legalReasonsAuthenticatedOtherReply|markdown}}</div>
+              <div class="answer-detail"><div class="answer-lead"><p>We will use the following authorization arrangements:</p></div>{{legalReasonsAuthenticatedOtherReply|markdown}}</div>
             {%- else -%}
               <p>We will make other arrangements for authorizing potential users.</p>
               {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="authorization-details" data-status="missing"><strong>Information not provided:</strong> details of the authorization arrangements.</p>{% endif %}

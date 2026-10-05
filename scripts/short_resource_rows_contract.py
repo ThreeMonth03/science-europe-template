@@ -114,11 +114,13 @@ def row_fragments(row):
     return dict(title=str(title), purpose=inner(first), budget=inner(cells[1]), funding=inner(cells[2]))
 
 
-def project_hints(source):
+def project_hints(source, current_small=False):
     """Validate every new attribute before removing precisely its source bytes.
 
     The dedicated probe additionally checks that all eligible rows get a hint;
     this projection permits the historical long-table oracle to remain exact.
+    Small ordinary tables are current-only; the default historical scope stays
+    at 4..32 rows and retains all grammar, identity and attribute checks.
     """
     soup = BeautifulSoup(source,'html.parser')
     for row in soup.select('.pdf-short-resource-row'):
@@ -127,7 +129,7 @@ def project_hints(source):
         assert row.attrs == {'data-item-id':identity,'class':['pdf-short-resource-row'],'style':'break-inside: avoid'}
         table = row.find_parent('table')
         assert table.attrs == {'class':['resource-table']}
-        assert row.parent is table.tbody and 4<=len(table.tbody.find_all('tr',recursive=False))<=32
+        assert row.parent is table.tbody and (1 if current_small else 4)<=len(table.tbody.find_all('tr',recursive=False))<=32
         assert eligible(row_fragments(row)), identity
         before = '<tr data-item-id="'+identity+'" class="pdf-short-resource-row" style="break-inside: avoid">'
         assert source.count(before)==1

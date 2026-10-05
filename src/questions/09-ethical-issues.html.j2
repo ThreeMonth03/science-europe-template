@@ -113,7 +113,8 @@
       {%- if collectPersonalAUuid == uuids.collectPersonalNoAUuid %}
         <p>We will not collect any data related to individuals, i.e. "personal data".</p>
       {%- elif collectPersonalAUuid == uuids.collectPersonalYesAUuid %}
-        {%- set sentences = ['We will collect data related to individuals, i.e. "personal data".'] -%}{%- set ethicsLead = namespace(first=none) -%}
+        {%- set collectPersonalSentence %}We will collect data related to individuals, i.e. "personal data".{% endset -%}
+        {%- set sentences = [collectPersonalSentence] -%}{%- set ethicsLead = namespace(indices=[]) -%}
         {%- set cpersGdprPath = [collectPersonalPath, collectPersonalAUuid, uuids.cpersGdprQUuid]|reply_path -%}
         {%- set cpersGdprAUuid = repliesMap[cpersGdprPath]|reply_str_value -%}
         {%- if cpersGdprAUuid == uuids.cpersGdprExploreAUuid -%}
@@ -142,8 +143,9 @@
             {%- set cpersExplainInformedPath = [legalBasePath, legalBaseAUuid, uuids.cpersExplainInformedQUuid]|reply_path -%}
             {%- set cpersExplainInformed = repliesMap[cpersExplainInformedPath]|reply_str_value -%}
             {%- if cpersExplainInformed|trim -%}
+              {%- do ethicsLead.indices.append(sentences|length) -%}
               {%- do sentences.append('The data subjects will be informed as follows:') -%}
-              {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersExplainInformed|markdown) -%}
+              {%- do sentences.append(cpersExplainInformed|markdown) -%}
             {%- endif -%}
 
             {%- set cpersReusersPath = [legalBasePath, legalBaseAUuid, uuids.cpersReusersQUuid]|reply_path -%}
@@ -157,8 +159,9 @@
             {%- set cpersDescribeProcedurePath = [legalBasePath, legalBaseAUuid, uuids.cpersDescribeProcedureQUuid]|reply_path -%}
             {%- set cpersDescribeProcedure = repliesMap[cpersDescribeProcedurePath]|reply_str_value -%}
             {%- if cpersDescribeProcedure|trim -%}
+              {%- do ethicsLead.indices.append(sentences|length) -%}
               {%- do sentences.append('The procedure for obtaining consent from data subjects is as follows:') -%}
-              {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersDescribeProcedure|markdown) -%}
+              {%- do sentences.append(cpersDescribeProcedure|markdown) -%}
             {%- endif -%}
 
           {%- elif legalBaseAUuid == uuids.cpersGdprLegalBasisOtherAUuid -%}
@@ -185,8 +188,9 @@
           {%- set cpersGdprPurposePath = [cpersGdprPath, cpersGdprAUuid, uuids.cpersGdprPurposeQUuid]|reply_path -%}
           {%- set cpersGdprPurpose = repliesMap[cpersGdprPurposePath]|reply_str_value -%}
           {%- if cpersGdprPurpose|trim -%}
+            {%- do ethicsLead.indices.append(sentences|length) -%}
             {%- do sentences.append('The purpose of processing the personal data can be described as follows:') -%}
-            {%- if ethicsLead.first is none -%}{%- set ethicsLead.first = sentences|length -%}{%- endif -%}{%- do sentences.append(cpersGdprPurpose|markdown) -%}
+            {%- do sentences.append(cpersGdprPurpose|markdown) -%}
           {%- endif -%}
 
           {# DPIA #}
@@ -197,7 +201,21 @@
           {%- endif -%}
         {%- endif -%}
 
-        {% if output_profile|default('review') == 'submission' and ethicsLead.first is not none %}{% set ethicsLeadSentences = sentences[:ethicsLead.first] %}{% set ethicsBodySentences = sentences[ethicsLead.first:] %}<div class="answer-detail"><p class="answer-lead" style="margin-bottom: 0">{{ ethicsLeadSentences|join(' ') }}</p>{{ ethicsBodySentences|join(' ') }}</div>{% else %}<div class="answer-detail">{{ sentences|join(' ') }}</div>{% endif %}
+        <div class="answer-detail">
+          {%- set prose = namespace(parts=[]) -%}
+          {%- for sentence in sentences -%}
+            {%- if loop.index0 in ethicsLead.indices -%}
+              {%- do prose.parts.append(sentence) -%}
+              <div class="answer-lead"><p>{{ prose.parts|join(' ') }}</p></div>
+              {%- do prose.parts.clear() -%}
+            {%- elif loop.index0 - 1 in ethicsLead.indices -%}
+              <div>{{ sentence }}</div>
+            {%- else -%}
+              {%- do prose.parts.append(sentence) -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {% if prose.parts %}<p>{{ prose.parts|join(' ') }}</p>{% endif %}
+        </div>
       {%- endif -%}
 
       {% if ethLegAUuid == uuids.ethLegNoAUuid %}

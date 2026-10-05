@@ -8,6 +8,8 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from submission_preview_contract import CONTRACT, historical_overrides, project_source
 from output_profile_contract import environment, WRAPPER
+from test_answer_retention import path
+from test_science_europe_contract import render_question
 
 
 class SubmissionPreviewTests(unittest.TestCase):
@@ -59,3 +61,32 @@ class SubmissionPreviewTests(unittest.TestCase):
         self.assertTrue(review.select('.data-gap'))
         self.assertFalse(submission.select('#dmp-projects, #dmp-contributors, .data-gap'))
         self.assertTrue(all(not answer.get_text().strip() for answer in submission.select('.question > .answer')))
+
+    def test_empty_contributor_records_do_not_leave_submission_diagnostics_or_heading(self):
+        parent = path('adminDetailsCUuid', 'contributorsQUuid')
+        dc = {'project': {'created_by': None}, 'e': {'choices': {}}}
+        diagnostic = 'There are no contributors described for this DMP.'
+        for blank in (None, '', ' \t\n\u3000'):
+            values = {parent: ['person']}
+            if blank is not None:
+                for field in ('contributorNameQUuid', 'contributorEmailQUuid'):
+                    values[path(parent, 'person', field)] = blank
+                for field in ('contributorOrcidQUuid', 'contributorAffiliationQUuid'):
+                    values[path(parent, 'person', field)] = {
+                        'value': {'value': {'type': 'PlainType', 'value': blank}}}
+                values[path(parent, 'person', 'contributorRoleQUuid')] = []
+            with self.subTest(blank=blank):
+                submission = BeautifulSoup(render_question('src/contributors.html.j2', values,
+                    dc=dc, output_profile='submission'), 'html.parser')
+                self.assertFalse(submission.select('#dmp-contributors, .data-gap, .data-review, .empty-value'))
+                self.assertNotIn('People and responsibilities', submission.get_text())
+                self.assertNotIn(diagnostic, submission.get_text())
+                review = BeautifulSoup(render_question('src/contributors.html.j2', values,
+                    dc=dc, output_profile='review'), 'html.parser')
+                self.assertIsNotNone(review.select_one('#dmp-contributors > h2'))
+                self.assertIn(diagnostic, review.get_text())
+        values = {parent: ['person'], path(parent, 'person', 'contributorNameQUuid'): 'Research team'}
+        submission = BeautifulSoup(render_question('src/contributors.html.j2', values,
+            dc=dc, output_profile='submission'), 'html.parser')
+        self.assertEqual('Research team', submission.select_one('.contributor .name').get_text())
+        self.assertNotIn(diagnostic, submission.get_text())

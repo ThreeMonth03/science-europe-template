@@ -1,23 +1,23 @@
 {%- set contributorsPath = [uuids.adminDetailsCUuid, uuids.contributorsQUuid]|join(".") -%}
 {%- set contributorsItems = repliesMap[contributorsPath]|reply_items -%}
-{% if contributorsItems or dc.project.created_by or output_profile|default('review') != 'submission' %}<div id="dmp-contributors">
-  <h2>People and responsibilities</h2>
-
   {% set contributors = [] %}
   {%- for contributor in contributorsItems -%}
     {%- set pathPrefix = [contributorsPath, contributor]|reply_path ~ "." -%}
     {%- set contributorName = repliesMap[pathPrefix ~ uuids.contributorNameQUuid]|reply_str_value -%}
     {%- set contributorEmail = repliesMap[pathPrefix ~ uuids.contributorEmailQUuid]|reply_str_value -%}
+    {%- set contributorEmail = contributorEmail if contributorEmail|trim else '' -%}
     {%- set contributorOrcid = repliesMap[pathPrefix ~ uuids.contributorOrcidQUuid] -%}
+    {%- set contributorOrcid = contributorOrcid if contributorOrcid and (contributorOrcid.value.value.value|default('', true)|trim or contributorOrcid.value.value.raw|default(none)) else none -%}
     {%- set contributorRoles = repliesMap[pathPrefix ~ uuids.contributorRoleQUuid]|reply_items -%}
     {%- set contributorAffiliationReply = repliesMap[pathPrefix ~ uuids.contributorAffiliationQUuid] -%}
-    {%- if contributorName or contributorEmail or contributorOrcid or contributorRoles or contributorAffiliationReply -%}
-      {%- set roles = [] -%}
-      {%- for role in contributorRoles -%}
-        {%- if role in dc.e.choices.keys() -%}
-          {%- do roles.append(dc.e.choices[role].label) -%}
-        {%- endif -%}
-      {%- endfor -%}
+    {%- set contributorAffiliationReply = contributorAffiliationReply if contributorAffiliationReply and (contributorAffiliationReply.value.value.value|default('', true)|trim or contributorAffiliationReply.value.value.raw|default(none)) else none -%}
+    {%- set roles = [] -%}
+    {%- for role in contributorRoles -%}
+      {%- if role in dc.e.choices.keys() -%}
+        {%- do roles.append(dc.e.choices[role].label) -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if contributorName|trim or contributorEmail or contributorOrcid or roles or contributorAffiliationReply -%}
       {%- do contributors.append({
         'name': contributorName,
         'email': contributorEmail,
@@ -28,6 +28,9 @@
       }) -%}
     {%- endif -%}
   {%- endfor -%}
+
+{% if contributors or dc.project.created_by or output_profile|default('review') != 'submission' %}<div id="dmp-contributors">
+  <h2>People and responsibilities</h2>
 
   {%- if contributors|length > 0 -%}
   <ul>

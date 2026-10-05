@@ -4,7 +4,7 @@
   "candidate_version": "0.3.54",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "a716ee2115afa5448db1efdff1300f6be8401ec389af170fb946d7288f934cd3",
+  "candidate_tree_sha256": "38e2585d3ce32352387295e77fafbb282a27b1f91494f03c4b756eaafc8e0ed2",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
@@ -12,6 +12,7 @@
     "src/layout.css",
     "src/macros.html.j2",
     "src/pdf/index.html.j2",
+    "src/pdf/short-resource-rows.html.j2",
     "src/pdf/short-resources.html.j2",
     "src/post-project-archive.html.j2",
     "src/preservation-publication-reason.html.j2",

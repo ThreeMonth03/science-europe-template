@@ -117,7 +117,7 @@
       {%- endif %}
         {# Datasets #}
         {%- if neqDataSetsItems|length > 0 -%}
-          <p>The non-equipment datasets are:</p>
+          <div class="answer-lead"><p>The non-equipment datasets are:</p></div>
           <ul>
           {%- for neqDataSetItem in neqDataSetsItems -%}
             {%- set pathPrefix = [neqDataSetsPath, neqDataSetItem]|reply_path -%}

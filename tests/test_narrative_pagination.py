@@ -1,4 +1,5 @@
 import unittest
+from bs4 import BeautifulSoup
 
 from test_answer_retention import IDS, path
 from test_science_europe_contract import render_question
@@ -7,6 +8,51 @@ from test_structure_bindings import BlockProbe
 
 
 class NarrativePaginationTests(unittest.TestCase):
+    def test_each_consent_detail_has_its_own_fixed_lead_without_flattening_answers(self):
+        parent = path('creatingCUuid', 'collectPersonalQUuid')
+        gdpr = path(parent, 'collectPersonalYesAUuid', 'cpersGdprQUuid')
+        legal = path(gdpr, 'cpersGdprExploreAUuid', 'cpersGdprLegalBasisQUuid')
+        consent = path(legal, 'cpersGdprLegalBasisAskAUuid')
+        values = {parent: IDS['collectPersonalYesAUuid'], gdpr: IDS['cpersGdprExploreAUuid'],
+                  legal: IDS['cpersGdprLegalBasisAskAUuid']}
+        fields = [(path(consent, 'cpersExplainInformedQUuid'), 'Informed'),
+                  (path(consent, 'cpersDescribeProcedureQUuid'), 'Procedure'),
+                  (path(gdpr, 'cpersGdprExploreAUuid', 'cpersGdprPurposeQUuid'), 'Purpose')]
+        for key, name in fields:
+            values[key] = '<p>' + name + ' opening.</p><ul><li>' + name + ' original item.</li></ul>'
+        for profile in ('submission', 'review'):
+            output = render_question('src/questions/09-ethical-issues.html.j2', values, output_profile=profile)
+            soup = BeautifulSoup(output, 'html.parser')
+            leads = soup.select('.answer-detail > div.answer-lead')
+            self.assertEqual(3, len(leads))
+            for lead, (_, name) in zip(leads, fields):
+                body = lead.find_next_sibling()
+                self.assertEqual('div', body.name)
+                self.assertEqual(name + ' opening.', body.p.get_text())
+                self.assertEqual(name + ' original item.', body.li.get_text())
+                self.assertEqual(1, output.count(values[next(k for k, v in fields if v == name)]))
+            probe = BlockProbe(); probe.feed(output)
+            self.assertEqual([], probe.errors)
+
+    def test_qualified_reference_label_keeps_only_its_own_relation(self):
+        data = path('preservingCUuid', 'producedDataQUuid')
+        published = path(data, 'data', 'isPublishedDataQUuid')
+        refs = path(published, 'isPublishedDataYesAUuid', 'publishedQReferencesQUuid')
+        items = path(refs, 'publishedQReferencesYesAUuid', 'publishedQReferencesItemQUuid')
+        values = {data: ['data'], published: IDS['isPublishedDataYesAUuid'],
+                  refs: IDS['publishedQReferencesYesAUuid'], items: ['with-body', 'name-only'],
+                  path(items, 'with-body', 'publishedQReferenceIdQUuid'): 'Original.csv',
+                  path(items, 'with-body', 'publishedQReferenceRelQUuid'): 'Original relation. Keep item.',
+                  path(items, 'name-only', 'publishedQReferenceIdQUuid'): 'Name-only.csv'}
+        soup = BeautifulSoup(render_question('src/questions/10-share-restrictions.html.j2', values,
+            output_profile='submission'), 'html.parser')
+        lead = next(d for d in soup.select('div.answer-lead') if d.get_text() == 'References to other datasets:')
+        records = lead.find_next_sibling().find_all('li', recursive=False)
+        self.assertEqual('Original.csv', records[0].select_one('.answer-lead').get_text())
+        self.assertEqual('Original relation. Keep item.', records[0].select_one('.answer-detail').get_text())
+        self.assertFalse(records[1].select('.answer-lead'))
+        self.assertEqual('Name-only.csv', records[1].get_text(strip=True))
+
     def test_archive_only_does_not_answer_security(self):
         replies = test_storage_sharing.StorageSharingTests().storage_replies()
         output = render_question('src/questions/06-access-security.html.j2', replies)
@@ -52,6 +98,30 @@ class NarrativePaginationTests(unittest.TestCase):
         output = render_question('src/questions/05-store-backup.html.j2', {})
         self.assertEqual(2, output.count('<div class="reading-gap"><p class="data-gap"'))
         self.assertIn('data-fact-id="backup-arrangement" data-status="missing"', output)
+
+    def test_archive_only_submission_omits_empty_workspace_policy_but_keeps_archive_facts(self):
+        values = test_storage_sharing.StorageSharingTests().storage_replies()
+        submission = BeautifulSoup(render_question('src/questions/05-store-backup.html.j2', values,
+            output_profile='submission'), 'html.parser')
+        self.assertFalse(submission.select('.workspace-policy, .data-gap, .reading-gap'))
+        self.assertEqual('Archival during the project', submission.select_one('h4').get_text())
+        for fact, text in (('during-project-archive', 'Data will be archived in cold storage during the project.'),
+                           ('archive-medium', 'The archive will be stored on tape.'),
+                           ('archive-remote-location', 'The archive will be stored at a remote location.')):
+            self.assertEqual(text, submission.select_one('[data-fact-id="'+fact+'"]').get_text())
+        review = BeautifulSoup(render_question('src/questions/05-store-backup.html.j2', values,
+            output_profile='review'), 'html.parser')
+        self.assertIsNotNone(review.select_one('.workspace-policy [data-fact-id="working-storage-arrangement"][data-status="missing"]'))
+
+    def test_security_policy_lead_remains_attached_to_its_owned_list(self):
+        policies = path('adminDetailsCUuid', 'policiesProceduresQUuid')
+        values = {policies: ['policy'], path(policies, 'policy', 'policiesProceduresNameQUuid'): 'Access policy'}
+        soup = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', values,
+            output_profile='submission'), 'html.parser')
+        lead = soup.select_one('.answer > div.answer-lead')
+        self.assertEqual('We will use the following policies and procedures:', lead.get_text())
+        self.assertEqual('ul', lead.find_next_sibling().name)
+        self.assertEqual('Access policy', lead.find_next_sibling().get_text(' ', strip=True))
 
     def test_long_restrictions_stay_in_a_separate_answer_block(self):
         from generate_storage_fixtures import storage_cases

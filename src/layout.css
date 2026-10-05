@@ -85,6 +85,8 @@ html body .answer-detail li { margin-bottom: .2em; }
 html body .answer-detail ul:has(> li:last-child:nth-child(-n+3)) { break-inside: avoid; }
 html body li > p:first-child { break-after: avoid; }
 html body .resource-table { font-size: 10pt; table-layout: fixed; }
+/* Manually entered amount/currency/funding text must stay in its own cell. */
+html body .resource-table td { overflow-wrap: anywhere; word-break: break-word; }
 html body .resource-table col.resource-purpose { width: 57%; }
 html body .resource-table col.resource-budget { width: 17%; }
 html body .resource-table col.resource-funding { width: 26%; }
@@ -126,6 +128,11 @@ html body .dataset-section { margin: .6em 0 1em; }
 html body .dataset-section > h5 { font-size: 11pt; margin: .5em 0 .35em; }
 html body .distribution-section { margin: .25em 0 .45em; }
 html body .distribution-section + .distribution-section { border-top: 1px solid #cbd2d5; padding-top: .4em; }
+/* Keep an owned label with the first visible body, not the entire distribution.
+   Empty submission gap wrappers must not provide an intervening page break. */
+html body .distribution-section > .distribution-reading-unit { break-before: avoid; }
+html body .distribution-reading-unit > .reading-gap:empty { margin: 0; break-after: avoid; }
+html body .project-resources > p:first-child { break-after: avoid; }
 html body .license-entry { margin: .25em 0 .5em; }
 html body .license-entry + .license-entry { border-top: 1px dotted #cbd2d5; padding-top: .4em; }
 html body .storage-detail-limits li { margin-bottom: .25em; }
@@ -183,6 +190,10 @@ html body #q-data-preservation .post-project-archive[data-scope="project"] > .da
 
 /* Local prototype: keep the final purpose fragment with its allocation. */
 html body .pdf-resource-reading tbody > tr > td > .answer-detail[data-fact-id="resource-justification"] { break-after: avoid; }
+/* Attach the last purpose paragraph to an existing allocation. Four-line
+   fragment minima move short paragraphs intact without making a long authored
+   paragraph, the whole purpose or a nested table unbreakable. */
+html body #q-required-resources .resource-table > tbody > tr > td:first-child > .answer-detail[data-fact-id="resource-justification"]:has(+ p:not(.data-gap)) > p:last-child { break-after: avoid; orphans: 4; widows: 4; }
 
 /* Q10 identifiers: text before strong is not counted by :first-child.
    Keep the identifier value inline with its type, not as a dataset heading.

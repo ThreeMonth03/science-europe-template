@@ -2,20 +2,13 @@
 {%- set projectListParts = [uuids.adminDetailsCUuid, uuids.projectsQUuid] -%}
 {%- set projectsPath = active.path(projectListParts, 'ListQuestion') -%}
 {%- set projectsItems = repliesMap[projectsPath]|reply_items if projectsPath else [] -%}
-{% if projectsItems or output_profile|default('review') != 'submission' %}<div id="dmp-projects">
-  <h2>Research overview</h2>
-
+{% if projectsItems or output_profile|default('review') != 'submission' %}
+  {% set projectOverviewContent %}
   {% for projectsItem in projectsItems %}
-    <div class="project" data-item-id="{{ projectsItem }}">
     {%- set projectParts = projectListParts + [projectsItem] -%}
     {%- set projectNamePath = active.path(projectParts + [uuids.projectNameQUuid], 'ValueQuestion') -%}
     {%- set projectName = repliesMap[projectNamePath]|reply_str_value if projectNamePath else '' -%}
-    {%- if projectName|trim and projectsItems|length > 1 -%}
-      <h3>{{ projectName|e }}</h3>
-    {%- elif not projectName|trim -%}
-      {% if output_profile|default('review') == 'submission' %}<h3>{{ macros.projectLabel(projectsItems.index(projectsItem) + 1) }}</h3>{% else %}<h3 class="empty-value">(project name not given)</h3>{% endif %}
-    {%- endif -%}
-
+    {% set projectContent %}
     {%- set projectAcronymPath = active.path(projectParts + [uuids.projectAcronymQUuid], 'ValueQuestion') -%}
     {%- set projectAcronym = repliesMap[projectAcronymPath]|reply_str_value if projectAcronymPath else '' -%}
     {%- set projectNumberPath = active.path(projectParts + [uuids.projectNumberQUuid], 'ValueQuestion') -%}
@@ -62,8 +55,25 @@
         {{ projectAbstract|markdown }}
       </section>
     {%- endif -%}
-    </div>
+    {% endset %}
+    {% if output_profile|default('review') != 'submission' or (projectName|trim and projectsItems|length > 1) or projectContent|striptags|trim or '<img' in projectContent|lower or '<table' in projectContent|lower %}
+      <div class="project" data-item-id="{{ projectsItem }}">
+        {%- if projectName|trim and projectsItems|length > 1 -%}
+          <h3>{{ projectName|e }}</h3>
+        {%- elif not projectName|trim -%}
+          {% if output_profile|default('review') == 'submission' %}<h3>{{ macros.projectLabel(projectsItems.index(projectsItem) + 1) }}</h3>{% else %}<h3 class="empty-value">(project name not given)</h3>{% endif %}
+        {%- endif -%}
+        {{ projectContent }}
+      </div>
+    {% endif %}
   {% else %}
     <div style="font-style:italic;">There are no projects described for this DMP.</div>
   {% endfor %}
-</div>{% endif %}
+  {% endset %}
+  {% if output_profile|default('review') != 'submission' or projectOverviewContent|striptags|trim or '<img' in projectOverviewContent|lower or '<table' in projectOverviewContent|lower %}
+    <div id="dmp-projects">
+      <h2>Research overview</h2>
+      {{ projectOverviewContent }}
+    </div>
+  {% endif %}
+{% endif %}

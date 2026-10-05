@@ -1,4 +1,4 @@
-{# PDF-only: bounded rows in an ordinary 4..32-row table. Original captured
+{# PDF-only: bounded rows in an ordinary 1..32-row table. Original captured
    fragments remain authoritative. No whole-table keep or prose reconstruction. #}
 {%- macro classify(row, result) -%}
   {%- set result.ok = true -%}
@@ -47,7 +47,7 @@
 
 {%- macro table(original, rows) -%}
   {%- set result = namespace(value=original) -%}
-  {%- if 4 <= rows|length <= 32 and original.count('<table class="resource-table">') == 1 and original.count('<tr data-item-id=') == rows|length -%}
+  {%- if 1 <= rows|length <= 32 and original.count('<table class="resource-table">') == 1 and original.count('<tr data-item-id=') == rows|length -%}
     {%- for row in rows -%}
       {%- set eligible = namespace(ok=false) -%}
       {{- classify(row, eligible) -}}

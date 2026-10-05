@@ -24,11 +24,18 @@ class LayoutTests(unittest.TestCase):
         sys.path.insert(0, str(ROOT / 'scripts'))
         from probe_q8_word import IMAGE, RUNNER
         questions = [
+            ('q-what-data', '02-what-data',
+             'The non-equipment datasets are:', '非儀器資料集如下：'),
+            ('q-access-security', '06-access-security',
+             'We will use the following policies and procedures:',
+             '我們將採用以下政策與程序：'),
             ('q-copyright-ipr', '08-copyright-ipr',
              'The following conditions apply to the reference and non-reference datasets that we reuse:',
              '此計畫再利用的參考及非參考資料集須遵守以下條件：'),
             ('q-share-restrictions', '10-share-restrictions',
              'The dataset has the following identifiers:', '此資料集具有以下識別碼：'),
+            ('q-share-restrictions', '10-share-restrictions',
+             'References to other datasets:', '其他資料集的參照資訊：'),
         ]
         bodies = []
         for qid, filename, english, chinese in questions:

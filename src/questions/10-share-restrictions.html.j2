@@ -228,10 +228,15 @@
                 {%- endfor -%}
             {%- endif -%}
             {%- if qreferences|length > 0 -%}
-                <p>References to other datasets:</p>
+                <div class="answer-lead"><p>References to other datasets:</p></div>
                 <ul>
                     {%- for qref in qreferences -%}
-                    <li>{% if qref.id|trim %}<em>{{ qref.id|e }}</em>{% endif %}{% if qref.id|trim and qref.relation|trim %} &ndash; {% endif %}{% if qref.relation|trim %}{{ qref.relation|markdown }}{% endif %}</li>
+                    <li>
+                      {% if qref.id|trim %}
+                        {% if qref.relation|trim %}<div class="answer-lead">{% endif %}<p><em>{{ qref.id|e }}</em></p>{% if qref.relation|trim %}</div>{% endif %}
+                      {% endif %}
+                      {% if qref.relation|trim %}<div class="answer-detail">{{ qref.relation|markdown }}</div>{% endif %}
+                    </li>
                     {%- endfor -%}
                 </ul>
             {%- endif -%}

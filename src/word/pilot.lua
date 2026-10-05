@@ -107,6 +107,7 @@ end
 -- Q8 reference entries are a plain name Div followed by a permission paragraph.
 -- The generic BulletList rule only links the end of an item to the next item;
 -- it does not link a name to its own permission. Bound each pair independently.
+-- Restricted terms may add further authored blocks after the fixed permission.
 -- No recursive walk into authored Divs/lists, no new text or paragraph merging.
 local function keep_q8_reference_labels(div)
   local function width(value)
@@ -128,7 +129,7 @@ local function keep_q8_reference_labels(div)
       for _, list in ipairs(answer.content) do
         if list.t == "BulletList" and #list.content <= 32 then
           for _, item in ipairs(list.content) do
-            if #item == 2 then
+            if #item >= 2 then
               local label, permission = item[1], item[2]
               -- BulletList may have wrapped only the permission in this style.
               local linked_permission = false

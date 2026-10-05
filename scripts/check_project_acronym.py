@@ -100,7 +100,10 @@ def check(root, language):
             if profile == 'submission':
                 assert bool(soup.select('table.project-details')) == visible
                 if not name:
-                    assert soup.h3.get_text(strip=True) == ('Project 1' if language == 'en' else '計畫 1')
+                    if visible:
+                        assert soup.h3.get_text(strip=True) == ('Project 1' if language == 'en' else '計畫 1')
+                    else:
+                        assert soup.select_one('#dmp-projects') is None
             counts['value_cases'] += 1
 
         for change, profile in itertools.product(
@@ -243,10 +246,11 @@ def check(root, language):
             visible = bool((name or '').strip())
             assert soup.h1.get_text() == (name if visible and not multiple else DOCUMENT_NAME)
             assert soup.h1.find(True) is None
-            heading = soup.select_one('.project h3')
+            heading = soup.select_one('.project[data-item-id="project-a"] h3')
             if multiple and visible: assert heading.get_text() == name and heading.find(True) is None
             elif not visible:
-                assert heading.get_text().strip() == (('Project 1' if language=='en' else '計畫 1') if profile=='submission' else ('(project name not given)' if language=='en' else '（尚未提供專案名稱）'))
+                if profile=='submission': assert heading is None
+                else: assert heading.get_text().strip() == ('(project name not given)' if language=='en' else '（尚未提供專案名稱）')
             else: assert heading is None
             assert DOCUMENT_NAME in soup.header.get_text()
             counts['project_titles'] += 1
@@ -294,7 +298,8 @@ def check(root, language):
             replies[path(LISTING,'project-a','projectAbstractQUuid')] = '<p>Keep <em>authored formatting</em>.</p>'
             replies[path(LISTING,'deleted','projectNameQUuid')] = 'STALE-DELETED'
             soup = render(full, km, replies, profile)
-            assert [p['data-item-id'] for p in soup.select('.project')] == replies[LISTING]
+            expected = replies[LISTING] if profile=='review' else ['project-b', 'project-a']
+            assert [p['data-item-id'] for p in soup.select('.project')] == expected
             assert soup.select_one('.abstract em').get_text() == 'authored formatting'
             assert 'SECOND' in soup.get_text() and 'THIRD' in soup.get_text() and 'STALE-DELETED' not in soup.get_text()
             blank = copy.deepcopy(replies)

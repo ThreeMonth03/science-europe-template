@@ -6,7 +6,7 @@
     {# Data stored by members (no shared workspace) #}
     {%- set sharedWorkspacePath = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid]|reply_path -%}
     {%- set sharedWorkspaceAUuid = repliesMap[sharedWorkspacePath]|reply_str_value -%}
-    <div class="workspace-policy dataset-policy">
+    {% if sharedWorkspaceAUuid in [uuids.sharedWorkspaceYesAUuid, uuids.sharedWorkspaceNoAUuid] or output_profile|default('review') != 'submission' %}<div class="workspace-policy dataset-policy">
     {%- if sharedWorkspaceAUuid == uuids.sharedWorkspaceNoAUuid -%}
       <p data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="complete">The project will not use a shared workspace to work with data.</p>
       {%- set notSharedBackupPath = [sharedWorkspacePath, uuids.sharedWorkspaceNoAUuid, uuids.notSharedBackupQUuid]|reply_path -%}
@@ -78,7 +78,7 @@
       <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="working-storage-arrangement" data-status="missing"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p>{% endif %}</div>
       <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3a" data-fact-id="backup-arrangement" data-status="missing"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p>{% endif %}</div>
     {%- endif -%}
-    </div>
+    </div>{% endif %}
     {# Cold archival DURING research is independent of the shared workspace. #}
     {% set archivePath = [uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path %}
     {% set archive = repliesMap[archivePath]|reply_str_value %}

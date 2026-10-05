@@ -97,16 +97,22 @@
         {%- endif -%}
 
         {# Managed access procedure to personal data #}
+        {%- import 'src/active-answer.j2' as activeAnswer with context -%}
+        {%- set openImmediatelyPath = [uuids.accessCUuid, uuids.openImmediatelyQUuid]|reply_path -%}
+        {%- set openImmediatelyReply = repliesMap[openImmediatelyPath]|reply_str_value -%}
         {%- set notOpenLegalReasonsQUuid = [uuids.accessCUuid, uuids.openImmediatelyQUuid, uuids.openImmediatelyNoAUuid, uuids.notOpenLegalReasonsQUuid]|reply_path -%}
         {%- set notOpenLegalReasonsReply = repliesMap[notOpenLegalReasonsQUuid]|reply_str_value -%}
-        {%- if notOpenLegalReasonsReply == uuids.notOpenLegalReasonsYesAUuid -%}
-            {%- set notOpenLegalReasonsPrivacyQUuid = [notOpenLegalReasonsQUuid, uuids.notOpenLegalReasonsYesAUuid, uuids.notOpenLegalReasonsPrivacyQUuid]|reply_path -%}
-            {%- set notOpenLegalReasonsPrivacyReply = repliesMap[notOpenLegalReasonsPrivacyQUuid]|reply_str_value -%}
+        {%- if openImmediatelyReply == uuids.openImmediatelyNoAUuid and notOpenLegalReasonsReply == uuids.notOpenLegalReasonsYesAUuid -%}
+            {%- set privacyParts = [uuids.accessCUuid, uuids.openImmediatelyQUuid, uuids.openImmediatelyNoAUuid, uuids.notOpenLegalReasonsQUuid, uuids.notOpenLegalReasonsYesAUuid, uuids.notOpenLegalReasonsPrivacyQUuid] -%}
+            {%- set notOpenLegalReasonsPrivacyQUuid = activeAnswer.path(privacyParts, 'OptionsQuestion') if km is defined else privacyParts|reply_path -%}
+            {%- set notOpenLegalReasonsPrivacyReply = repliesMap[notOpenLegalReasonsPrivacyQUuid]|reply_str_value if notOpenLegalReasonsPrivacyQUuid else '' -%}
 
-            {%- if notOpenLegalReasonsPrivacyReply == uuids.notOpenLegalReasonsPrivacyYesAUuid -%}
+            {%- if notOpenLegalReasonsPrivacyReply == uuids.notOpenLegalReasonsPrivacyYesAUuid and (km is not defined or (notOpenLegalReasonsPrivacyReply in km.entities.questions[uuids.notOpenLegalReasonsPrivacyQUuid].answerUuids and notOpenLegalReasonsPrivacyReply in km.entities.answers)) -%}
+                <p data-fact-id="personal-data-privacy-restriction" data-status="complete">Privacy restrictions prevent some project data from being made openly available.</p>
 
-                {%- set personalDataManagedAccessQUuid = [notOpenLegalReasonsPrivacyQUuid, uuids.notOpenLegalReasonsPrivacyYesAUuid, uuids.notOpenLegalReasonsPrivacyAccessQUuid ]|reply_path -%}
-                {%- set personalDataManagedAccessReply = repliesMap[personalDataManagedAccessQUuid]|reply_str_value -%}
+                {%- set procedureParts = privacyParts + [uuids.notOpenLegalReasonsPrivacyYesAUuid, uuids.notOpenLegalReasonsPrivacyAccessQUuid] -%}
+                {%- set personalDataManagedAccessQUuid = activeAnswer.path(procedureParts, 'ValueQuestion') if km is defined else procedureParts|reply_path -%}
+                {%- set personalDataManagedAccessReply = repliesMap[personalDataManagedAccessQUuid]|reply_str_value if personalDataManagedAccessQUuid else '' -%}
                 
                 {%- if personalDataManagedAccessReply|trim -%}
                     <h4>Access procedure to personal data</h4>

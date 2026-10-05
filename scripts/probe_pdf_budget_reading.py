@@ -157,7 +157,9 @@ def check(root, prior=None):
     for name, replies, eligible in matrix(grouped=grouped):
         original = render(root, replies); pdf = render(root, replies, True)
         from short_resource_rows_contract import project_hints
-        pdf = project_bounded_budget_hint(project_hints(pdf))
+        # Validate the existing whole-table hint before stripping it; then
+        # validate current per-row hints with an explicit small-table opt-in.
+        pdf = project_hints(project_bounded_budget_hint(pdf),current_small=True)
         if prior is not None:
             before = render(root, replies, question=prior)
             historic_original = original

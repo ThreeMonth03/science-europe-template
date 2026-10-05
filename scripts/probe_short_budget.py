@@ -10,6 +10,7 @@ from markupsafe import Markup
 from probe_pdf_budget_reading import matrix as long_matrix, render, project_bounded_budget_hint
 from generate_pilot_fixtures import IDS
 from probe_budget_word import ROOT
+from short_resource_rows_contract import project_hints
 
 BEGIN = '/* BEGIN short-budget panel:'
 END = '/* END short-budget panel */'
@@ -75,11 +76,13 @@ def check(root):
         replies = copy.deepcopy(base); replies.update(updates)
         original = render(root, replies); actual = project_bounded_budget_hint(render(root, replies, True))
         assert len(BeautifulSoup(actual, 'html.parser').select('.pdf-short-budget')) == int(eligible), name
-        assert actual.replace('class="resource-table pdf-short-budget"', 'class="resource-table"') == original, name
+        actual = actual.replace('class="resource-table pdf-short-budget"', 'class="resource-table"')
+        assert project_hints(actual, current_small=True) == original, name
         escaped_original = render(root, replies, autoescape=True)
         escaped_actual = project_bounded_budget_hint(render(root, replies, True, autoescape=True))
         assert len(BeautifulSoup(escaped_actual, 'html.parser').select('.pdf-short-budget')) == int(eligible), (name, 'Autoescaped PDF hint')
-        assert escaped_actual.replace('class="resource-table pdf-short-budget"', 'class="resource-table"') == escaped_original, (name, 'Autoescaped answer changed')
+        escaped_actual = escaped_actual.replace('class="resource-table pdf-short-budget"', 'class="resource-table"')
+        assert project_hints(escaped_actual, current_small=True) == escaped_original, (name, 'Autoescaped answer changed')
         results.append({'case': 'question-'+name, 'eligible': eligible, 'passed': True})
     return results
 

@@ -8,6 +8,13 @@ ROLE_NAMES = ['DataCurator', 'DataCollector', 'DataManager', 'DataSteward',
               'Distributor', 'DataProtector', 'CreatorOfDMP']
 ROLES = [IDS['contributorRole' + role + 'AUuid'] for role in ROLE_NAMES]
 CONTACT = '2c6ee59d-4dc9-4dcb-ac13-d969c317a117'
+# Public Common DSW KM 2.7.0 choice labels, as supplied by the worker's dc.e.choices.
+ROLE_LABELS = {
+    'en': ['Data Curator', 'Data Collector', 'Data Manager', 'Data Steward',
+           'Distributor', 'Data Protection Officer', 'Creator of DMP', 'Contact Person'],
+    'zh-Hant': ['資料策展人', '資料蒐集者', '資料管理者', '資料託管員',
+                '發布者', '資料保護官', '資料管理方案創作者', '聯絡人'],
+}
 SENTENCES = {
     'en': [
         'Data curation: reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.',
@@ -47,7 +54,8 @@ def check(root, language):
     label = 'Contributor' if language == 'en' else '參與人員'
     name_gap = ('Please provide the name of the person or team assigned these responsibilities.'
                 if language == 'en' else '請補上負責上述職責的人員或團隊名稱。')
-    dc = {'project': {'created_by': None}, 'e': {'choices': {}}}
+    dc = {'project': {'created_by': None}, 'e': {'choices': {
+        role: {'label': label} for role, label in zip([*ROLES, CONTACT], ROLE_LABELS[language])}}}
     for escape in (False, True):
         env = environment(root, escape)
         question = env.from_string(PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
@@ -98,6 +106,7 @@ def check(root, language):
             [('a', 'Long organizational name ' * 50, ROLES)],
             [('a', 'Contact only', [CONTACT])],
             [('a', 'Unassigned', [])],
+            [('obsolete', None, ['obsolete-role'])],
             [],
         ]
         for people, profile in itertools.product(identity_cases, ('review', 'submission')):
@@ -108,8 +117,12 @@ def check(root, language):
             soup = render(question, replies, profile)
             validate(soup, people, profile)
             assert 'Deleted person' not in soup.get_text()
-            if people and people[0][1].startswith('Long organizational'):
+            if people and people[0][1] and people[0][1].startswith('Long organizational'):
                 assert not soup.select('.person-responsibilities.short-reading-unit')
+            if people and people[0][0] == 'obsolete':
+                people_front = render(front, replies, profile)
+                assert not people_front.select('.contributor')
+                assert bool(people_front.select('#dmp-contributors')) == (profile == 'review')
             counts['identity_cases'] += 1
 
         for name, profile in itertools.product((None, '', ' \n '), ('review', 'submission')):

@@ -1,5 +1,6 @@
 """Fixed choices become prose; missing answers and authored blocks stay distinct."""
 import itertools
+from copy import deepcopy
 import unittest
 from bs4 import BeautifulSoup
 from test_answer_retention import IDS, path
@@ -91,6 +92,111 @@ class QualityReadingTests(unittest.TestCase):
         output = render_question(template, {path('creatingCUuid', 'ownershipQUuid'): IDS['ownershipPIAUuid']})
         self.assertIn('All data will be owned by the Principal Investigator.', output)
         self.assertNotIn('data-status="missing-output"', output)
+
+    def test_multiple_open_data_reasons_have_one_complete_lead_and_keep_reason_order(self):
+        opened = path('accessCUuid', 'openImmediatelyQUuid')
+        prefix = path(opened, 'openImmediatelyNoAUuid')
+        values = {opened: IDS['openImmediatelyNoAUuid'],
+                  path(prefix, 'notOpenLegalReasonsQUuid'): IDS['notOpenLegalReasonsYesAUuid'],
+                  path(prefix, 'notOpenBusinessReasonsQUuid'): IDS['notOpenBusinessReasonsPatentsAUuid'],
+                  path(prefix, 'notOpenOtherReasonsQUuid'): IDS['notOpenOtherReasonsPapersAUuid']}
+        expected = ['legal restrictions', 'patent-related commercial considerations',
+                    'papers need to be submitted first']
+        for profile in ('review', 'submission'):
+            soup = BeautifulSoup(render_question('src/questions/08-copyright-ipr.html.j2', values,
+                output_profile=profile), 'html.parser')
+            reasons = soup.select_one('.answer-detail > ul')
+            self.assertIsNotNone(reasons)
+            lead = reasons.find_previous_sibling()
+            self.assertIsNotNone(lead)
+            self.assertIn('answer-lead', lead.get('class', []))
+            self.assertEqual(1, len(lead.find_all('p', recursive=False)))
+            self.assertEqual('The data cannot be made fully open for the following reasons:', lead.get_text(' ', strip=True))
+            self.assertEqual(expected, [item.get_text(' ', strip=True) for item in reasons.find_all('li', recursive=False)])
+            self.assertFalse(soup.select('p p, p div, p ul, p ol'))
+
+    def test_paper_reason_does_not_change_submission_into_publication(self):
+        opened = path('accessCUuid', 'openImmediatelyQUuid')
+        values = {opened: IDS['openImmediatelyNoAUuid'],
+                  path(opened, 'openImmediatelyNoAUuid', 'notOpenOtherReasonsQUuid'):
+                      IDS['notOpenOtherReasonsPapersAUuid']}
+        for profile in ('review', 'submission'):
+            text = BeautifulSoup(render_question('src/questions/08-copyright-ipr.html.j2', values,
+                output_profile=profile), 'html.parser').get_text(' ', strip=True)
+            self.assertIn('The data cannot be made fully open because papers need to be submitted first.', text)
+            self.assertNotIn('publish a paper', text)
+
+    def test_authorization_lead_precedes_unchanged_authored_blocks(self):
+        opened = path('accessCUuid', 'openImmediatelyQUuid')
+        legal = path(opened, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
+        authentication = path(legal, 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid')
+        authorization = path(authentication, 'legalReasonsAuthenticatedYesAUuid', 'legalReasonsAuthorizeQUuid')
+        authored = '<p>First <strong>owned</strong> paragraph.</p><ul><li>Keep this item.</li></ul><p>Last paragraph.</p>'
+        values = {opened: IDS['openImmediatelyNoAUuid'], legal: IDS['notOpenLegalReasonsYesAUuid'],
+                  authentication: IDS['legalReasonsAuthenticatedYesAUuid'],
+                  authorization: IDS['legalReasonsAuthorizeOtherAUuid'],
+                  path(authorization, 'legalReasonsAuthorizeOtherAUuid', 'legalReasonsAuthorizeOtherQUuid'): authored}
+        for profile in ('review', 'submission'):
+            soup = BeautifulSoup(render_question('src/questions/08-copyright-ipr.html.j2', values,
+                output_profile=profile), 'html.parser')
+            heading = soup.select_one('[data-fact-id="authorization-arrangements"]')
+            detail = heading.find_next_sibling('div')
+            lead = detail.find('div', recursive=False)
+            self.assertEqual(['answer-lead'], lead.get('class'))
+            self.assertEqual('We will use the following authorization arrangements:', lead.p.get_text())
+            self.assertEqual(authored, ''.join(str(node) for node in lead.next_siblings))
+            self.assertFalse(soup.select('p p, p div, p ul, p ol'))
+
+    def test_workspace_access_requires_current_reachable_choice_but_keeps_https(self):
+        chapter = IDS['processingCUuid']
+        workspace, yes, no = (IDS[n] for n in ('sharedWorkspaceQUuid', 'sharedWorkspaceYesAUuid', 'sharedWorkspaceNoAUuid'))
+        access = IDS['sharedAccessControlQUuid']
+        choices = {IDS[name]: text for name, text in (
+            ('sharedAccessControlMembersRWAUuid', 'All project members have read and write access to the data.'),
+            ('sharedAccessControlInstituteRAUuid', 'Everyone at the institute has read access to the data; all project members have read and write access.'),
+            ('sharedAccessControlMembersRAUuid', 'Only project members have read access; only designated project members can modify the data.'),
+            ('sharedAccessControlMembersRequestAUuid', 'Everyone at the institute can read the data; only project members can request write access.'))}
+        km = {'chapterUuids': [chapter], 'entities': {
+            'chapters': {chapter: {'questionUuids': [workspace, IDS['risksQUuid']]}},
+            'questions': {workspace: {'questionType': 'OptionsQuestion', 'answerUuids': [yes, no]},
+                          access: {'questionType': 'OptionsQuestion', 'answerUuids': list(choices)},
+                          IDS['risksQUuid']: {'questionType': 'OptionsQuestion', 'answerUuids': [IDS['risksExploreAUuid']]},
+                          IDS['risksHttpsQUuid']: {'questionType': 'OptionsQuestion', 'answerUuids': [IDS['risksHttpsYesAUuid']]}},
+            'answers': {yes: {'followUpUuids': [access]}, no: {'followUpUuids': []},
+                        IDS['risksExploreAUuid']: {'followUpUuids': [IDS['risksHttpsQUuid']]},
+                        IDS['risksHttpsYesAUuid']: {'followUpUuids': []},
+                        **{choice: {'followUpUuids': []} for choice in choices}}}}
+        workspace_path = path(chapter, workspace)
+        access_path = path(workspace_path, yes, access)
+        sibling = {path(chapter, 'risksQUuid'): IDS['risksExploreAUuid'],
+                   path(chapter, 'risksQUuid', 'risksExploreAUuid', 'risksHttpsQUuid'): IDS['risksHttpsYesAUuid']}
+        for parent in (yes, no, None, '', 'unknown'):
+            for choice in (*choices, 'unknown'):
+                values = dict(sibling, **{access_path: choice})
+                if parent is not None: values[workspace_path] = parent
+                for schema in ({}, {'km': km}):
+                    for profile in ('review', 'submission'):
+                        with self.subTest(parent=parent, choice=choice, schema=bool(schema), profile=profile):
+                            soup = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', values,
+                                output_profile=profile, **schema), 'html.parser')
+                            text = soup.get_text(' ', strip=True)
+                            active = parent == yes and choice in choices
+                            self.assertEqual(active, 'Access to data during research' in text)
+                            for fact in choices.values(): self.assertEqual(active and fact == choices.get(choice), fact in text)
+                            self.assertIn('All project web services are accessible through HTTPS.', text)
+        values = dict(sibling, **{workspace_path: yes, access_path: next(iter(choices))})
+        for mutation in ('removed-question', 'removed-followup', 'wrong-type', 'removed-choice', 'dangling-answer'):
+            altered = deepcopy(km)
+            if mutation == 'removed-question': del altered['entities']['questions'][access]
+            elif mutation == 'removed-followup': altered['entities']['answers'][yes]['followUpUuids'] = []
+            elif mutation == 'wrong-type': altered['entities']['questions'][access]['questionType'] = 'ValueQuestion'
+            elif mutation == 'removed-choice': altered['entities']['questions'][access]['answerUuids'] = []
+            else: del altered['entities']['answers'][values[access_path]]
+            for profile in ('review', 'submission'):
+                text = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', values,
+                    output_profile=profile, km=altered), 'html.parser').get_text(' ', strip=True)
+                self.assertNotIn('Access to data during research', text, mutation)
+                self.assertIn('All project web services are accessible through HTTPS.', text, mutation)
 
     def test_unnamed_roles_keep_facts_and_a_specific_name_gap(self):
         parent = path('adminDetailsCUuid', 'contributorsQUuid')

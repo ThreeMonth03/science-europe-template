@@ -4,6 +4,7 @@ import unittest
 from bs4 import BeautifulSoup
 from test_science_europe_contract import ROOT, render_question
 from test_personal_data_gaps import UUIDS, case, QUESTION
+from test_answer_retention import path
 sys.path.insert(0, str(ROOT/'scripts'))
 from generate_personal_data_fixtures import personal_data_cases, personal_paths
 
@@ -24,6 +25,36 @@ class PersonalDataFollowupTests(unittest.TestCase):
 
     def facts(self, values):
         return {p['data-fact-id'] for p in self.output(values).select('[data-fact-id][data-status="missing"]')}
+
+    def test_known_privacy_restriction_survives_blank_access_procedure(self):
+        opened = path('accessCUuid', 'openImmediatelyQUuid')
+        legal = path(opened, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
+        privacy = path(legal, 'notOpenLegalReasonsYesAUuid', 'notOpenLegalReasonsPrivacyQUuid')
+        procedure = path(privacy, 'notOpenLegalReasonsPrivacyYesAUuid', 'notOpenLegalReasonsPrivacyAccessQUuid')
+        values = {opened: UUIDS['openImmediatelyNoAUuid'], legal: UUIDS['notOpenLegalReasonsYesAUuid'],
+                  privacy: UUIDS['notOpenLegalReasonsPrivacyYesAUuid']}
+        known = 'Privacy restrictions prevent some project data from being made openly available.'
+        for blank in (None, '', ' \t\n\u3000'):
+            current = dict(values)
+            if blank is not None: current[procedure] = blank
+            for profile in ('review', 'submission'):
+                with self.subTest(blank=blank, profile=profile):
+                    soup = BeautifulSoup(render_question(QUESTION, current, output_profile=profile), 'html.parser')
+                    fact = soup.select_one('[data-fact-id="personal-data-privacy-restriction"][data-status="complete"]')
+                    self.assertIsNotNone(fact)
+                    self.assertEqual(known, fact.get_text(' ', strip=True))
+                    self.assertFalse(soup.select('h4'))
+                    if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review, .empty-value'))
+        values[procedure] = 'Request permission from the data custodian.'
+        self.assertIn(values[procedure], self.output(values).get_text())
+        for parent, inactive in ((opened, UUIDS['openImmediatelyYesAUuid']),
+                                 (legal, UUIDS['notOpenLegalReasonsNoAUuid']),
+                                 (privacy, '')):
+            current = dict(values); current[parent] = inactive
+            for profile in ('review', 'submission'):
+                soup = BeautifulSoup(render_question(QUESTION, current, output_profile=profile), 'html.parser')
+                self.assertFalse(soup.select('[data-fact-id="personal-data-privacy-restriction"]'))
+                self.assertNotIn(values[procedure], soup.get_text())
 
     def test_opened_followups_are_not_completed_answers(self):
         values = replies('personal-followups-empty')
