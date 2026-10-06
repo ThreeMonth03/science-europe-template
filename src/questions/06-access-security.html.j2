@@ -12,8 +12,12 @@
     {%- if risksAUuid == uuids.risksExploreAUuid and (km is not defined or (risksAUuid in km.entities.questions[uuids.risksQUuid].answerUuids and risksAUuid in km.entities.answers)) -%}
     {%- set risksPathPrefix = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid]|reply_path -%}
     {# Basic risks #}
-    {%- set risksStoreLabPath = [risksPathPrefix, uuids.risksStoreLabQUuid]|reply_path -%}
-    {%- set risksStoreLabAUuid = repliesMap[risksStoreLabPath]|reply_str_value -%}
+    {%- set risksStoreLabParts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, uuids.risksStoreLabQUuid] -%}
+    {%- set risksStoreLabPath = activeAnswer.path(risksStoreLabParts, 'OptionsQuestion') if km is defined else risksStoreLabParts|reply_path -%}
+    {%- set risksStoreLabAUuid = repliesMap[risksStoreLabPath]|reply_str_value if risksStoreLabPath else '' -%}
+    {%- if km is defined and risksStoreLabPath and (risksStoreLabAUuid not in km.entities.questions[uuids.risksStoreLabQUuid].answerUuids or risksStoreLabAUuid not in km.entities.answers) -%}
+      {%- set risksStoreLabAUuid = '' -%}
+    {%- endif -%}
     {%- set risksCarryHomeParts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, uuids.risksCarryHomeQUuid] -%}
     {%- set risksCarryHomePath = activeAnswer.path(risksCarryHomeParts, 'OptionsQuestion') if km is defined else risksCarryHomeParts|reply_path -%}
     {%- set risksCarryHomeAUuid = repliesMap[risksCarryHomePath]|reply_str_value if risksCarryHomePath else '' -%}
@@ -44,8 +48,12 @@
     {%- if km is defined and risksHttpsPath and (risksHttpsAUuid not in km.entities.questions[uuids.risksHttpsQUuid].answerUuids or risksHttpsAUuid not in km.entities.answers) -%}
       {%- set risksHttpsAUuid = '' -%}
     {%- endif -%}
-    {%- set risksInstructedPath = [risksPathPrefix, uuids.risksInstructedQUuid]|reply_path -%}
-    {%- set risksInstructedAUuid = repliesMap[risksInstructedPath]|reply_str_value -%}
+    {%- set risksInstructedParts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, uuids.risksInstructedQUuid] -%}
+    {%- set risksInstructedPath = activeAnswer.path(risksInstructedParts, 'OptionsQuestion') if km is defined else risksInstructedParts|reply_path -%}
+    {%- set risksInstructedAUuid = repliesMap[risksInstructedPath]|reply_str_value if risksInstructedPath else '' -%}
+    {%- if km is defined and risksInstructedPath and (risksInstructedAUuid not in km.entities.questions[uuids.risksInstructedQUuid].answerUuids or risksInstructedAUuid not in km.entities.answers) -%}
+      {%- set risksInstructedAUuid = '' -%}
+    {%- endif -%}
 
     {%- set homeEncrypted = risksCarryHomeEncAUuid == uuids.risksCarryHomeEncYesAUuid -%}
     {%- set homeNotEncrypted = risksCarryHomeEncAUuid == uuids.risksCarryHomeEncNoAUuid -%}
@@ -53,10 +61,12 @@
     {%- set homeNotPassword = risksCarryHomeAUuid == uuids.risksCarryHomeYesAUuid and risksCarryHomePassAUuid == uuids.risksCarryHomePassNoAUuid -%}
     {%- set storeLab = risksStoreLabAUuid == uuids.risksStoreLabNoAUuid -%}
 
-    {%- if storeLab or (risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid]) or (risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid]) or (risksHttpsAUuid in [uuids.risksHttpsYesAUuid, uuids.risksHttpsNoAUuid]) or (risksInstructedAUuid == uuids.risksInstructedYesAUuid) %}
+    {%- if risksStoreLabAUuid in [uuids.risksStoreLabNoAUuid, uuids.risksStoreLabYesAUuid] or (risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid]) or (risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid]) or (risksHttpsAUuid in [uuids.risksHttpsYesAUuid, uuids.risksHttpsNoAUuid]) or (risksInstructedAUuid in [uuids.risksInstructedYesAUuid, uuids.risksInstructedNoAUuid]) %}
       <p>
         {%- if storeLab %}
           Project members will not store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
+        {%- elif risksStoreLabAUuid == uuids.risksStoreLabYesAUuid %}
+          Project members store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
         {%- endif -%}
         {%- if risksCarryHomeAUuid == uuids.risksCarryHomeNoAUuid %}
           {%- if storeLab -%}They{%- else -%}Project members{%- endif %} will not carry data with them (e.g. on laptops, USB sticks, or other external media).
@@ -87,6 +97,8 @@
         {%- endif -%}
         {%- if risksInstructedAUuid == uuids.risksInstructedYesAUuid %}
           Project members have been instructed about both generic and specific risks to the project.
+        {%- elif risksInstructedAUuid == uuids.risksInstructedNoAUuid %}
+          Project members have not received instruction covering both generic and project-specific risks.
         {%- endif -%}
       </p>
     {%- endif -%}

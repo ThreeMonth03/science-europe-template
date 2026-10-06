@@ -45,6 +45,8 @@ class ReadingPolishTests(unittest.TestCase):
         }
         free = 'The repositories we use do not charge for their services.'
         funded = 'We have allocated funds for the time and effort needed to prepare the data for publication.'
+        unfunded = 'We have not budgeted for the time and effort needed to prepare the data for publication.'
+        self.assertEqual('f765ae2f-7d22-478c-bd53-1a388c4dbcc9', IDS.get('budgetTimeEffortNoAUuid'))
         authored = 'Keep v1.2: 0 TWD; department A does not pay.'
         render = environment(ROOT, escape=True).from_string(
             PREFIX + "{% include 'src/questions/11-data-preservation.html.j2' %}").render
@@ -57,6 +59,7 @@ class ReadingPolishTests(unittest.TestCase):
                 self.assertEqual(charge == 'Yes' and payment == option, sentence in text)
             self.assertEqual(charge == 'No', free in text)
             self.assertEqual(budget == 'Yes', funded in text)
+            self.assertEqual(budget == 'No', unfunded in text)
             self.assertEqual(charge == 'Yes' and payment == 'Other', authored in text)
 
     def test_fixed_english_prose_uses_complete_natural_sentences(self):

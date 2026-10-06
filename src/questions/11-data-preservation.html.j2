@@ -233,13 +233,21 @@
     {% set resourceContent %}
     <div class="preservation-resources dataset-policy">
     {# Repository charges #}
-    {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}
-    {%- set repoChargesAUuid = repliesMap[repoChargesPath]|reply_str_value -%}
+    {%- set repoChargesParts = [uuids.preservingCUuid, uuids.repoChargesQUuid] -%}
+    {%- set repoChargesPath = activeAnswer.path(repoChargesParts, 'OptionsQuestion') if km is defined else repoChargesParts|reply_path -%}
+    {%- set repoChargesAUuid = repliesMap[repoChargesPath]|reply_str_value if repoChargesPath else '' -%}
+    {%- if km is defined and repoChargesPath and (repoChargesAUuid not in km.entities.questions[uuids.repoChargesQUuid].answerUuids or repoChargesAUuid not in km.entities.answers) -%}
+      {%- set repoChargesAUuid = '' -%}
+    {%- endif -%}
     {%- if repoChargesAUuid == uuids.repoChargesNoAUuid -%}
       <p>The repositories we use do not charge for their services.</p>
     {%- elif repoChargesAUuid == uuids.repoChargesYesAUuid -%}
-      {%- set repoChargesHowPayPath = [repoChargesPath, uuids.repoChargesYesAUuid, uuids.repoChargesHowPayQUuid]|reply_path -%}
-      {%- set repoChargesHowPayAUuid = repliesMap[repoChargesHowPayPath]|reply_str_value -%}
+      {%- set repoChargesHowPayParts = [uuids.preservingCUuid, uuids.repoChargesQUuid, uuids.repoChargesYesAUuid, uuids.repoChargesHowPayQUuid] -%}
+      {%- set repoChargesHowPayPath = activeAnswer.path(repoChargesHowPayParts, 'OptionsQuestion') if km is defined else repoChargesHowPayParts|reply_path -%}
+      {%- set repoChargesHowPayAUuid = repliesMap[repoChargesHowPayPath]|reply_str_value if repoChargesHowPayPath else '' -%}
+      {%- if km is defined and repoChargesHowPayPath and (repoChargesHowPayAUuid not in km.entities.questions[uuids.repoChargesHowPayQUuid].answerUuids or repoChargesHowPayAUuid not in km.entities.answers) -%}
+        {%- set repoChargesHowPayAUuid = '' -%}
+      {%- endif -%}
       {%- if repoChargesHowPayAUuid == uuids.repoChargesHowPayBudgetedAUuid -%}
         <p>The project budget includes the repository service fees.</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayDepartmentAUuid -%}
@@ -247,19 +255,28 @@
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayInstituteAUuid -%}
         <p>A participating institute will cover the repository service fees.</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayOtherAUuid -%}
-        {%- set repoChargesHowPayOtherPath = [repoChargesHowPayPath, uuids.repoChargesHowPayOtherAUuid, uuids.repoChargesHowPayOtherQUuid]|reply_path -%}
-        {%- set repoChargesHowPayOther = repliesMap[repoChargesHowPayOtherPath]|reply_str_value -%}
+        {%- set repoChargesHowPayOtherParts = [uuids.preservingCUuid, uuids.repoChargesQUuid, uuids.repoChargesYesAUuid, uuids.repoChargesHowPayQUuid, uuids.repoChargesHowPayOtherAUuid, uuids.repoChargesHowPayOtherQUuid] -%}
+        {%- set repoChargesHowPayOtherPath = activeAnswer.path(repoChargesHowPayOtherParts, 'ValueQuestion') if km is defined else repoChargesHowPayOtherParts|reply_path -%}
+        {%- set repoChargesHowPayOther = repliesMap[repoChargesHowPayOtherPath]|reply_str_value if repoChargesHowPayOtherPath else '' -%}
         {%- if repoChargesHowPayOther|trim -%}
           <div class="answer-lead"><p>Other arrangements for paying repository costs:</p></div>
           <div class="answer-detail">{{ repoChargesHowPayOther|markdown }}</div>
+        {%- else -%}
+          <p>Other arrangements are planned for paying repository service fees.</p>
         {%- endif -%}
       {%- endif -%}
     {%- endif -%}
     {# Budget time and effort #}
-    {%- set budgetTimeEffortPath = [uuids.preservingCUuid, uuids.budgetTimeEffortQUuid]|reply_path -%}
-    {%- set budgetTimeEffortAUuid = repliesMap[budgetTimeEffortPath]|reply_str_value -%}
+    {%- set budgetTimeEffortParts = [uuids.preservingCUuid, uuids.budgetTimeEffortQUuid] -%}
+    {%- set budgetTimeEffortPath = activeAnswer.path(budgetTimeEffortParts, 'OptionsQuestion') if km is defined else budgetTimeEffortParts|reply_path -%}
+    {%- set budgetTimeEffortAUuid = repliesMap[budgetTimeEffortPath]|reply_str_value if budgetTimeEffortPath else '' -%}
+    {%- if km is defined and budgetTimeEffortPath and (budgetTimeEffortAUuid not in km.entities.questions[uuids.budgetTimeEffortQUuid].answerUuids or budgetTimeEffortAUuid not in km.entities.answers) -%}
+      {%- set budgetTimeEffortAUuid = '' -%}
+    {%- endif -%}
     {%- if budgetTimeEffortAUuid == uuids.budgetTimeEffortYesAUuid -%}
       <p>We have allocated funds for the time and effort needed to prepare the data for publication.</p>
+    {%- elif budgetTimeEffortAUuid == uuids.budgetTimeEffortNoAUuid -%}
+      <p>We have not budgeted for the time and effort needed to prepare the data for publication.</p>
     {%- endif -%}
     </div>
     {% endset %}

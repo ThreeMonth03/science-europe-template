@@ -100,6 +100,24 @@ class AnswerStateTests(unittest.TestCase):
     def test_negative_followups_preserve_exact_no_and_active_yes_only(self):
         cases = [
             ('src/questions/06-access-security.html.j2',
+             ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksStoreLabQUuid'),
+             'risksStoreLabYesAUuid', 'risksStoreLabNoAUuid',
+             '17172079-ddce-40a7-b93a-f86dc6611452',
+             'Project members store data or software on computers in the lab or external hard drives connected to those computers.',
+             'Project members will not store data or software on computers in the lab or external hard drives connected to those computers.'),
+            ('src/questions/06-access-security.html.j2',
+             ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksInstructedQUuid'),
+             'risksInstructedYesAUuid', 'risksInstructedNoAUuid',
+             'd802675e-f76b-4714-87ee-1b328da826ab',
+             'Project members have been instructed about both generic and specific risks to the project.',
+             'Project members have not received instruction covering both generic and project-specific risks.'),
+            ('src/questions/11-data-preservation.html.j2',
+             ('preservingCUuid', 'budgetTimeEffortQUuid'),
+             'budgetTimeEffortYesAUuid', 'budgetTimeEffortNoAUuid',
+             'f765ae2f-7d22-478c-bd53-1a388c4dbcc9',
+             'We have allocated funds for the time and effort needed to prepare the data for publication.',
+             'We have not budgeted for the time and effort needed to prepare the data for publication.'),
+            ('src/questions/06-access-security.html.j2',
              ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksCarryHomeQUuid',
               'risksCarryHomeYesAUuid', 'risksCarryHomePassQUuid'),
              'risksCarryHomePassYesAUuid', 'risksCarryHomePassNoAUuid',
@@ -141,7 +159,11 @@ class AnswerStateTests(unittest.TestCase):
              'We will not provide others with standardized, machine-readable metadata.'),
         ]
         for template, names, yes, no, exact_no, yes_text, no_text in cases:
-            self.assertEqual(exact_no, IDS.get(no), 'The exact No option must have a source binding')
+            with self.subTest(question=names[-1], stage='bindings'):
+                self.assertEqual(exact_no, IDS.get(no), 'The exact No option must have a source binding')
+                self.assertIn(yes, IDS, 'The exact Yes option must have a source binding')
+            if yes not in IDS or no not in IDS:
+                continue
             parts = [IDS[name] for name in names]
             leaf = path(*parts)
             ancestors = {path(*parts[:index]): parts[index]
@@ -187,17 +209,21 @@ class AnswerStateTests(unittest.TestCase):
                         self.assertNotIn(yes_text, text)
                         self.assertNotIn(no_text, text)
             # A compiled KM cannot authorize a removed question, answer, follow-up or wrong type.
-            for mutation in ('removed-question', 'removed-choice', 'dangling-answer', 'removed-followup', 'wrong-type'):
+            for mutation, choice in itertools.product(
+                    ('removed-question', 'removed-choice', 'dangling-answer', 'removed-followup', 'wrong-type'), (yes, no)):
                 altered = deepcopy(km)
+                selected = IDS[choice]
                 if mutation == 'removed-question': del altered['entities']['questions'][parts[-1]]
-                elif mutation == 'removed-choice': altered['entities']['questions'][parts[-1]]['answerUuids'] = [IDS[yes]]
-                elif mutation == 'dangling-answer': del altered['entities']['answers'][IDS[no]]
-                elif mutation == 'removed-followup': altered['entities']['answers'][parts[-2]]['followUpUuids'] = []
+                elif mutation == 'removed-choice': altered['entities']['questions'][parts[-1]]['answerUuids'] = [IDS[no if choice == yes else yes]]
+                elif mutation == 'dangling-answer': del altered['entities']['answers'][selected]
+                elif mutation == 'removed-followup':
+                    if len(parts) == 2: altered['entities']['chapters'][parts[0]]['questionUuids'] = []
+                    else: altered['entities']['answers'][parts[-2]]['followUpUuids'] = []
                 else: altered['entities']['questions'][parts[-1]]['questionType'] = 'ValueQuestion'
                 for profile in ('review', 'submission'):
-                    text = BeautifulSoup(render_question(template, dict(ancestors, **{leaf: IDS[no]}),
+                    text = BeautifulSoup(render_question(template, dict(ancestors, **{leaf: selected}),
                         output_profile=profile, km=altered), 'html.parser').get_text(' ', strip=True)
-                    self.assertNotIn(no_text, text, mutation)
+                    self.assertNotIn(yes_text if choice == yes else no_text, text, mutation)
 
     def test_negative_limitations_share_prose_without_losing_positive_siblings(self):
         risk = path('processingCUuid', 'risksQUuid')

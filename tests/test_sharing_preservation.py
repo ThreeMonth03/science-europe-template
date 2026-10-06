@@ -218,3 +218,12 @@ class SharingPreservationTests(unittest.TestCase):
         self.assertEqual(AUTHORED, resources.select_one('.answer-detail').decode_contents())
         self.assertEqual('Other arrangements for paying repository costs:', resources.select_one('.answer-lead').get_text())
         self.assertFalse(soup.select('p p, p div, p ul'))
+        fallback = 'Other arrangements are planned for paying repository service fees.'
+        for profile, detail in itertools.product(('review', 'submission'), (None, '', ' \t\n\u3000')):
+            partial = dict(replies)
+            if detail is None: partial.pop(key)
+            else: partial[key] = detail
+            rendered = BeautifulSoup(render_question(Q11, partial, output_profile=profile), 'html.parser')
+            self.assertIn(fallback, rendered.get_text(' ', strip=True))
+            self.assertNotIn('Other arrangements for paying repository costs:', rendered.get_text(' ', strip=True))
+            self.assertFalse(rendered.select('p p, p div, p ul'))
