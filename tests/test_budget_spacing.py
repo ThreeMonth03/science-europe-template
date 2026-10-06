@@ -19,6 +19,36 @@ def fixture(n=12, question='q-required-resources', table='resource-table', detai
 
 
 class BudgetSpacingTests(unittest.TestCase):
+    def test_list_closing_keep_is_scoped_without_locking_whole_resource(self):
+        selector = ('html body #q-required-resources .resource-table > tbody > '
+                    'tr[data-item-id] > td:first-child > '
+                    '.answer-detail[data-fact-id="resource-justification"]:has(+ p:not(.data-gap)) > '
+                    ':is(ol, ul) + p:last-child')
+        css = (ROOT / 'src/layout.css').read_text()
+        self.assertIn(selector + ' { break-before: avoid; }', css)
+        for tag in ['ol', 'ul']:
+            for closing in ['Retain original records.', '保留原始紀錄。']:
+                source = ('<html><body><div id="q-required-resources"><table class="resource-table">'
+                          '<tbody><tr data-item-id="resource-2"><td><strong>Resource 2</strong>'
+                          '<div class="answer-detail" data-fact-id="resource-justification">'
+                          '<p>Steps:</p><' + tag + '><li>' + ('Long item. ' * 150) + '</li></' + tag + '>'
+                          '<p>' + closing + '</p></div><p>Allocation.</p></td>'
+                          '<td>0 TWD</td><td>Funder.</td></tr></tbody></table></div></body></html>')
+                soup = BeautifulSoup(source, 'html.parser')
+                self.assertEqual([n.get_text() for n in soup.select(selector)], [closing])
+                # No whole-row/list keep is introduced; only this final p matches.
+                for absent in [source.replace('<p>Allocation.</p>', ''),
+                               source.replace('<p>Allocation.</p>', '<p class="data-gap">Missing.</p>'),
+                               source.replace('<p>Steps:</p><' + tag + '>', '<p>Steps:</p></div><div><' + tag + '>'),
+                               source.replace('id="q-required-resources"', 'id="q-other"'),
+                               source.replace('data-item-id="resource-2"', ''),
+                               source.replace('<p>' + closing + '</p></div>', '<p>' + closing + '</p><p>More.</p></div>')]:
+                    self.assertFalse(BeautifulSoup(absent, 'html.parser').select(selector))
+                soup.select_one('.answer-detail').clear()
+                soup.select_one('.answer-detail').append(soup.new_tag('p'))
+                soup.select_one('.answer-detail > p').string = closing
+                self.assertFalse(soup.select(selector))
+
     def test_native_probe_covers_current_hints_and_unbounded_controls(self):
         from probe_budget_pdf import cases
         rows = cases()

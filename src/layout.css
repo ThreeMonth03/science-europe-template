@@ -206,6 +206,9 @@ html body .pdf-resource-reading tbody > tr > td > .answer-detail[data-fact-id="r
    fragment minima move short paragraphs intact without making a long authored
    paragraph, the whole purpose or a nested table unbreakable. */
 html body #q-required-resources .resource-table > tbody > tr > td:first-child > .answer-detail[data-fact-id="resource-justification"]:has(+ p:not(.data-gap)) > p:last-child { break-after: avoid; orphans: 4; widows: 4; }
+/* Keep a list's closing paragraph with its last fragment and allocation.
+   Single-paragraph purposes and unbounded list items remain breakable. */
+html body #q-required-resources .resource-table > tbody > tr[data-item-id] > td:first-child > .answer-detail[data-fact-id="resource-justification"]:has(+ p:not(.data-gap)) > :is(ol, ul) + p:last-child { break-before: avoid; }
 
 /* Q10 identifiers: text before strong is not counted by :first-child.
    Keep the identifier value inline with its type, not as a dataset heading.
