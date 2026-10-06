@@ -103,7 +103,7 @@ class ReadingPolishTests(unittest.TestCase):
         coverage = path(listing, 'resource-a', 'costCoverQUuid')
         detail = path(coverage, 'costCoverOtherAUuid', 'costCoverOtherHowQUuid')
         replies.update({listing: ['resource-a'], path(listing, 'resource-a', 'costTitleQUuid'): 'Archival storage'})
-        fact = 'Other arrangements are planned for covering this cost.'
+        fact = 'Other funding arrangements are planned.'
         authored = '<p>Keep 0 TWD.</p><ul><li>Department A does not pay.</li></ul><table><tr><td>Original funding</td></tr></table>'
         for choice, value, profile in itertools.product((None, 'unknown', IDS['costCoverGrantAUuid'], IDS['costCoverOtherAUuid']),
                 (None, '', ' \t\n\u3000', authored), ('review', 'submission')):

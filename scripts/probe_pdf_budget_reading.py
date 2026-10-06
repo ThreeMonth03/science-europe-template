@@ -16,6 +16,7 @@ from probe_budget_word import IMAGE, ROOT
 sys.path.insert(0, str(ROOT / 'tests'))
 from test_science_europe_contract import reply_path, reply_items, reply_str_value
 from check_project_acronym import fixture as project_fixture
+from check_answer_mapping import question as km_question
 
 QUESTION = 'src/questions/15-required-resources.html.j2'
 
@@ -84,6 +85,19 @@ def render(root, replies, pdf=False, question=None, autoescape=False, word=False
     template = env.from_string("{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include '"+QUESTION+"' %}")
     # The project list and labels are active KM fields, not unscoped replies.
     km, _ = project_fixture()
+    children = km['entities']['questions'][IDS['projectsQUuid']]['itemTemplateQuestionUuids']
+    children = km_question(km, children, IDS['costQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+    for field in ('costTitleQUuid', 'costDescriptionQUuid', 'costAmountQUuid'):
+        km_question(km, children, IDS[field], 'ValueQuestion')
+    km_question(km, children, IDS['costCurrencyQUuid'], 'IntegrationQuestion')
+    km_question(km, children, IDS['costAllocationQUuid'], 'MultiChoiceQuestion',
+                [IDS['costAllocation' + option + 'AUuid'] for option in
+                 ('Findability', 'Accessibility', 'Interoperability', 'Reusability')] + [IDS['costManagementAUuid']])
+    km_question(km, children, IDS['costCoverQUuid'], 'OptionsQuestion',
+                [IDS['costCoverGrantAUuid'], IDS['costCoverOtherAUuid']])
+    for option, field in (('Grant', 'costCoverGrantIdQUuid'), ('Other', 'costCoverOtherHowQUuid')):
+        km_question(km, km['entities']['answers'][IDS['costCover' + option + 'AUuid']]['followUpUuids'],
+                    IDS[field], 'ValueQuestion')
     return template.render(repliesMap=replies, km=km, pdf_budget_reading=pdf, word_budget_reading=word)
 
 
@@ -164,6 +178,13 @@ def check(root, prior=None):
             before = render(root, replies, question=prior)
             historic_original = original
             question = (root/QUESTION).read_text()
+            if root.resolve() == ROOT:
+                from current_repairs_contract import CONTRACT, project_source
+                if json.loads((root/'template.json').read_text())['version'] == CONTRACT['candidate_version']:
+                    # Only the sealed canonical candidate takes this historical
+                    # content view. Live original/pdf below stay unprojected;
+                    # the older oracle does not validate newly added facts.
+                    question = project_source()[0][QUESTION].decode()
             if 'resourceOverview.original' in question:
                 # Prove the old table contract on the precisely unwrapped
                 # question; keep the live joined original/pdf below. The new

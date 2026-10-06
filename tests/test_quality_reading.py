@@ -87,9 +87,23 @@ class QualityReadingTests(unittest.TestCase):
 
     def test_legal_fallback_only_for_empty_output(self):
         template = 'src/questions/08-copyright-ipr.html.j2'
-        for values in ({}, {path('creatingCUuid', 'ownershipQUuid'): IDS['ownershipOtherAUuid']}):
+        ownership = path('creatingCUuid', 'ownershipQUuid')
+        detail = path(ownership, 'ownershipOtherAUuid', 'ownershipOtherQUuid')
+        partial = 'Rights to the collected data are arranged in another way.'
+        for values in ({}, {ownership: 'unknown-option'},
+                       {ownership: 'unknown-option', detail: '<p>Inactive ownership detail.</p>'}):
             self.assertIn('data-status="missing-output"', render_question(template, values))
-        output = render_question(template, {path('creatingCUuid', 'ownershipQUuid'): IDS['ownershipPIAUuid']})
+            self.assertNotIn(partial, render_question(template, values))
+        for profile, value in itertools.product(('review', 'submission'), (None, '', ' \t\n\u3000')):
+            values = {ownership: IDS['ownershipOtherAUuid']}
+            if value is not None: values[detail] = value
+            output = render_question(template, values, output_profile=profile)
+            self.assertEqual(1, output.count(partial))
+            self.assertNotIn('data-status="missing-output"', output)
+        output = render_question(template, {ownership: IDS['ownershipNoOwnerAUuid']})
+        self.assertIn('The project data are not protected by copyright and therefore have no copyright owner.', output)
+        self.assertNotIn(partial, output)
+        output = render_question(template, {ownership: IDS['ownershipPIAUuid']})
         self.assertIn('All data will be owned by the Principal Investigator.', output)
         self.assertNotIn('data-status="missing-output"', output)
 

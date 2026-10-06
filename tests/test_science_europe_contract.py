@@ -252,6 +252,21 @@ class ScienceEuropeContractTests(unittest.TestCase):
             f"{cover}.2e37f71b-b7aa-4182-888a-8b7a5156b53c.2964c7f7-d9be-42ac-8cfe-dbcf4d62f8a2": "institutional funds",
         }
         km, _ = project_fixture(None, 'Example project', 'project-1')
+        from check_answer_mapping import question
+        from generate_pilot_fixtures import IDS
+        children = km['entities']['questions'][IDS['projectsQUuid']]['itemTemplateQuestionUuids']
+        children = question(km, children, IDS['costQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+        for field in ('costTitleQUuid', 'costDescriptionQUuid', 'costAmountQUuid'):
+            question(km, children, IDS[field], 'ValueQuestion')
+        question(km, children, IDS['costCurrencyQUuid'], 'IntegrationQuestion')
+        question(km, children, IDS['costAllocationQUuid'], 'MultiChoiceQuestion',
+                 [IDS['costAllocation' + option + 'AUuid'] for option in
+                  ('Findability', 'Accessibility', 'Interoperability', 'Reusability')] + [IDS['costManagementAUuid']])
+        question(km, children, IDS['costCoverQUuid'], 'OptionsQuestion',
+                 [IDS['costCoverGrantAUuid'], IDS['costCoverOtherAUuid']])
+        for option, field in (('Grant', 'costCoverGrantIdQUuid'), ('Other', 'costCoverOtherHowQUuid')):
+            question(km, km['entities']['answers'][IDS['costCover' + option + 'AUuid']]['followUpUuids'],
+                     IDS[field], 'ValueQuestion')
         output = render_question("src/questions/15-required-resources.html.j2", replies, km=km)
         self.assertIn("Data curator time", output)
         self.assertIn("5000 EUR", output)

@@ -202,7 +202,7 @@
                           {%- if costCoverOtherHowReply|trim -%}
                             <div class="answer-detail">{{costCoverOtherHowReply|markdown}}</div>
                           {%- else -%}
-                            <p data-fact-id="cost-coverage" data-status="partial">Other arrangements are planned for covering this cost.</p>
+                            <p>Other funding arrangements are planned.</p>
                             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>{% endif %}
                           {%- endif -%}
                         {%- else -%}

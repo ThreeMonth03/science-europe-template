@@ -127,14 +127,21 @@ def check(root, language="en"):
             if profile == 'submission': assert not q8.select('.data-gap,.data-review')
             counts['authorization_cases'] += 1
         negatives = {parent: IDS['openImmediatelyYesAUuid'], reason: IDS['notOpenLegalReasonsNoAUuid'],
-                     authenticated: 'da8b25a9-8865-4ce8-a2ba-d592c42daa4c'}  # KM 2.7.0: authenticated access = No
+                     authenticated: IDS['legalReasonsAuthenticatedNoAUuid']}
         for key, value, profile in itertools.product([parent, reason, authenticated],
                 [None, 'negative', 'obsolete-option'], ['review', 'submission']):
             replies = dict(base); replies[authorization] = IDS['legalReasonsAuthorizeOtherAUuid']; replies[detail] = authored
             if value is None: replies.pop(key)
             else: replies[key] = negatives[key] if value == 'negative' else value
             soup = BeautifulSoup(legal.render(repliesMap=replies, output_profile=profile), 'html.parser')
-            assert not soup.select('[data-fact-id="authorization-arrangements"],[data-fact-id="authorization-details"],[data-fact-id="authenticated-access"]')
+            assert not soup.select('[data-fact-id="authorization-arrangements"],[data-fact-id="authorization-details"]')
+            known_no = key == authenticated and value == 'negative'
+            facts = soup.select('[data-fact-id="authenticated-access"]')
+            assert len(facts) == int(known_no)
+            if facts:
+                assert facts[0]['data-status'] == 'explicit-no'
+                expected = 'We will not permit authenticated access to the data.' if language == 'en' else '我們不會允許通過身分驗證後取用資料。'
+                assert ' '.join(facts[0].get_text().split()) == expected
             assert 'Access office:' not in soup.get_text()
             counts['authorization_cases'] += 1
 
