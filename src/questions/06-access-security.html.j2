@@ -103,21 +103,27 @@
       </p>
     {%- endif -%}
     {# Information loss, leak, and vandalism #}
-    {%- set risksInfoLossPath = [risksPathPrefix, uuids.risksInfoLossQUuid]|reply_path -%}
-    {%- set risksInfoLossAUuid = repliesMap[risksInfoLossPath]|reply_str_value -%}
-    {%- set risksInfoLeakPath = [risksPathPrefix, uuids.risksInfoLeakQUuid]|reply_path -%}
-    {%- set risksInfoLeakAUuid = repliesMap[risksInfoLeakPath]|reply_str_value -%}
-    {%- set risksInfoVandalismPath = [risksPathPrefix, uuids.risksInfoVandalismQUuid]|reply_path -%}
-    {%- set risksInfoVandalismAUuid = repliesMap[risksInfoVandalismPath]|reply_str_value -%}
+    {%- set riskAnswers = {} -%}
+    {%- for question in [uuids.risksInfoLossQUuid, uuids.risksInfoLeakQUuid, uuids.risksInfoVandalismQUuid] -%}
+      {%- set parts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, question] -%}
+      {%- set answerPath = activeAnswer.path(parts, 'OptionsQuestion') if km is defined else parts|reply_path -%}
+      {%- set choice = repliesMap[answerPath]|reply_str_value if answerPath else '' -%}
+      {%- if km is not defined or (answerPath and choice in km.entities.questions[question].answerUuids and choice in km.entities.answers) -%}
+        {%- do riskAnswers.update({question: choice}) -%}
+      {%- endif -%}
+    {%- endfor -%}
 
     {# Define mapping of UUIDs to qualitative levels #}
     {%- set risk_levels = {
+      uuids.risksInfoLossNoAUuid: 'not-considered',
       uuids.risksInfoLossSmallAUuid: 'small',
       uuids.risksInfoLossLowAUuid: 'low',
       uuids.risksInfoLossWillAUuid: 'will',
+      uuids.risksInfoLeakNoAUuid: 'not-considered',
       uuids.risksInfoLeakSmallAUuid: 'small',
       uuids.risksInfoLeakLowAUuid: 'low',
       uuids.risksInfoLeakWillAUuid: 'will',
+      uuids.risksInfoVandalismNoAUuid: 'not-considered',
       uuids.risksInfoVandalismSmallAUuid: 'small',
       uuids.risksInfoVandalismLowAUuid: 'low',
       uuids.risksInfoVandalismWillAUuid: 'will'
@@ -146,14 +152,15 @@
 
     {# Extract selected levels for each type #}
     {%- set selected = {
-      riskLoss: risk_levels[risksInfoLossAUuid],
-      riskDisclosure: risk_levels[risksInfoLeakAUuid],
-      riskTampering: risk_levels[risksInfoVandalismAUuid]
+      riskLoss: risk_levels.get(riskAnswers.get(uuids.risksInfoLossQUuid, '')),
+      riskDisclosure: risk_levels.get(riskAnswers.get(uuids.risksInfoLeakQUuid, '')),
+      riskTampering: risk_levels.get(riskAnswers.get(uuids.risksInfoVandalismQUuid, ''))
     } -%}
 
     {%- set small = [] -%}
     {%- set low = [] -%}
     {%- set will = [] -%}
+    {%- set notConsidered = [] -%}
 
     {# simple grouping in one pass #}
     {%- for key, level in selected.items() -%}
@@ -163,6 +170,8 @@
         {%- do low.append(key) -%}
       {%- elif level == 'will' -%}
         {%- do will.append(key) -%}
+      {%- elif level == 'not-considered' -%}
+        {%- do notConsidered.append(key) -%}
       {%- endif -%}
     {%- endfor -%}
 
@@ -179,6 +188,10 @@
     {%- if will|length > 0 -%}
       {%- set risks = risk_list(will)|trim -%}
       {%- set _ = fragments.append("We will mitigate the risk of " ~ risks) -%}
+    {%- endif -%}
+    {%- if notConsidered|length > 0 -%}
+      {%- set risks = risk_list(notConsidered)|trim -%}
+      {%- set _ = fragments.append("We have not considered the possible impact on the project or organization of " ~ risks) -%}
     {%- endif -%}
     {%- if fragments|length > 0 -%}
       <p>{{ fragments | join('. ') }}.</p>

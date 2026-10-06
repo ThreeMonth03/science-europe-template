@@ -78,8 +78,13 @@
   {%- endif -%}
 
   {# Non-equipment datasets #}
-  {%- set neqDataPath = [uuids.creatingCUuid, uuids.neqDataQUuid]|reply_path -%}
-  {%- set neqDataAUuid = repliesMap[neqDataPath]|reply_str_value -%}
+  {%- import 'src/active-answer.j2' as activeAnswer with context -%}
+  {%- set neqDataParts = [uuids.creatingCUuid, uuids.neqDataQUuid] -%}
+  {%- set neqDataPath = activeAnswer.path(neqDataParts, 'OptionsQuestion') if km is defined else neqDataParts|reply_path -%}
+  {%- set neqDataAUuid = repliesMap[neqDataPath]|reply_str_value if neqDataPath else '' -%}
+  {%- if km is defined and neqDataPath and (neqDataAUuid not in km.entities.questions[uuids.neqDataQUuid].answerUuids or neqDataAUuid not in km.entities.answers) -%}
+    {%- set neqDataAUuid = '' -%}
+  {%- endif -%}
   {%- if neqDataAUuid == uuids.neqDataYesAUuid -%}
     {%- set neqDataPrefix = [neqDataPath, uuids.neqDataYesAUuid]|reply_path -%}
     {%- set neqDataQuestPath = [neqDataPrefix, uuids.neqDataQuestQUuid]|reply_path -%}
@@ -133,6 +138,8 @@
           </ul>
         {%- endif -%}
       </div>
+    {%- else -%}
+      <p>The project includes data capture that does not use measurement equipment.</p>
     {%- endif -%}
   {%- endif -%}
   {# Existing datasets #}

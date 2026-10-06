@@ -139,8 +139,13 @@
     {%- endif -%}
     
     {# Ownership #}
-    {%- set ownershipPath = [uuids.creatingCUuid, uuids.ownershipQUuid]|reply_path -%}
-    {%- set ownershipAUuid = repliesMap[ownershipPath]|reply_str_value -%}
+    {%- import 'src/active-answer.j2' as activeAnswer with context -%}
+    {%- set ownershipParts = [uuids.creatingCUuid, uuids.ownershipQUuid] -%}
+    {%- set ownershipPath = activeAnswer.path(ownershipParts, 'OptionsQuestion') if km is defined else ownershipParts|reply_path -%}
+    {%- set ownershipAUuid = repliesMap[ownershipPath]|reply_str_value if ownershipPath else '' -%}
+    {%- if km is defined and ownershipPath and (ownershipAUuid not in km.entities.questions[uuids.ownershipQUuid].answerUuids or ownershipAUuid not in km.entities.answers) -%}
+      {%- set ownershipAUuid = '' -%}
+    {%- endif -%}
     {%- if ownershipAUuid == uuids.ownershipNoOwnerAUuid -%}
       <p>The project data are not protected by copyright and therefore have no copyright owner.</p>
     {%- elif ownershipAUuid == uuids.ownershipPIAUuid -%}
@@ -150,10 +155,13 @@
     {%- elif ownershipAUuid == uuids.ownershipConsortiumAUuid -%}
       <p>Our consortium agreement defines ownership of intellectual property rights.</p>
     {%- elif ownershipAUuid == uuids.ownershipOtherAUuid -%}
-      {%- set ownershipOtherPath = [ownershipPath, uuids.ownershipOtherAUuid, uuids.ownershipOtherQUuid]|reply_path -%}
-      {%- set ownershipOther = repliesMap[ownershipOtherPath]|reply_str_value -%}
+      {%- set ownershipOtherParts = ownershipParts + [uuids.ownershipOtherAUuid, uuids.ownershipOtherQUuid] -%}
+      {%- set ownershipOtherPath = activeAnswer.path(ownershipOtherParts, 'ValueQuestion') if km is defined else ownershipOtherParts|reply_path -%}
+      {%- set ownershipOther = repliesMap[ownershipOtherPath]|reply_str_value if ownershipOtherPath else '' -%}
       {%- if ownershipOther|trim -%}
         <div class="answer-detail">We have made the following arrangements regarding data ownership: {{ ownershipOther|markdown }}</div>
+      {%- else -%}
+        <p>Rights to the collected data are arranged in another way.</p>
       {%- endif -%}
     {%- endif -%}
 

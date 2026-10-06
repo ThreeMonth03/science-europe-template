@@ -37,6 +37,8 @@ def folder_replies():
 
 # Public KM paths for the audited blank-value regressions; no project answers.
 BLANK_FIELDS = [
+    ('preservingCUuid budgetTimeEffortQUuid budgetTimeEffortYesAUuid', 'budgetTimeEffortAmountQUuid'),
+    ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid publishedSpecSwUseQUuid publishedSpecSwUseNoAUuid', 'publishedSpecSwUseNoReasonQUuid'),
     ('adminDetailsCUuid projectsQUuid ITEM costQUuid ITEM', 'costTitleQUuid costDescriptionQUuid costCurrencyQUuid costAmountQUuid'),
     ('adminDetailsCUuid projectsQUuid ITEM costQUuid ITEM costCoverQUuid costCoverGrantAUuid', 'costCoverGrantIdQUuid'),
     ('adminDetailsCUuid projectsQUuid ITEM costQUuid ITEM costCoverQUuid costCoverOtherAUuid', 'costCoverOtherHowQUuid'),

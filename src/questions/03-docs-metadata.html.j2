@@ -23,8 +23,12 @@
         {%- set metadataStandardsDataCityAUuid = repliesMap[metadataStandardsDataCityPath]|reply_str_value -%}
         {%- set metadataStandardsDDIPath = [metadataStandardsPath, uuids.metadataStandardsExploreAUuid, uuids.metadataStandardsDDIQUuid]|reply_path -%}
         {%- set metadataStandardsDDIAUuid = repliesMap[metadataStandardsDDIPath]|reply_str_value -%}
-        {%- set metadataStandardsKeywordsPath = [metadataStandardsPath, uuids.metadataStandardsExploreAUuid, uuids.metadataStandardsKeywordsQUuid]|reply_path -%}
-        {%- set metadataStandardsKeywordsAUuid = repliesMap[metadataStandardsKeywordsPath]|reply_str_value -%}
+        {%- set metadataStandardsKeywordsParts = [uuids.creatingCUuid, uuids.metadataQUuid, uuids.metadataExploreAUuid, uuids.metadataStandardsQUuid, uuids.metadataStandardsExploreAUuid, uuids.metadataStandardsKeywordsQUuid] -%}
+        {%- set metadataStandardsKeywordsPath = activeAnswer.path(metadataStandardsKeywordsParts, 'OptionsQuestion') if km is defined else metadataStandardsKeywordsParts|reply_path -%}
+        {%- set metadataStandardsKeywordsAUuid = repliesMap[metadataStandardsKeywordsPath]|reply_str_value if metadataStandardsKeywordsPath else '' -%}
+        {%- if km is defined and metadataStandardsKeywordsPath and (metadataStandardsKeywordsAUuid not in km.entities.questions[uuids.metadataStandardsKeywordsQUuid].answerUuids or metadataStandardsKeywordsAUuid not in km.entities.answers) -%}
+          {%- set metadataStandardsKeywordsAUuid = '' -%}
+        {%- endif -%}
 
 
         {%- set metadataStandards = [] -%}
@@ -45,7 +49,7 @@
           {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ ", " ~ metadataStandards[1] ~ ", and " ~ metadataStandards[2] ~ " metadata standards.") -%}
         {%- endif -%}
         {%- if metadataStandardsKeywordsAUuid == uuids.metadataStandardsKeywordsYesAUuid -%}
-          {%- do metadataSentences.append("We will include keywords and relevant ontology references to optimize the possibility for discovery and potential reuse.") -%}
+          {%- do metadataSentences.append("We will include keywords or relevant ontology references to optimize the possibility for discovery and potential reuse.") -%}
         {%- endif -%}
       {%- endif -%}
 

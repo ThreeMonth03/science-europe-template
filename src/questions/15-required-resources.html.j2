@@ -180,8 +180,12 @@
  
                         {% endset %}{{ budgetRow.purpose }}</td><td>{{ budgetRow.budget }}</td><td>
                         {%- set budgetRow.funding -%}
-                        {%- set projectCostItemCoverQUuid = [projectCostItem, uuids.costCoverQUuid]|reply_path  -%}
-                        {%- set projectCostItemCoverReply = repliesMap[projectCostItemCoverQUuid]|reply_str_value -%}
+                        {%- set projectCostItemCoverParts = budgetProjectParts + [i, uuids.costQUuid, j, uuids.costCoverQUuid] -%}
+                        {%- set projectCostItemCoverQUuid = active.path(projectCostItemCoverParts, 'OptionsQuestion') -%}
+                        {%- set projectCostItemCoverReply = repliesMap[projectCostItemCoverQUuid]|reply_str_value if projectCostItemCoverQUuid else '' -%}
+                        {%- if projectCostItemCoverQUuid and (projectCostItemCoverReply not in km.entities.questions[uuids.costCoverQUuid].answerUuids or projectCostItemCoverReply not in km.entities.answers) -%}
+                          {%- set projectCostItemCoverReply = '' -%}
+                        {%- endif -%}
 
                         {%- if projectCostItemCoverReply == uuids.costCoverGrantAUuid -%}
                           {%- set costCoverGrantIdQUuid = [projectCostItemCoverQUuid, uuids.costCoverGrantAUuid, uuids.costCoverGrantIdQUuid]|reply_path -%}
@@ -193,11 +197,12 @@
                             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="grant-number" data-status="missing"><strong>Information not provided:</strong> the grant number.</p>{% endif %}
                           {% endif %}
                         {%- elif projectCostItemCoverReply == uuids.costCoverOtherAUuid -%}
-                          {%- set costCoverOtherHowQUuid = [projectCostItemCoverQUuid,uuids.costCoverOtherAUuid, uuids.costCoverOtherHowQUuid]|reply_path  -%}
-                          {%- set costCoverOtherHowReply = repliesMap[costCoverOtherHowQUuid]|reply_str_value -%}
+                          {%- set costCoverOtherHowQUuid = active.path(projectCostItemCoverParts + [uuids.costCoverOtherAUuid, uuids.costCoverOtherHowQUuid], 'ValueQuestion') -%}
+                          {%- set costCoverOtherHowReply = repliesMap[costCoverOtherHowQUuid]|reply_str_value if costCoverOtherHowQUuid else '' -%}
                           {%- if costCoverOtherHowReply|trim -%}
                             <div class="answer-detail">{{costCoverOtherHowReply|markdown}}</div>
                           {%- else -%}
+                            <p data-fact-id="cost-coverage" data-status="partial">Other arrangements are planned for covering this cost.</p>
                             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>{% endif %}
                           {%- endif -%}
                         {%- else -%}

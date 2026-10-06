@@ -3,6 +3,7 @@
 
   <div class="answer">
     {% set answerContent %}
+    {%- import 'src/active-answer.j2' as activeAnswer with context -%}
     {% include 'src/reference-publication-plan.html.j2' %}
     {# How data will be shared #}
     {# Produced datasets #}
@@ -255,9 +256,7 @@
 
     {%- set openImmediatelyPath = [uuids.accessCUuid, uuids.openImmediatelyQUuid]|reply_path -%}
     {%- set openImmediatelyAUuid = repliesMap[openImmediatelyPath]|reply_str_value -%}
-    {%- if openImmediatelyAUuid == uuids.openImmediatelyYesAUuid -%}
-      <p>No data sharing agreement will be required.</p>
-    {%- elif openImmediatelyAUuid == uuids.openImmediatelyNoAUuid -%}
+    {%- if openImmediatelyAUuid == uuids.openImmediatelyNoAUuid -%}
       {%- set pathPrefix = [openImmediatelyPath, uuids.openImmediatelyNoAUuid]|reply_path -%}
       {%- set embargoPath = [uuids.accessCUuid, uuids.limitedEmbargoQUuid]|reply_path -%}
       {%- set embargoAUuid = repliesMap[embargoPath]|reply_str_value -%}
@@ -272,8 +271,12 @@
         </p>
       {%- endif -%}
 
-      {%- set legalReasonsAuthenticatedPath = [pathPrefix, uuids.notOpenLegalReasonsQUuid, uuids.notOpenLegalReasonsYesAUuid, uuids.legalReasonsAuthenticatedQUuid]|reply_path -%}
-      {%- set legalReasonsAuthenticatedAUuid = repliesMap[legalReasonsAuthenticatedPath]|reply_str_value -%}
+      {%- set legalReasonsAuthenticatedParts = [uuids.accessCUuid, uuids.openImmediatelyQUuid, uuids.openImmediatelyNoAUuid, uuids.notOpenLegalReasonsQUuid, uuids.notOpenLegalReasonsYesAUuid, uuids.legalReasonsAuthenticatedQUuid] -%}
+      {%- set legalReasonsAuthenticatedPath = activeAnswer.path(legalReasonsAuthenticatedParts, 'OptionsQuestion') if km is defined else legalReasonsAuthenticatedParts|reply_path -%}
+      {%- set legalReasonsAuthenticatedAUuid = repliesMap[legalReasonsAuthenticatedPath]|reply_str_value if legalReasonsAuthenticatedPath else '' -%}
+      {%- if km is defined and legalReasonsAuthenticatedPath and (legalReasonsAuthenticatedAUuid not in km.entities.questions[uuids.legalReasonsAuthenticatedQUuid].answerUuids or legalReasonsAuthenticatedAUuid not in km.entities.answers) -%}
+        {%- set legalReasonsAuthenticatedAUuid = '' -%}
+      {%- endif -%}
       {%- set legalReasonsPath = [pathPrefix, uuids.notOpenLegalReasonsQUuid]|reply_path -%}
       {%- if repliesMap[legalReasonsPath]|reply_str_value == uuids.notOpenLegalReasonsYesAUuid and legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthenticatedYesAUuid -%}
         {%- set legalReasonsAuthorizePath = [legalReasonsAuthenticatedPath, uuids.legalReasonsAuthenticatedYesAUuid, uuids.legalReasonsAuthorizeQUuid]|reply_path -%}
@@ -311,6 +314,8 @@
           <div class="answer-lead">{{ authorizationLead }}</div>
           <div class="authorization-details">{{ authorizationDetails|markdown }}</div>
         {% else %}{{ authorizationLead }}{% endif %}
+      {%- elif repliesMap[legalReasonsPath]|reply_str_value == uuids.notOpenLegalReasonsYesAUuid and legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthenticatedNoAUuid -%}
+        <p data-fact-id="authenticated-access" data-status="explicit-no">We will not permit authenticated access to the data.</p>
       {%- endif -%}
     {%- endif -%}
 

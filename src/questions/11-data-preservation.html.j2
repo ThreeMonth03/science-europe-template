@@ -275,6 +275,13 @@
     {%- endif -%}
     {%- if budgetTimeEffortAUuid == uuids.budgetTimeEffortYesAUuid -%}
       <p>We have allocated funds for the time and effort needed to prepare the data for publication.</p>
+      {%- set budgetTimeEffortAmountParts = [uuids.preservingCUuid, uuids.budgetTimeEffortQUuid, uuids.budgetTimeEffortYesAUuid, uuids.budgetTimeEffortAmountQUuid] -%}
+      {%- set budgetTimeEffortAmountPath = activeAnswer.path(budgetTimeEffortAmountParts, 'ValueQuestion') if km is defined else budgetTimeEffortAmountParts|reply_path -%}
+      {%- set budgetTimeEffortAmount = repliesMap[budgetTimeEffortAmountPath]|reply_str_value if budgetTimeEffortAmountPath else '' -%}
+      {%- if budgetTimeEffortAmount|trim -%}
+        <div class="answer-lead"><p>Budget for making data or other research outputs FAIR:</p></div>
+        <div class="answer-detail" data-fact-id="preparation-budget-amount" data-status="complete">{{ budgetTimeEffortAmount|markdown }}</div>
+      {%- endif -%}
     {%- elif budgetTimeEffortAUuid == uuids.budgetTimeEffortNoAUuid -%}
       <p>We have not budgeted for the time and effort needed to prepare the data for publication.</p>
     {%- endif -%}

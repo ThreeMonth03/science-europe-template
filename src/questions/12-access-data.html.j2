@@ -99,7 +99,15 @@
             {% elif output_profile|default('review') != 'submission' %}
               <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-list" data-status="missing">Software is required, but the tools have not yet been listed.</p>
             {% endif %}
-          {% elif isPublishedDataSwAUuid != uuids.publishedSpecSwUseNoAUuid and output_profile|default('review') != 'submission' %}
+          {% elif isPublishedDataSwAUuid == uuids.publishedSpecSwUseNoAUuid %}
+            {% set softwareNotRequiredParts = [uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedSpecSwUseQUuid, uuids.publishedSpecSwUseNoAUuid, uuids.publishedSpecSwUseNoReasonQUuid] %}
+            {% set softwareNotRequiredPath = activeAnswer.path(softwareNotRequiredParts, 'ValueQuestion') if km is defined else softwareNotRequiredParts|reply_path %}
+            {% set softwareNotRequiredReason = repliesMap[softwareNotRequiredPath]|reply_str_value if softwareNotRequiredPath else '' %}
+            {% if softwareNotRequiredReason|trim %}
+              <div class="answer-lead"><p>Reason why specific software is not required:</p></div>
+              <div class="answer-detail" data-fact-id="software-not-required-reason" data-status="complete">{{ softwareNotRequiredReason|markdown }}</div>
+            {% endif %}
+          {% elif output_profile|default('review') != 'submission' %}
             <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-decision" data-status="missing">It has not yet been specified whether software is required to use this dataset.</p>
           {% endif %}
         {% elif isPublishedDataAUuid != uuids.isPublishedDataNoAUuid and output_profile|default('review') != 'submission' %}

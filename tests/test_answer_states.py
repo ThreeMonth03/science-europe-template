@@ -100,6 +100,31 @@ class AnswerStateTests(unittest.TestCase):
     def test_negative_followups_preserve_exact_no_and_active_yes_only(self):
         cases = [
             ('src/questions/06-access-security.html.j2',
+             ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksInfoLossQUuid'),
+             'risksInfoLossSmallAUuid', 'risksInfoLossNoAUuid',
+             '4c5d329b-6e18-4f4e-92a9-f0298adf38fe',
+             'The potential impact of data loss is small.',
+             'We have not considered the possible impact on the project or organization of data loss.'),
+            ('src/questions/06-access-security.html.j2',
+             ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksInfoLeakQUuid'),
+             'risksInfoLeakSmallAUuid', 'risksInfoLeakNoAUuid',
+             '04dd5577-367f-4c34-b90c-4bc25d80c819',
+             'The potential impact of data disclosure is small.',
+             'We have not considered the possible impact on the project or organization of data disclosure.'),
+            ('src/questions/06-access-security.html.j2',
+             ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksInfoVandalismQUuid'),
+             'risksInfoVandalismSmallAUuid', 'risksInfoVandalismNoAUuid',
+             'b4dbc287-8eed-4799-800e-5ce0ede13cd8',
+             'The potential impact of data tampering is small.',
+             'We have not considered the possible impact on the project or organization of data tampering.'),
+            ('src/questions/10-share-restrictions.html.j2',
+             ('accessCUuid', 'openImmediatelyQUuid', 'openImmediatelyNoAUuid',
+              'notOpenLegalReasonsQUuid', 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid'),
+             'legalReasonsAuthenticatedYesAUuid', 'legalReasonsAuthenticatedNoAUuid',
+             'da8b25a9-8865-4ce8-a2ba-d592c42daa4c',
+             'We will permit authenticated access to the data.',
+             'We will not permit authenticated access to the data.'),
+            ('src/questions/06-access-security.html.j2',
              ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksStoreLabQUuid'),
              'risksStoreLabYesAUuid', 'risksStoreLabNoAUuid',
              '17172079-ddce-40a7-b93a-f86dc6611452',
@@ -169,6 +194,8 @@ class AnswerStateTests(unittest.TestCase):
             ancestors = {path(*parts[:index]): parts[index]
                          for index in range(2, len(parts), 2)}
             inactive_answers = {
+                'openImmediatelyQUuid': 'openImmediatelyYesAUuid',
+                'notOpenLegalReasonsQUuid': 'notOpenLegalReasonsNoAUuid',
                 'risksCarryHomeQUuid': 'risksCarryHomeNoAUuid',
                 'storageConvFSysQUuid': 'storageConvFSysNoAUuid',
                 'preexistingQUuid': 'preexistingNoAUuid',
@@ -224,6 +251,83 @@ class AnswerStateTests(unittest.TestCase):
                     text = BeautifulSoup(render_question(template, dict(ancestors, **{leaf: selected}),
                         output_profile=profile, km=altered), 'html.parser').get_text(' ', strip=True)
                     self.assertNotIn(yes_text if choice == yes else no_text, text, mutation)
+
+        # Eventual openness says nothing about whether an agreement is needed.
+        for profile in ('review', 'submission'):
+            open_path = path('accessCUuid', 'openImmediatelyQUuid')
+            collab = path('creatingCUuid', 'collabQUuid')
+            replies = {open_path: IDS['openImmediatelyYesAUuid'], collab: IDS['collabYesAUuid'],
+                       path(collab, 'collabYesAUuid', 'collabAgreeQUuid'): IDS['collabAgreeYesAUuid']}
+            text = BeautifulSoup(render_question('src/questions/10-share-restrictions.html.j2',
+                                 replies, output_profile=profile), 'html.parser').get_text(' ', strip=True)
+            self.assertNotIn('No data sharing agreement will be required.', text)
+            self.assertIn('A collaboration agreement is in place to specify who can access which project data.', text)
+
+        # Newly mapped authored follow-ups are independent of siblings, but
+        # only current answers behind the exact selected parents are visible.
+        from check_sentence_layout import partial_fixture
+        fields = [
+            ('src/questions/11-data-preservation.html.j2',
+             'preservingCUuid budgetTimeEffortQUuid budgetTimeEffortYesAUuid budgetTimeEffortAmountQUuid',
+             '2a0cf686-63ed-44b6-ae74-38ddd39ac741', 'preparation-budget-amount'),
+            ('src/questions/12-access-data.html.j2',
+             'preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid '
+             'publishedSpecSwUseQUuid publishedSpecSwUseNoAUuid publishedSpecSwUseNoReasonQUuid',
+             '14f7a766-c28e-400e-8426-53f7b4e5b90b', 'software-not-required-reason'),
+        ]
+        authored = '<p>Keep <strong>v1.2.csv</strong>: 0 TWD; do not rewrite .,</p><ul><li>Reason A.</li></ul>'
+        for template, chain, exact_uuid, fact in fields:
+            names = chain.split()
+            self.assertEqual(exact_uuid, IDS.get(names[-1]))
+            if names[-1] not in IDS: continue
+            km, base, leaf = partial_fixture(chain)
+            for schema, profile, value in itertools.product(({}, {'km': km}), ('review', 'submission'),
+                                                           (None, '', ' \t\n\u3000', '0', authored)):
+                replies = dict(base)
+                if value is not None: replies[leaf] = value
+                soup = BeautifulSoup(render_question(template, replies, output_profile=profile, **schema), 'html.parser')
+                detail = soup.select_one('[data-fact-id="'+fact+'"]')
+                filled = bool((value or '').strip())
+                self.assertEqual(filled, bool(detail), (chain, value))
+                if detail: self.assertEqual(value, detail.decode_contents())
+                self.assertFalse(soup.select('p p, p div, p ul'))
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review'))
+            if fact == 'software-not-required-reason':
+                # Equal/missing names cannot merge two datasets' explanations.
+                listing = path('preservingCUuid', 'producedDataQUuid')
+                other_pub = path(listing, 'OTHER', 'isPublishedDataQUuid')
+                other_sw = path(other_pub, 'isPublishedDataYesAUuid', 'publishedSpecSwUseQUuid')
+                other_reason = path(other_sw, 'publishedSpecSwUseNoAUuid', 'publishedSpecSwUseNoReasonQUuid')
+                replies = dict(base, **{listing: ['ITEM', 'OTHER'], leaf: authored,
+                    other_pub: IDS['isPublishedDataYesAUuid'], other_sw: IDS['publishedSpecSwUseNoAUuid'],
+                    other_reason: '<p>Only the second dataset uses standard tools.</p>'})
+                for profile in ('review', 'submission'):
+                    soup = BeautifulSoup(render_question(template, replies, output_profile=profile, km=km), 'html.parser')
+                    first = soup.select_one('.dataset-section[data-item-id="ITEM"]')
+                    second = soup.select_one('.dataset-section[data-item-id="OTHER"]')
+                    self.assertEqual(authored, first.select_one('[data-fact-id="'+fact+'"]').decode_contents())
+                    self.assertNotIn('Only the second dataset', first.get_text())
+                    self.assertIn('Only the second dataset', second.get_text())
+                    self.assertNotIn('v1.2.csv', second.get_text())
+                    deleted = dict(replies, **{listing: ['OTHER']})
+                    output = render_question(template, deleted, output_profile=profile, km=km)
+                    self.assertNotIn('v1.2.csv', output)
+                    self.assertIn('Only the second dataset', output)
+            for ancestor in base:
+                for selected in (None, '', 'unknown', []):
+                    replies = dict(base, **{leaf: authored})
+                    if selected is None: del replies[ancestor]
+                    else: replies[ancestor] = selected
+                    soup = BeautifulSoup(render_question(template, replies, output_profile='submission', km=km), 'html.parser')
+                    self.assertFalse(soup.select('[data-fact-id="'+fact+'"]'), (chain, ancestor, selected))
+            for mutation in ('removed-question', 'removed-followup', 'wrong-type'):
+                altered = deepcopy(km)
+                if mutation == 'removed-question': del altered['entities']['questions'][exact_uuid]
+                elif mutation == 'removed-followup': altered['entities']['answers'][IDS[names[-2]]]['followUpUuids'] = []
+                else: altered['entities']['questions'][exact_uuid]['questionType'] = 'OptionsQuestion'
+                soup = BeautifulSoup(render_question(template, dict(base, **{leaf: authored}),
+                                                    output_profile='submission', km=altered), 'html.parser')
+                self.assertFalse(soup.select('[data-fact-id="'+fact+'"]'), (chain, mutation))
 
     def test_negative_limitations_share_prose_without_losing_positive_siblings(self):
         risk = path('processingCUuid', 'risksQUuid')
