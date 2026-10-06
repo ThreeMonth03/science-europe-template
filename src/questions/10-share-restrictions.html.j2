@@ -325,6 +325,8 @@
         <p>This project involves collaboration between different groups and institutions. However, no collaboration agreement is in place to specify who can access which project data.</p>
       {%- elif collabAgreeAUuid == uuids.collabAgreeYesAUuid -%}
         <p>This project involves collaboration between different groups and institutions. A collaboration agreement is in place to specify who can access which project data.</p>
+      {%- else -%}
+        <p>This project involves collaboration between different groups and institutions.</p>
       {%- endif -%}
     {%- endif -%}
     {% endset %}

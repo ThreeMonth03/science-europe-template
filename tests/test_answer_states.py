@@ -30,6 +30,46 @@ def storage_matrix():
 
 
 class AnswerStateTests(unittest.TestCase):
+    def test_instrument_acquisition_survives_missing_or_empty_dataset_list(self):
+        measured = path('creatingCUuid', 'measuredQUuid')
+        datasets = path(measured, 'measuredYesAUuid', 'measuredDataQUuid')
+        fact = 'We will acquire data using measurement equipment.'
+        for choice, listing, profile in itertools.product(('Yes', 'No', None, 'unknown'), (None, []), ('review', 'submission')):
+            replies = {path(datasets, 'removed-item', 'measuredDataNameQUuid'): 'Stale instrument dataset'}
+            if choice is not None: replies[measured] = IDS.get('measured'+choice+'AUuid', choice)
+            if listing is not None: replies[datasets] = listing
+            with self.subTest(choice=choice, listing=listing, profile=profile):
+                soup = BeautifulSoup(render_question('src/questions/01-how-data.html.j2', replies,
+                    output_profile=profile), 'html.parser')
+                text = soup.get_text(' ', strip=True)
+                self.assertEqual(choice == 'Yes', fact in text)
+                self.assertNotIn('Stale instrument dataset', text)
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review'))
+
+    def test_carrying_data_survives_missing_security_details_without_inference(self):
+        risk = path('processingCUuid', 'risksQUuid')
+        prefix = path(risk, 'risksExploreAUuid')
+        carry = path(prefix, 'risksCarryHomeQUuid')
+        enc = path(carry, 'risksCarryHomeYesAUuid', 'risksCarryHomeEncQUuid')
+        password = path(carry, 'risksCarryHomeYesAUuid', 'risksCarryHomePassQUuid')
+        for encryption, protection, profile in itertools.product(('Yes', 'No', None, 'unknown'),
+                ('Yes', 'No', None, 'unknown'), ('review', 'submission')):
+            replies = {risk: IDS['risksExploreAUuid'], carry: IDS['risksCarryHomeYesAUuid'],
+                path(prefix, 'risksHttpsQUuid'): IDS['risksHttpsYesAUuid']}
+            if encryption is not None: replies[enc] = IDS.get('risksCarryHomeEnc'+encryption+'AUuid', encryption)
+            if protection is not None: replies[password] = IDS.get('risksCarryHomePass'+protection+'AUuid', protection)
+            with self.subTest(encryption=encryption, protection=protection, profile=profile):
+                soup = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', replies,
+                    output_profile=profile), 'html.parser')
+                text = soup.get_text(' ', strip=True)
+                verb = 'can' if encryption == 'Yes' or protection == 'Yes' else 'will'
+                self.assertIn('Project members '+verb+' carry data with them', text)
+                self.assertEqual(encryption == 'Yes', 'on encrypted data carriers' in text)
+                self.assertEqual(encryption == 'No', 'Not all data carriers are encrypted.' in text)
+                self.assertEqual(protection == 'Yes', 'password-protected laptops' in text)
+                self.assertIn('All project web services are accessible through HTTPS.', text)
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review'))
+
     def test_risk_parent_gates_all_risk_facts_but_not_workspace_access(self):
         risk = path('processingCUuid', 'risksQUuid')
         prefix = path(risk, 'risksExploreAUuid')

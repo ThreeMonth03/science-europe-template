@@ -6,8 +6,12 @@
   {%- import 'src/nonreuse.html.j2' as nonreuse with context -%}
   {%- import 'src/active-answer.j2' as activeAnswer with context -%}
   
-  {%- set measuredPath = [uuids.creatingCUuid, uuids.measuredQUuid]|reply_path -%}
-  {%- set measuredAUuid = repliesMap[measuredPath]|reply_str_value -%}
+  {%- set measuredParts = [uuids.creatingCUuid, uuids.measuredQUuid] -%}
+  {%- set measuredPath = activeAnswer.path(measuredParts, 'OptionsQuestion') if km is defined else measuredParts|reply_path -%}
+  {%- set measuredAUuid = repliesMap[measuredPath]|reply_str_value if measuredPath else '' -%}
+  {%- if km is defined and measuredPath and (measuredAUuid not in km.entities.questions[uuids.measuredQUuid].answerUuids or measuredAUuid not in km.entities.answers) -%}
+    {%- set measuredAUuid = '' -%}
+  {%- endif -%}
   {%- if measuredAUuid == uuids.measuredYesAUuid -%}
     {# Measured datasets #}
     {%- set measuredDataPath = [measuredPath, uuids.measuredYesAUuid, uuids.measuredDataQUuid]|reply_path -%}
@@ -52,6 +56,7 @@
         {%- endfor -%}
       </ul>
     {%- else -%}
+      <p>We will acquire data using measurement equipment.</p>
       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="collection-methods" data-status="missing"><strong>Information not provided:</strong> the datasets to be collected or produced and the methods, instruments, or software that will be used.</p>{% endif %}
     {%- endif -%}
   {%- elif measuredAUuid == uuids.measuredNoAUuid -%}

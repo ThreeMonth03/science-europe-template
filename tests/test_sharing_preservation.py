@@ -32,6 +32,23 @@ def matrix_cases():
 
 
 class SharingPreservationTests(unittest.TestCase):
+    def test_collaboration_fact_survives_missing_agreement_without_inference(self):
+        parent = path('creatingCUuid', 'collabQUuid')
+        agreement = path(parent, 'collabYesAUuid', 'collabAgreeQUuid')
+        fact = 'This project involves collaboration between different groups and institutions.'
+        for choice, detail, profile in itertools.product(('Yes', 'No', None, 'unknown'),
+                ('Yes', 'No', None, 'unknown'), ('review', 'submission')):
+            replies = {}
+            if choice is not None: replies[parent] = IDS.get('collab'+choice+'AUuid', choice)
+            if detail is not None: replies[agreement] = IDS.get('collabAgree'+detail+'AUuid', detail)
+            with self.subTest(choice=choice, detail=detail, profile=profile):
+                soup = BeautifulSoup(render_question(Q10, replies, output_profile=profile), 'html.parser')
+                text = soup.get_text(' ', strip=True)
+                self.assertEqual(choice == 'Yes', fact in text)
+                self.assertEqual(choice == 'Yes' and detail == 'Yes', 'A collaboration agreement is in place' in text)
+                self.assertEqual(choice == 'Yes' and detail == 'No', 'However, no collaboration agreement is in place' in text)
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review'))
+
     def test_embargo_does_not_infer_a_legal_reason(self):
         opened = path('accessCUuid', 'openImmediatelyQUuid')
         legal = path(opened, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
