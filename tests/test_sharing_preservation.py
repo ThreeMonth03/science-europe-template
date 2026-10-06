@@ -32,6 +32,23 @@ def matrix_cases():
 
 
 class SharingPreservationTests(unittest.TestCase):
+    def test_embargo_does_not_infer_a_legal_reason(self):
+        opened = path('accessCUuid', 'openImmediatelyQUuid')
+        legal = path(opened, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
+        embargo = path('accessCUuid', 'limitedEmbargoQUuid')
+        for reason, profile in itertools.product(('Yes', 'No', None, 'unknown'), ('review', 'submission')):
+            replies = {opened: IDS['openImmediatelyNoAUuid'], embargo: IDS['limitedEmbargoYesAUuid'],
+                path(embargo, 'limitedEmbargoYesAUuid', 'limitedEmbargoPeriodQUuid'): '180 days'}
+            if reason is not None: replies[legal] = IDS.get('notOpenLegalReasons'+reason+'AUuid', reason)
+            with self.subTest(reason=reason, profile=profile):
+                text = BeautifulSoup(render_question(Q10, replies, output_profile=profile), 'html.parser').get_text(' ', strip=True)
+                self.assertNotIn('Data cannot be completely open due to legal reasons.', text)
+                self.assertIn('Data not subject to legal restrictions will be released openly after a fixed time period.', text)
+                self.assertIn('The embargo period will be 180 days.', text)
+                q8 = BeautifulSoup(render_question('src/questions/08-copyright-ipr.html.j2', replies,
+                    output_profile=profile), 'html.parser').get_text(' ', strip=True)
+                self.assertEqual(reason == 'Yes', 'The data cannot be made fully open because of legal restrictions.' in q8)
+
     def test_publication_children_require_yes_without_hiding_identifier_siblings(self):
         # Stored Yes follow-ups are historical, not independent answers, when
         # their publication parent is missing, unknown or explicitly No.

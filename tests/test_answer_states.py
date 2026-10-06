@@ -30,6 +30,33 @@ def storage_matrix():
 
 
 class AnswerStateTests(unittest.TestCase):
+    def test_risk_parent_gates_all_risk_facts_but_not_workspace_access(self):
+        risk = path('processingCUuid', 'risksQUuid')
+        prefix = path(risk, 'risksExploreAUuid')
+        choices = {'risksStoreLabQUuid': 'risksStoreLabNoAUuid',
+                   'risksCarryHomeQUuid': 'risksCarryHomeNoAUuid',
+                   'risksHttpsQUuid': 'risksHttpsYesAUuid',
+                   'risksInstructedQUuid': 'risksInstructedYesAUuid',
+                   'risksInfoLossQUuid': 'risksInfoLossSmallAUuid',
+                   'risksPersonalDataQUuid': 'risksPersonalDataNotUsingAUuid'}
+        workspace = path('processingCUuid', 'sharedWorkspaceQUuid')
+        values = {path(prefix, q): IDS[a] for q, a in choices.items()}
+        values.update({workspace: IDS['sharedWorkspaceYesAUuid'],
+            path(workspace, 'sharedWorkspaceYesAUuid', 'sharedAccessControlQUuid'): IDS['sharedAccessControlMembersRWAUuid']})
+        facts = ('will not store data or software', 'will not carry data with them',
+                 'accessible through HTTPS', 'have been instructed',
+                 'The potential impact of data loss is small', 'We are not using any personal information.')
+        for parent, profile in itertools.product((IDS['risksExploreAUuid'], None, '', 'unknown'), ('review', 'submission')):
+            replies = dict(values)
+            if parent is not None: replies[risk] = parent
+            with self.subTest(parent=parent, profile=profile):
+                soup = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', replies,
+                    output_profile=profile), 'html.parser')
+                text = soup.get_text(' ', strip=True)
+                for fact in facts: self.assertEqual(parent == IDS['risksExploreAUuid'], fact in text, fact)
+                self.assertIn('All project members have read and write access to the data.', text)
+                self.assertFalse(soup.select('p p, p div, p ul'))
+
     def test_negative_followups_preserve_exact_no_and_active_yes_only(self):
         cases = [
             ('src/questions/06-access-security.html.j2',

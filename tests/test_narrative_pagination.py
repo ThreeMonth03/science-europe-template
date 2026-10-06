@@ -65,6 +65,7 @@ class NarrativePaginationTests(unittest.TestCase):
 
     def test_security_content_and_reference_are_independent(self):
         replies = test_storage_sharing.StorageSharingTests().storage_replies()
+        replies[path('processingCUuid', 'risksQUuid')] = IDS['risksExploreAUuid']
         replies[path('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksHttpsQUuid')] = IDS['risksHttpsYesAUuid']
         output = render_question('src/questions/06-access-security.html.j2', replies)
         self.assertIn('All project web services are accessible through HTTPS', output)

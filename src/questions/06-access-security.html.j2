@@ -4,7 +4,12 @@
   <div class="answer">
   {% set answerContent %}
     {%- import 'src/active-answer.j2' as activeAnswer with context -%}
-    {%- set risksAUuid = repliesMap[[uuids.processingCUuid, uuids.risksQUuid]|reply_path]|reply_str_value -%}
+    {%- set risksParts = [uuids.processingCUuid, uuids.risksQUuid] -%}
+    {%- set risksPath = activeAnswer.path(risksParts, 'OptionsQuestion') if km is defined else risksParts|reply_path -%}
+    {%- set risksAUuid = repliesMap[risksPath]|reply_str_value if risksPath else '' -%}
+    {# All risk follow-ups belong to the explicit Explore decision; workspace
+       access and policies below are independent and must remain visible. #}
+    {%- if risksAUuid == uuids.risksExploreAUuid and (km is not defined or (risksAUuid in km.entities.questions[uuids.risksQUuid].answerUuids and risksAUuid in km.entities.answers)) -%}
     {%- set risksPathPrefix = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid]|reply_path -%}
     {# Basic risks #}
     {%- set risksStoreLabPath = [risksPathPrefix, uuids.risksStoreLabQUuid]|reply_path -%}
@@ -174,6 +179,7 @@
     {%- endif -%}
     
 
+    {%- endif -%}
     {# Access controls remain here; archival/backup facts are owned by Q5. #}
     {%- set sharedWorkspacePath = [uuids.processingCUuid, uuids.sharedWorkspaceQUuid]|reply_path -%}
     {%- set sharedWorkspaceAUuid = repliesMap[sharedWorkspacePath]|reply_str_value -%}
