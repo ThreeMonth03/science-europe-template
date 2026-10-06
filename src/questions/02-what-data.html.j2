@@ -82,6 +82,9 @@
   {%- set neqDataParts = [uuids.creatingCUuid, uuids.neqDataQUuid] -%}
   {%- set neqDataPath = activeAnswer.path(neqDataParts, 'OptionsQuestion') if km is defined else neqDataParts|reply_path -%}
   {%- set neqDataAUuid = repliesMap[neqDataPath]|reply_str_value if neqDataPath else '' -%}
+  {%- if neqDataPath in repliesMap and repliesMap[neqDataPath].value is defined and repliesMap[neqDataPath].value.type is defined and repliesMap[neqDataPath].value.type != 'AnswerReply' -%}
+    {%- set neqDataAUuid = '' -%}
+  {%- endif -%}
   {%- if km is defined and neqDataPath and (neqDataAUuid not in km.entities.questions[uuids.neqDataQUuid].answerUuids or neqDataAUuid not in km.entities.answers) -%}
     {%- set neqDataAUuid = '' -%}
   {%- endif -%}
@@ -93,8 +96,12 @@
     {%- set neqDataCaseReportAUuid = repliesMap[neqDataCaseReportPath]|reply_str_value -%}
     {%- set neqDataERecordsPath = [neqDataPrefix, uuids.neqDataERecordsQUuid]|reply_path -%}
     {%- set neqDataERecordsAUuid = repliesMap[neqDataERecordsPath]|reply_str_value -%}
-    {%- set neqDataSetsPath = [neqDataPrefix, uuids.neqDataSetsQUuid]|reply_path -%}
-    {%- set neqDataSetsItems = repliesMap[neqDataSetsPath]|reply_items -%}
+    {%- set neqDataSetsParts = neqDataParts + [uuids.neqDataYesAUuid, uuids.neqDataSetsQUuid] -%}
+    {%- set neqDataSetsPath = activeAnswer.path(neqDataSetsParts, 'ListQuestion') if km is defined else neqDataSetsParts|reply_path -%}
+    {%- set neqDataSetsItems = repliesMap[neqDataSetsPath]|reply_items if neqDataSetsPath else [] -%}
+    {%- if neqDataSetsPath in repliesMap and repliesMap[neqDataSetsPath].value is defined and repliesMap[neqDataSetsPath].value.type is defined and repliesMap[neqDataSetsPath].value.type != 'ItemListReply' -%}
+      {%- set neqDataSetsItems = [] -%}
+    {%- endif -%}
 
     {%- set questionnaires = neqDataQuestAUuid == uuids.neqDataQuestYesAUuid -%}
     {%- set caseReport = neqDataCaseReportAUuid == uuids.neqDataCaseReportYesAUuid -%}
@@ -126,13 +133,72 @@
           <ul>
           {%- for neqDataSetItem in neqDataSetsItems -%}
             {%- set pathPrefix = [neqDataSetsPath, neqDataSetItem]|reply_path -%}
-            {%- set neqDataSetsName = repliesMap[[pathPrefix, uuids.neqDataSetsNameQUuid]|reply_path]|reply_str_value -%}
-            {%- set neqDataSetsDesc = repliesMap[[pathPrefix, uuids.neqDataSetsDescQUuid]|reply_path]|reply_str_value -%}
-            <li>
-              {% if neqDataSetsDesc|trim %}<div class="answer-lead"><p>{% endif %}
-              <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName|trim %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ neqDataSetsName if neqDataSetsName|trim else "(no name given)" }}{% endif %}</strong>
+            {%- set itemParts = neqDataSetsParts + [neqDataSetItem] -%}
+            {%- set namePath = activeAnswer.path(itemParts + [uuids.neqDataSetsNameQUuid], 'ValueQuestion') if km is defined else [pathPrefix, uuids.neqDataSetsNameQUuid]|reply_path -%}
+            {%- set descPath = activeAnswer.path(itemParts + [uuids.neqDataSetsDescQUuid], 'ValueQuestion') if km is defined else [pathPrefix, uuids.neqDataSetsDescQUuid]|reply_path -%}
+            {%- set neqDataSetsName = repliesMap[namePath]|reply_str_value if namePath else '' -%}
+            {%- set neqDataSetsDesc = repliesMap[descPath]|reply_str_value if descPath else '' -%}
+            {%- if namePath in repliesMap and repliesMap[namePath].value is defined and repliesMap[namePath].value.type is defined and repliesMap[namePath].value.type != 'StringReply' -%}
+              {%- set neqDataSetsName = '' -%}
+            {%- endif -%}
+            {%- if descPath in repliesMap and repliesMap[descPath].value is defined and repliesMap[descPath].value.type is defined and repliesMap[descPath].value.type != 'StringReply' -%}
+              {%- set neqDataSetsDesc = '' -%}
+            {%- endif -%}
+            {%- set captureSelections = {} -%}
+            {%- set captureParts = itemParts + [uuids.neqDataSetsCaptureQUuid] -%}
+            {%- set paperParts = captureParts + [uuids.neqDataSetsCapturePaperAUuid] -%}
+            {%- for field, parts in [(uuids.neqDataSetsCaptureQUuid, captureParts),
+                (uuids.neqDataSetsEntryQUuid, paperParts + [uuids.neqDataSetsEntryQUuid]),
+                (uuids.neqDataSetsAvailableQUuid, paperParts + [uuids.neqDataSetsAvailableQUuid])] -%}
+              {%- set fieldPath = activeAnswer.path(parts, 'OptionsQuestion') -%}
+              {%- set selected = repliesMap[fieldPath]|reply_str_value if fieldPath else '' -%}
+              {%- if fieldPath in repliesMap and repliesMap[fieldPath].value is defined and repliesMap[fieldPath].value.type is defined and repliesMap[fieldPath].value.type != 'AnswerReply' -%}
+                {%- set selected = '' -%}
+              {%- endif -%}
+              {%- if fieldPath and (selected not in km.entities.questions[field].answerUuids or selected not in km.entities.answers) -%}
+                {%- set selected = '' -%}
+              {%- endif -%}
+              {%- do captureSelections.update({field: selected}) -%}
+            {%- endfor -%}
+            {%- set capture = captureSelections[uuids.neqDataSetsCaptureQUuid] -%}
+            {%- set entry = captureSelections[uuids.neqDataSetsEntryQUuid] -%}
+            {%- set available = captureSelections[uuids.neqDataSetsAvailableQUuid] -%}
+            {%- set captureSentences = [] -%}
+            {%- set entryOther = '' -%}
+            {%- if capture == uuids.neqDataSetsCaptureDigitalAUuid -%}
+              {%- do captureSentences.append("All data in this dataset will be captured immediately in digital form.") -%}
+            {%- elif capture == uuids.neqDataSetsCapturePaperAUuid -%}
+              {%- do captureSentences.append("Data in this dataset will first be captured on paper.") -%}
+              {%- if entry == uuids.neqDataSetsEntryTeamAUuid -%}
+                {%- do captureSentences.append("A specialized team will perform the data entry.") -%}
+              {%- elif entry == uuids.neqDataSetsEntryMemberAUuid -%}
+                {%- do captureSentences.append("A member of the project team will perform the data entry.") -%}
+              {%- elif entry == uuids.neqDataSetsEntryOtherAUuid -%}
+                {%- set entryOtherPath = activeAnswer.path(paperParts + [uuids.neqDataSetsEntryQUuid, uuids.neqDataSetsEntryOtherAUuid, uuids.neqDataSetsEntryOtherQUuid], 'ValueQuestion') -%}
+                {%- if entryOtherPath and km.entities.questions[uuids.neqDataSetsEntryOtherQUuid].valueType in ['TextQuestionValueType', 'StringQuestionValueType'] -%}
+                  {%- set entryOther = repliesMap[entryOtherPath]|reply_str_value -%}
+                  {%- if entryOtherPath in repliesMap and repliesMap[entryOtherPath].value is defined and repliesMap[entryOtherPath].value.type is defined and repliesMap[entryOtherPath].value.type != 'StringReply' -%}
+                    {%- set entryOther = '' -%}
+                  {%- endif -%}
+                {%- endif -%}
+                {%- if not entryOther|trim -%}
+                  {%- do captureSentences.append("Other arrangements have been made for data entry.") -%}
+                {%- endif -%}
+              {%- endif -%}
+              {%- if available == uuids.neqDataSetsAvailableYesAUuid -%}
+                {%- do captureSentences.append("We have arranged for someone to make this dataset available in digital form.") -%}
+              {%- elif available == uuids.neqDataSetsAvailableNotYetAUuid -%}
+                {%- do captureSentences.append("We have not yet arranged for someone to make this dataset available in digital form.") -%}
+              {%- endif -%}
+            {%- endif -%}
+            <li data-item-id="{{ neqDataSetItem }}">
+              {% if neqDataSetsDesc|trim or captureSentences or entryOther|trim %}<div class="answer-lead"><p>{% endif %}
+              <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName|trim %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ (neqDataSetsName if neqDataSetsName|trim else "(no name given)")|e }}{% endif %}</strong>
               {# Keep the authored body out of automatic first-paragraph lead styling. #}
-              {% if neqDataSetsDesc|trim %}</p></div><div class="answer-detail"><div>{{ neqDataSetsDesc|markdown }}</div></div>{% endif %}
+              {% if neqDataSetsDesc|trim or captureSentences or entryOther|trim %}</p></div>{% endif %}
+              {% if neqDataSetsDesc|trim %}<div class="answer-detail"><div>{{ neqDataSetsDesc|markdown }}</div></div>{% endif %}
+              {% if captureSentences %}<p class="collection-summary" data-fact-id="non-equipment-capture">{{ captureSentences|join(" ") }}</p>{% endif %}
+              {% if entryOther|trim %}<div class="answer-lead"><p>Other data-entry arrangements:</p></div><div class="answer-detail" data-fact-id="non-equipment-data-entry-other"><div>{{ entryOther|markdown }}</div></div>{% endif %}
             </li>
           {%- endfor -%}
           </ul>

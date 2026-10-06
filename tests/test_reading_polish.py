@@ -2,7 +2,7 @@ import itertools
 from copy import deepcopy
 import unittest
 from bs4 import BeautifulSoup
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Undefined
 from test_science_europe_contract import ROOT, render_question
 from test_format_volume import values, FORMATS, Q2
 from generate_storage_fixtures import storage_cases
@@ -235,6 +235,143 @@ class ReadingPolishTests(unittest.TestCase):
             elif mutation == 'choice': altered['entities']['questions'][IDS['neqDataQUuid']]['answerUuids'] = []
             else: del altered['entities']['answers'][IDS['neqDataYesAUuid']]
             self.assertNotIn(fact, render_question(Q2, {parent: IDS['neqDataYesAUuid']}, km=altered, output_profile='submission'))
+
+        # The real KM places capture and both paper followups inside each list item.
+        capture = '4e84a44f-e66b-42f5-bb42-7e6c4bd3b79b'
+        digital, paper = '407560bc-705a-4885-85d6-4f61fe58eeed', '374974a6-2c51-4508-aa93-9ef8f1ef65fd'
+        entry = '32f5bc5c-6bc6-4df0-849f-1619951c5b98'
+        team, member, other = ('9d51aae1-ca1b-4267-b0df-d43dc85f5bc6',
+                              '9660950a-41d7-4c3b-a6fd-97e58c8fa412', '82ef3ee8-461e-4f5b-a66a-2d4aaccbe68b')
+        detail = 'f0e57014-79ad-4f2d-becd-e00f50ed1770'
+        available = 'a205f751-cbb6-4f58-a692-2ba450e1e133'
+        not_yet, yes = '1c6da256-72d5-45b1-842e-c1458e6d2e21', '83d23b9f-4b91-4444-8e38-f1c7982e41aa'
+        question(km, fields, capture, 'OptionsQuestion', [digital, paper])
+        followups = km['entities']['answers'][paper]['followUpUuids']
+        question(km, followups, entry, 'OptionsQuestion', [team, member, other])
+        question(km, followups, available, 'OptionsQuestion', [not_yet, yes])
+        question(km, km['entities']['answers'][other]['followUpUuids'], detail, 'ValueQuestion')['valueType'] = 'TextQuestionValueType'
+        for qid in (IDS['neqDataSetsNameQUuid'], IDS['neqDataSetsDescQUuid']):
+            km['entities']['questions'][qid]['valueType'] = 'TextQuestionValueType'
+        base = path(listing, 'dataset-a')
+        capture_path = path(base, capture)
+        entry_path, available_path = path(capture_path, paper, entry), path(capture_path, paper, available)
+        detail_path = path(entry_path, other, detail)
+        capture_facts = {digital: 'All data in this dataset will be captured immediately in digital form.',
+                         paper: 'Data in this dataset will first be captured on paper.'}
+        entry_facts = {team: 'A specialized team will perform the data entry.',
+                       member: 'A member of the project team will perform the data entry.',
+                       other: 'Other arrangements have been made for data entry.'}
+        available_facts = {yes: 'We have arranged for someone to make this dataset available in digital form.',
+                           not_yet: 'We have not yet arranged for someone to make this dataset available in digital form.'}
+        lead = 'Other data-entry arrangements:'
+        authored = '<p>Keep the original entry arrangement.</p><ul><li>Double entry, not scanning.</li></ul><table><tr><td>Original check</td></tr></table>'
+        description = '<p>Original dataset description.</p><ul><li>Retain original paper records.</li></ul>'
+        fixed_facts = list(capture_facts.values()) + list(entry_facts.values()) + list(available_facts.values())
+        scenarios = [(digital, other, not_yet, authored), (paper, None, None, authored),
+                     (paper, team, yes, authored), (paper, member, not_yet, authored),
+                     (paper, None, yes, authored), (paper, 'unknown', 'unknown', authored),
+                     (None, other, yes, authored), ('unknown', other, yes, authored)]
+        scenarios += [(paper, other, yes, value) for value in (None, '', ' \t\n\u3000', authored)]
+        for (capture_choice, entry_choice, available_choice, value), profile in itertools.product(scenarios, ('review', 'submission')):
+            replies = {parent: IDS['neqDataYesAUuid'], listing: ['dataset-a'],
+                       path(base, 'neqDataSetsNameQUuid'): 'Survey <2026> & logs',
+                       path(base, 'neqDataSetsDescQUuid'): description}
+            for key, answer in ((capture_path, capture_choice), (entry_path, entry_choice),
+                                (available_path, available_choice), (detail_path, value)):
+                if answer is not None: replies[key] = answer
+            output = render_question(Q2, replies, km=km, output_profile=profile)
+            expected = [capture_facts[capture_choice]] if capture_choice in capture_facts else []
+            if capture_choice == paper:
+                if entry_choice in entry_facts and (entry_choice != other or not (value or '').strip()):
+                    expected.append(entry_facts[entry_choice])
+                if available_choice in available_facts: expected.append(available_facts[available_choice])
+            for sentence in fixed_facts: self.assertEqual(sentence in expected, sentence in output, (capture_choice, entry_choice, sentence))
+            has_detail = capture_choice == paper and entry_choice == other and bool((value or '').strip())
+            self.assertEqual(has_detail, authored in output)
+            self.assertEqual(has_detail, lead in output)
+            self.assertIn(description, output)
+            soup = BeautifulSoup(output, 'html.parser')
+            owned = soup.select_one('li[data-item-id="dataset-a"]')
+            self.assertIsNotNone(owned)
+            self.assertEqual('Survey <2026> & logs', owned.select_one('.item-label').get_text())
+            self.assertFalse(owned.select('survey, p p'))
+            if expected:
+                self.assertIn(' '.join(expected), [p.get_text(' ', strip=True) for p in owned.select('p')])
+            if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review'))
+
+        values = {parent: IDS['neqDataYesAUuid'], listing: ['dataset-a'], capture_path: paper,
+                  entry_path: other, available_path: yes, detail_path: authored,
+                  path(base, 'neqDataSetsDescQUuid'): description}
+        for qid, choice, absent in ((capture, paper, [capture_facts[paper], lead, authored, available_facts[yes]]),
+                                   (entry, other, [lead, authored]), (available, yes, [available_facts[yes]])):
+            for mutation, profile in itertools.product(('removed', 'type', 'detached', 'choice', 'dangling'), ('review', 'submission')):
+                altered = deepcopy(km)
+                if mutation == 'removed': del altered['entities']['questions'][qid]
+                elif mutation == 'type': altered['entities']['questions'][qid]['questionType'] = 'ValueQuestion'
+                elif mutation == 'detached':
+                    container = altered['entities']['questions'][IDS['neqDataSetsQUuid']]['itemTemplateQuestionUuids'] if qid == capture else altered['entities']['answers'][paper]['followUpUuids']
+                    container.remove(qid)
+                elif mutation == 'choice': altered['entities']['questions'][qid]['answerUuids'].remove(choice)
+                else: del altered['entities']['answers'][choice]
+                output = render_question(Q2, values, km=altered, output_profile=profile)
+                for sentence in absent: self.assertNotIn(sentence, output, (qid, mutation, sentence))
+                self.assertIn(description, output)
+                if qid != capture: self.assertIn(capture_facts[paper], output)
+                if qid == entry: self.assertIn(available_facts[yes], output)
+                if qid == available: self.assertIn(authored, output)
+        for mutation in ('removed', 'type', 'value-type'):
+            altered = deepcopy(km)
+            if mutation == 'removed': del altered['entities']['questions'][detail]
+            elif mutation == 'type': altered['entities']['questions'][detail]['questionType'] = 'OptionsQuestion'
+            else: altered['entities']['questions'][detail]['valueType'] = 'NumberQuestionValueType'
+            output = render_question(Q2, values, km=altered, output_profile='submission')
+            self.assertNotIn(authored, output)
+            self.assertIn(entry_facts[other], output)
+            self.assertIn(available_facts[yes], output)
+        for key, invalid in ((parent, None), (parent, '514befe5-76b0-4e4e-bdf5-2bc164e38d7f'),
+                             (parent, 'unknown'), (listing, None), (listing, []), (listing, ['different-item'])):
+            inactive = dict(values)
+            if invalid is None: inactive.pop(key)
+            else: inactive[key] = invalid
+            output = render_question(Q2, inactive, km=km, output_profile='submission')
+            for sentence in fixed_facts + [authored, description]: self.assertNotIn(sentence, output)
+        typed_env = environment(ROOT, escape=True)
+        typed_env.filters['reply_str_value'] = lambda reply: '' if isinstance(reply, Undefined) or reply is None else (
+            str(reply['value']['value']) if isinstance(reply, dict) and isinstance(reply.get('value'), dict)
+            else str(reply['value']) if isinstance(reply, dict) and 'value' in reply else str(reply))
+        typed_render = typed_env.from_string(PREFIX + "{% include 'src/questions/02-what-data.html.j2' %}").render
+        for key, choice, absent in ((parent, IDS['neqDataYesAUuid'], fixed_facts + [authored, description]),
+                                   (capture_path, paper, [capture_facts[paper], lead, authored, available_facts[yes]]),
+                                   (entry_path, other, [lead, authored]),
+                                   (available_path, yes, [available_facts[yes]])):
+            invalid = dict(values, **{key: {'value': {'type': 'StringReply', 'value': choice}}})
+            output = typed_render(repliesMap=invalid, km=km, output_profile='submission')
+            for sentence in absent: self.assertNotIn(sentence, output, (key, 'wrong-reply-type'))
+        invalid = dict(values, **{detail_path: {'value': {'type': 'AnswerReply', 'value': authored}}})
+        output = typed_render(repliesMap=invalid, km=km, output_profile='submission')
+        self.assertNotIn(authored, output)
+        self.assertIn(entry_facts[other], output)
+        typed = dict(values)
+        for key in (parent, capture_path, entry_path, available_path):
+            typed[key] = {'value': {'type': 'AnswerReply', 'value': values[key]}}
+        typed[detail_path] = {'value': {'type': 'StringReply', 'value': authored}}
+        output = typed_render(repliesMap=typed, km=km, output_profile='submission')
+        for sentence in (capture_facts[paper], available_facts[yes], authored): self.assertIn(sentence, output)
+        # A second nameless record keeps its current ordinal and its own paper facts.
+        multiple = dict(values, **{capture_path: digital, listing: ['dataset-a', 'dataset-b']})
+        second = path(listing, 'dataset-b')
+        multiple.update({path(second, 'neqDataSetsNameQUuid'): ' \u3000', path(second, capture): paper,
+                         path(second, capture, paper, entry): member,
+                         path(second, capture, paper, available): not_yet})
+        soup = BeautifulSoup(render_question(Q2, multiple, km=km, output_profile='submission'), 'html.parser')
+        owned = soup.select('li[data-item-id]')
+        self.assertEqual(['dataset-a', 'dataset-b'], [li['data-item-id'] for li in owned])
+        self.assertIn(capture_facts[digital], owned[0].get_text())
+        self.assertNotIn(entry_facts[member], owned[0].get_text())
+        self.assertIn('Non-equipment dataset 2', owned[1].get_text())
+        for sentence in (capture_facts[paper], entry_facts[member], available_facts[not_yet]):
+            self.assertIn(sentence, owned[1].get_text())
+        self.assertNotIn(description, str(owned[1]))
 
     def test_quantity_keeps_short_units_but_not_long_text_unbreakable(self):
         env = Environment(loader=FileSystemLoader(ROOT), extensions=['jinja2.ext.do'])

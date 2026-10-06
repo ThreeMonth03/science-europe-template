@@ -54,6 +54,7 @@ BLANK_FIELDS = [
     ('creatingCUuid collectPersonalQUuid collectPersonalYesAUuid cpersGdprQUuid cpersGdprExploreAUuid cpersGdprLegalBasisQUuid cpersGdprLegalBasisAskAUuid', 'cpersExplainInformedQUuid cpersDescribeProcedureQUuid'),
     ('creatingCUuid collectPersonalQUuid collectPersonalYesAUuid cpersGdprQUuid cpersGdprExploreAUuid', 'cpersGdprPurposeQUuid'),
     ('creatingCUuid ownershipQUuid ownershipOtherAUuid', 'ownershipOtherQUuid'),
+    ('creatingCUuid neqDataQUuid neqDataYesAUuid neqDataSetsQUuid ITEM neqDataSetsCaptureQUuid neqDataSetsCapturePaperAUuid neqDataSetsEntryQUuid neqDataSetsEntryOtherAUuid', 'neqDataSetsEntryOtherQUuid'),
     ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvFSysQUuid storageConvFSysYesAUuid scFSysSubjFoldersQUuid scFSysSubjFoldersYesAUuid', 'scFSysSubjFoldersConvsQUuid'),
     ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvFSysQUuid storageConvFSysYesAUuid scFSysAnalysisFoldersQUuid scFSysAnalysisFoldersYesAUuid', 'scFSysAnalysisFoldersConvsQUuid'),
     ('processingCUuid storageConvQUuid storageConvExploreAUuid storageConvFSysQUuid storageConvFSysYesAUuid scFSysWorkflowStepFoldersQUuid scFSysWorkflowStepFoldersYesAUuid', 'scFSysWorkflowStepFoldersConvsQUuid'),
@@ -108,6 +109,8 @@ def check_partial_answers(env, language):
     for prefix, fields in BLANK_FIELDS:
         for field in fields.split():
             km, base, key = partial_fixture(prefix + ' ' + field)
+            if field == 'neqDataSetsEntryOtherQUuid':
+                km['entities']['questions'][IDS[field]]['valueType'] = 'TextQuestionValueType'
             integration = field in ['costCurrencyQUuid', 'dataCompReadOthersYesStandardQUuid', 'domainSpecificRepoNameQUuid', 'generalPurposeRepoNameQUuid']
             token = '0' if field == 'costAmountQUuid' else '2026-10-01' if field == 'publishedDataLicenseStartQUuid' else 'Original-UNIQUE-value'
             for profile in ['review', 'submission']:
