@@ -32,6 +32,36 @@ def matrix_cases():
 
 
 class SharingPreservationTests(unittest.TestCase):
+    def test_publication_children_require_yes_without_hiding_identifier_siblings(self):
+        # Stored Yes follow-ups are historical, not independent answers, when
+        # their publication parent is missing, unknown or explicitly No.
+        for publication, profile in itertools.product(['Yes', 'No', None, 'obsolete'], ['review', 'submission']):
+            replies = publication_replies(publication, 'Soon', 'Yes')
+            pub = path(DATASETS, 'dataset-a', 'isPublishedDataQUuid', 'isPublishedDataYesAUuid')
+            refs = path(pub, 'publishedQReferencesQUuid')
+            items = path(refs, 'publishedQReferencesYesAUuid', 'publishedQReferencesItemQUuid')
+            identifiers = path(DATASETS, 'dataset-a', 'producedDataIdentifiersQUuid')
+            replies.update({refs: IDS['publishedQReferencesYesAUuid'], items: ['reference-a'],
+                path(items, 'reference-a', 'publishedQReferenceIdQUuid'): 'Reference-01',
+                path(items, 'reference-a', 'publishedQReferenceRelQUuid'): 'Derived from reference data.',
+                identifiers: ['identifier-a'],
+                path(identifiers, 'identifier-a', 'dataIdentifierTypeQUuid'): IDS['dataIdentifierTypeDoiAUuid'],
+                path(identifiers, 'identifier-a', 'dataIdentifierIdentifierQUuid'): '10.1234/retained'})
+            with self.subTest(publication=publication, profile=profile):
+                soup = BeautifulSoup(render_question(Q10, replies, output_profile=profile), 'html.parser')
+                dataset = soup.select_one('.dataset-section[data-item-id="dataset-a"]')
+                text = dataset.get_text()
+                self.assertEqual(publication == 'Yes', 'published as soon as possible' in text)
+                self.assertEqual(publication == 'Yes', 'at least one data catalogue' in text)
+                self.assertEqual(publication == 'Yes', 'Reference-01' in text)
+                self.assertEqual(publication == 'Yes', 'Derived from reference data.' in text)
+                self.assertEqual(publication == 'No', 'This dataset will not be published.' in text)
+                self.assertEqual('https://doi.org/10.1234/retained', dataset.select_one('a')['href'])
+                if publication == 'Yes':
+                    self.assertEqual('Derived from reference data.', dataset.select_one('.answer-detail').get_text())
+                if profile == 'submission':
+                    self.assertFalse(soup.select('.data-gap, .data-review'))
+
     def test_identifier_siblings_survive_unpublished_or_missing_decision(self):
         for publication, profile in itertools.product(['Yes', 'No', None, 'obsolete'], ['review', 'submission']):
             replies = publication_replies(publication, None, None, name=None)

@@ -42,6 +42,8 @@ def publication_replies(publication='Yes', timing='Wrapped', catalogue='Yes', na
 def expected(publication, timing, catalogue, language):
     if publication == 'No':
         return [NO[language]]
+    if publication != 'Yes':
+        return []
     sentences = []
     if timing in TIMING[language]:
         sentences.append(TIMING[language][timing])

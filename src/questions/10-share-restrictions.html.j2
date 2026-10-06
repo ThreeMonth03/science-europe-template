@@ -212,7 +212,7 @@
             {%- set publishedQReferencesPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedQReferencesQUuid]|reply_path -%}
             {%- set publishedQReferencesAUuid = repliesMap[publishedQReferencesPath]|reply_str_value -%}
             {%- set qreferences = [] -%}
-            {%- if isPublishedDataAUuid != uuids.isPublishedDataNoAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesYesAUuid -%}
+            {%- if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesYesAUuid -%}
                 {%- set publishedQReferencesItemsPath = [publishedQReferencesPath, uuids.publishedQReferencesYesAUuid, uuids.publishedQReferencesItemQUuid ]|reply_path -%}
                 {%- set publishedQReferencesItems = repliesMap[publishedQReferencesItemsPath]|reply_items -%}
                 {%- set qreferences = [] -%}
