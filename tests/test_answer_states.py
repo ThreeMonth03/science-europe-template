@@ -100,6 +100,19 @@ class AnswerStateTests(unittest.TestCase):
     def test_negative_followups_preserve_exact_no_and_active_yes_only(self):
         cases = [
             ('src/questions/06-access-security.html.j2',
+             ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksCarryHomeQUuid',
+              'risksCarryHomeYesAUuid', 'risksCarryHomePassQUuid'),
+             'risksCarryHomePassYesAUuid', 'risksCarryHomePassNoAUuid',
+             'f2d273c1-8e6e-4656-93ba-6b78d7d6785f',
+             'Project members can carry data with them on password-protected laptops.',
+             'Not all laptop accounts are password-protected.'),
+            ('src/questions/06-access-security.html.j2',
+             ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksHttpsQUuid'),
+             'risksHttpsYesAUuid', 'risksHttpsNoAUuid',
+             '2b934f9d-d849-4e22-8e0c-65dbf7b9dbeb',
+             'All project web services are accessible through HTTPS.',
+             'Not all project web services are accessible through HTTPS.'),
+            ('src/questions/06-access-security.html.j2',
              ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksCertificationsQUuid'),
              'risksCertificationsYesAUuid', 'risksCertificationsNoAUuid',
              '9acf74b1-e045-477d-be96-695692bb22c3',
@@ -128,7 +141,7 @@ class AnswerStateTests(unittest.TestCase):
              'We will not provide others with standardized, machine-readable metadata.'),
         ]
         for template, names, yes, no, exact_no, yes_text, no_text in cases:
-            self.assertEqual(exact_no, IDS[no])
+            self.assertEqual(exact_no, IDS.get(no), 'The exact No option must have a source binding')
             parts = [IDS[name] for name in names]
             leaf = path(*parts)
             ancestors = {path(*parts[:index]): parts[index]

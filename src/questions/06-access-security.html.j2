@@ -26,25 +26,34 @@
     {%- if km is defined and risksCarryHomeEncPath and (risksCarryHomeEncAUuid not in km.entities.questions[uuids.risksCarryHomeEncQUuid].answerUuids or risksCarryHomeEncAUuid not in km.entities.answers) -%}
       {%- set risksCarryHomeEncAUuid = '' -%}
     {%- endif -%}
-    {%- set risksCarryHomePassPath = [risksCarryHomePath, uuids.risksCarryHomeYesAUuid, uuids.risksCarryHomePassQUuid]|reply_path -%}
-    {%- set risksCarryHomePassAUuid = repliesMap[risksCarryHomePassPath]|reply_str_value -%}
+    {%- set risksCarryHomePassParts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, uuids.risksCarryHomeQUuid, uuids.risksCarryHomeYesAUuid, uuids.risksCarryHomePassQUuid] -%}
+    {%- set risksCarryHomePassPath = activeAnswer.path(risksCarryHomePassParts, 'OptionsQuestion') if km is defined else risksCarryHomePassParts|reply_path -%}
+    {%- set risksCarryHomePassAUuid = repliesMap[risksCarryHomePassPath]|reply_str_value if risksCarryHomePassPath and risksCarryHomeAUuid == uuids.risksCarryHomeYesAUuid else '' -%}
+    {%- if km is defined and risksCarryHomePassPath and (risksCarryHomePassAUuid not in km.entities.questions[uuids.risksCarryHomePassQUuid].answerUuids or risksCarryHomePassAUuid not in km.entities.answers) -%}
+      {%- set risksCarryHomePassAUuid = '' -%}
+    {%- endif -%}
     {%- set risksCertificationsParts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, uuids.risksCertificationsQUuid] -%}
     {%- set risksCertificationsPath = activeAnswer.path(risksCertificationsParts, 'OptionsQuestion') if km is defined else risksCertificationsParts|reply_path -%}
     {%- set risksCertificationsAUuid = repliesMap[risksCertificationsPath]|reply_str_value if risksCertificationsPath and risksAUuid == uuids.risksExploreAUuid else '' -%}
     {%- if km is defined and risksCertificationsPath and (risksCertificationsAUuid not in km.entities.questions[uuids.risksCertificationsQUuid].answerUuids or risksCertificationsAUuid not in km.entities.answers) -%}
       {%- set risksCertificationsAUuid = '' -%}
     {%- endif -%}
-    {%- set risksHttpsPath = [risksPathPrefix, uuids.risksHttpsQUuid]|reply_path -%}
-    {%- set risksHttpsAUuid = repliesMap[risksHttpsPath]|reply_str_value -%}
+    {%- set risksHttpsParts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, uuids.risksHttpsQUuid] -%}
+    {%- set risksHttpsPath = activeAnswer.path(risksHttpsParts, 'OptionsQuestion') if km is defined else risksHttpsParts|reply_path -%}
+    {%- set risksHttpsAUuid = repliesMap[risksHttpsPath]|reply_str_value if risksHttpsPath else '' -%}
+    {%- if km is defined and risksHttpsPath and (risksHttpsAUuid not in km.entities.questions[uuids.risksHttpsQUuid].answerUuids or risksHttpsAUuid not in km.entities.answers) -%}
+      {%- set risksHttpsAUuid = '' -%}
+    {%- endif -%}
     {%- set risksInstructedPath = [risksPathPrefix, uuids.risksInstructedQUuid]|reply_path -%}
     {%- set risksInstructedAUuid = repliesMap[risksInstructedPath]|reply_str_value -%}
 
     {%- set homeEncrypted = risksCarryHomeEncAUuid == uuids.risksCarryHomeEncYesAUuid -%}
     {%- set homeNotEncrypted = risksCarryHomeEncAUuid == uuids.risksCarryHomeEncNoAUuid -%}
     {%- set homePassword = risksAUuid == uuids.risksExploreAUuid and risksCarryHomeAUuid == uuids.risksCarryHomeYesAUuid and risksCarryHomePassAUuid == uuids.risksCarryHomePassYesAUuid -%}
+    {%- set homeNotPassword = risksCarryHomeAUuid == uuids.risksCarryHomeYesAUuid and risksCarryHomePassAUuid == uuids.risksCarryHomePassNoAUuid -%}
     {%- set storeLab = risksStoreLabAUuid == uuids.risksStoreLabNoAUuid -%}
 
-    {%- if storeLab or (risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid]) or (risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid]) or (risksHttpsAUuid == uuids.risksHttpsYesAUuid) or (risksInstructedAUuid == uuids.risksInstructedYesAUuid) %}
+    {%- if storeLab or (risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid]) or (risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid]) or (risksHttpsAUuid in [uuids.risksHttpsYesAUuid, uuids.risksHttpsNoAUuid]) or (risksInstructedAUuid == uuids.risksInstructedYesAUuid) %}
       <p>
         {%- if storeLab %}
           Project members will not store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
@@ -63,6 +72,9 @@
         {%- if homeNotEncrypted %}
           Not all data carriers are encrypted.
         {%- endif -%}
+        {%- if homeNotPassword %}
+          Not all laptop accounts are password-protected.
+        {%- endif -%}
         {%- if risksCertificationsAUuid == uuids.risksCertificationsYesAUuid %}
           All data centres that store project data hold appropriate certifications.
         {%- elif risksCertificationsAUuid == uuids.risksCertificationsNoAUuid %}
@@ -70,6 +82,8 @@
         {%- endif -%}
         {%- if risksHttpsAUuid == uuids.risksHttpsYesAUuid %}
           All project web services are accessible through HTTPS.
+        {%- elif risksHttpsAUuid == uuids.risksHttpsNoAUuid %}
+          Not all project web services are accessible through HTTPS.
         {%- endif -%}
         {%- if risksInstructedAUuid == uuids.risksInstructedYesAUuid %}
           Project members have been instructed about both generic and specific risks to the project.
