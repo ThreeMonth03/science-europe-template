@@ -19,13 +19,31 @@ def plain(case='preservation-complete'):
     return {p: v['value'] for p,v in preservation_cases('en')[case].items()}
 
 
-def render(replies): return BeautifulSoup(render_question(Q11, replies, km=preservation_schema()), 'html.parser')
+def preservation_cost_schema():
+    """Register the active cost paths used by these local layout fixtures."""
+    from check_answer_mapping import question
+    km = preservation_schema()
+    children = km['entities']['chapters'][IDS['preservingCUuid']]['questionUuids']
+    question(km, children, IDS['repoChargesQUuid'], 'OptionsQuestion',
+             [IDS['repoCharges' + option + 'AUuid'] for option in ('No', 'Yes')])
+    payer_children = km['entities']['answers'][IDS['repoChargesYesAUuid']]['followUpUuids']
+    question(km, payer_children, IDS['repoChargesHowPayQUuid'], 'OptionsQuestion',
+             [IDS['repoChargesHowPay' + option + 'AUuid']
+              for option in ('Budgeted', 'Department', 'Institute', 'Other')])
+    other_children = km['entities']['answers'][IDS['repoChargesHowPayOtherAUuid']]['followUpUuids']
+    question(km, other_children, IDS['repoChargesHowPayOtherQUuid'], 'ValueQuestion')
+    question(km, children, IDS['budgetTimeEffortQUuid'], 'OptionsQuestion',
+             [IDS['budgetTimeEffort' + option + 'AUuid'] for option in ('Yes', 'No')])
+    return km
+
+
+def render(replies): return BeautifulSoup(render_question(Q11, replies, km=preservation_cost_schema()), 'html.parser')
 
 
 def grouping_fixture(count=3):
     """Local complete-choice schema; do not broaden the existing fixtures."""
     from check_answer_mapping import question
-    km = preservation_schema()
+    km = preservation_cost_schema()
     children = km['entities']['questions'][IDS['producedDataQUuid']]['itemTemplateQuestionUuids']
     question(km, children, IDS['publishedDataHowLongQUuid'], 'OptionsQuestion',
              [IDS['publishedDataHowLong' + option + 'AUuid'] for option in ('Technical', 'Deleted', 'Fixed')])
