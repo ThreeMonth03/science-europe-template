@@ -57,6 +57,7 @@
     }
   ],
   "defect_scope": "Internal review metadata only; submission intentionally hides this block. No template fix was mixed into this pinned-source acceptance run.",
+  "subsequent_fix": "Historical defects above are resolved by source 8b480c0; see metadata.json for the changed pair and local regression. This e2e receipt remains bound to its original exact artifacts and is not retroactively accepted for the new pair.",
   "km_boundary": "Public root/root-zh-hant 2.7.0 bundles. Entity structure/UUIDs and replies match fixtures. ZH full/partial public KM has 234 display-text leaves different from the previously curated synthetic KM. Native controls use the actual Server KM, not old fixture output.",
   "preserved_presentation_observations": [
     "Partial English review PDF metadata-only tail page remains.",

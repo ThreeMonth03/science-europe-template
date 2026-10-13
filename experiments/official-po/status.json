@@ -1,12 +1,12 @@
 {
-  "status": "local-po-e2e-verified-review-metadata-fixes-required-not-released",
+  "status": "local-po-review-metadata-fixed-workflow-integration-pending-not-released",
   "branch": "codex/official-po",
   "baseline_snapshot_commit": "895741e",
   "source_language": "en",
   "locale_language": "zh-Hant",
-  "marked_messages": 855,
+  "marked_messages": 859,
   "migrated_scope": [
-    "47 original uncontexted messages and 808 contexted messages",
+    "47 original uncontexted messages and 812 contexted messages (808 migrated plus four approved phase labels)",
     "Existing approved Chinese, including whole clauses, responsibility subjects, locale joins, display punctuation, fallbacks and project metadata",
     "Reviewed current template scope; catalog key coverage is not proof of every possible input or human-readable literal"
   ],
@@ -20,6 +20,7 @@
   "verified_runtime": "DSW document-worker 4.35.0",
   "verified_worker_image": "datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3",
   "preparation_requirement": "Native comparison uses frozen prepared assets. The follow-up packaging rehearsal independently exports pinned clean source, prepares English once with the committed font, then runs official 4.35 verify/package/unpackage. All 77 src files match the native-accepted package byte-for-byte. Never prepare an already-prepared reference again.",
+  "local_checks_scope": "Historical pre-metadata-fix migration acceptance. Current metadata source/package/catalog regression is recorded separately in metadata.json; do not repoint the old native/API receipts.",
   "local_checks": {
     "catalog_messages": 855,
     "contexted_messages": 808,
@@ -88,6 +89,7 @@
   ],
   "packaging_rehearsal": "See experiments/official-po/packaging.json. Template metadata additionally restores root-zh-hant eligibility; it does not alter rendering or questionnaire mappings. Native acceptance still refers to the unchanged render inputs.",
   "end_to_end_rehearsal": "See experiments/official-po/e2e.json: real local Server/PO/S3/Worker generation and all 56 page-pair comparisons passed. Original-size reading found two review metadata defects, so this is not overall candidate acceptance or cutover approval.",
-  "next_step": "Fix only the true Server phase-path and review project-name label issues, localize the restored known Chinese phase label, then rebind/regress affected outputs. After that approve the single PO authority and adapt the existing workflow with explicit document language and immutable pairing; no parallel CI.",
+  "review_metadata_follow_up": "Both defects are fixed in source 8b480c0 and passed focused tests, updated 859-message catalog checks and four new native review outputs (21 inspected pages). Eight submission entry hashes are unchanged. See metadata.json for the new exact pair and the bounded offline-regression evidence.",
+  "next_step": "Add backward-compatible explicit document language forwarding to the existing Tool, then approve the single PO authority and adapt the existing workflow with immutable pairing. Use a new publication version, never overwrite the legacy meeting 0.3.78 pair; no parallel CI.",
   "remote_operations": false
 }

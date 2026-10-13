@@ -1,5 +1,6 @@
 {
   "status": "local-rehearsal-only-not-a-production-release-lock",
+  "subsequent_metadata_fix": "This is the original packaging rehearsal. See metadata.json for source 8b480c0, its new ZIP/PO/MO pair and targeted native regression; original receipt hashes remain unchanged.",
   "source_input_commit": "4c9cf7642009862544f84ef54f049118bfc5f36a",
   "catalog_at_source_input_commit": "locales/zh-Hant.po",
   "catalog_sha256": "fe8c1cda076b45aec55de42c6f87c1391b50041eb7d0aa775ecd926a372f3d1b",
@@ -45,7 +46,7 @@
   },
   "existing_workflow_not_migrated": "Existing repositories remain on their current release/translation workflows. Their old runtime declaration or Tool SHA alone does not prove a fully locked 4.35 dependency set.",
   "required_before_cutover": [
-    "Local official HTTP/PO/S3/Worker generation is now exercised in e2e.json. Resolve its two review metadata defects and rebind acceptance; browser UI and replacement-preview invalidation remain unverified. Agree metadata/format labels and rollout with server maintainers.",
+    "Local official HTTP/PO/S3/Worker generation is exercised in e2e.json. Its two metadata defects are fixed and locally regressed in metadata.json; the new pair has not been reinstalled. Browser UI and replacement-preview invalidation remain unverified. Agree final labels and rollout with server maintainers.",
     "Transfer the approved PO to exactly one authoritative location and replace the legacy translation generation path once, without dual-write synchronization.",
     "Promote exact tooling/runtime and paired artifact guards into the existing workflow without adding parallel CI pipelines.",
     "Choose new immutable publication versions, then bind acceptance to the final artifacts."
