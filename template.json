@@ -19,6 +19,12 @@
       "kmId": "lifesciences",
       "minVersion": "2.7.0",
       "maxVersion": null
+    },
+    {
+      "orgId": "dsw",
+      "kmId": "root-zh-hant",
+      "minVersion": "2.7.0",
+      "maxVersion": null
     }
   ],
   "formats": [
