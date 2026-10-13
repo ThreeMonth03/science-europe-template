@@ -1,0 +1,78 @@
+{
+  "status": "local-official-po-e2e-passed-two-review-metadata-fixes-required-not-released",
+  "integration_passed": true,
+  "overall_candidate_accepted": false,
+  "source_input_commit": "4c9cf7642009862544f84ef54f049118bfc5f36a",
+  "template_zip_sha256": "3dd5189df5ad57c1c9d09527eda8dddc614c5007785bc3b740233d845ad266e7",
+  "po_sha256": "fe8c1cda076b45aec55de42c6f87c1391b50041eb7d0aa775ecd926a372f3d1b",
+  "mo_sha256": "0906094f5b6615cdc806fb2205ab293c776c45fc3c8954ce14bfd8f4fe842695",
+  "runtime": {
+    "server": "datastewardshipwizard/wizard-server@sha256:80684ed8db1635a44bc5f8ee7102f8afed9842e4b717746de9b5d96334f64f94",
+    "server_version": "4.35.2",
+    "server_version_note": "Stock patch used for fresh-database initialization; reviewed DT/locale API is unchanged from 4.35.0.",
+    "worker": "datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3",
+    "worker_version": "4.35.0",
+    "worker_or_pandoc_modified": false,
+    "network": "New Docker internal network, fresh PostgreSQL and S3 volumes; no live DSW or existing local project touched."
+  },
+  "actual_official_api_checks": {
+    "template_import_into_new_empty_sandbox": true,
+    "locale_multipart_name_and_poContent": true,
+    "po_readback_bytes_identical": true,
+    "duplicate_locale_code_rejected_http_status": 400,
+    "same_locale_preserved_after_duplicate_attempt": true,
+    "true_worker_cached_mo_bytes_identical": true,
+    "approved_catalog_messages_verified": 855,
+    "six_synthetic_projects_created_by_api": true,
+    "reply_counts_per_language": [124, 86, 0],
+    "reply_values_exact_after_api_replay_and_in_true_server_context": true,
+    "true_context_source": "Read-only lookup of each own sandbox persistent_command.body, scoped by tenant and new document UUID. No DB reply writes.",
+    "explicit_document_languages": ["en", "zh-Hant"],
+    "fresh_document_generation_not_preview": true,
+    "actual_pdf_documents": 6,
+    "actual_word_documents": 6,
+    "controls": "12 additional direct stock Worker outputs, network=none, using each exact true Server context and the same config defaults/prepared package/locale."
+  },
+  "native_and_reading_checks": {
+    "pixel_and_text_identical_page_pairs": 56,
+    "docx_content_and_style_parts_byte_identical": true,
+    "docx_core_equal_except_created_modified_timestamps": true,
+    "actual_pages_individually_inspected_original_size": {"en": 29, "zh-Hant": 27},
+    "all_15_questions_retained_in_each_actual_document": true,
+    "submission_gap_hints_absent": true,
+    "new_confirmed_layout_or_body_grammar_defects": false,
+    "boundary": "Canonical bundled Poppler and LibreOffice previews, not native Microsoft Word or arbitrary-input acceptance."
+  },
+  "confirmed_review_metadata_defects": [
+    {
+      "source": "src/document-provenance.html.j2:5",
+      "related_source": "src/header.html.j2:62",
+      "issue": "True 4.35 Server context has project.phaseUuid, not top-level phaseUuid. Review provenance silently omits the phase.",
+      "follow_up": "Resolve the real field with explicit old-context compatibility. Public root-zh-hant phase titles are English; verify the restored known Chinese label instead of blindly displaying that title."
+    },
+    {
+      "source": "src/document-provenance.html.j2:3",
+      "issue": "Document / 文件名稱 label is populated from project.name. The sandbox document.name differs, proving the mismatch.",
+      "follow_up": "Make the project-identity label match the intended field; preserve authored answers."
+    }
+  ],
+  "defect_scope": "Internal review metadata only; submission intentionally hides this block. No template fix was mixed into this pinned-source acceptance run.",
+  "km_boundary": "Public root/root-zh-hant 2.7.0 bundles. Entity structure/UUIDs and replies match fixtures. ZH full/partial public KM has 234 display-text leaves different from the previously curated synthetic KM. Native controls use the actual Server KM, not old fixture output.",
+  "preserved_presentation_observations": [
+    "Partial English review PDF metadata-only tail page remains.",
+    "Chinese filled Word keeps the full budget table on the next page.",
+    "All-missing cover and all 15 questions remain; synthetic Server creator metadata is distinct from questionnaire answers."
+  ],
+  "local_evidence_root": "/home/trc/.local/share/dsw-po-e2e435.lQPEf2Yx",
+  "acceptance_receipt_sha256": "7c9aeb059d2525ec5c1e41262a751d9421c5f8eb73a1ec7d2a875fb0fe34e1a2",
+  "native_comparison_sha256": "f160788a67286cd5c53b072c667b456337d5b598a6015ca3259f00b8182a1662",
+  "visual_review_sha256": "d10c3d76b1f53e50f9d62923c872aa259e1d2549a400d5cd8eef01cd8bab2bd6",
+  "safety": "Own synthetic containers stopped; two data volumes and internal network retained. Unrelated existing containers, original dirty repositories and original handoff hashes unchanged. No keyring access, remote write, push, CI change or production deployment.",
+  "not_verified": [
+    "Browser UI interaction and locale-replacement preview invalidation",
+    "ItemSelectReply, external IntegrationType or uploaded-file answers in this native set",
+    "Native Microsoft Word and arbitrary questionnaire inputs",
+    "Existing production CI/release cutover"
+  ],
+  "next_step": "Fix only the two review metadata defects, rebind the source/package pair and regress the affected review outputs plus submission invariance. Then decide the single PO authority and adapt the existing Tool/release workflow without parallel CI."
+}

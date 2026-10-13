@@ -20,7 +20,7 @@
     "s3": "Local stub implementing the download contract only; real S3/database/network not exercised.",
     "output_storage": "Hashes only for matching HTML; no duplicated large HTML or new native output documents."
   },
-  "publication_guard": "Experimental 0.3.78 coordinates are not authorized for upload or overwriting any existing release. Assign a new immutable release identity and rebind acceptance before publication.",
+  "publication_guard": "Experimental 0.3.78 was installed only in a new empty synthetic local sandbox for e2e.json. It is not authorized for live upload or overwriting any existing release. Assign a new immutable release identity and rebind acceptance before publication.",
   "official_locale_boundary": "Source-reviewed Server 4.35 attaches PO to an exact released DT UUID; the Worker selects that locale UUID and caches by updatedAt. Neither verifies a Git source/POT hash. The DT ZIP does not include locales, so new DT versions/imports need a new PO attachment. See installation.json for the reviewed API/UI contract and untested runtime boundaries.",
   "locale_contract_for_server_maintainers_to_verify": {
     "selected_locale_code": "zh-Hant",
@@ -45,7 +45,7 @@
   },
   "existing_workflow_not_migrated": "Existing repositories remain on their current release/translation workflows. Their old runtime declaration or Tool SHA alone does not prove a fully locked 4.35 dependency set.",
   "required_before_cutover": [
-    "Exercise the source-reviewed locale installation/selection contract in an isolated local 4.35 stack, then agree metadata/format labels and rollout with server maintainers. Source review and offline requests are not real HTTP/UI acceptance.",
+    "Local official HTTP/PO/S3/Worker generation is now exercised in e2e.json. Resolve its two review metadata defects and rebind acceptance; browser UI and replacement-preview invalidation remain unverified. Agree metadata/format labels and rollout with server maintainers.",
     "Transfer the approved PO to exactly one authoritative location and replace the legacy translation generation path once, without dual-write synchronization.",
     "Promote exact tooling/runtime and paired artifact guards into the existing workflow without adding parallel CI pipelines.",
     "Choose new immutable publication versions, then bind acceptance to the final artifacts."

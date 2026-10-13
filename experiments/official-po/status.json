@@ -1,5 +1,5 @@
 {
-  "status": "bounded-local-locale-verified-not-released",
+  "status": "local-po-e2e-verified-review-metadata-fixes-required-not-released",
   "branch": "codex/official-po",
   "baseline_snapshot_commit": "895741e",
   "source_language": "en",
@@ -82,11 +82,12 @@
   "not_verified": [
     "Adoption of the locally rehearsed packaging path into the existing production CI/release workflow",
     "Existing general CI under updated 4.35 dependencies",
-    "Wizard locale installation/UI/cache/S3 at runtime (official 4.35 API/UI source contract is now reviewed)",
+    "Wizard browser UI and locale-replacement preview invalidation (official locale API/S3/fresh-generation runtime is now exercised; see e2e.json)",
     "Native Microsoft Word",
     "Arbitrary questionnaire inputs"
   ],
   "packaging_rehearsal": "See experiments/official-po/packaging.json. Template metadata additionally restores root-zh-hant eligibility; it does not alter rendering or questionnaire mappings. Native acceptance still refers to the unchanged render inputs.",
-  "next_step": "Rehearse real installation and fresh document generation in an isolated local 4.35 stack using the reviewed installation.json contract; do not use the current Tool request without explicit language support. Then approve the single PO authority and existing-workflow cutover. Keep no-delete/new-version pairing and do not mix in prose/layout changes.",
+  "end_to_end_rehearsal": "See experiments/official-po/e2e.json: real local Server/PO/S3/Worker generation and all 56 page-pair comparisons passed. Original-size reading found two review metadata defects, so this is not overall candidate acceptance or cutover approval.",
+  "next_step": "Fix only the true Server phase-path and review project-name label issues, localize the restored known Chinese phase label, then rebind/regress affected outputs. After that approve the single PO authority and adapt the existing workflow with explicit document language and immutable pairing; no parallel CI.",
   "remote_operations": false
 }
