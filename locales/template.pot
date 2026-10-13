@@ -1,10 +1,10 @@
-# English translations for local:official-po-prototype.
+# English translations for science-europe-enhanced.
 
 msgid ""
 msgstr ""
-"Project-Id-Version: local:official-po-prototype 0.3.78\n"
+"Project-Id-Version: science-europe-enhanced 0.3.78\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-13 02:37+0000\n"
+"POT-Creation-Date: 2026-10-13 03:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -15,13 +15,1022 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
+#: src/projects.html.j2:31
+msgctxt "projects"
+msgid "(applied)"
+msgstr ""
+
+#: src/projects.html.j2:31
+msgctxt "projects"
+msgid "(granted)"
+msgstr ""
+
+#: src/contributors.html.j2:39
+msgctxt "contributors"
+msgid "(name not given)"
+msgstr ""
+
+#: src/quality-control.html.j2:10
+msgctxt "quality-control"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:204
+msgctxt "questions/02-what-data"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:225
+#: src/questions/08-copyright-ipr.html.j2:254
+msgctxt "questions/08-copyright-ipr"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:92
+msgctxt "questions/12-access-data"
+msgid "(no name given)"
+msgstr ""
+
+#: src/projects.html.j2:31
+msgctxt "projects"
+msgid "(planned)"
+msgstr ""
+
+#: src/projects.html.j2:64
+msgctxt "projects"
+msgid "(project name not given)"
+msgstr ""
+
+#: src/projects.html.j2:31
+msgctxt "projects"
+msgid "(rejected)"
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:341
 #: src/questions/15-required-resources.html.j2:184
 msgid ", "
 msgstr ""
 
+#: src/questions/01-how-data.html.j2:3
+msgctxt "questions/01-how-data"
+msgid "1. How will new data be collected or produced and/or how will existing data be re-used?"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:3
+msgctxt "questions/10-share-restrictions"
+msgid "10. How and when will data be shared? Are there possible restrictions to data sharing or embargo reasons?"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:3
+msgctxt "questions/11-data-preservation"
+msgid "11. How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:2
+msgctxt "questions/12-access-data"
+msgid "12. What methods or software tools are needed to access and use data?"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:3
+msgctxt "questions/13-persistent-identifier"
+msgid "13. How will the application of a unique and persistent identifier (such as a Digital Object Identifier (DOI)) to each data set be ensured?"
+msgstr ""
+
+#: src/questions/14-dm-responsible.html.j2:2
+msgctxt "questions/14-dm-responsible"
+msgid "14. Who (for example role, position, and institution) will be responsible for data management (i.e. the data steward)?"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:3
+msgctxt "questions/15-required-resources"
+msgid "15. What resources (for example financial and time) will be dedicated to data management and ensuring that data will be FAIR (Findable, Accessible, Interoperable, Re-usable)?"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:3
+msgctxt "questions/02-what-data"
+msgid "2. What data (for example the kinds, formats, and volumes) will be collected or produced?"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:3
+msgctxt "questions/03-docs-metadata"
+msgid "3. What metadata and documentation (for example the methodology of data collection and way of organising data) will accompany the data?"
+msgstr ""
+
+#: src/questions/04-quality-control.html.j2:2
+msgctxt "questions/04-quality-control"
+msgid "4. What data quality control measures will be used?"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:2
+msgctxt "questions/05-store-backup"
+msgid "5. How will data and metadata be stored and backed up during the research process?"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:3
+msgctxt "questions/06-access-security"
+msgid "6. How will data security and protection of sensitive data be taken care of during the research?"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:3
+msgctxt "questions/07-personal-data"
+msgid "7. If personal data are processed, how will compliance with legislation on personal data and on security be ensured?"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:3
+msgctxt "questions/08-copyright-ipr"
+msgid "8. How will other legal issues, such as intellectual property rights and ownership, be managed? What legislation is applicable?"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:36
+msgctxt "questions/09-ethical-issues"
+msgid "9. What ethical issues and codes of conduct are there, and how will they be taken into account?"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:139
+msgctxt "questions/11-data-preservation"
+msgid "<em>General-purpose repository</em>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:254
+msgctxt "questions/01-how-data"
+msgid "<p class=\"answer-lead\"><strong>Shared arrangements</strong></p>"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:312
+msgctxt "questions/06-access-security"
+msgid "<p class=\"answer-reference\"><a href=\"#q-store-backup\">See question 5 for archival and backup arrangements.</a></p>"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:126
+msgctxt "questions/08-copyright-ipr"
+msgid "<p class=\"data-gap\" data-fact-id=\"authorization-details\" data-status=\"missing\"><strong>Information not provided:</strong> details of the authorization arrangements.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:130 src/questions/01-how-data.html.j2:287
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-fact-id=\"dataset-source\" data-status=\"missing\"><strong>Information not provided:</strong> where this dataset can be obtained.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:166
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-fact-id=\"dataset-version\" data-status=\"missing\"><strong>Information not provided:</strong> which version of this dataset will be used.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:175
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-fact-id=\"dataset-version-policy\" data-status=\"missing\"><strong>Information not provided:</strong> how new dataset versions will be handled.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:212
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-fact-id=\"grant-number\" data-status=\"missing\"><strong>Information not provided:</strong> the grant number.</p>"
+msgstr ""
+
+#: src/nonreuse.html.j2:27
+#, python-format
+msgctxt "nonreuse"
+msgid "<p class=\"data-gap\" data-fact-id=\"nonreuse-reason\" data-status=\"%(reasonStatus)s\"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:74
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-fact-id=\"repository-charges\" data-status=\"missing\"><strong>Information not provided:</strong> whether repository service charges will be incurred.</p>"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:135
+msgctxt "questions/11-data-preservation"
+msgid "<p class=\"data-gap\" data-fact-id=\"repository-contact-arrangements\" data-status=\"missing\">The other repository contact arrangements have not been described.</p>"
+msgstr ""
+
+#: src/nonreuse.html.j2:44
+msgctxt "nonreuse"
+msgid "<p class=\"data-gap\" data-fact-id=\"reuse-decision\" data-status=\"missing\"><strong>Information not provided:</strong> whether this dataset will be re-used.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:139 src/questions/01-how-data.html.j2:297
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-fact-id=\"reuse-purpose\" data-status=\"missing\"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:61
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"collection-methods\" data-status=\"missing\"><strong>Information not provided:</strong> the datasets to be collected or produced and the methods, instruments, or software that will be used.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:66
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"new-data\" data-status=\"missing\"><strong>Information not provided:</strong> whether the project will collect or produce new instrument data.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:481
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance-detail\" data-status=\"missing\"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:376
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"reuse-sources\" data-status=\"missing\"><strong>Information not provided:</strong> the existing datasets considered for re-use, including any sources that were considered but discarded.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:452
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"reuse-sources\" data-status=\"missing\"><strong>Information not provided:</strong> whether existing data will be re-used, including constraints or reasons for discarding candidate sources.</p>"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:79
+msgctxt "questions/05-store-backup"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-3a\" data-fact-id=\"backup-arrangement\" data-status=\"missing\"><strong>Information not provided:</strong> how project data and metadata will be backed up.</p>"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:19
+msgctxt "questions/05-store-backup"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-3a\" data-fact-id=\"backup-reliability\" data-status=\"missing\"><strong>Information not provided:</strong> whether data stored by individual project members are adequately backed up and traceable.</p>"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:78
+msgctxt "questions/05-store-backup"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-3a\" data-fact-id=\"working-storage-arrangement\" data-status=\"missing\"><strong>Information not provided:</strong> whether data will be kept in a shared workspace or by individual project members.</p>"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:72
+msgctxt "questions/07-personal-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-additional-safeguards\" data-status=\"missing\"><strong>Information not provided:</strong> details of any other technical and procedural safeguards.</p>"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:63
+msgctxt "questions/07-personal-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-identifiability\" data-status=\"missing\"><strong>Information not provided:</strong> whether the stored data are anonymized, pseudonymized, or identifiable.</p>"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:22
+msgctxt "questions/07-personal-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-legal-basis\" data-status=\"missing\"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:20
+msgctxt "questions/07-personal-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-other-legal-basis\" data-status=\"missing\"><strong>Information not provided:</strong> the alternative legal basis selected for collecting and processing personal data.</p>"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:99
+msgctxt "questions/07-personal-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-safeguards\" data-status=\"missing\"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:91
+msgctxt "questions/07-personal-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-transfer\" data-status=\"missing\"><strong>Information not provided:</strong> whether data will be transferred outside the EU/EEA.</p>"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:86
+msgctxt "questions/07-personal-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-transfer-measures\" data-status=\"missing\"><strong>Information not provided:</strong> the measures for protecting data transferred outside the EU/EEA.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:221
+#: src/questions/15-required-resources.html.j2:224
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"cost-coverage\" data-status=\"missing\"><strong>Information not provided:</strong> how this cost will be covered.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:61
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"hardware-software\" data-status=\"missing\"><strong>Information not provided:</strong> whether additional hardware or software is required.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:58
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"hardware-software-detail\" data-status=\"missing\"><strong>Information not provided:</strong> the additional hardware or software required.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:135
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"resource-justification\" data-status=\"missing\"><strong>Information not provided:</strong> why this resource is needed to deliver FAIR data.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:243
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"resources-costing\" data-status=\"missing\"><strong>Information not provided:</strong> resources such as staff time, storage, deposit preparation, and repository charges budgeted for this project.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:250
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"resources-costing\" data-status=\"missing\"><strong>Information not provided:</strong> the financial and time resources budgeted for data management and FAIR data.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:39
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"specialist-expertise\" data-status=\"missing\"><strong>Information not provided:</strong> whether additional specialist expertise is required.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:36
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"specialist-expertise-detail\" data-status=\"missing\"><strong>Information not provided:</strong> the expertise for which new staff will be hired.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:23
+msgctxt "questions/15-required-resources"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"specialist-expertise-detail\" data-status=\"missing\"><strong>Information not provided:</strong> the training that existing staff will receive.</p>"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:93
+msgctxt "questions/09-ethical-issues"
+msgid "<p class=\"data-gap\" data-status=\"missing-output\">A case number has not been provided.</p>"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:90
+msgctxt "questions/09-ethical-issues"
+msgid "<p class=\"data-gap\" data-status=\"missing-output\">Approval status has not been provided.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:210
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-status=\"missing-output\">Restrictions apply, but the conditions of use are not yet described.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:125
+#, python-format
+msgctxt "questions/01-how-data"
+msgid "<p class=\"dataset-source\" data-fact-id=\"dataset-source\" data-status=\"complete\">Source: <a href=\"%(refDataWhere)s\">%(refDataWhere)s</a></p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:208
+msgctxt "questions/15-required-resources"
+msgid "<p data-fact-id=\"cost-coverage\" data-status=\"complete\">This cost will be covered by a funding grant.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:284
+#, python-format
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"dataset-source\" data-status=\"complete\">Source: %(nrefDataWhere)s</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:127
+#, python-format
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"dataset-source\" data-status=\"complete\">Source: %(refDataWhere)s</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:282
+#, python-format
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"dataset-source\" data-status=\"complete\">Source: <a href=\"%(nrefDataWhere)s\">%(nrefDataWhere)s</a></p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:158
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"dataset-versioning\" data-status=\"complete\">This reference dataset is versioned.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:178
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"dataset-versioning\" data-status=\"explicit-no\">This reference dataset is not versioned.</p>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:86
+msgctxt "questions/13-persistent-identifier"
+msgid "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">A project data steward or principal investigator will assign the persistent identifier.</span></p>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:89
+msgctxt "questions/13-persistent-identifier"
+msgid "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">An institutional data steward will assign the persistent identifier.</span></p>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:92
+msgctxt "questions/13-persistent-identifier"
+msgid "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">The repository will assign the persistent identifier.</span></p>"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:133
+msgctxt "questions/11-data-preservation"
+msgid "<p data-fact-id=\"repository-contact-arrangements\" data-status=\"complete\">Other arrangements have been made for contacting the repository.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:279
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"reuse-decision\" data-status=\"complete\">This dataset will be re-used.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:344
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"reuse-personal-data\" data-status=\"explicit-no\">This dataset does not contain personal data.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:210
+msgctxt "questions/01-how-data"
+msgid "<p data-fact-id=\"reuse-restrictions\" data-status=\"partial\">Restrictions apply to this dataset.</p>"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:203
+msgctxt "questions/03-docs-metadata"
+msgid "<p style=\"margin:0\">There will be  a <strong>(sub)folder for each (repeated) analysis</strong>. </p>"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:212
+msgctxt "questions/03-docs-metadata"
+msgid "<p style=\"margin:0\">There will be a <strong>(sub)folder for each step in the analysis workflow</strong>.</p>"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:194
+msgctxt "questions/03-docs-metadata"
+msgid "<p style=\"margin:0\">There will be a <strong>folder for each sample/subject</strong>.</p>"
+msgstr ""
+
+#: src/word/versions.html.j2:23
+msgctxt "word/versions"
+msgid "<p><em>There are no named versions.</em></p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:53
+msgctxt "questions/15-required-resources"
+msgid "<p><strong>Additional hardware or software required</strong></p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:208
+msgctxt "questions/01-how-data"
+msgid "<p><strong>Conditions of use</strong></p>"
+msgstr ""
+
+#: src/reuse-summary.html.j2:100
+msgctxt "reuse-summary"
+msgid "<p><strong>Conditions of use</strong></p>"
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:8
+msgctxt "reuse-rightsholder"
+msgid "<p><strong>Data rights holder and contact information</strong></p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:31
+msgctxt "questions/15-required-resources"
+msgid "<p><strong>Expertise to recruit</strong></p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:293
+msgctxt "questions/01-how-data"
+msgid "<p><strong>Purpose of re-use</strong></p>"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:30
+msgctxt "questions/12-access-data"
+msgid "<p><strong>Reason for not including software documentation:</strong></p>"
+msgstr ""
+
+#: src/nonreuse.html.j2:24
+msgctxt "nonreuse"
+msgid "<p><strong>Reason for not re-using this dataset</strong></p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:162
+msgctxt "questions/01-how-data"
+msgid "<p><strong>Version</strong></p>"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:294
+msgctxt "questions/09-ethical-issues"
+msgid "<p>DPIA:</p>"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:196
+#: src/questions/03-docs-metadata.html.j2:205
+#: src/questions/03-docs-metadata.html.j2:214
+msgctxt "questions/03-docs-metadata"
+msgid "<p>Each of those will use the following conventions:</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:210
+#, python-format
+msgctxt "questions/15-required-resources"
+msgid "<p>Grant number: %(costCoverGrantIdReply)s.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:173
+msgctxt "questions/01-how-data"
+msgid "<p>If a new version becomes available during the project, all analyses will be repeated using it.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:171
+msgctxt "questions/01-how-data"
+msgid "<p>If a new version becomes available during the project, it will be used for new analyses.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:169
+msgctxt "questions/01-how-data"
+msgid "<p>If a new version becomes available during the project, the current version will continue to be used.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:355
+msgctxt "questions/01-how-data"
+msgid "<p>New ethical approval under research ethics laws will be needed for our re-use of this dataset.</p>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:220
+msgctxt "questions/15-required-resources"
+msgid "<p>Other funding arrangements are planned.</p>"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:128
+msgctxt "questions/11-data-preservation"
+msgid "<p>Other repository contact arrangements:</p>"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:51
+#, python-format
+msgctxt "questions/10-share-restrictions"
+msgid "<p>Recorded identifier: <strong>%(identifierValue)s</strong></p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:351
+msgctxt "questions/01-how-data"
+msgid "<p>The existing ethical approval under research ethics laws covers our re-use of this dataset.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:353
+msgctxt "questions/01-how-data"
+msgid "<p>The existing ethical approval under research ethics laws will need to be extended to cover our re-use of this dataset.</p>"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:51
+msgctxt "questions/10-share-restrictions"
+msgid "<p>We do not assign persistent identifiers to this dataset.</p>"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:20
+msgctxt "questions/08-copyright-ipr"
+msgid "<p>We will manage our data according to the principle <em>as open as possible</em>.</p>"
+msgstr ""
+
+#: src/header.html.j2:38 src/header.html.j2:82
+msgctxt "header"
+msgid "<span class=\"contact-name missing\">(name not given)</span>"
+msgstr ""
+
+#: src/header.html.j2:54
+msgctxt "header"
+msgid "<span class=\"empty-value\">There is no contact person specified yet</span>"
+msgstr ""
+
+#: src/header.html.j2:98
+msgctxt "header"
+msgid "<span class=\"empty-value\">There is no creator specified yet</span>"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:88
+#, python-format
+msgctxt "questions/09-ethical-issues"
+msgid "<span class=\"ethical-approval-case\">Case number: %(authority_case)s</span>"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:107
+#, python-format
+msgctxt "questions/11-data-preservation"
+msgid "<span class=\"repository-label\">Distribution %(loop_index)s:</span>"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:355
+msgctxt "questions/09-ethical-issues"
+msgid "<span data-fact-id=\"ethical-informed-consent-collected\" data-status=\"complete\">Informed consent has been collected from the research subjects.</span>"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:357
+msgctxt "questions/09-ethical-issues"
+msgid "<span data-fact-id=\"ethical-informed-consent-collected\" data-status=\"explicit-no\">Informed consent has not been collected from the research subjects.</span>"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:154
+msgctxt "questions/11-data-preservation"
+msgid "<span data-requirement-id=\"SE-5b\" data-fact-id=\"repository-destination\" data-status=\"missing\">The repository for this distribution has not been specified.</span>"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:152
+msgctxt "questions/11-data-preservation"
+msgid "<span data-requirement-id=\"SE-5b\" data-fact-id=\"repository-destination\" data-status=\"needs-review\">The selected repository type cannot be described by this template.</span>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:115 src/questions/01-how-data.html.j2:272
+msgctxt "questions/01-how-data"
+msgid "<strong class=\"item-label\">(no name given)</strong>"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:206
+#, python-format
+msgctxt "questions/10-share-restrictions"
+msgid "<strong>Distribution %(loop_index)s</strong>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:47
+#, python-format
+msgctxt "questions/13-persistent-identifier"
+msgid "<strong>Distribution %(loop_index)s</strong>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:51
+msgctxt "questions/13-persistent-identifier"
+msgid "<strong>Domain-specific repository</strong>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:53
+msgctxt "questions/13-persistent-identifier"
+msgid "<strong>General-purpose repository</strong>"
+msgstr ""
+
 #: src/questions/15-required-resources.html.j2:192
 msgid "<strong>Information not provided:</strong> which FAIR or data-management activities this resource supports."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:57
+msgctxt "questions/13-persistent-identifier"
+msgid "<strong>Institutional repository</strong>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:55
+msgctxt "questions/13-persistent-identifier"
+msgid "<strong>National repository</strong>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:107
+#, python-format
+msgctxt "questions/15-required-resources"
+msgid "<strong>Project %(i)s%(projectItemNumberReply)s </strong>"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:59
+msgctxt "questions/13-persistent-identifier"
+msgid "<strong>Special-purpose repository</strong>"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:143
+msgctxt "questions/08-copyright-ipr"
+msgid "A fixed embargo period cannot be used because some restricted data must remain closed indefinitely."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:183
+msgctxt "questions/02-what-data"
+msgid "A member of the project team will perform the data entry."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:259
+msgctxt "questions/11-data-preservation"
+msgid "A participating department will cover the repository service fees."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:261
+msgctxt "questions/11-data-preservation"
+msgid "A participating institute will cover the repository service fees."
+msgstr ""
+
+#: src/post-project-archive.html.j2:65
+msgctxt "post-project-archive"
+msgid "A principal investigator involved in the project will decide on an extension."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:181
+msgctxt "questions/02-what-data"
+msgid "A specialized team will perform the data entry."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:125
+msgctxt "questions/07-personal-data"
+msgid "Access procedure to personal data"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:174
+msgctxt "questions/10-share-restrictions"
+msgid "Access requests will follow a specialized process."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:262
+msgctxt "questions/06-access-security"
+msgid "Access to data during research"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:143
+msgctxt "questions/10-share-restrictions"
+msgid "Access to this distribution is subject to restrictions."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:76
+msgctxt "questions/10-share-restrictions"
+msgid "Access will be limited to a predefined group of people."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:311
+msgctxt "questions/09-ethical-issues"
+msgid "According to the questionnaire, a data protection impact assessment (DPIA) is not required."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:236
+msgctxt "questions/09-ethical-issues"
+msgid "According to the questionnaire, a data protection impact assessment (DPIA) is required."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:12
+msgctxt "preservation-publication-reason"
+msgid "According to the questionnaire, this dataset will not be published because it has no value for re-use."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:16
+msgctxt "preservation-publication-reason"
+msgid "According to the questionnaire, this dataset will not be published because it was lost."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:70
+msgctxt "questions/09-ethical-issues"
+msgid "According to the questionnaire, this project does not require ethical approval."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:83
+msgctxt "questions/06-access-security"
+msgid "Accounts on laptops are password-protected."
+msgstr ""
+
+#: src/quality-control.html.j2:51
+#, python-format
+msgctxt "quality-control"
+msgid "Additional quality control details for <strong>%(qualityName)s</strong>:"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:16
+msgctxt "questions/15-required-resources"
+msgid "Additional specialist expertise is required. Existing staff will receive training."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:28
+msgctxt "questions/15-required-resources"
+msgid "Additional specialist expertise is required. New staff will be recruited."
+msgstr ""
+
+#: src/contributors.html.j2:62
+#, python-format
+msgctxt "contributors"
+msgid "Affiliation: <span class=\"affiliation\">%(dc_project_created_by_affiliation)s</span>"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:78
+msgctxt "questions/06-access-security"
+msgid "All data carriers are encrypted."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:88
+msgctxt "questions/06-access-security"
+msgid "All data centres that store project data hold appropriate certifications."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:177
+msgctxt "questions/02-what-data"
+msgid "All data in this dataset will be captured immediately in digital form."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:167
+msgctxt "questions/08-copyright-ipr"
+msgid "All data will be owned by the Principal Investigator."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:169
+msgctxt "questions/08-copyright-ipr"
+msgid "All data will be owned by the institute."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:58
+msgctxt "questions/05-store-backup"
+msgid "All essential data will also be stored elsewhere to prevent a total loss of data."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:248
+msgctxt "questions/06-access-security"
+msgid "All personal data will be anonymized as early as possible."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:246
+msgctxt "questions/06-access-security"
+msgid "All personal data will be collected anonymously."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:228
+msgctxt "questions/06-access-security"
+msgid "All personal data will be processed in pseudonymized form only."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:29
+msgctxt "questions/08-copyright-ipr"
+msgid "All project data can eventually be made openly available."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:67
+msgctxt "questions/05-store-backup"
+msgid "All project data stored outside the workspace will be adequately backed up."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:264
+msgctxt "questions/06-access-security"
+msgid "All project members, and no one else, have read and write access to the data."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:93
+msgctxt "questions/06-access-security"
+msgid "All project web services are accessible through HTTPS."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:205
+msgctxt "questions/09-ethical-issues"
+msgid "Alternative legal basis for collecting personal data:"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:94
+msgctxt "questions/12-access-data"
+msgid "An access location for this tool has not been provided."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:138
+msgctxt "questions/05-store-backup"
+msgid "An actual backup schedule is not established by these mapped answers; a need for frequent backups is not a schedule."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:207
+msgctxt "questions/09-ethical-issues"
+msgid "An alternative legal basis was selected, but it has not been specified; see Question 7."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:207
+msgctxt "questions/09-ethical-issues"
+msgid "An alternative legal basis was selected."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:79
+msgctxt "questions/09-ethical-issues"
+msgid "An application for approval has been submitted."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:81
+msgctxt "questions/09-ethical-issues"
+msgid "Approval has been granted."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:83
+msgctxt "questions/09-ethical-issues"
+msgid "Approval has been rejected."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:77
+msgctxt "questions/09-ethical-issues"
+msgid "Approval is planned."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:88
+msgctxt "questions/05-store-backup"
+msgid "Archival during the project"
+msgstr ""
+
+#: src/post-project-archive.html.j2:109
+msgctxt "post-project-archive"
+msgid "Archived data will be migrated regularly to more modern storage media."
+msgstr ""
+
+#: src/post-project-archive.html.j2:111
+msgctxt "post-project-archive"
+msgid "Archived data will not be migrated regularly to more modern storage media."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:103
+msgctxt "questions/08-copyright-ipr"
+msgid "Authentication and Authorization of Users"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:263
+msgctxt "questions/09-ethical-issues"
+msgid "Automated decision-making with legal or similarly significant effects on data subjects."
+msgstr ""
+
+#: src/research-quality.html.j2:27
+msgctxt "research-quality"
+msgid "Automated pipelines and workflows"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:93
+#, python-format
+msgctxt "questions/12-access-data"
+msgid "Available at: %(swPIDReply)s"
+msgstr ""
+
+#: src/header.html.j2:59
+msgctxt "header"
+msgid "Based on"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:418
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others through a standard repository."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:420
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:422
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we will need to convert the data into a machine-readable form but will not make this version available to others."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:424
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we will need to convert the data into a machine-readable form."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:117
+msgctxt "questions/15-required-resources"
+msgid "Budget"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:287
+msgctxt "questions/11-data-preservation"
+msgid "Budget for making data or other research outputs FAIR:"
+msgstr ""
+
+#: src/versions.html.j2:10
+msgctxt "versions"
+msgid "Changes"
+msgstr ""
+
+#: src/word/versions.html.j2:9
+msgctxt "word/versions"
+msgid "Changes"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:114
+msgctxt "questions/05-store-backup"
+msgid "Changes to archived data will require re-archival."
+msgstr ""
+
+#: src/macros.html.j2:154
+#, python-format
+msgctxt "macros"
+msgid "Contributor %(index)s"
+msgstr ""
+
+#: src/header.html.j2:68
+msgctxt "header"
+msgid "Created by"
+msgstr ""
+
+#: src/word/frontpage.html.j2:4
+#, python-format
+msgctxt "word/frontpage"
+msgid "Created in <a href=\"%(dc_config_service_url)s\">%(dc_config_service_name)s</a>."
+msgstr ""
+
+#: src/document-provenance.html.j2:4
+#, python-format
+msgctxt "document-provenance"
+msgid "Created on %(dc_document_created_at)s"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:43
+msgctxt "questions/03-docs-metadata"
+msgid "DDI (Data Documentation Initiative)"
+msgstr ""
+
+#: src/frontmatter.html.j2:9 src/frontmatter.html.j2:12
+msgctxt "frontmatter"
+msgid "Data Management Plan"
+msgstr ""
+
+#: src/index.html.j2:12
+msgctxt "index"
+msgid "Data Management Plan"
+msgstr ""
+
+#: src/word/frontpage.html.j2:1
+msgctxt "word/frontpage"
+msgid "Data Management Plan"
+msgstr ""
+
+#: src/word/index.html.j2:13
+msgctxt "word/index"
+msgid "Data Management Plan"
+msgstr ""
+
+#: src/header.html.j2:112
+#, python-format
+msgctxt "header"
+msgid "Data Management Plan created in %(dc_config_service_name)s &laquo;<a href=\"%(dc_config_service_url)s\" target=\"_blank\">%(dc_config_service_domain_name)s</a>&raquo;"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:65
+msgctxt "questions/05-store-backup"
+msgid "Data are stored only in the workspace, so no additional copies of files outside the workspace need to be backed up."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:59
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "Data collection for <strong>%(collectionName)s</strong> has not yet been described."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:260
+msgctxt "questions/09-ethical-issues"
+msgid "Data concerning vulnerable data subjects, including minors, employees, elderly people, mentally incapacitated people, and patients receiving care."
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:267
@@ -38,9 +1047,467 @@ msgstr ""
 msgid "Data formats and types"
 msgstr ""
 
+#: src/questions/03-docs-metadata.html.j2:261
+msgctxt "questions/03-docs-metadata"
+msgid "Data in the database will be read-only."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:179
+msgctxt "questions/02-what-data"
+msgid "Data in this dataset will first be captured on paper."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:283
+msgctxt "questions/10-share-restrictions"
+msgid "Data not subject to legal restrictions will be released openly after a fixed time period."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:150
+#, python-format
+msgctxt "questions/08-copyright-ipr"
+msgid "Data not subject to legal restrictions will be released unconditionally after a fixed period (%(embargoPeriod)s)."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:152
+msgctxt "questions/08-copyright-ipr"
+msgid "Data not subject to legal restrictions will be released unconditionally after a fixed period."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:69
+msgctxt "questions/02-what-data"
+msgid "Data ownership arrangements:"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:262
+msgctxt "questions/09-ethical-issues"
+msgid "Data processed on a large scale, considering the proportion of the relevant population, duration of processing, geographical scale, and volume or range of data."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:241
+msgctxt "questions/09-ethical-issues"
+msgid "Data protection impact assessments (DPIAs) have been performed for the personal data."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:307
+msgctxt "questions/09-ethical-issues"
+msgid "Data protection impact assessments (DPIAs) have not been performed for the personal data."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:289
+msgctxt "questions/09-ethical-issues"
+msgid "Data protection impact assessments and the data they cover:"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:272
+msgctxt "questions/03-docs-metadata"
+msgid "Data storage and file conventions"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:15
+msgctxt "questions/05-store-backup"
+msgid "Data stored by individual project members are backed up reliably and remain traceable, protecting them against loss caused by equipment failure or human error."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:17
+msgctxt "questions/05-store-backup"
+msgid "Data stored by individual project members are not yet adequately backed up and traceable."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:145
+msgctxt "questions/09-ethical-issues"
+msgid "Data we collect"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:122
+msgctxt "questions/09-ethical-issues"
+msgid "Data we produce"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:90
+msgctxt "questions/05-store-backup"
+msgid "Data will be archived in cold storage during the project."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:145
+msgctxt "questions/08-copyright-ipr"
+msgid "Data will be released as soon as the restrictions no longer apply."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:132
+msgctxt "questions/05-store-backup"
+msgid "Data will not be archived in cold storage during the project."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:98
+msgctxt "questions/15-required-resources"
+msgid "Data-management budget"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:25
+msgctxt "questions/05-store-backup"
+msgid "Dedicated specialists will operate the shared workspace."
+msgstr ""
+
+#: src/post-project-archive.html.j2:18
+msgctxt "post-project-archive"
+msgid "Departmental budgets of one or more project participants will pay for this long-term storage."
+msgstr ""
+
+#: src/document-provenance.html.j2:3
+#, python-format
+msgctxt "document-provenance"
+msgid "Document: %(dc_project_name)s"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:13
+msgctxt "questions/12-access-data"
+msgid "Documentation for this software will be included in the metadata."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:15
+msgctxt "questions/12-access-data"
+msgid "Documentation for this software will not be included in the metadata."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:89
+msgctxt "questions/10-share-restrictions"
+msgid "Domain-specific repository"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:108
+msgctxt "questions/11-data-preservation"
+msgid "Domain-specific repository"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:188
+msgctxt "questions/01-how-data"
+msgid "Each dataset will remain available from its provider in the long term."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:192
+msgctxt "questions/01-how-data"
+msgid "Each dataset will remain available from its provider in the long term. We will also retain a copy of each dataset and provide these copies alongside the research results."
+msgstr ""
+
+#: src/projects.html.j2:41
+msgctxt "projects"
+msgid "End date"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:101
+msgctxt "questions/09-ethical-issues"
+msgid "Ethical approval records have not been provided."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:66
+msgctxt "questions/09-ethical-issues"
+msgid "Ethical approvals"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:264
+msgctxt "questions/09-ethical-issues"
+msgid "Evaluation or scoring concerning work performance, economic situation, health, personal preferences or interests, reliability or behaviour, location, or movements."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:270
+msgctxt "questions/06-access-security"
+msgid "Everyone at the institute can read the data; only project members can request write access."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:266
+msgctxt "questions/06-access-security"
+msgid "Everyone at the institute has read access to the data; all project members have read and write access."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:137
+msgctxt "questions/05-store-backup"
+msgid "Exact working-storage and backup locations are not established by these mapped answers."
+msgstr ""
+
+#: src/project-file-naming.html.j2:8
+msgctxt "project-file-naming"
+msgid "File naming conventions:"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:238
+msgctxt "questions/03-docs-metadata"
+msgid "File naming conventions:"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:102
+msgctxt "questions/10-share-restrictions"
+msgid "For repository contact arrangements, see Question 11 under this dataset."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:102
+#, python-format
+msgctxt "questions/10-share-restrictions"
+msgid "For repository contact arrangements, see Question 11, distribution %(loop_index)s of this dataset."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:323
+msgctxt "questions/10-share-restrictions"
+msgid "For the authorization of potential users, we will make special arrangements."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:323
+msgctxt "questions/10-share-restrictions"
+msgid "For the authorization of potential users, we will make special arrangements:"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:42
+msgctxt "questions/01-how-data"
+msgid "For this dataset, we are using the following instruments:"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:139
+msgctxt "questions/10-share-restrictions"
+msgid "Freely available for any use (public domain or CC0)."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:141
+msgctxt "questions/10-share-restrictions"
+msgid "Freely available with an obligation to cite the source (e.g. CC BY)."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:121
+msgctxt "questions/05-store-backup"
+msgid "Frequent backups are not required because the archived data changes infrequently."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:119
+msgctxt "questions/05-store-backup"
+msgid "Frequent backups are required because the archived data changes frequently."
+msgstr ""
+
+#: src/projects.html.j2:43
+msgctxt "projects"
+msgid "Funding"
+msgstr ""
+
+#: src/projects.html.j2:47
+msgctxt "projects"
+msgid "Funding information has not been provided."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:117
+msgctxt "questions/15-required-resources"
+msgid "Funding source"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:106
+msgctxt "questions/10-share-restrictions"
+msgid "General-purpose repository"
+msgstr ""
+
+#: src/header.html.j2:108
+msgctxt "header"
+msgid "Generated on"
+msgstr ""
+
+#: src/word/frontpage.html.j2:3
+#, python-format
+msgctxt "word/frontpage"
+msgid "Generated on %(dc_doc_created_at)s."
+msgstr ""
+
+#: src/document-provenance.html.j2:9
+#, python-format
+msgctxt "document-provenance"
+msgid "Generated with <a href=\"%(dc_config_service_url)s\">%(dc_config_service_name)s</a>."
+msgstr ""
+
+#: src/versions.html.j2:5
+msgctxt "versions"
+msgid "History of changes"
+msgstr ""
+
+#: src/word/versions.html.j2:1
+msgctxt "word/versions"
+msgid "History of changes"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:181
+msgctxt "questions/10-share-restrictions"
+msgid "How to request restricted access has not been specified."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:58
+msgctxt "questions/10-share-restrictions"
+msgid "Identifier information for this dataset:"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:240
+msgctxt "questions/06-access-security"
+msgid "Independent party that keeps the pseudonymization keys:"
+msgstr ""
+
+#: src/research-quality.html.j2:31
+msgctxt "research-quality"
+msgid "Independent tools or workflows for key steps"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:120
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "Information not provided: %(metadataInstructionsGap)s; %(metadataHarvestGap)s."
+msgstr ""
+
+#: src/reference-maintenance-plan.html.j2:12
+msgctxt "reference-maintenance-plan"
+msgid "Information not provided: how reference data created by the project will be maintained."
+msgstr ""
+
+#: src/macros.html.j2:161
+msgctxt "macros"
+msgid "Information not provided: instrument name and description."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:80
+msgctxt "questions/02-what-data"
+msgid "Information not provided: ownership arrangements for data collected by the external party."
+msgstr ""
+
+#: src/project-file-naming.html.j2:12
+msgctxt "project-file-naming"
+msgid "Information not provided: the agreed file naming conventions."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:168
+msgctxt "questions/03-docs-metadata"
+msgid "Information not provided: the estimated storage space for all project data and software, including temporary storage (GB)."
+msgstr ""
+
+#: src/reference-publication-plan.html.j2:12
+msgctxt "reference-publication-plan"
+msgid "Information not provided: the publication schedule for reference data created by the project."
+msgstr ""
+
+#: src/reuse-summary.html.j2:104
+msgctxt "reuse-summary"
+msgid "Information not provided: the specific conditions of use."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:77
+msgctxt "questions/03-docs-metadata"
+msgid "Information not provided: whether a data/variable dictionary will be created."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:65
+msgctxt "questions/02-what-data"
+msgid "Information not provided: whether the equipment is adequately documented or needs additional process documentation."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:133
+msgctxt "questions/03-docs-metadata"
+msgid "Information not provided: whether the metadata will be available in a form that can be harvested and indexed."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:126
+msgctxt "questions/03-docs-metadata"
+msgid "Information not provided: whether the metadata will include instructions for accessing the data."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:62
+msgctxt "questions/02-what-data"
+msgid "Information not provided: who will collect this dataset."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:92
+msgctxt "questions/03-docs-metadata"
+msgid "Information not provided: why the metadata will not be openly available."
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:341
 #, python-format
 msgid "Information still needed: %(formatGaps)s."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:267
+msgctxt "questions/09-ethical-issues"
+msgid "Innovative use or application of new technological or organizational solutions, such as combining fingerprint and face recognition for physical access control."
+msgstr ""
+
+#: src/macros.html.j2:158
+#, python-format
+msgctxt "macros"
+msgid "Instrument %(index)s"
+msgstr ""
+
+#: src/macros.html.j2:146
+msgctxt "macros"
+msgid "Instrument dataset"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:21
+msgctxt "questions/01-how-data"
+msgid "Instrument datasets"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:14
+msgctxt "questions/02-what-data"
+msgid "Instrument datasets"
+msgstr ""
+
+#: src/nonreuse.html.j2:9
+msgctxt "nonreuse"
+msgid "It does not contain the data required for this project."
+msgstr ""
+
+#: src/nonreuse.html.j2:12
+msgctxt "nonreuse"
+msgid "It does not cover the aspects required for this project."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:348
+msgctxt "questions/09-ethical-issues"
+msgid "It does not involve human subjects."
+msgstr ""
+
+#: src/quality-control.html.j2:58
+#, python-format
+msgctxt "quality-control"
+msgid "It has not been specified whether quality control processes will be used for <strong>%(qualityName)s</strong>."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:188
+msgctxt "questions/10-share-restrictions"
+msgid "It has not been specified whether the access conditions will be included in open metadata."
+msgstr ""
+
+#: src/post-project-archive.html.j2:97
+msgctxt "post-project-archive"
+msgid "It has not been specified whether the archival period can be extended."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:111
+msgctxt "questions/12-access-data"
+msgid "It has not yet been specified whether software is required to use this dataset."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:215
+msgctxt "questions/10-share-restrictions"
+msgid "It has not yet been specified whether this dataset will be published."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:42
+msgctxt "questions/11-data-preservation"
+msgid "It has not yet been specified whether this dataset will be published."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:114
+msgctxt "questions/12-access-data"
+msgid "It has not yet been specified whether this dataset will be published."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:139
+msgctxt "questions/13-persistent-identifier"
+msgid "It has not yet been specified whether this dataset will be published."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:350
+msgctxt "questions/09-ethical-issues"
+msgid "It involves human subjects."
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:271
@@ -51,25 +1518,950 @@ msgstr ""
 msgid "It is a standardized format."
 msgstr ""
 
+#: src/questions/09-ethical-issues.html.j2:345
+msgctxt "questions/09-ethical-issues"
+msgid "It is covered by ethical review."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:229
+#: src/questions/08-copyright-ipr.html.j2:257
+msgctxt "questions/08-copyright-ipr"
+msgid "It is freely available for any use (public domain or CC0)."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:231
+#: src/questions/08-copyright-ipr.html.j2:259
+msgctxt "questions/08-copyright-ipr"
+msgid "It is freely available with an obligation to cite the source (e.g. CC BY)."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:343
+msgctxt "questions/09-ethical-issues"
+msgid "It is not covered by ethical review."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:110
+msgctxt "questions/03-docs-metadata"
+msgid "It will also be provided in a form that can be harvested and indexed."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:106
+msgctxt "questions/03-docs-metadata"
+msgid "It will not be provided in a form that can be harvested and indexed."
+msgstr ""
+
+#: src/nonreuse.html.j2:18
+msgctxt "nonreuse"
+msgid "Its conditions of use do not permit the intended re-use."
+msgstr ""
+
+#: src/nonreuse.html.j2:15
+msgctxt "nonreuse"
+msgid "Its quality is insufficient for this project."
+msgstr ""
+
+#: src/document-provenance.html.j2:8
+#, python-format
+msgctxt "document-provenance"
+msgid "Knowledge model: %(dc_pkg_name)s, %(dc_pkg_version)s (%(dc_pkg_organization_id)s:%(dc_pkg_km_id)s:%(dc_pkg_version)s)"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:24
+msgctxt "questions/07-personal-data"
+msgid "Legal basis for collecting and processing personal data"
+msgstr ""
+
+#: src/post-project-archive.html.j2:67
+msgctxt "post-project-archive"
+msgid "Library or archive staff will decide on an extension."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:136
+#, python-format
+msgctxt "questions/10-share-restrictions"
+msgid "Licence start date: %(licenseDate)s."
+msgstr ""
+
+#: src/reference-maintenance-plan.html.j2:8
+msgctxt "reference-maintenance-plan"
+msgid "Maintenance of reference data created by the project:"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:266
+msgctxt "questions/09-ethical-issues"
+msgid "Matching or combining datasets, for example from processing operations performed for different purposes."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:101
+msgctxt "questions/03-docs-metadata"
+msgid "Metadata will be openly available without instructions on how to access the data."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:99
+msgctxt "questions/03-docs-metadata"
+msgid "Metadata will be openly available, including instructions on how to access the data."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:103
+msgctxt "questions/03-docs-metadata"
+msgid "Metadata will be openly available."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:88
+msgctxt "questions/03-docs-metadata"
+msgid "Metadata will not be available openly."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:265
+msgctxt "questions/03-docs-metadata"
+msgid "Modifications will be made by <em>Expiring</em> the existing data and <em>Adding</em> updated data."
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:33
+msgctxt "reuse-rightsholder"
+msgid "No application for data access is required."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:141
+msgctxt "questions/08-copyright-ipr"
+msgid "No embargo period is needed because all data will be made openly available."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:450
+msgctxt "questions/01-how-data"
+msgid "No existing datasets will be re-used."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:51
+msgctxt "questions/01-how-data"
+msgid "No instruments for this dataset have been specified."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:64
+msgctxt "questions/01-how-data"
+msgid "No new instrument datasets will be produced in this project."
+msgstr ""
+
+#: src/quality-control.html.j2:13
+#, python-format
+msgctxt "quality-control"
+msgid "No quality control processes will be used for <strong>%(qualityName)s</strong>."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:70
+msgctxt "questions/15-required-resources"
+msgid "No repository service charges are expected."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:69
+msgctxt "questions/12-access-data"
+msgid "No specific software is required to access or use this dataset."
+msgstr ""
+
+#: src/macros.html.j2:146
+msgctxt "macros"
+msgid "Non-equipment dataset"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:119
+msgctxt "questions/02-what-data"
+msgid "Non-equipment datasets"
+msgstr ""
+
+#: src/macros.html.j2:146
+msgctxt "macros"
+msgid "Non-reference dataset"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:80
+msgctxt "questions/06-access-security"
+msgid "Not all data carriers are encrypted."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:90
+msgctxt "questions/06-access-security"
+msgid "Not all data centres that store project data hold appropriate certifications."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:85
+msgctxt "questions/06-access-security"
+msgid "Not all laptop accounts are password-protected."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:95
+msgctxt "questions/06-access-security"
+msgid "Not all project web services are accessible through HTTPS."
+msgstr ""
+
+#: src/macros.html.j2:38
+#, python-format
+msgctxt "macros"
+msgid "ORCID: %(orcid)s"
+msgstr ""
+
+#: src/macros.html.j2:40
+msgctxt "macros"
+msgid "ORCID: Not found"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:249
+msgctxt "questions/03-docs-metadata"
+msgid "Object naming conventions:"
+msgstr ""
+
+#: src/post-project-archive.html.j2:101
+msgctxt "post-project-archive"
+msgid "Obsolete data formats in cold storage will be upgraded."
+msgstr ""
+
+#: src/post-project-archive.html.j2:103
+msgctxt "post-project-archive"
+msgid "Obsolete data formats in cold storage will not be upgraded."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:105
+msgctxt "questions/08-copyright-ipr"
+msgid "One of the project members will authorize potential users of the data."
+msgstr ""
+
+#: src/post-project-archive.html.j2:20
+msgctxt "post-project-archive"
+msgid "One or more participating institutes have budgeted for this long-term storage service."
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:297
 msgid "Only a small volume of data is expected."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:268
+msgctxt "questions/06-access-security"
+msgid "Only project members have read access; only designated project members can modify the data."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:163
+msgctxt "questions/13-persistent-identifier"
+msgid "Only we will be interested in re-using this data."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:74
+msgctxt "questions/10-share-restrictions"
+msgid "Open access: this distribution will be shared with anyone."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:270
+msgctxt "questions/11-data-preservation"
+msgid "Other arrangements are planned for paying repository service fees."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:267
+msgctxt "questions/11-data-preservation"
+msgid "Other arrangements for paying repository costs:"
+msgstr ""
+
+#: src/post-project-archive.html.j2:39
+msgctxt "post-project-archive"
+msgid "Other arrangements for the archive's minimum lifetime:"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:193
+msgctxt "questions/02-what-data"
+msgid "Other arrangements have been made for data entry."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:77
+msgctxt "questions/02-what-data"
+msgid "Other arrangements have been made for ownership of this dataset."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:209
+msgctxt "questions/02-what-data"
+msgid "Other data-entry arrangements:"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:46
+msgctxt "questions/10-share-restrictions"
+msgid "Other identifier"
+msgstr ""
+
+#: src/quality-control.html.j2:41 src/quality-control.html.j2:55
+#, python-format
+msgctxt "quality-control"
+msgid "Other quality control methods are planned for <strong>%(qualityName)s</strong>."
+msgstr ""
+
+#: src/quality-control.html.j2:55
+#, python-format
+msgctxt "quality-control"
+msgid "Other quality control methods were selected for <strong>%(qualityName)s</strong>, but the details have not been provided."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:20
+msgctxt "preservation-publication-reason"
+msgid "Other reasons for not publishing this dataset:"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:165
+msgctxt "questions/13-persistent-identifier"
+msgid "Other researchers in this field will be interested in re-using this data."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:69
+msgctxt "questions/07-personal-data"
+msgid "Other technical and procedural safeguards:"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:468
+msgctxt "questions/01-how-data"
+msgid "Our computing workflow system records provenance information about the data analysis."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:171
+msgctxt "questions/08-copyright-ipr"
+msgid "Our consortium agreement defines ownership of intellectual property rights."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:148
+msgctxt "questions/11-data-preservation"
+msgid "Our institutional repository."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:146
+msgctxt "questions/11-data-preservation"
+msgid "Our national repository."
+msgstr ""
+
+#: src/contributors.html.j2:33
+msgctxt "contributors"
+msgid "People and responsibilities"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:320
+msgctxt "questions/10-share-restrictions"
+msgid "People can apply to an existing data access committee."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:313
+msgctxt "questions/10-share-restrictions"
+msgid "People can apply to one of the project members."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:315
+msgctxt "questions/10-share-restrictions"
+msgid "People can apply to the data access committee that we will set up."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:318
+msgctxt "questions/10-share-restrictions"
+msgid "People can apply to the following data access committee:"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:94
+msgctxt "questions/13-persistent-identifier"
+msgid "Persistent identifiers will be assigned."
 msgstr ""
 
 #: src/questions/11-data-preservation.html.j2:63
 msgid "Please check how the prepaid retention period relates to the answer that repository services have no charges."
 msgstr ""
 
+#: src/research-quality.html.j2:44
+msgctxt "research-quality"
+msgid "Please check the unanswered or unsupported research-result verification options:"
+msgstr ""
+
+#: src/questions/14-dm-responsible.html.j2:25
+msgctxt "questions/14-dm-responsible"
+msgid "Please provide the name of the person or team assigned these responsibilities."
+msgstr ""
+
 #: src/questions/11-data-preservation.html.j2:60
 msgid "Please specify a time unit for the retention period."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:299
+msgctxt "questions/06-access-security"
+msgid "Policies and Procedures"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:190
+msgctxt "questions/13-persistent-identifier"
+msgid "Possible re-use of created data in other contexts"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:181
+msgctxt "questions/13-persistent-identifier"
+msgid "Potential uses in other fields:"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:169
+msgctxt "questions/11-data-preservation"
+msgid "Preservation destinations by distribution:"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:219
+#, python-format
+msgctxt "questions/11-data-preservation"
+msgid "Preservation policy: see %(policyReference)s."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:306
+msgctxt "questions/11-data-preservation"
+msgid "Preservation selection still requires review: publication decisions and archive renewal criteria do not by themselves explain which datasets and versions must be retained or destroyed."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:118
+msgctxt "questions/07-personal-data"
+msgid "Privacy restrictions prevent some project data from being made openly available."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:268
+msgctxt "questions/09-ethical-issues"
+msgid "Processing that prevents data subjects from exercising a right or using a service or a contract."
+msgstr ""
+
+#: src/macros.html.j2:146
+msgctxt "macros"
+msgid "Produced dataset"
+msgstr ""
+
+#: src/macros.html.j2:148
+#, python-format
+msgctxt "macros"
+msgid "Project %(index)s"
+msgstr ""
+
+#: src/projects.html.j2:39
+msgctxt "projects"
+msgid "Project Number"
+msgstr ""
+
+#: src/projects.html.j2:38
+msgctxt "projects"
+msgid "Project acronym"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:75
+msgctxt "questions/06-access-security"
+msgid "Project members carry data with them (e.g. on laptops, USB sticks, or other external media)."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:73
+msgctxt "questions/06-access-security"
+msgid "Project members do not carry data with them (e.g. on laptops, USB sticks, or other external media)."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:98
+msgctxt "questions/06-access-security"
+msgid "Project members have been instructed about both generic and specific risks to the project."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:100
+msgctxt "questions/06-access-security"
+msgid "Project members have not received instruction covering both generic and project-specific risks."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:63
+msgctxt "questions/05-store-backup"
+msgid "Project participants are responsible for backing up project data stored outside the workspace."
+msgstr ""
+
+#: src/header.html.j2:63
+msgctxt "header"
+msgid "Project phase"
+msgstr ""
+
+#: src/document-provenance.html.j2:6
+#, python-format
+msgctxt "document-provenance"
+msgid "Project phase: %(phases_phaseUuid_title)s"
+msgstr ""
+
+#: src/post-project-archive.html.j2:7
+msgctxt "post-project-archive"
+msgid "Project-wide cold storage after the project"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:486
+msgctxt "questions/01-how-data"
+msgid "Provenance"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:232
+msgctxt "questions/06-access-security"
+msgid "Pseudonymization is performed by an independent party to enable data linkage."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:230
+msgctxt "questions/06-access-security"
+msgid "Pseudonymization is performed within the project, and only a limited number of people can access the re-identification keys."
+msgstr ""
+
+#: src/versions.html.j2:9
+msgctxt "versions"
+msgid "Publication date"
+msgstr ""
+
+#: src/word/versions.html.j2:8
+msgctxt "word/versions"
+msgid "Publication date"
+msgstr ""
+
+#: src/reference-publication-plan.html.j2:8
+msgctxt "reference-publication-plan"
+msgid "Publication schedule for reference data created by the project:"
+msgstr ""
+
+#: src/quality-control.html.j2:47
+#, python-format
+msgctxt "quality-control"
+msgid "Quality control is planned for <strong>%(qualityName)s</strong>, but the methods have not been specified."
+msgstr ""
+
+#: src/quality-control.html.j2:45
+#, python-format
+msgctxt "quality-control"
+msgid "Quality control is planned for <strong>%(qualityName)s</strong>."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:99
+msgctxt "questions/01-how-data"
+msgid "Re-used datasets"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:170
+msgctxt "questions/10-share-restrictions"
+msgid "Re-users can request access through the project's Data Access Committee."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:168
+msgctxt "questions/10-share-restrictions"
+msgid "Re-users will be able to get access by request to the contact person."
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:315
 msgid "Reason for using a non-standard format:"
 msgstr ""
 
+#: src/questions/12-access-data.html.j2:107
+msgctxt "questions/12-access-data"
+msgid "Reason why specific software is not required:"
+msgstr ""
+
+#: src/macros.html.j2:146
+msgctxt "macros"
+msgid "Reference dataset"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:244
+msgctxt "questions/10-share-restrictions"
+msgid "References to other datasets:"
+msgstr ""
+
+#: src/preservation-paper.html.j2:15
+msgctxt "preservation-paper"
+msgid "Related paper:"
+msgstr ""
+
+#: src/research-quality.html.j2:35
+msgctxt "research-quality"
+msgid "Repeated analysis of a subset of the data"
+msgstr ""
+
+#: src/research-quality.html.j2:23
+msgctxt "research-quality"
+msgid "Repeating jobs across computing infrastructures"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:297
+msgctxt "questions/11-data-preservation"
+msgid "Repository costs and publication preparation"
+msgstr ""
+
+#: src/projects.html.j2:75
+msgctxt "projects"
+msgid "Research overview"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:167
+msgctxt "questions/13-persistent-identifier"
+msgid "Researchers working in other fields will be interested in re-using this data."
+msgstr ""
+
+#: src/macros.html.j2:150
+#, python-format
+msgctxt "macros"
+msgid "Resource %(index)s"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:117
+msgctxt "questions/15-required-resources"
+msgid "Resource and purpose"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:192
+#, python-format
+msgctxt "questions/10-share-restrictions"
+msgid "Restriction details: %(restrictionLink)s."
+msgstr ""
+
 #: src/questions/11-data-preservation.html.j2:53
 #, python-format
 msgid "Retention period (prepaid): %(period)s."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:182
+msgctxt "questions/08-copyright-ipr"
+msgid "Rights to the collected data are arranged in another way."
+msgstr ""
+
+#: src/content.html.j2:3
+msgctxt "content"
+msgid "Section 1: Data description and collection or re-use of existing data"
+msgstr ""
+
+#: src/content.html.j2:9
+msgctxt "content"
+msgid "Section 2: Documentation and data quality"
+msgstr ""
+
+#: src/content.html.j2:15
+msgctxt "content"
+msgid "Section 3: Storage and backup during research process"
+msgstr ""
+
+#: src/content.html.j2:21
+msgctxt "content"
+msgid "Section 4: Legal and ethical requirements, codes of conduct"
+msgstr ""
+
+#: src/content.html.j2:28
+msgctxt "content"
+msgid "Section 5: Data sharing and long-term preservation"
+msgstr ""
+
+#: src/content.html.j2:36
+msgctxt "content"
+msgid "Section 6: Data management responsibilities and resources"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:261
+msgctxt "questions/09-ethical-issues"
+msgid "Sensitive data or data of a highly personal nature, including racial or ethnic origin, political opinions, religious or philosophical beliefs, trade union membership, genetic data, health data, biometric data, or sexual orientation."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:230
+#, python-format
+msgctxt "questions/11-data-preservation"
+msgid "Shared preservation policy %(group_number)s"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:100
+msgctxt "questions/12-access-data"
+msgid "Software is required, but the tools have not yet been listed."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:71
+msgctxt "questions/12-access-data"
+msgid "Software required to use this dataset:"
+msgstr ""
+
+#: src/macros.html.j2:152
+#, python-format
+msgctxt "macros"
+msgid "Software tool %(index)s"
+msgstr ""
+
+#: src/post-project-archive.html.j2:94
+msgctxt "post-project-archive"
+msgid "Some selected reasons for extending the archival period cannot be interpreted by this template. Please review the answer."
+msgstr ""
+
+#: src/nonreuse.html.j2:37
+#, python-format
+msgctxt "nonreuse"
+msgid "Source: %(source)s"
+msgstr ""
+
+#: src/nonreuse.html.j2:35
+#, python-format
+msgctxt "nonreuse"
+msgid "Source: <a href=\"%(source)s\">%(source)s</a>"
+msgstr ""
+
+#: src/repository-special.html.j2:4
+msgctxt "repository-special"
+msgid "Special-purpose repository for the project."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:72
+msgctxt "questions/12-access-data"
+msgid "Specific software is required to use this dataset."
+msgstr ""
+
+#: src/projects.html.j2:40
+msgctxt "projects"
+msgid "Start date"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:37
+msgctxt "questions/05-store-backup"
+msgid "Storage needs are large at the beginning and will be reduced later."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:41
+msgctxt "questions/05-store-backup"
+msgid "Storage needs are largest in the middle of the project."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:39
+msgctxt "questions/05-store-backup"
+msgid "Storage needs are small at the beginning and will grow later."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:35
+msgctxt "questions/05-store-backup"
+msgid "Storage needs will be the same during the whole project."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:265
+msgctxt "questions/09-ethical-issues"
+msgid "Systematic monitoring used to observe, monitor, or control data subjects, including data collected through networks."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:50
+msgctxt "questions/07-personal-data"
+msgid "Technical and procedural measures"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:80
+msgctxt "questions/10-share-restrictions"
+msgid "The access arrangement for this distribution has not been provided."
+msgstr ""
+
+#: src/post-project-archive.html.j2:62
+msgctxt "post-project-archive"
+msgid "The archival period can be extended."
+msgstr ""
+
+#: src/post-project-archive.html.j2:52
+msgctxt "post-project-archive"
+msgid "The archival period cannot be extended."
+msgstr ""
+
+#: src/post-project-archive.html.j2:55
+msgctxt "post-project-archive"
+msgid "The archival period is limited by law or contract."
+msgstr ""
+
+#: src/post-project-archive.html.j2:57
+msgctxt "post-project-archive"
+msgid "The archival period is limited by the budget."
+msgstr ""
+
+#: src/post-project-archive.html.j2:35
+#, python-format
+msgctxt "post-project-archive"
+msgid "The archive will be kept for at least %(archiveDuration)s."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:103
+msgctxt "questions/05-store-backup"
+msgid "The archive will be stored at a remote location."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:94
+msgctxt "questions/05-store-backup"
+msgid "The archive will be stored on disk."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:96
+msgctxt "questions/05-store-backup"
+msgid "The archive will be stored on tape."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:105
+msgctxt "questions/05-store-backup"
+msgid "The archive will not be stored at a remote location."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:98
+msgctxt "questions/05-store-backup"
+msgid "The archive will use a medium other than disk or tape."
+msgstr ""
+
+#: src/post-project-archive.html.j2:47
+msgctxt "post-project-archive"
+msgid "The archive's minimum lifetime has not been provided."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:111
+msgctxt "questions/05-store-backup"
+msgid "The archived data is not expected to change over time."
+msgstr ""
+
+#: src/post-project-archive.html.j2:113
+msgctxt "post-project-archive"
+msgid "The arrangement for migration to more modern storage media has not been specified."
+msgstr ""
+
+#: src/post-project-archive.html.j2:105
+msgctxt "post-project-archive"
+msgid "The arrangement for obsolete data formats in cold storage has not been specified."
+msgstr ""
+
+#: src/post-project-archive.html.j2:92
+msgctxt "post-project-archive"
+msgid "The basis for deciding on an extension has not been specified."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:164
+msgctxt "questions/10-share-restrictions"
+msgid "The conditions of restricted access have not been provided."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:184
+msgctxt "questions/10-share-restrictions"
+msgid "The conditions will be published as part of open metadata."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:186
+msgctxt "questions/10-share-restrictions"
+msgid "The conditions will not be published as part of open metadata."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:325
+msgctxt "questions/01-how-data"
+msgid "The consent also covers our reuse."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:327
+msgctxt "questions/01-how-data"
+msgid "The consent does not cover our reuse; new consent will be needed."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:190
+msgctxt "questions/09-ethical-issues"
+msgid "The consent form will be available to people who reuse the data."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:188
+msgctxt "questions/09-ethical-issues"
+msgid "The consent form will not be available to people who reuse the data."
+msgstr ""
+
+#: src/reuse-summary.html.j2:55
+msgctxt "reuse-summary"
+msgid "The data can be reused without format conversion."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:222
+msgctxt "questions/01-how-data"
+msgid "The data can be used directly without format conversion."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:57
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of legal restrictions."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:59
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of patent-related commercial considerations."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:64
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because papers need to be submitted first."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:70
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open for the following reasons:"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:91
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:334
+msgctxt "questions/09-ethical-issues"
+msgid "The data collection is not subject to ethical legislation."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:341
+msgctxt "questions/09-ethical-issues"
+msgid "The data collection is subject to ethical legislation."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:220
+msgctxt "questions/01-how-data"
+msgid "The data format must be converted before use."
+msgstr ""
+
+#: src/reuse-summary.html.j2:53
+msgctxt "reuse-summary"
+msgid "The data format needs to be converted before reuse."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:181
+msgctxt "questions/09-ethical-issues"
+msgid "The data subjects will be informed as follows:"
+msgstr ""
+
+#: src/reuse-summary.html.j2:60
+msgctxt "reuse-summary"
+msgid "The dataset is fixed, so changes to the source data will not affect the reproducibility of the research results."
+msgstr ""
+
+#: src/reuse-summary.html.j2:67
+msgctxt "reuse-summary"
+msgid "The dataset is freely available for any use."
+msgstr ""
+
+#: src/reuse-summary.html.j2:69
+msgctxt "reuse-summary"
+msgid "The dataset is freely available provided that the source is cited."
+msgstr ""
+
+#: src/reuse-summary.html.j2:62
+msgctxt "reuse-summary"
+msgid "The dataset may change, which could affect the reproducibility of the research results."
+msgstr ""
+
+#: src/publication-summary.html.j2:17
+msgctxt "publication-summary"
+msgid "The dataset will be published after all processing has finished."
+msgstr ""
+
+#: src/publication-summary.html.j2:21
+msgctxt "publication-summary"
+msgid "The dataset will be published after an embargo."
+msgstr ""
+
+#: src/publication-summary.html.j2:15
+msgctxt "publication-summary"
+msgid "The dataset will be published after initial cleanup."
+msgstr ""
+
+#: src/publication-summary.html.j2:13
+msgctxt "publication-summary"
+msgid "The dataset will be published as soon as possible after collection."
+msgstr ""
+
+#: src/publication-summary.html.j2:19
+msgctxt "publication-summary"
+msgid "The dataset will be published when the project is completed."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:54
+msgctxt "questions/02-what-data"
+msgid "The equipment is less well described or not completely standard, so we will need to take extra care documenting the process."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:52
+msgctxt "questions/02-what-data"
+msgid "The equipment is very well described and known."
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:309
@@ -82,8 +2474,399 @@ msgstr ""
 msgid "The estimated data volume is %(formatTotalQuantity)s."
 msgstr ""
 
+#: src/questions/05-store-backup.html.j2:135
+msgctxt "questions/05-store-backup"
+msgid "The fields mapped by this template are insufficient to establish the following operational details:"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:255
+msgctxt "questions/01-how-data"
+msgid "The following arrangements apply to all reference datasets selected for re-use above."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:211
+msgctxt "questions/08-copyright-ipr"
+msgid "The following conditions apply to the reference and non-reference datasets that we reuse:"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:301
+msgctxt "questions/09-ethical-issues"
+msgid "The following indicators were selected as reasons why a DPIA is deemed necessary:"
+msgstr ""
+
+#: src/post-project-archive.html.j2:16
+msgctxt "post-project-archive"
+msgid "The grant will pay for this long-term storage."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:68
+msgctxt "questions/11-data-preservation"
+msgid "The metadata will be available even when the data no longer exists."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:70
+msgctxt "questions/11-data-preservation"
+msgid "The metadata will not remain available once the data no longer exists."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:140
+msgctxt "questions/02-what-data"
+msgid "The non-equipment datasets are:"
+msgstr ""
+
+#: src/post-project-archive.html.j2:44
+msgctxt "post-project-archive"
+msgid "The other arrangements for the archive's minimum lifetime have not been described."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:25
+msgctxt "preservation-publication-reason"
+msgid "The other reasons for not publishing have not been described."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:38
+msgctxt "questions/02-what-data"
+msgid "The ownership of the resulting data will remain with the external party."
+msgstr ""
+
+#: src/post-project-archive.html.j2:22
+msgctxt "post-project-archive"
+msgid "The payer for post-project cold storage has not been specified."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:128
+msgctxt "questions/13-persistent-identifier"
+msgid "The persistent identifier arrangement is not yet described."
+msgstr ""
+
+#: src/post-project-archive.html.j2:69
+msgctxt "post-project-archive"
+msgid "The person or team responsible for deciding on an extension has not been specified."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:197
+msgctxt "questions/09-ethical-issues"
+msgid "The procedure for obtaining consent from data subjects is as follows:"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:257
+msgctxt "questions/11-data-preservation"
+msgid "The project budget includes the repository service fees."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:165
+msgctxt "questions/08-copyright-ipr"
+msgid "The project data are not protected by copyright and therefore have no copyright owner."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:216
+msgctxt "questions/02-what-data"
+msgid "The project includes data capture that does not use measurement equipment."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:40
+msgctxt "questions/02-what-data"
+msgid "The project partners acquire full ownership of the data."
+msgstr ""
+
+#: src/post-project-archive.html.j2:12
+msgctxt "post-project-archive"
+msgid "The project will keep copies of its data in cold storage after it finishes."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:11
+msgctxt "questions/05-store-backup"
+msgid "The project will not use a shared workspace to work with data."
+msgstr ""
+
+#: src/post-project-archive.html.j2:10
+msgctxt "post-project-archive"
+msgid "The project will not use cold storage after it finishes. This answer does not rule out other forms of preservation."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:161
+msgctxt "questions/03-docs-metadata"
+msgid "The project will require so little storage space for all data and software (including temporary storage) that it is not a problem."
+msgstr ""
+
+#: src/reuse-summary.html.j2:48
+msgctxt "reuse-summary"
+msgid "The project will reuse a selected subset of the data and make it available with the research results."
+msgstr ""
+
+#: src/reuse-summary.html.j2:46
+msgctxt "reuse-summary"
+msgid "The project will reuse a subset of the data and document the filtering or selection process."
+msgstr ""
+
+#: src/reuse-summary.html.j2:44
+msgctxt "reuse-summary"
+msgid "The project will reuse the complete dataset."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:60
+msgctxt "questions/03-docs-metadata"
+msgid "The provenance will be captured using W3C PROV."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:188
+msgctxt "questions/01-how-data"
+msgid "The provider will keep this dataset available in the long term."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:192
+msgctxt "questions/01-how-data"
+msgid "The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:212
+msgctxt "questions/10-share-restrictions"
+msgid "The publication locations have not been listed."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:134
+msgctxt "questions/13-persistent-identifier"
+msgid "The publication locations have not been listed."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:226
+msgctxt "questions/09-ethical-issues"
+msgid "The purpose of processing the personal data can be described as follows:"
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:28
+msgctxt "preservation-publication-reason"
+msgid "The reason for not publishing has not been provided."
+msgstr ""
+
+#: src/post-project-archive.html.j2:59
+msgctxt "post-project-archive"
+msgid "The reason the archival period cannot be extended has not been specified."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:248
+msgctxt "questions/11-data-preservation"
+msgid "The repositories we use do not charge for their services."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:119
+msgctxt "questions/10-share-restrictions"
+msgid "The repository for this distribution has not been provided."
+msgstr ""
+
+#: src/identifier-repository.html.j2:4
+msgctxt "identifier-repository"
+msgid "The repository will assign the persistent identifier and ensure that it resolves to a digital object."
+msgstr ""
+
+#: src/identifier-repository.html.j2:6
+msgctxt "identifier-repository"
+msgid "The repository will assign the persistent identifier but will not guarantee that it resolves to a digital object."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:99
+msgctxt "questions/13-persistent-identifier"
+msgid "The repository will make sure the persistent identifier can be resolved to a digital object."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:102
+msgctxt "questions/13-persistent-identifier"
+msgid "The repository will not make sure the persistent identifier can be resolved to a digital object."
+msgstr ""
+
+#: src/repository-special.html.j2:23
+msgctxt "repository-special"
+msgid "The repository will provide a download-only service."
+msgstr ""
+
+#: src/repository-special.html.j2:26
+msgctxt "repository-special"
+msgid "The repository will provide a search and simple access interface."
+msgstr ""
+
+#: src/repository-special.html.j2:29
+msgctxt "repository-special"
+msgid "The repository will provide an advanced processing service."
+msgstr ""
+
 #: src/questions/11-data-preservation.html.j2:58
 msgid "The retention period has not been provided."
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:22
+msgctxt "reuse-rightsholder"
+msgid "The rights holder will collaborate with us on this research."
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:26
+msgctxt "reuse-rightsholder"
+msgid "The rights holder will not collaborate with us on this research."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:75
+msgctxt "questions/03-docs-metadata"
+msgid "The selected data-dictionary option cannot be represented by this template; please review it."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:124
+msgctxt "questions/03-docs-metadata"
+msgid "The selected metadata access-instructions option cannot be represented by this template; please review it."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:131
+msgctxt "questions/03-docs-metadata"
+msgid "The selected metadata harvesting and indexing option cannot be represented by this template; please review it."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:72
+msgctxt "questions/15-required-resources"
+msgid "The selected repositories charge for their services."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:108
+msgctxt "questions/03-docs-metadata"
+msgid "The selected repository or repositories will provide it in a form that can be harvested and indexed."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:27
+msgctxt "questions/05-store-backup"
+msgid "The shared workspace will not be operated by dedicated specialists."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:178
+msgctxt "questions/10-share-restrictions"
+msgid "The specialized access process has not been described."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:161
+msgctxt "questions/09-ethical-issues"
+msgid "The stated legal basis for collecting and processing personal data is a task carried out in the public interest."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:333
+msgctxt "questions/01-how-data"
+msgid "The stated legal basis for processing these data is a legal obligation."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:337
+msgctxt "questions/01-how-data"
+msgid "The stated legal basis for processing these data is legitimate interests."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:339
+msgctxt "questions/01-how-data"
+msgid "The stated legal basis for processing these data is performance of a contract with the data subjects."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:335
+msgctxt "questions/01-how-data"
+msgid "The stated legal basis for processing these data is the protection of vital interests of the data subjects."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:321
+msgctxt "questions/01-how-data"
+msgid "The stated legal basis for processing these data under the GDPR is consent from the data subjects."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:319
+msgctxt "questions/01-how-data"
+msgid "The stated legal basis for processing these data under the GDPR is public interest."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:10
+msgctxt "preservation-publication-reason"
+msgid "The stated reason for not publishing is that the intermediate data can be reproduced easily."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:6
+msgctxt "preservation-publication-reason"
+msgid "The stated reason for not publishing is that the raw data will not need to be reprocessed."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:8
+msgctxt "preservation-publication-reason"
+msgid "The stated reason for not publishing is that this dataset only led to unpublishable results."
+msgstr ""
+
+#: src/preservation-publication-reason.html.j2:14
+msgctxt "preservation-publication-reason"
+msgid "The stated reason for not publishing is the cost."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:61
+msgctxt "questions/07-personal-data"
+msgid "The stored data are identifiable."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:57
+msgctxt "questions/07-personal-data"
+msgid "The stored data are irrevocably anonymized."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:59
+msgctxt "questions/07-personal-data"
+msgid "The stored data are pseudonymized."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:56
+msgctxt "questions/05-store-backup"
+msgid "The workspace provides sufficient safeguards against a total loss of data."
+msgstr ""
+
+#: src/contributors.html.j2:67
+msgctxt "contributors"
+msgid "There are no contributors described for this DMP."
+msgstr ""
+
+#: src/versions.html.j2:22
+msgctxt "versions"
+msgid "There are no named versions"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:91
+msgctxt "questions/15-required-resources"
+msgid "There are no other recurring fees for keeping data or documents available."
+msgstr ""
+
+#: src/projects.html.j2:70
+msgctxt "projects"
+msgid "There are no projects described for this DMP."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:89
+msgctxt "questions/15-required-resources"
+msgid "There are other recurring fees for keeping data or documents available."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:126
+#, python-format
+msgctxt "questions/07-personal-data"
+msgid "There is a procedure for users to access private data as follows: %(personalDataManagedAccessReply)s"
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:22
+msgctxt "questions/05-store-backup"
+msgid "There is a shared workspace used during the project for working with data."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:125
+msgctxt "questions/05-store-backup"
+msgid "These backups will be used to recover from accidental changes or deletions."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:127
+msgctxt "questions/05-store-backup"
+msgid "These backups will not be relied on to recover from accidental changes or deletions."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:203
+msgctxt "questions/01-how-data"
+msgid "These datasets are freely available for any use."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:205
+msgctxt "questions/01-how-data"
+msgid "These datasets are freely available with an obligation to cite their sources."
 msgstr ""
 
 #: src/questions/11-data-preservation.html.j2:46
@@ -96,6 +2879,216 @@ msgstr ""
 
 #: src/questions/11-data-preservation.html.j2:48
 msgid "This data set will be kept available until it needs to be deleted for legal, contractual or regulatory reasons."
+msgstr ""
+
+#: src/preservation-dataset.html.j2:13
+msgctxt "preservation-dataset"
+msgid "This dataset contains intermediate data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:17
+msgctxt "ethics-data-summary"
+msgid "This dataset contains neither personal nor sensitive data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:11
+msgctxt "ethics-data-summary"
+msgid "This dataset contains personal and sensitive data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:13
+msgctxt "ethics-data-summary"
+msgid "This dataset contains personal data but no sensitive data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:21
+msgctxt "ethics-data-summary"
+msgid "This dataset contains personal data."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:317
+msgctxt "questions/01-how-data"
+msgid "This dataset contains personal data."
+msgstr ""
+
+#: src/preservation-dataset.html.j2:17
+msgctxt "preservation-dataset"
+msgid "This dataset contains processed data leading to published results."
+msgstr ""
+
+#: src/preservation-dataset.html.j2:15
+msgctxt "preservation-dataset"
+msgid "This dataset contains processed data leading to unpublishable results."
+msgstr ""
+
+#: src/preservation-dataset.html.j2:11
+msgctxt "preservation-dataset"
+msgid "This dataset contains raw data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:15
+msgctxt "ethics-data-summary"
+msgid "This dataset contains sensitive data but no personal data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:27
+msgctxt "ethics-data-summary"
+msgid "This dataset contains sensitive data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:23
+msgctxt "ethics-data-summary"
+msgid "This dataset does not contain personal data."
+msgstr ""
+
+#: src/ethics-data-summary.html.j2:29
+msgctxt "ethics-data-summary"
+msgid "This dataset does not contain sensitive data."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:258
+msgctxt "questions/10-share-restrictions"
+msgid "This dataset has no qualified references to other datasets."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:256
+msgctxt "questions/10-share-restrictions"
+msgid "This dataset has qualified references to other datasets."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:203
+msgctxt "questions/01-how-data"
+msgid "This dataset is freely available for any use."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:205
+msgctxt "questions/01-how-data"
+msgid "This dataset is freely available with an obligation to cite the source."
+msgstr ""
+
+#: src/nonreuse.html.j2:6
+msgctxt "nonreuse"
+msgid "This dataset was considered but will not be re-used."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:36
+msgctxt "questions/02-what-data"
+msgid "This dataset will be collected by an external party."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:32
+msgctxt "questions/02-what-data"
+msgid "This dataset will be collected by experts in the project, at a specialized infrastructure."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:30
+msgctxt "questions/02-what-data"
+msgid "This dataset will be collected by experts in the project, with our own equipment."
+msgstr ""
+
+#: src/publication-summary.html.j2:23
+msgctxt "publication-summary"
+msgid "This dataset will be published."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:40
+msgctxt "questions/11-data-preservation"
+msgid "This dataset will be published."
+msgstr ""
+
+#: src/publication-summary.html.j2:10
+msgctxt "publication-summary"
+msgid "This dataset will not be published."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:37
+msgctxt "questions/11-data-preservation"
+msgid "This dataset will not be published."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:66
+msgctxt "questions/12-access-data"
+msgid "This dataset will not be published."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:137
+msgctxt "questions/13-persistent-identifier"
+msgid "This dataset will not be published."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:78
+msgctxt "questions/10-share-restrictions"
+msgid "This distribution is not intended for sharing."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:113
+msgctxt "questions/10-share-restrictions"
+msgid "This distribution will be deposited in a national repository."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:117
+msgctxt "questions/10-share-restrictions"
+msgid "This distribution will be deposited in a special-purpose repository for the project."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:115
+msgctxt "questions/10-share-restrictions"
+msgid "This distribution will be deposited in an institutional repository."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:308
+msgctxt "questions/06-access-security"
+msgid "This document does not yet contain an answer about data security and protection of sensitive data."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:309
+msgctxt "questions/11-data-preservation"
+msgid "This document does not yet contain an answer about data selection and long-term preservation."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:367
+msgctxt "questions/09-ethical-issues"
+msgid "This document does not yet contain an answer about ethical issues and codes of conduct."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:282
+msgctxt "questions/03-docs-metadata"
+msgid "This document does not yet contain an answer about metadata and documentation."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:135
+msgctxt "questions/07-personal-data"
+msgid "This document does not yet contain an answer about personal-data protection and compliance."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:277
+msgctxt "questions/08-copyright-ipr"
+msgid "This document does not yet describe arrangements for data ownership, intellectual property rights, or applicable legislation. Please review and complete this section."
+msgstr ""
+
+#: src/questions/04-quality-control.html.j2:29
+msgctxt "questions/04-quality-control"
+msgid "This document does not yet describe data quality checks. Re-used data also need appropriate quality control."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:357
+msgctxt "questions/10-share-restrictions"
+msgid "This document does not yet describe how and when data will be shared, or any restrictions."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:145
+msgctxt "questions/13-persistent-identifier"
+msgid "This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned."
+msgstr ""
+
+#: src/questions/14-dm-responsible.html.j2:36
+msgctxt "questions/14-dm-responsible"
+msgid "This document does not yet identify a named person or team with a data management responsibility. Please check the contributor names and roles."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:119
+msgctxt "questions/12-access-data"
+msgid "This document does not yet identify the datasets to be shared or the tools needed to use them."
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:236
@@ -118,6 +3111,37 @@ msgstr ""
 msgid "This is not a suitable format for long-term archiving; however, we plan to convert it to a suitable format before the end of the project."
 msgstr ""
 
+#: src/questions/11-data-preservation.html.j2:231
+#, python-format
+msgctxt "questions/11-data-preservation"
+msgid "This policy applies separately to produced datasets %(policyMemberIndices)s."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:341
+msgctxt "questions/10-share-restrictions"
+msgid "This project does not involve collaboration between different groups or institutions. Therefore, no collaboration agreement for data access is needed."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:350
+msgctxt "questions/10-share-restrictions"
+msgid "This project involves collaboration between different groups and institutions."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:348
+msgctxt "questions/10-share-restrictions"
+msgid "This project involves collaboration between different groups and institutions. A collaboration agreement is in place to specify who can access which project data."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:346
+msgctxt "questions/10-share-restrictions"
+msgid "This project involves collaboration between different groups and institutions. However, no collaboration agreement is in place to specify who can access which project data."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:70
+msgctxt "questions/09-ethical-issues"
+msgid "This project requires ethical approval."
+msgstr ""
+
 #: src/questions/15-required-resources.html.j2:184
 #, python-format
 msgid "This resource supports %(activities)s, and %(last_activity)s of data."
@@ -133,9 +3157,70 @@ msgstr ""
 msgid "This resource supports %(first_activity)s and %(second_activity)s of data."
 msgstr ""
 
+#: src/questions/12-access-data.html.j2:17
+msgctxt "questions/12-access-data"
+msgid "This software will be included."
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:19
+msgctxt "questions/12-access-data"
+msgid "This software will not be included."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:12
+msgctxt "questions/15-required-resources"
+msgid "To execute the DMP, additional specialist expertise is required and we have such trained support staff available."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:10
+msgctxt "questions/15-required-resources"
+msgid "To execute the DMP, no additional specialist expertise is required."
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:267
 #, python-format
 msgid "Unnamed data format %(loop_index)s."
+msgstr ""
+
+#: src/reuse-summary.html.j2:71
+msgctxt "reuse-summary"
+msgid "Use of this dataset is subject to restrictions, which the project will observe."
+msgstr ""
+
+#: src/header.html.j2:104
+msgctxt "header"
+msgid "Version"
+msgstr ""
+
+#: src/versions.html.j2:8
+msgctxt "versions"
+msgid "Version"
+msgstr ""
+
+#: src/word/versions.html.j2:7
+msgctxt "word/versions"
+msgid "Version"
+msgstr ""
+
+#: src/frontmatter.html.j2:15
+#, python-format
+msgctxt "frontmatter"
+msgid "Version: %(version_name)s (%(version_created_at)s)"
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:42
+msgctxt "reuse-rightsholder"
+msgid "We already have a copy of this dataset."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:99
+msgctxt "questions/10-share-restrictions"
+msgid "We are going to contact the repository."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:121
+msgctxt "questions/11-data-preservation"
+msgid "We are going to contact the repository."
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:276
@@ -150,6 +3235,57 @@ msgstr ""
 msgid "We are not using a standardized format."
 msgstr ""
 
+#: src/questions/06-access-security.html.j2:202
+msgctxt "questions/06-access-security"
+msgid "We are not using any personal information."
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:24
+msgctxt "reuse-rightsholder"
+msgid "We are the rights holder of this dataset."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:163
+msgctxt "questions/09-ethical-issues"
+msgid "We ask the data subjects for their consent."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:93
+msgctxt "questions/10-share-restrictions"
+msgid "We do not need to contact the repository in advance because depositing data there is routine for us."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:117
+msgctxt "questions/11-data-preservation"
+msgid "We do not need to contact the repository in advance because depositing data there is routine for us."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:397
+msgctxt "questions/01-how-data"
+msgid "We do not need to harmonize existing data from different sources before reuse."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:89
+msgctxt "questions/07-personal-data"
+msgid "We do not plan to transfer data outside the EU/EEA."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:47
+msgctxt "questions/15-required-resources"
+msgid "We do not require any hardware or software in addition to what is usually available in the institute."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:230
+msgctxt "questions/03-docs-metadata"
+msgid "We document how we manage file versioning for files and folders."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:165
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "We estimate the storage space that the project will require for all data and software (including temporary storage) to be %(size)s gigabytes."
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:305
 #, python-format
 msgid "We expect %(formatsVolumeFiles)s files, with an estimated average size of %(formatAverageQuantity)s."
@@ -160,12 +3296,432 @@ msgstr ""
 msgid "We expect %(formatsVolumeFiles)s files."
 msgstr ""
 
+#: src/questions/11-data-preservation.html.j2:282
+msgctxt "questions/11-data-preservation"
+msgid "We have allocated funds for the time and effort needed to prepare the data for publication."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:96
+msgctxt "questions/10-share-restrictions"
+msgid "We have already contacted the repository."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:119
+msgctxt "questions/11-data-preservation"
+msgid "We have already contacted the repository."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:197
+msgctxt "questions/02-what-data"
+msgid "We have arranged for someone to make this dataset available in digital form."
+msgstr ""
+
+#: src/repository-special.html.j2:43
+msgctxt "repository-special"
+msgid "We have arranged system administration (at least security updates) and hardware maintenance for the repository servers."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:178
+msgctxt "questions/08-copyright-ipr"
+msgid "We have made the following arrangements regarding data ownership:"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:291
+msgctxt "questions/11-data-preservation"
+msgid "We have not budgeted for the time and effort needed to prepare the data for publication."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:232
+msgctxt "questions/03-docs-metadata"
+msgid "We have not documented how we manage file versioning for files and folders."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:199
+msgctxt "questions/02-what-data"
+msgid "We have not yet arranged for someone to make this dataset available in digital form."
+msgstr ""
+
+#: src/repository-special.html.j2:46
+msgctxt "repository-special"
+msgid "We have not yet completed the arrangements for system administration (at least security updates) and hardware maintenance for the repository servers."
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:31
+msgctxt "reuse-rightsholder"
+msgid "We need to apply for access to this dataset."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:82
+msgctxt "questions/07-personal-data"
+msgid "We plan to transfer data outside the EU/EEA with the following protection measures:"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:85
+msgctxt "questions/07-personal-data"
+msgid "We plan to transfer data outside the EU/EEA."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:57
+msgctxt "questions/15-required-resources"
+msgid "We require hardware or software in addition to what is usually available in the institute."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:479
+msgctxt "questions/01-how-data"
+msgid "We use other arrangements to document data provenance."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:60
+msgctxt "questions/01-how-data"
+msgid "We will acquire data using measurement equipment."
+msgstr ""
+
+#: src/publication-summary.html.j2:26
+msgctxt "publication-summary"
+msgid "We will add a reference to the published data in at least one data catalogue."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:77
+msgctxt "questions/11-data-preservation"
+msgid "We will add a reference to the published data in at least one data catalogue."
+msgstr ""
+
+#: src/repository-special.html.j2:10
+msgctxt "repository-special"
+msgid "We will be able to support this repository for a sufficiently long time."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:263
+msgctxt "questions/03-docs-metadata"
+msgid "We will be allowing Create, Update and Delete operations for data in the database."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:247
+msgctxt "questions/03-docs-metadata"
+msgid "We will be storing data in an \"object/document store\" system."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:150
+msgctxt "questions/09-ethical-issues"
+msgid "We will collect data related to individuals, i.e. \"personal data\"."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:69
+msgctxt "questions/03-docs-metadata"
+msgid "We will create a data/variable dictionary."
+msgstr ""
+
+#: src/research-quality.html.j2:32
+msgctxt "research-quality"
+msgid "We will cross-check key steps using independently developed tools or workflows to reduce human error."
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:44
+msgctxt "reuse-rightsholder"
+msgid "We will download or obtain a copy of this dataset."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:53
+msgctxt "questions/03-docs-metadata"
+msgid "We will include keywords or relevant ontology references to optimize the possibility for discovery and potential reuse."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:69
+msgctxt "questions/05-store-backup"
+msgid "We will make automated backups of all data stored outside the workspace."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:125
+msgctxt "questions/08-copyright-ipr"
+msgid "We will make other arrangements for authorizing potential users."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:115
+msgctxt "questions/08-copyright-ipr"
+msgid "We will make use of an existing data committee."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:113
+msgctxt "questions/08-copyright-ipr"
+msgid "We will make use of an existing data committee:"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:79
+msgctxt "questions/11-data-preservation"
+msgid "We will not add a reference to the published data in a data catalogue."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:81
+msgctxt "questions/11-data-preservation"
+msgid "We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field."
+msgstr ""
+
+#: src/repository-special.html.j2:13
+msgctxt "repository-special"
+msgid "We will not be able to support this repository for a sufficiently long time."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:243
+msgctxt "questions/03-docs-metadata"
+msgid "We will not be storing data in an \"object/document store\" system."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:148
+msgctxt "questions/09-ethical-issues"
+msgid "We will not collect any data related to individuals, i.e. \"personal data\"."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:103
+msgctxt "questions/07-personal-data"
+msgid "We will not collect any data related to individuals."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:71
+msgctxt "questions/03-docs-metadata"
+msgid "We will not create a data/variable dictionary."
+msgstr ""
+
+#: src/research-quality.html.j2:33
+msgctxt "research-quality"
+msgid "We will not cross-check key steps using independently developed tools or workflows."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:22
+msgctxt "questions/08-copyright-ipr"
+msgid "We will not manage our data according to the principle of being as open as possible."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:334
+msgctxt "questions/10-share-restrictions"
+msgid "We will not permit authenticated access to the data."
+msgstr ""
+
+#: src/research-quality.html.j2:25
+msgctxt "research-quality"
+msgid "We will not repeat jobs across different computing infrastructures as a verification measure."
+msgstr ""
+
+#: src/research-quality.html.j2:37
+msgctxt "research-quality"
+msgid "We will not repeat the analysis of a subset of the data to detect changes in the results."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:254
+msgctxt "questions/03-docs-metadata"
+msgid "We will not use a database system to store project data."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:174
+msgctxt "questions/03-docs-metadata"
+msgid "We will not use a filesystem with files and folders."
+msgstr ""
+
+#: src/research-quality.html.j2:29
+msgctxt "research-quality"
+msgid "We will not use automated tools to integrate the analysis tools into pipelines and workflows."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:447
+msgctxt "questions/01-how-data"
+msgid "We will not use existing data that needs to be converted into a machine-readable form before reuse."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:168
+msgctxt "questions/09-ethical-issues"
+msgid "We will obtain consent for this project's specific use of the data."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:170
+msgctxt "questions/09-ethical-issues"
+msgid "We will obtain consent for this project's use and for subsequent reuse of the data."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:172
+msgctxt "questions/09-ethical-issues"
+msgid "We will obtain consent for this project's use of the data and for anonymization. We will then anonymize the data for subsequent reuse."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:174
+msgctxt "questions/09-ethical-issues"
+msgid "We will obtain consent to anonymize the data. We will anonymize the data before any further processing."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:311
+msgctxt "questions/10-share-restrictions"
+msgid "We will permit authenticated access to the data."
+msgstr ""
+
+#: src/research-quality.html.j2:24
+msgctxt "research-quality"
+msgid "We will repeat a subset of jobs across the computing infrastructures used to check the consistency of the results."
+msgstr ""
+
+#: src/research-quality.html.j2:36
+msgctxt "research-quality"
+msgid "We will repeat the analysis of a subset of the data to detect unexpected changes in the results."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:190
+msgctxt "questions/01-how-data"
+msgid "We will retain a copy of each dataset and provide these copies alongside the research results."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:190
+msgctxt "questions/01-how-data"
+msgid "We will retain a copy of this dataset and provide it alongside the research results."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:107
+msgctxt "questions/08-copyright-ipr"
+msgid "We will set up a data access committee for authorization of potential users of the data."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:257
+msgctxt "questions/03-docs-metadata"
+msgid "We will use a database system to store project data."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:189
+msgctxt "questions/03-docs-metadata"
+msgid "We will use a filesystem with files and folders with the following folder conventions:"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:220
+msgctxt "questions/03-docs-metadata"
+msgid "We will use a filesystem with files and folders."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:466
+msgctxt "questions/01-how-data"
+msgid "We will use an electronic lab notebook to document the provenance of the data analysis."
+msgstr ""
+
+#: src/research-quality.html.j2:28
+msgctxt "research-quality"
+msgid "We will use automated tools to integrate the analysis tools into pipelines and workflows."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:464
+msgctxt "questions/01-how-data"
+msgid "We will use lab notebooks to document the provenance of the data analysis."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:123
+msgctxt "questions/08-copyright-ipr"
+msgid "We will use the following authorization arrangements:"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:300
+msgctxt "questions/06-access-security"
+msgid "We will use the following policies and procedures:"
+msgstr ""
+
+#: src/reuse-rightsholder.html.j2:46
+msgctxt "reuse-rightsholder"
+msgid "We will use this dataset online."
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:133
+msgctxt "questions/09-ethical-issues"
+msgid "Whether this dataset contains personal or sensitive data has not been specified."
+msgstr ""
+
+#: src/repository-special.html.j2:16
+msgctxt "repository-special"
+msgid "Whether we will be able to support this repository for a sufficiently long time has not been specified."
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:126
+msgctxt "questions/13-persistent-identifier"
+msgid "Within this repository, unique and persistent identifiers will not be applied."
+msgstr ""
+
 #: src/questions/15-required-resources.html.j2:169
 msgid "accessibility"
 msgstr ""
 
+#: src/post-project-archive.html.j2:77
+msgctxt "post-project-archive"
+msgid "actual use of the archived data"
+msgstr ""
+
+#: src/post-project-archive.html.j2:85
+msgctxt "post-project-archive"
+msgid "available budget"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:34
+msgctxt "questions/07-personal-data"
+msgid "because the processing is necessary for legitimate interests."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:38
+msgctxt "questions/07-personal-data"
+msgid "because the processing is necessary to comply with a legal obligation."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:32
+msgctxt "questions/07-personal-data"
+msgid "because the processing is necessary to perform a contract."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:27
+msgctxt "questions/07-personal-data"
+msgid "because the processing is necessary to perform a task carried out in the public interest."
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:36
+msgctxt "questions/07-personal-data"
+msgid "because the processing is necessary to protect vital interests."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:123
+msgctxt "questions/02-what-data"
+msgid "case report forms"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:216
+msgctxt "questions/09-ethical-issues"
+msgid "compliance with a legal obligation."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:148
+msgctxt "questions/06-access-security"
+msgid "data disclosure and data tampering"
+msgstr ""
+
+#: src/quality-control.html.j2:27
+msgctxt "quality-control"
+msgid "data entry validation"
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:321
 msgid "data format name"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:144
+msgctxt "questions/06-access-security"
+msgid "data loss and data disclosure"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:146
+msgctxt "questions/06-access-security"
+msgid "data loss and data tampering"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:142
+msgctxt "questions/06-access-security"
+msgid "data loss, data disclosure, and data tampering"
+msgstr ""
+
+#: src/quality-control.html.j2:30
+msgctxt "quality-control"
+msgid "data peer review"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:124
+msgctxt "questions/02-what-data"
+msgid "electronic patient records"
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:337
@@ -192,20 +3748,85 @@ msgstr ""
 msgid "interoperability"
 msgstr ""
 
+#: src/questions/08-copyright-ipr.html.j2:73
+msgctxt "questions/08-copyright-ipr"
+msgid "legal restrictions"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:212
+msgctxt "questions/09-ethical-issues"
+msgid "legitimate interests."
+msgstr ""
+
 #: src/questions/15-required-resources.html.j2:178
 msgid "management"
+msgstr ""
+
+#: src/quality-control.html.j2:18
+msgctxt "quality-control"
+msgid "measurement calibration"
+msgstr ""
+
+#: src/quality-control.html.j2:36
+msgctxt "quality-control"
+msgid "measurement of samples with known outcomes to monitor consistency"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:82
+msgctxt "questions/08-copyright-ipr"
+msgid "papers need to be submitted first"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:76
+msgctxt "questions/08-copyright-ipr"
+msgid "patent-related commercial considerations"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:210
+msgctxt "questions/09-ethical-issues"
+msgid "performance of a contract."
+msgstr ""
+
+#: src/post-project-archive.html.j2:81
+msgctxt "post-project-archive"
+msgid "predicted use of the archived data"
+msgstr ""
+
+#: src/questions/09-ethical-issues.html.j2:214
+msgctxt "questions/09-ethical-issues"
+msgid "protection of vital interests."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:122
+msgctxt "questions/02-what-data"
+msgid "questionnaires"
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:326
 msgid "reason for using a non-standard format"
 msgstr ""
 
+#: src/quality-control.html.j2:21
+msgctxt "quality-control"
+msgid "repeat sampling or measurement"
+msgstr ""
+
 #: src/questions/15-required-resources.html.j2:175
 msgid "reusability"
 msgstr ""
 
+#: src/quality-control.html.j2:24
+msgctxt "quality-control"
+msgid "standardized data capture or recording"
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:329
 msgid "suitability for long-term archiving"
+msgstr ""
+
+#: src/quality-control.html.j2:33
+msgctxt "quality-control"
+msgid "use of controlled vocabularies"
 msgstr ""
 
 #: src/questions/02-what-data.html.j2:331
@@ -214,5 +3835,25 @@ msgstr ""
 
 #: src/questions/02-what-data.html.j2:324
 msgid "whether the format is standardized"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:115
+msgctxt "questions/13-persistent-identifier"
+msgid "whether the repository guarantees resolution of the persistent identifier to a digital object"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:111
+msgctxt "questions/13-persistent-identifier"
+msgid "who will assign the persistent identifier"
+msgstr ""
+
+#: src/questions/07-personal-data.html.j2:29
+msgctxt "questions/07-personal-data"
+msgid "with the consent of the data subjects."
+msgstr ""
+
+#: src/post-project-archive.html.j2:34
+msgctxt "post-project-archive"
+msgid "years"
 msgstr ""
 

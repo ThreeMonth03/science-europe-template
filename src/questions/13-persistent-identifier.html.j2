@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-persistent-identifier" class="question">
-    <h3>13. How will the application of a unique and persistent identifier (such as a Digital Object Identifier (DOI)) to each data set be ensured?</h3>
+    <h3>{{ pgettext("questions/13-persistent-identifier", "13. How will the application of a unique and persistent identifier (such as a Digital Object Identifier (DOI)) to each data set be ensured?") }}</h3>
 
     <div class="answer">
     {# identifiers #}
@@ -44,19 +44,19 @@
                             <div class="distribution-section" data-item-id="{{ j }}">
                             {% if publishedDistrosItems|length > 1 or repositoryKindKnown %}
                             <div class="identifier-heading">
-                            {% if publishedDistrosItems|length > 1 %}<p class="answer-lead"><strong>Distribution {{ loop.index }}</strong></p>{% endif %}
+                            {% if publishedDistrosItems|length > 1 %}<p class="answer-lead">{{ pgettext("questions/13-persistent-identifier", "<strong>Distribution %(loop_index)s</strong>", loop_index=loop.index) }}</p>{% endif %}
                             {% if repositoryKindKnown %}
                             <p class="answer-lead">
                             {%- if repositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid -%}
-                                <strong>Domain-specific repository</strong>
+                                {{ pgettext("questions/13-persistent-identifier", "<strong>Domain-specific repository</strong>") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid -%}
-                                <strong>General-purpose repository</strong>
+                                {{ pgettext("questions/13-persistent-identifier", "<strong>General-purpose repository</strong>") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid -%}
-                               <strong>National repository</strong>
+                               {{ pgettext("questions/13-persistent-identifier", "<strong>National repository</strong>") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryInstitutionalAUuid -%}
-                                <strong>Institutional repository</strong>
+                                {{ pgettext("questions/13-persistent-identifier", "<strong>Institutional repository</strong>") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid -%}
-                                <strong>Special-purpose repository</strong>
+                                {{ pgettext("questions/13-persistent-identifier", "<strong>Special-purpose repository</strong>") }}
                             {%- endif -%}
                             </p>
                             {% endif %}
@@ -83,23 +83,23 @@
                                        facts. A negative guarantee is NOT a failed resolution. #}
                                     <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">{% include 'src/identifier-repository.html.j2' with context %}</span></p>
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
-                                    <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">A project data steward or principal investigator will assign the persistent identifier.</span></p>
+                                    {{ pgettext("questions/13-persistent-identifier", "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">A project data steward or principal investigator will assign the persistent identifier.</span></p>") }}
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid -%}
-                                    <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">An institutional data steward will assign the persistent identifier.</span></p>
+                                    {{ pgettext("questions/13-persistent-identifier", "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">An institutional data steward will assign the persistent identifier.</span></p>") }}
 
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsRepositoryAUuid -%}
-                                    <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">The repository will assign the persistent identifier.</span></p>
+                                    {{ pgettext("questions/13-persistent-identifier", "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">The repository will assign the persistent identifier.</span></p>") }}
                                 {%- else -%}
-                                    <p data-fact-id="persistent-identifier" data-status="complete">Persistent identifiers will be assigned.</p>
+                                    <p data-fact-id="persistent-identifier" data-status="complete">{{ pgettext("questions/13-persistent-identifier", "Persistent identifiers will be assigned.") }}</p>
                                 {%- endif -%}
 
                                 {# Resolvable #}
                                 {%- if not repositoryHandlesBoth and publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid -%}
-                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="complete">The repository will make sure the persistent identifier can be resolved to a digital object.</p>
+                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="complete">{{ pgettext("questions/13-persistent-identifier", "The repository will make sure the persistent identifier can be resolved to a digital object.") }}</p>
 
                                 {%- elif not repositoryHandlesBoth and publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableNoAUuid -%}
-                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="explicit-no">The repository will not make sure the persistent identifier can be resolved to a digital object.</p>
+                                    <p data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="explicit-no">{{ pgettext("questions/13-persistent-identifier", "The repository will not make sure the persistent identifier can be resolved to a digital object.") }}</p>
                                 {%- endif -%}
 
                                 {# The old identifier-specification question is absent from KM 2.7.0. #}
@@ -108,11 +108,11 @@
                                Capture each translatable label before joining, as in Q2. #}
                             {% set identifierMissing = [] %}{% set identifierReview = [] %}
                             {% if publishedDataIdentifierAssignsAUuid not in [uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid, uuids.publishedDataIdentifierAssignsInstitDataStewardAUuid, uuids.publishedDataIdentifierAssignsRepositoryAUuid] %}
-                              {% set fieldGap %}<span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="{{ 'needs-review' if publishedDataIdentifierAssignsAUuid|trim else 'missing' }}">who will assign the persistent identifier</span>{% endset %}
+                              {% set fieldGap %}<span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="{{ 'needs-review' if publishedDataIdentifierAssignsAUuid|trim else 'missing' }}">{{ pgettext("questions/13-persistent-identifier", "who will assign the persistent identifier") }}</span>{% endset %}
                               {% if publishedDataIdentifierAssignsAUuid|trim %}{% do identifierReview.append(fieldGap) %}{% else %}{% do identifierMissing.append(fieldGap) %}{% endif %}
                             {% endif %}
                             {% if publishedDataIdentifierResolvableAUuid not in [uuids.publishedDataIdentifierResolvableYesAUuid, uuids.publishedDataIdentifierResolvableNoAUuid] %}
-                              {% set fieldGap %}<span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="{{ 'needs-review' if publishedDataIdentifierResolvableAUuid|trim else 'missing' }}">whether the repository guarantees resolution of the persistent identifier to a digital object</span>{% endset %}
+                              {% set fieldGap %}<span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="{{ 'needs-review' if publishedDataIdentifierResolvableAUuid|trim else 'missing' }}">{{ pgettext("questions/13-persistent-identifier", "whether the repository guarantees resolution of the persistent identifier to a digital object") }}</span>{% endset %}
                               {% if publishedDataIdentifierResolvableAUuid|trim %}{% do identifierReview.append(fieldGap) %}{% else %}{% do identifierMissing.append(fieldGap) %}{% endif %}
                             {% endif %}
                             {% if identifierMissing or identifierReview %}
@@ -123,26 +123,26 @@
                             {% endif %}
                             </div>
                             {%- elif publishedDataIdentifierAUuid == uuids.publishedDataIdentifierNoAUuid -%}
-                              <p>Within this repository, unique and persistent identifiers will not be applied.</p>
+                              <p>{{ pgettext("questions/13-persistent-identifier", "Within this repository, unique and persistent identifiers will not be applied.") }}</p>
                             {%- else -%}
-                              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">The persistent identifier arrangement is not yet described.</p>{% endif %}
+                              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">{{ pgettext("questions/13-persistent-identifier", "The persistent identifier arrangement is not yet described.") }}</p>{% endif %}
                             {%- endif -%}
                             </div>
                             {% endif %}
                         {%- endfor -%}
                     {% else %}
-                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="identifier-distributions" data-status="missing">The publication locations have not been listed.</p>{% endif %}
+                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="identifier-distributions" data-status="missing">{{ pgettext("questions/13-persistent-identifier", "The publication locations have not been listed.") }}</p>{% endif %}
                     {%- endif -%}
             {% elif isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
-                <p>This dataset will not be published.</p>
+                <p>{{ pgettext("questions/13-persistent-identifier", "This dataset will not be published.") }}</p>
             {% else %}
-                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}
+                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">{{ pgettext("questions/13-persistent-identifier", "It has not yet been specified whether this dataset will be published.") }}</p>{% endif %}
             {%- endif -%}
             </div>
             {% endif %}
         {%- endfor -%}
     {%- else -%}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d" data-status="missing-output">{{ pgettext("questions/13-persistent-identifier", "This document does not yet describe which datasets will receive persistent identifiers or how they will be assigned.") }}</p>{% endif %}
     {%- endif -%}
 
     {# Keep the optional re-use summary compact, with authored uses in their own
@@ -160,11 +160,11 @@
             {%- set reuseSummary -%}
               {%- if measuredDataReuseQUuid and measuredDataReuseAUuid in km.entities.questions[uuids.measuredDataReuseQUuid].answerUuids and measuredDataReuseAUuid in km.entities.answers -%}
                 {%- if measuredDataReuseAUuid == uuids.measuredDataReuseUsAUuid -%}
-                  Only we will be interested in re-using this data.
+                  {{ pgettext("questions/13-persistent-identifier", "Only we will be interested in re-using this data.") }}
                 {%- elif measuredDataReuseAUuid == uuids.measuredDataReuseSameFieldAUuid -%}
-                  Other researchers in this field will be interested in re-using this data.
+                  {{ pgettext("questions/13-persistent-identifier", "Other researchers in this field will be interested in re-using this data.") }}
                 {%- elif measuredDataReuseAUuid == uuids.measuredDataReuseOtherFieldAUuid -%}
-                  Researchers working in other fields will be interested in re-using this data.
+                  {{ pgettext("questions/13-persistent-identifier", "Researchers working in other fields will be interested in re-using this data.") }}
                 {%- endif -%}
               {%- endif -%}
             {%- endset -%}
@@ -178,7 +178,7 @@
                 <p class="reuse-summary"><strong>{% if output_profile|default('review') == 'submission' and not measuredDataNameReply|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply|e if measuredDataNameReply|trim else "(no name given)" }}{% endif %}</strong>{% if reuseSummary %} — <span data-fact-id="measured-data-reuse" data-status="complete">{{ reuseSummary }}</span>{% endif %}</p>
                 {% if keepReuseLead %}</div>{% endif %}
                 {% if reuseHow|trim %}
-                  <div class="answer-lead"><p>Potential uses in other fields:</p></div>
+                  <div class="answer-lead"><p>{{ pgettext("questions/13-persistent-identifier", "Potential uses in other fields:") }}</p></div>
                   <div class="answer-detail" data-fact-id="measured-data-reuse-uses" data-status="complete">{{ answerMarkdown.markdown(reuseHow) }}</div>
                 {% endif %}
               </li>
@@ -187,7 +187,7 @@
     {% endset %}
     {% if reuseItems|trim %}
       <div class="measured-data-reuse">
-        <h4>Possible re-use of created data in other contexts</h4>
+        <h4>{{ pgettext("questions/13-persistent-identifier", "Possible re-use of created data in other contexts") }}</h4>
         <ul>{{ reuseItems }}</ul>
       </div>
     {% endif %}

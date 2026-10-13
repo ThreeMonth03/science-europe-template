@@ -6,12 +6,12 @@
   {%- set overviewNamePath = active.path(overviewParts + [overviewItems[0], uuids.projectNameQUuid], 'ValueQuestion') if overviewItems|length == 1 else '' -%}
   {%- set overviewName = repliesMap[overviewNamePath]|reply_str_value if overviewNamePath else '' -%}
   {% if overviewName|trim %}
-  <p class="document-kind">Data Management Plan</p>
+  <p class="document-kind">{{ pgettext("frontmatter", "Data Management Plan") }}</p>
   <h1>{{ overviewName|e }}</h1>
   {% else %}
-  <h1>Data Management Plan</h1>
+  <h1>{{ pgettext("frontmatter", "Data Management Plan") }}</h1>
   {% endif %}
   {% for version in dc.project.versions if version.uuid == ctx.project.versionUuid %}
-  <p class="document-meta">Version: {{ version.name|e }} ({{ version.created_at|datetime_format("%Y-%m-%d") }})</p>
+  <p class="document-meta">{{ pgettext("frontmatter", "Version: %(version_name)s (%(version_created_at)s)", version_name=version.name|e, version_created_at=version.created_at|datetime_format("%Y-%m-%d")) }}</p>
   {% endfor %}
 </header>

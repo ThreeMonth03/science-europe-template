@@ -1,5 +1,5 @@
 <div id="q-quality-control" class="question" data-requirement-id="SE-2b">
-  <h3>4. What data quality control measures will be used?</h3>
+  <h3>{{ pgettext("questions/04-quality-control", "4. What data quality control measures will be used?") }}</h3>
   <div class="answer">
     {% set measuredPath = [uuids.creatingCUuid, uuids.measuredQUuid]|reply_path %}
     {% set measuredAnswer = repliesMap[measuredPath]|reply_str_value %}
@@ -26,7 +26,7 @@
     {% set researchQuality %}{% include 'src/research-quality.html.j2' %}{% endset %}
     {{ instrumentQuality }}{{ researchQuality }}
     {% if not instrumentQuality|striptags|trim and not researchQuality|striptags|trim %}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-2b" data-status="missing-output">This document does not yet describe data quality checks. Re-used data also need appropriate quality control.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-2b" data-status="missing-output">{{ pgettext("questions/04-quality-control", "This document does not yet describe data quality checks. Re-used data also need appropriate quality control.") }}</p>{% endif %}
     {% endif %}
   </div>
 </div>

@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-copyright-ipr" class="question">
-  <h3>8. How will other legal issues, such as intellectual property rights and ownership, be managed? What legislation is applicable?
+  <h3>{{ pgettext("questions/08-copyright-ipr", "8. How will other legal issues, such as intellectual property rights and ownership, be managed? What legislation is applicable?") }}
 </h3>
 
   <div class="answer">
@@ -17,16 +17,16 @@
       {%- set asOpenAsPossibleAUuid = '' -%}
     {%- endif -%}
     {%- if asOpenAsPossibleAUuid == uuids.asOpenAsPossibleYesAUuid -%}
-      <p>We will manage our data according to the principle <em>as open as possible</em>.</p>
+      {{ pgettext("questions/08-copyright-ipr", "<p>We will manage our data according to the principle <em>as open as possible</em>.</p>") }}
     {%- elif asOpenAsPossibleAUuid == uuids.asOpenAsPossibleNoAUuid -%}
-      <p data-fact-id="openness-principle" data-status="explicit-no">We will not manage our data according to the principle of being as open as possible.</p>
+      <p data-fact-id="openness-principle" data-status="explicit-no">{{ pgettext("questions/08-copyright-ipr", "We will not manage our data according to the principle of being as open as possible.") }}</p>
     {%- endif -%}
 
     {# Can open data #}
     {%- set openImmediatelyPath = [uuids.accessCUuid, uuids.openImmediatelyQUuid]|reply_path -%}
     {%- set openImmediatelyAUuid = repliesMap[openImmediatelyPath]|reply_str_value -%}
     {%- if openImmediatelyAUuid == uuids.openImmediatelyYesAUuid -%}
-      <p>All project data can eventually be made openly available.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "All project data can eventually be made openly available.") }}</p>
     {%- elif openImmediatelyAUuid == uuids.openImmediatelyNoAUuid -%}
       {%- set pathPrefix = [openImmediatelyPath, uuids.openImmediatelyNoAUuid]|reply_path -%}
       {%- set notOpenLegalReasonsPath = [pathPrefix, uuids.notOpenLegalReasonsQUuid]|reply_path -%}
@@ -54,32 +54,32 @@
         <div class="answer-detail">
         {%- if nReasons == 1 -%}
           {%- if legalReasons %}
-            The data cannot be made fully open because of legal restrictions.
+            {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of legal restrictions.") }}
           {%- elif businessReasonsPatents %}
-            The data cannot be made fully open because of patent-related commercial considerations.
+            {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of patent-related commercial considerations.") }}
           {%- elif businessReasonsOther %}
             <div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>The data cannot be made fully open because of commercial considerations unrelated to patents{{ ":" if notOpenBusinessReasonsOther else "." }}</p></div>
             {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}
           {%- elif otherReasonsPapers %}
-            The data cannot be made fully open because papers need to be submitted first.
+            {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because papers need to be submitted first.") }}
           {%- elif otherReasonsOther %}
             <div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>The data cannot be made fully open because of reasons other than publishing a paper{{ ":" if notOpenOtherReasonsOther else "." }}</p></div>
             {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}
           {%- endif -%}
         {%- else %}
-          <div class="answer-lead"><p>The data cannot be made fully open for the following reasons:</p></div>
+          <div class="answer-lead"><p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open for the following reasons:") }}</p></div>
           <ul>
             {%- if legalReasons %}
-              <li>legal restrictions</li>
+              <li>{{ pgettext("questions/08-copyright-ipr", "legal restrictions") }}</li>
             {%- endif -%}
             {%- if businessReasonsPatents %}
-              <li>patent-related commercial considerations</li>
+              <li>{{ pgettext("questions/08-copyright-ipr", "patent-related commercial considerations") }}</li>
             {%- elif businessReasonsOther %}
               <li><div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>commercial considerations unrelated to patents{{ ":" if notOpenBusinessReasonsOther else "" }}</p></div>
                 {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}</li>
             {%- endif -%}
             {%- if otherReasonsPapers %}
-              <li>papers need to be submitted first</li>
+              <li>{{ pgettext("questions/08-copyright-ipr", "papers need to be submitted first") }}</li>
             {%- elif otherReasonsOther -%}
               <li><div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>reasons other than publishing a paper{{ ":" if notOpenOtherReasonsOther else "" }}</p></div>
                 {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}</li>
@@ -88,7 +88,7 @@
         {%- endif -%}
         </div>
       {%- else -%}
-        <p>The data cannot be made fully open.</p>
+        <p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open.") }}</p>
       {%- endif -%}
 
       {# Authentication and authorization of users #}
@@ -100,19 +100,19 @@
         {%- set legalReasonsAuthenticatedAUuid = repliesMap[legalReasonsAuthenticatedQUuid]|reply_str_value -%}
         
         {%- if authenticationReply == uuids.legalReasonsAuthenticatedYesAUuid and legalReasonsAuthenticatedAUuid in [uuids.legalReasonsAuthorizeMemberAUuid, uuids.legalReasonsAuthorizeNewCommitteeAUuid, uuids.legalReasonsAuthorizeOldCommitteeAUuid, uuids.legalReasonsAuthorizeOtherAUuid] -%}
-          <h4 data-fact-id="authorization-arrangements">Authentication and Authorization of Users</h4>
+          <h4 data-fact-id="authorization-arrangements">{{ pgettext("questions/08-copyright-ipr", "Authentication and Authorization of Users") }}</h4>
           {%- if legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthorizeMemberAUuid -%}
-            <p>One of the project members will authorize potential users of the data.</p>
+            <p>{{ pgettext("questions/08-copyright-ipr", "One of the project members will authorize potential users of the data.") }}</p>
           {%- elif legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthorizeNewCommitteeAUuid -%}
-            <p>We will set up a data access committee for authorization of potential users of the data.</p>
+            <p>{{ pgettext("questions/08-copyright-ipr", "We will set up a data access committee for authorization of potential users of the data.") }}</p>
           {%- elif legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthorizeOldCommitteeAUuid -%}
             {%- set legalReasonsAuthenticatedCommitteeQUuid = [legalReasonsAuthenticatedQUuid, uuids.legalReasonsAuthorizeOldCommitteeAUuid, uuids.legalReasonsAuthorizeOldCommitteeQUuid]|reply_path -%}
             {%- set legalReasonsAuthenticatedCommitteeReply = repliesMap[legalReasonsAuthenticatedCommitteeQUuid]|reply_str_value -%}
             
             {%- if legalReasonsAuthenticatedCommitteeReply|trim -%}
-              <div class="answer-detail"><div class="answer-lead"><p>We will make use of an existing data committee:</p></div>{{ answerMarkdown.markdown(legalReasonsAuthenticatedCommitteeReply) }}</div>
+              <div class="answer-detail"><div class="answer-lead"><p>{{ pgettext("questions/08-copyright-ipr", "We will make use of an existing data committee:") }}</p></div>{{ answerMarkdown.markdown(legalReasonsAuthenticatedCommitteeReply) }}</div>
             {%- else -%}
-              <p>We will make use of an existing data committee.</p>
+              <p>{{ pgettext("questions/08-copyright-ipr", "We will make use of an existing data committee.") }}</p>
             {%- endif -%}
 
           {%- elif legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthorizeOtherAUuid -%}
@@ -120,10 +120,10 @@
             {%- set legalReasonsAuthenticatedOtherReply = repliesMap[legalReasonsAuthenticatedOtherQUuid]|reply_str_value -%}
 
             {%- if legalReasonsAuthenticatedOtherReply|trim -%}
-              <div class="answer-detail"><div class="answer-lead"><p>We will use the following authorization arrangements:</p></div>{{ answerMarkdown.markdown(legalReasonsAuthenticatedOtherReply) }}</div>
+              <div class="answer-detail"><div class="answer-lead"><p>{{ pgettext("questions/08-copyright-ipr", "We will use the following authorization arrangements:") }}</p></div>{{ answerMarkdown.markdown(legalReasonsAuthenticatedOtherReply) }}</div>
             {%- else -%}
-              <p>We will make other arrangements for authorizing potential users.</p>
-              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="authorization-details" data-status="missing"><strong>Information not provided:</strong> details of the authorization arrangements.</p>{% endif %}
+              <p>{{ pgettext("questions/08-copyright-ipr", "We will make other arrangements for authorizing potential users.") }}</p>
+              {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/08-copyright-ipr", "<p class=\"data-gap\" data-fact-id=\"authorization-details\" data-status=\"missing\"><strong>Information not provided:</strong> details of the authorization arrangements.</p>") }}{% endif %}
             {%- endif -%}
           {%- endif -%}
  
@@ -138,18 +138,18 @@
     {%- set embargoPath = [uuids.accessCUuid, uuids.limitedEmbargoQUuid]|reply_path -%}
     {%- set embargoAUuid = repliesMap[embargoPath]|reply_str_value -%}
     {%- if embargoAUuid == uuids.limitedEmbargoOpenAUuid -%}
-      <p>No embargo period is needed because all data will be made openly available.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "No embargo period is needed because all data will be made openly available.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoIndefinitelyAUuid -%}
-      <p>A fixed embargo period cannot be used because some restricted data must remain closed indefinitely.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "A fixed embargo period cannot be used because some restricted data must remain closed indefinitely.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoReleasedSoonAUuid -%}
-      <p>Data will be released as soon as the restrictions no longer apply.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "Data will be released as soon as the restrictions no longer apply.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoYesAUuid -%}
       {%- set embargoPeriodPath = [embargoPath, embargoAUuid, uuids.limitedEmbargoPeriodQUuid]|reply_path -%}
       {%- set embargoPeriod = repliesMap[embargoPeriodPath]|reply_str_value -%}
       {%- if embargoPeriod|trim -%}
-        <p>Data not subject to legal restrictions will be released unconditionally after a fixed period ({{ embargoPeriod }}).</p>
+        <p>{{ pgettext("questions/08-copyright-ipr", "Data not subject to legal restrictions will be released unconditionally after a fixed period (%(embargoPeriod)s).", embargoPeriod=embargoPeriod) }}</p>
       {%- else -%}
-        <p>Data not subject to legal restrictions will be released unconditionally after a fixed period.</p>
+        <p>{{ pgettext("questions/08-copyright-ipr", "Data not subject to legal restrictions will be released unconditionally after a fixed period.") }}</p>
       {%- endif -%}
     {%- endif -%}
     
@@ -162,24 +162,24 @@
       {%- set ownershipAUuid = '' -%}
     {%- endif -%}
     {%- if ownershipAUuid == uuids.ownershipNoOwnerAUuid -%}
-      <p>The project data are not protected by copyright and therefore have no copyright owner.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "The project data are not protected by copyright and therefore have no copyright owner.") }}</p>
     {%- elif ownershipAUuid == uuids.ownershipPIAUuid -%}
-      <p>All data will be owned by the Principal Investigator.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "All data will be owned by the Principal Investigator.") }}</p>
     {%- elif ownershipAUuid == uuids.ownershipInstituteAUuid -%}
-      <p>All data will be owned by the institute.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "All data will be owned by the institute.") }}</p>
     {%- elif ownershipAUuid == uuids.ownershipConsortiumAUuid -%}
-      <p>Our consortium agreement defines ownership of intellectual property rights.</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "Our consortium agreement defines ownership of intellectual property rights.") }}</p>
     {%- elif ownershipAUuid == uuids.ownershipOtherAUuid -%}
       {%- set ownershipOtherParts = ownershipParts + [uuids.ownershipOtherAUuid, uuids.ownershipOtherQUuid] -%}
       {%- set ownershipOtherPath = activeAnswer.path(ownershipOtherParts, 'ValueQuestion') if km is defined else ownershipOtherParts|reply_path -%}
       {%- set ownershipOther = repliesMap[ownershipOtherPath]|reply_str_value if ownershipOtherPath else '' -%}
       {%- if ownershipOther|trim -%}
         <div class="answer-detail">
-          <div class="answer-lead"><p>We have made the following arrangements regarding data ownership:</p></div>
+          <div class="answer-lead"><p>{{ pgettext("questions/08-copyright-ipr", "We have made the following arrangements regarding data ownership:") }}</p></div>
           {{ answerMarkdown.markdown(ownershipOther) }}
         </div>
       {%- else -%}
-        <p>Rights to the collected data are arranged in another way.</p>
+        <p>{{ pgettext("questions/08-copyright-ipr", "Rights to the collected data are arranged in another way.") }}</p>
       {%- endif -%}
     {%- endif -%}
 
@@ -208,7 +208,7 @@
         {%- endif -%}
       {%- endfor -%}
       {%- if (answeredRefData|length + answeredNRefData|length) > 0 -%}
-        <div class="answer-lead"><p>The following conditions apply to the reference and non-reference datasets that we reuse:</p></div>
+        <div class="answer-lead"><p>{{ pgettext("questions/08-copyright-ipr", "The following conditions apply to the reference and non-reference datasets that we reuse:") }}</p></div>
         <ul>
           {%- for i in answeredRefData -%}
             {%- set refDataPrefix = [refDataPath, i]|reply_path -%}
@@ -222,13 +222,13 @@
                 {%- if refDataNameReply|trim -%}
                   <div>{{ refDataNameReply }}</div>
                 {%- else -%}
-                  {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(i) + 1) }}</div>{% else %}<div>(no name given)</div>{% endif %}
+                  {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(i) + 1) }}</div>{% else %}<div>{{ pgettext("questions/08-copyright-ipr", "(no name given)") }}</div>{% endif %}
                 {%- endif -%}
                 
                 {% if refDataConditionsAUuid == uuids.refDataConditionsCC0AUuid -%}
-                  It is freely available for any use (public domain or CC0).
+                  {{ pgettext("questions/08-copyright-ipr", "It is freely available for any use (public domain or CC0).") }}
                 {%- elif refDataConditionsAUuid == uuids.refDataConditionsCCBYAUuid -%}
-                  It is freely available with an obligation to cite the source (e.g. CC BY).
+                  {{ pgettext("questions/08-copyright-ipr", "It is freely available with an obligation to cite the source (e.g. CC BY).") }}
                 {%- elif refDataConditionsAUuid == uuids.refDataConditionsOtherAUuid -%}
                   {%- set refDataConditionsOtherPath = [refDataConditionsPath, uuids.refDataConditionsOtherAUuid, uuids.refDataConditionsOtherQUuid]|reply_path -%}
                   {%- set refDataConditionsOther = repliesMap[refDataConditionsOtherPath]|reply_str_value -%}
@@ -251,12 +251,12 @@
                 {%- if nrefDataNameReply|trim -%}
                   <div>{{ nrefDataNameReply }}</div>
                 {%- else -%}
-                  {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(i) + 1) }}</div>{% else %}<div>(no name given)</div>{% endif %}
+                  {% if output_profile|default('review') == 'submission' %}<div>{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(i) + 1) }}</div>{% else %}<div>{{ pgettext("questions/08-copyright-ipr", "(no name given)") }}</div>{% endif %}
                 {%- endif -%}
                 {% if nrefDataConditionsAUuid == uuids.nrefDataConditionsCC0AUuid -%}
-                  It is freely available for any use (public domain or CC0).
+                  {{ pgettext("questions/08-copyright-ipr", "It is freely available for any use (public domain or CC0).") }}
                 {%- elif nrefDataConditionsAUuid == uuids.nrefDataConditionsCCBYAUuid -%}
-                  It is freely available with an obligation to cite the source (e.g. CC BY).
+                  {{ pgettext("questions/08-copyright-ipr", "It is freely available with an obligation to cite the source (e.g. CC BY).") }}
                 {%- elif nrefDataConditionsAUuid == uuids.nrefDataConditionsOtherAUuid -%}
                   {%- set nrefDataConditionsOtherPath = [nrefDataConditionsPath, uuids.nrefDataConditionsOtherAUuid, uuids.nrefDataConditionsOtherQUuid]|reply_path -%}
                   {%- set nrefDataConditionsOther = repliesMap[nrefDataConditionsOtherPath]|reply_str_value -%}
@@ -274,7 +274,7 @@
     {% if legalContent|striptags|trim %}
       {{ legalContent }}
     {% else %}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4b" data-status="missing-output">This document does not yet describe arrangements for data ownership, intellectual property rights, or applicable legislation. Please review and complete this section.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4b" data-status="missing-output">{{ pgettext("questions/08-copyright-ipr", "This document does not yet describe arrangements for data ownership, intellectual property rights, or applicable legislation. Please review and complete this section.") }}</p>{% endif %}
     {% endif %}
   </div>
 </div>

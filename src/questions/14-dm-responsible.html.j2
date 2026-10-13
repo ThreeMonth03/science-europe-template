@@ -1,5 +1,5 @@
 <div id="q-dm-responsible" class="question">
-  <h3>14. Who (for example role, position, and institution) will be responsible for data management (i.e. the data steward)?</h3>
+  <h3>{{ pgettext("questions/14-dm-responsible", "14. Who (for example role, position, and institution) will be responsible for data management (i.e. the data steward)?") }}</h3>
 
   <div class="answer">
     {% set responsibilitiesContent %}
@@ -22,7 +22,7 @@
           {% set personContent %}
             <p class="responsibility-summary" data-fact-id="data-management-responsibilities" data-role-uuids="{{ mappedRoles|join(' ') }}">{{ responsibilitySentences|join(" ") }}</p>
             {% if not name|trim and output_profile|default('review') != 'submission' %}
-              <p class="data-gap" data-fact-id="responsible-person-name" data-status="missing">Please provide the name of the person or team assigned these responsibilities.</p>
+              <p class="data-gap" data-fact-id="responsible-person-name" data-status="missing">{{ pgettext("questions/14-dm-responsible", "Please provide the name of the person or team assigned these responsibilities.") }}</p>
             {% endif %}
           {% endset %}
           <div class="person-responsibilities{{ ' short-reading-unit' if personContent|striptags|length <= 500 else '' }}" data-contributor-id="{{ contributorItem|e }}" data-contributor-index="{{ contributorIndex }}">{{ personContent }}</div>
@@ -33,7 +33,7 @@
     {% if responsibilitiesContent|striptags|trim %}
       <div class="responsibilities-block">{{ responsibilitiesContent }}</div>
     {% else %}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6a" data-status="missing-output">This document does not yet identify a named person or team with a data management responsibility. Please check the contributor names and roles.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6a" data-status="missing-output">{{ pgettext("questions/14-dm-responsible", "This document does not yet identify a named person or team with a data management responsibility. Please check the contributor names and roles.") }}</p>{% endif %}
     {% endif %}
   </div>
 </div>

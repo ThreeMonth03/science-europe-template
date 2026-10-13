@@ -5,10 +5,10 @@
   {%- set authored = repliesMap[followupPath]|reply_str_value -%}
   {%- if authored|trim -%}
     <div class="dataset-policy reference-publication-plan" data-requirement-id="SE-5a">
-      <div class="answer-lead"><p>Publication schedule for reference data created by the project:</p></div>
+      <div class="answer-lead"><p>{{ pgettext("reference-publication-plan", "Publication schedule for reference data created by the project:") }}</p></div>
       <div class="answer-detail" data-fact-id="reference-data-publication-schedule">{{ answerMarkdown.markdown(authored) }}</div>
     </div>
   {%- elif output_profile|default('review') != 'submission' -%}
-    <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-5a" data-fact-id="reference-data-publication-schedule" data-status="missing">Information not provided: the publication schedule for reference data created by the project.</p></div>
+    <div class="reading-gap"><p class="data-gap" data-requirement-id="SE-5a" data-fact-id="reference-data-publication-schedule" data-status="missing">{{ pgettext("reference-publication-plan", "Information not provided: the publication schedule for reference data created by the project.") }}</p></div>
   {%- endif -%}
 {%- endif -%}

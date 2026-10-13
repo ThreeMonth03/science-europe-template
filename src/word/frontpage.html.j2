@@ -1,4 +1,4 @@
-<h1>Data Management Plan</h1>
+<h1>{{ pgettext("word/frontpage", "Data Management Plan") }}</h1>
 <p><strong>{{ ctx.project.name }}</strong></p>
-<p>Generated on {{ dc.doc.created_at|datetime_format("%Y-%m-%d") }}.</p>
-<p>Created in <a href="{{ dc.config.service_url }}">{{ dc.config.service_name }}</a>.</p>
+<p>{{ pgettext("word/frontpage", "Generated on %(dc_doc_created_at)s.", dc_doc_created_at=dc.doc.created_at|datetime_format("%Y-%m-%d")) }}</p>
+<p>{{ pgettext("word/frontpage", "Created in <a href=\"%(dc_config_service_url)s\">%(dc_config_service_name)s</a>.", dc_config_service_url=dc.config.service_url, dc_config_service_name=dc.config.service_name) }}</p>

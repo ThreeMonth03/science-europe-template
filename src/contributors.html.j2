@@ -30,13 +30,13 @@
   {%- endfor -%}
 
 {% if contributors or dc.project.created_by or output_profile|default('review') != 'submission' %}<div id="dmp-contributors">
-  <h2>People and responsibilities</h2>
+  <h2>{{ pgettext("contributors", "People and responsibilities") }}</h2>
 
   {%- if contributors|length > 0 -%}
   <ul>
   {% for contributor in contributors %}
     <li class="contributor">
-      <span class="name"><strong>{% if contributor.name|trim %}{{ contributor.name|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.contributorLabel(contributor.index) }}{% else %}(name not given){% endif %}</strong></span>
+      <span class="name"><strong>{% if contributor.name|trim %}{{ contributor.name|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.contributorLabel(contributor.index) }}{% else %}{{ pgettext("contributors", "(name not given)") }}{% endif %}</strong></span>
       {%- if contributor.email and contributor.orcid %}
         <br>{{ macros.formatEmail(contributor.email) }}, {{ macros.formatOrcid(contributor.orcid) }}
       {%- elif contributor.email %}
@@ -59,11 +59,11 @@
       <span class="name">{{ dc.project.created_by.first_name }} {{ dc.project.created_by.last_name }}</span>
       <br>{{ macros.formatEmail(dc.project.created_by.email) }}
       {%- if dc.project.created_by.affiliation %}
-      <br>Affiliation: <span class="affiliation">{{ dc.project.created_by.affiliation }}</span>
+      <br>{{ pgettext("contributors", "Affiliation: <span class=\"affiliation\">%(dc_project_created_by_affiliation)s</span>", dc_project_created_by_affiliation=dc.project.created_by.affiliation) }}
       {%- endif %}
     </li>
   </ul>
   {%- else -%}
-  <div style="font-style:italic;">There are no contributors described for this DMP.</div>
+  <div style="font-style:italic;">{{ pgettext("contributors", "There are no contributors described for this DMP.") }}</div>
   {%- endif -%}
 </div>{% endif %}

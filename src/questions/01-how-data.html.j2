@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-how-data" class="question" data-requirement-id="SE-1a">
-  <h3>1. How will new data be collected or produced and/or how will existing data be re-used?</h3>
+  <h3>{{ pgettext("questions/01-how-data", "1. How will new data be collected or produced and/or how will existing data be re-used?") }}</h3>
 
   <div class="answer">
   {%- import 'src/reuse-rightsholder.html.j2' as reuseRightsholder with context -%}
@@ -18,7 +18,7 @@
     {%- set measuredDataPath = [measuredPath, uuids.measuredYesAUuid, uuids.measuredDataQUuid]|reply_path -%}
     {%- set measuredDataItems = repliesMap[measuredDataPath]|reply_items -%}
     {%- if measuredDataItems|length > 0 -%}
-      <h4>Instrument datasets</h4>
+      <h4>{{ pgettext("questions/01-how-data", "Instrument datasets") }}</h4>
       <ul>
         {%- for datasetItem in measuredDataItems -%}
           {%- set pathPrefix = [measuredDataPath, datasetItem]|reply_path -%}
@@ -39,7 +39,7 @@
               {%- endif -%}
             {%- endfor -%}
             {%- if instrumentRows -%}
-              <p>For this dataset, we are using the following instruments:</p>
+              <p>{{ pgettext("questions/01-how-data", "For this dataset, we are using the following instruments:") }}</p>
               <ul>
                 {%- for index, measuredDataInstrName, measuredDataInstrDesc in instrumentRows -%}
                   <li>
@@ -48,7 +48,7 @@
                 {%- endfor -%}
               </ul>
             {%- else -%}
-              {% if output_profile|default('review') != 'submission' %}<p>No instruments for this dataset have been specified.</p>{% endif %}
+              {% if output_profile|default('review') != 'submission' %}<p>{{ pgettext("questions/01-how-data", "No instruments for this dataset have been specified.") }}</p>{% endif %}
             {%- endif -%}
             {% with qualityNameAlreadyRendered = true %}
               {% include "src/quality-control.html.j2" with context %}
@@ -57,13 +57,13 @@
         {%- endfor -%}
       </ul>
     {%- else -%}
-      <p>We will acquire data using measurement equipment.</p>
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="collection-methods" data-status="missing"><strong>Information not provided:</strong> the datasets to be collected or produced and the methods, instruments, or software that will be used.</p>{% endif %}
+      <p>{{ pgettext("questions/01-how-data", "We will acquire data using measurement equipment.") }}</p>
+      {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"collection-methods\" data-status=\"missing\"><strong>Information not provided:</strong> the datasets to be collected or produced and the methods, instruments, or software that will be used.</p>") }}{% endif %}
     {%- endif -%}
   {%- elif measuredAUuid == uuids.measuredNoAUuid -%}
-    <p data-requirement-id="SE-1a" data-fact-id="new-data" data-status="explicit-no">No new instrument datasets will be produced in this project.</p>
+    <p data-requirement-id="SE-1a" data-fact-id="new-data" data-status="explicit-no">{{ pgettext("questions/01-how-data", "No new instrument datasets will be produced in this project.") }}</p>
   {%- else -%}
-    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="new-data" data-status="missing"><strong>Information not provided:</strong> whether the project will collect or produce new instrument data.</p>{% endif %}
+    {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"new-data\" data-status=\"missing\"><strong>Information not provided:</strong> whether the project will collect or produce new instrument data.</p>") }}{% endif %}
   {%- endif -%}
 
  {# Existing datasets #}
@@ -96,7 +96,7 @@
 
     {%- if (refDataItems|length > 0) or (nrefDataItems|length > 0) -%}
       <div>
-      <h4>Re-used datasets</h4>
+      <h4>{{ pgettext("questions/01-how-data", "Re-used datasets") }}</h4>
       <ul class="dataset-list">
       {# Reference Data #}
         {%- for refDataItem in refDataItems -%}
@@ -112,7 +112,7 @@
           {%- if refDataNameReply|trim -%}
             <h5>{{ refDataNameReply }}</h5>
           {%- else -%}
-            {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(refDataItem) + 1) }}</strong>{% else %}<strong class="item-label">(no name given)</strong>{% endif %}
+            {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_REFERENCE, refDataItems.index(refDataItem) + 1) }}</strong>{% else %}{{ pgettext("questions/01-how-data", "<strong class=\"item-label\">(no name given)</strong>") }}{% endif %}
           {%- endif -%}
           
           {# Reference data set will be used #}
@@ -122,12 +122,12 @@
             <div data-fact-id="reuse-decision" data-status="complete">
             {% if refDataWhere|trim %}
               {% if refDataWhere.startswith("https://") or refDataWhere.startswith("http://") or refDataWhere.startswith("ftp://") %}
-              <p class="dataset-source" data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ refDataWhere }}">{{ refDataWhere }}</a></p>
+              {{ pgettext("questions/01-how-data", "<p class=\"dataset-source\" data-fact-id=\"dataset-source\" data-status=\"complete\">Source: <a href=\"%(refDataWhere)s\">%(refDataWhere)s</a></p>", refDataWhere=refDataWhere) }}
             {% else %}
-              <p data-fact-id="dataset-source" data-status="complete">Source: {{ refDataWhere }}</p>
+              {{ pgettext("questions/01-how-data", "<p data-fact-id=\"dataset-source\" data-status=\"complete\">Source: %(refDataWhere)s</p>", refDataWhere=refDataWhere) }}
             {% endif %}
             {% else %}
-              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>{% endif %}
+              {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"dataset-source\" data-status=\"missing\"><strong>Information not provided:</strong> where this dataset can be obtained.</p>") }}{% endif %}
             {% endif %}
             {%- set refDataUsageQ = [refDataUsedPrefix, uuids.refDataUsageQUuid]|reply_path -%}
             {%- set refDataUsageReply = repliesMap[refDataUsageQ]|reply_str_value -%}
@@ -136,7 +136,7 @@
                 {{ answerMarkdown.markdown(refDataUsageReply) }}
               </div>
             {% else %}
-              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
+              {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"reuse-purpose\" data-status=\"missing\"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>") }}{% endif %}
             {% endif %}
 
             {# version #}
@@ -155,27 +155,27 @@
               {%- set refDataVersionedChangePath = [refDataVersionedPath, uuids.refDataVersionedYesAUuid, uuids.refDataVersionedChangeQUuid]|reply_path -%}
               {%- set refDataVersionedChangeAUuid = repliesMap[refDataVersionedChangePath]|reply_str_value -%}
               {% if not refDataVersionedWhich|trim and refDataVersionedChangeAUuid not in [uuids.refDataVersionedChangeStayAUuid, uuids.refDataVersionedChangeNewAUuid, uuids.refDataVersionedChangeAllAUuid] %}
-                <p data-fact-id="dataset-versioning" data-status="complete">This reference dataset is versioned.</p>
+                {{ pgettext("questions/01-how-data", "<p data-fact-id=\"dataset-versioning\" data-status=\"complete\">This reference dataset is versioned.</p>") }}
               {% endif %}
               {% if refDataVersionedWhich|trim %}
                 <div class="dataset-version answer-detail" data-fact-id="dataset-version" data-status="complete">
-                  <div class="answer-lead"><p><strong>Version</strong></p></div>
+                  <div class="answer-lead">{{ pgettext("questions/01-how-data", "<p><strong>Version</strong></p>") }}</div>
                   {{ answerMarkdown.markdown(refDataVersionedWhich) }}
                 </div>
               {% else %}
-                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-version" data-status="missing"><strong>Information not provided:</strong> which version of this dataset will be used.</p>{% endif %}
+                {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"dataset-version\" data-status=\"missing\"><strong>Information not provided:</strong> which version of this dataset will be used.</p>") }}{% endif %}
               {% endif %}
               {% if refDataVersionedChangeAUuid == uuids.refDataVersionedChangeStayAUuid %}
-                <p>If a new version becomes available during the project, the current version will continue to be used.</p>
+                {{ pgettext("questions/01-how-data", "<p>If a new version becomes available during the project, the current version will continue to be used.</p>") }}
               {% elif refDataVersionedChangeAUuid == uuids.refDataVersionedChangeNewAUuid %}
-                <p>If a new version becomes available during the project, it will be used for new analyses.</p>
+                {{ pgettext("questions/01-how-data", "<p>If a new version becomes available during the project, it will be used for new analyses.</p>") }}
               {% elif refDataVersionedChangeAUuid == uuids.refDataVersionedChangeAllAUuid %}
-                <p>If a new version becomes available during the project, all analyses will be repeated using it.</p>
+                {{ pgettext("questions/01-how-data", "<p>If a new version becomes available during the project, all analyses will be repeated using it.</p>") }}
               {% else %}
-                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-version-policy" data-status="missing"><strong>Information not provided:</strong> how new dataset versions will be handled.</p>{% endif %}
+                {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"dataset-version-policy\" data-status=\"missing\"><strong>Information not provided:</strong> how new dataset versions will be handled.</p>") }}{% endif %}
               {% endif %}
             {%- elif refDataVersionedAUuid == uuids.refDataVersionedNoAUuid -%}
-              <p data-fact-id="dataset-versioning" data-status="explicit-no">This reference dataset is not versioned.</p>
+              {{ pgettext("questions/01-how-data", "<p data-fact-id=\"dataset-versioning\" data-status=\"explicit-no\">This reference dataset is not versioned.</p>") }}
             {%- endif -%}
 
             {% set referencePolicy %}
@@ -185,11 +185,11 @@
             <div class="dataset-policy">
             <p>
             {%- if refDataReproduceReply == uuids.refDataReproduceProviderAUuid -%}
-              {% if sharedReferencePolicy %}Each dataset will remain available from its provider in the long term.{% else %}The provider will keep this dataset available in the long term.{% endif %}
+              {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "Each dataset will remain available from its provider in the long term.") }}{% else %}{{ pgettext("questions/01-how-data", "The provider will keep this dataset available in the long term.") }}{% endif %}
             {%- elif refDataReproduceReply == uuids.refDataReproduceCopyAUuid  -%}
-              {% if sharedReferencePolicy %}We will retain a copy of each dataset and provide these copies alongside the research results.{% else %}We will retain a copy of this dataset and provide it alongside the research results.{% endif %}
+              {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "We will retain a copy of each dataset and provide these copies alongside the research results.") }}{% else %}{{ pgettext("questions/01-how-data", "We will retain a copy of this dataset and provide it alongside the research results.") }}{% endif %}
             {%- elif refDataReproduceReply == uuids.refDataReproduceBothAUuid -%}
-              {% if sharedReferencePolicy %}Each dataset will remain available from its provider in the long term. We will also retain a copy of each dataset and provide these copies alongside the research results.{% else %}The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results.{% endif %}
+              {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "Each dataset will remain available from its provider in the long term. We will also retain a copy of each dataset and provide these copies alongside the research results.") }}{% else %}{{ pgettext("questions/01-how-data", "The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results.") }}{% endif %}
             {%- endif -%}
             </p>
 
@@ -200,14 +200,14 @@
             {%- set refDataConditionsOtherReply = repliesMap[refDataConditionsOther]|reply_str_value -%}
             {%- if refDataConditionsReply %}
               {%- if refDataConditionsReply == uuids.refDataConditionsCC0AUuid -%}
-                <p>{% if sharedReferencePolicy %}These datasets are freely available for any use.{% else %}This dataset is freely available for any use.{% endif %}</p>
+                <p>{% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "These datasets are freely available for any use.") }}{% else %}{{ pgettext("questions/01-how-data", "This dataset is freely available for any use.") }}{% endif %}</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsCCBYAUuid -%}
-                <p>{% if sharedReferencePolicy %}These datasets are freely available with an obligation to cite their sources.{% else %}This dataset is freely available with an obligation to cite the source.{% endif %}</p>
+                <p>{% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "These datasets are freely available with an obligation to cite their sources.") }}{% else %}{{ pgettext("questions/01-how-data", "This dataset is freely available with an obligation to cite the source.") }}{% endif %}</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsOtherAUuid -%}
                   {%- if refDataConditionsOtherReply|trim -%}
-                    <div class="answer-detail"><p><strong>Conditions of use</strong></p>{{ answerMarkdown.markdown(refDataConditionsOtherReply) }}</div>
+                    <div class="answer-detail">{{ pgettext("questions/01-how-data", "<p><strong>Conditions of use</strong></p>") }}{{ answerMarkdown.markdown(refDataConditionsOtherReply) }}</div>
                   {%- else -%}
-                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">Restrictions apply, but the conditions of use are not yet described.</p>{% else %}<p data-fact-id="reuse-restrictions" data-status="partial">Restrictions apply to this dataset.</p>{% endif %}
+                    {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-status=\"missing-output\">Restrictions apply, but the conditions of use are not yet described.</p>") }}{% else %}{{ pgettext("questions/01-how-data", "<p data-fact-id=\"reuse-restrictions\" data-status=\"partial\">Restrictions apply to this dataset.</p>") }}{% endif %}
                   {%- endif -%}
               {%- endif -%}
             {%- endif -%}
@@ -217,9 +217,9 @@
             {%- set refDataFormatReply = repliesMap[refDataFormat]|reply_str_value -%}
             <p>
             {%- if refDataFormatReply == uuids.refDataFormatConvertAUuid -%}
-              The data format must be converted before use.
+              {{ pgettext("questions/01-how-data", "The data format must be converted before use.") }}
             {%- elif refDataFormatReply == uuids.refDataFormatUseAUuid -%}
-              The data can be used directly without format conversion.
+              {{ pgettext("questions/01-how-data", "The data can be used directly without format conversion.") }}
             {% endif %}
             </p>
             </div>
@@ -251,8 +251,8 @@
       {# Non-reference Data #}
       {% if sharedReferencePolicy %}
         <div class="shared-reference-policy">
-          <p class="answer-lead"><strong>Shared arrangements</strong></p>
-          <div class="answer-lead"><p>The following arrangements apply to all reference datasets selected for re-use above.</p></div>
+          {{ pgettext("questions/01-how-data", "<p class=\"answer-lead\"><strong>Shared arrangements</strong></p>") }}
+          <div class="answer-lead"><p>{{ pgettext("questions/01-how-data", "The following arrangements apply to all reference datasets selected for re-use above.") }}</p></div>
           {{ referencePolicies.content }}
         </div>
       {% endif %}
@@ -269,32 +269,32 @@
         {%- if nrefDataNameReply|trim -%}
           <h5>{{ nrefDataNameReply }}</h5>
         {%- else -%}
-          {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(nrefDataItem) + 1) }}</strong>{% else %}<strong class="item-label">(no name given)</strong>{% endif %}
+          {% if output_profile|default('review') == 'submission' %}<strong class="item-label">{{ macros.datasetLabel(macros.DATASET_NON_REFERENCE, nrefDataItems.index(nrefDataItem) + 1) }}</strong>{% else %}{{ pgettext("questions/01-how-data", "<strong class=\"item-label\">(no name given)</strong>") }}{% endif %}
         {%- endif -%}
         
         {# Non-reference data set will be used #}
         {%- if nrefDataUseReply == uuids.nrefDataUseYesAUuid %}
           {{ reuseRightsholder.render(nrefDataUsedPrefix.split('.') + [uuids.nrefDataOwnerQUuid]) }}
           {# identification #}
-          <p data-fact-id="reuse-decision" data-status="complete">This dataset will be re-used.</p>
+          {{ pgettext("questions/01-how-data", "<p data-fact-id=\"reuse-decision\" data-status=\"complete\">This dataset will be re-used.</p>") }}
           {% if nrefDataWhere|trim %}
             {% if nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("ftp://") %}
-              <p data-fact-id="dataset-source" data-status="complete">Source: <a href="{{ nrefDataWhere }}">{{ nrefDataWhere }}</a></p>
+              {{ pgettext("questions/01-how-data", "<p data-fact-id=\"dataset-source\" data-status=\"complete\">Source: <a href=\"%(nrefDataWhere)s\">%(nrefDataWhere)s</a></p>", nrefDataWhere=nrefDataWhere) }}
             {% else %}
-              <p data-fact-id="dataset-source" data-status="complete">Source: {{ nrefDataWhere }}</p>
+              {{ pgettext("questions/01-how-data", "<p data-fact-id=\"dataset-source\" data-status=\"complete\">Source: %(nrefDataWhere)s</p>", nrefDataWhere=nrefDataWhere) }}
             {% endif %}
           {% else %}
-            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-source" data-status="missing"><strong>Information not provided:</strong> where this dataset can be obtained.</p>{% endif %}
+            {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"dataset-source\" data-status=\"missing\"><strong>Information not provided:</strong> where this dataset can be obtained.</p>") }}{% endif %}
           {% endif %}
           {%- set nrefDataUsageQ = [nrefDataUsedPrefix, uuids.nrefDataUsageQUuid]|reply_path -%}
           {%- set nrefDataUsageReply = repliesMap[nrefDataUsageQ]|reply_str_value -%}
           {% if nrefDataUsageReply|trim %}
             <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
-              <p><strong>Purpose of re-use</strong></p>
+              {{ pgettext("questions/01-how-data", "<p><strong>Purpose of re-use</strong></p>") }}
               {{ answerMarkdown.markdown(nrefDataUsageReply) }}
             </div>
           {% else %}
-            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
+            {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"reuse-purpose\" data-status=\"missing\"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>") }}{% endif %}
           {% endif %}
 
           {{ reuseRightsholder.nonReferenceArrangements(nrefDataUsedPrefix.split('.')) }}
@@ -314,45 +314,45 @@
           {%- set nrefDataPersonalLegalBasis = [nrefDataPersonal, uuids.nrefDataPersonalYesAUuid, uuids.nrefDataPersonalLegalBasisQUuid]|reply_path -%}
           {%- set nrefDataPersonalLegalBasisReply = repliesMap[nrefDataPersonalLegalBasis]|reply_str_value -%}
           {# Each selected fact is a complete sentence, including partial replies. #}
-          <p>This dataset contains personal data.
+          <p>{{ pgettext("questions/01-how-data", "This dataset contains personal data.") }}
             {% if nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLegalBasisPubInterestAUuid %}
-              The stated legal basis for processing these data under the GDPR is public interest.
+              {{ pgettext("questions/01-how-data", "The stated legal basis for processing these data under the GDPR is public interest.") }}
             {% elif nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLegalBasisConsentAUuid %}
-              The stated legal basis for processing these data under the GDPR is consent from the data subjects.
+              {{ pgettext("questions/01-how-data", "The stated legal basis for processing these data under the GDPR is consent from the data subjects.") }}
               {% set nrefDataPersonalLegalBasisReuse = [nrefDataPersonalLegalBasis, uuids.nrefDataPersonalLegalBasisConsentAUuid, uuids.nrefDataPersonalLegalBasisConsentReuseQUuid]|reply_path %}
               {% set nrefDataPersonalLegalBasisReuseReply = repliesMap[nrefDataPersonalLegalBasisReuse]|reply_str_value %}
               {% if nrefDataPersonalLegalBasisReuseReply == uuids.nrefDataPersonalLegalBasisConsentReuseYesAUuid %}
-                The consent also covers our reuse.
+                {{ pgettext("questions/01-how-data", "The consent also covers our reuse.") }}
               {% elif nrefDataPersonalLegalBasisReuseReply == uuids.nrefDataPersonalLegalBasisConsentReuseNoAUuid %}
-                The consent does not cover our reuse; new consent will be needed.
+                {{ pgettext("questions/01-how-data", "The consent does not cover our reuse; new consent will be needed.") }}
               {% endif %}
             {% elif nrefDataPersonalLegalBasisReply == uuids.nrefDataPersonalLebalBasisOtherAUuid %}
               {% set nrefDataPersonalLegalBasisOther = [nrefDataPersonalLegalBasis, uuids.nrefDataPersonalLebalBasisOtherAUuid, uuids.nrefDataPersonalLegalBasisOtherQUuid]|reply_path %}
               {% set nrefDataPersonalLegalBasisOtherReply = repliesMap[nrefDataPersonalLegalBasisOther]|reply_str_value %}
               {% if nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherLegalAUuid %}
-                The stated legal basis for processing these data is a legal obligation.
+                {{ pgettext("questions/01-how-data", "The stated legal basis for processing these data is a legal obligation.") }}
               {% elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherVitalAUuid %}
-                The stated legal basis for processing these data is the protection of vital interests of the data subjects.
+                {{ pgettext("questions/01-how-data", "The stated legal basis for processing these data is the protection of vital interests of the data subjects.") }}
               {% elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherLegitAUuid %}
-                The stated legal basis for processing these data is legitimate interests.
+                {{ pgettext("questions/01-how-data", "The stated legal basis for processing these data is legitimate interests.") }}
               {% elif nrefDataPersonalLegalBasisOtherReply == uuids.nrefDataPersonalLegalBasisOtherContractAUuid %}
-                The stated legal basis for processing these data is performance of a contract with the data subjects.
+                {{ pgettext("questions/01-how-data", "The stated legal basis for processing these data is performance of a contract with the data subjects.") }}
               {% endif %}
             {% endif %}
           </p>
           {%- elif nrefDataPersonalReply == uuids.nrefDataPersonalNoAUuid -%}
-            <p data-fact-id="reuse-personal-data" data-status="explicit-no">This dataset does not contain personal data.</p>
+            {{ pgettext("questions/01-how-data", "<p data-fact-id=\"reuse-personal-data\" data-status=\"explicit-no\">This dataset does not contain personal data.</p>") }}
           {%- endif -%}
 
           {# Ethical Approval for Reuse #}
           {%- set nrefDataEthicalApproval = [nrefDataUsedPrefix, uuids.nrefDataEthicalApprovalQUuid]|reply_path -%}
           {%- set nrefDataEthicalApprovalReply = repliesMap[nrefDataEthicalApproval]|reply_str_value -%}
           {%- if nrefDataEthicalApprovalReply == uuids.nrefDataEthicalApprovalCoversAUuid -%}
-            <p>The existing ethical approval under research ethics laws covers our re-use of this dataset.</p>
+            {{ pgettext("questions/01-how-data", "<p>The existing ethical approval under research ethics laws covers our re-use of this dataset.</p>") }}
           {%- elif nrefDataEthicalApprovalReply == uuids.nrefDataEthicalApprovalExtensionAUuid -%}
-            <p>The existing ethical approval under research ethics laws will need to be extended to cover our re-use of this dataset.</p>
+            {{ pgettext("questions/01-how-data", "<p>The existing ethical approval under research ethics laws will need to be extended to cover our re-use of this dataset.</p>") }}
           {%- elif nrefDataEthicalApprovalReply == uuids.nrefDataEthicalApprovalNewAUuid -%}
-            <p>New ethical approval under research ethics laws will be needed for our re-use of this dataset.</p>
+            {{ pgettext("questions/01-how-data", "<p>New ethical approval under research ethics laws will be needed for our re-use of this dataset.</p>") }}
           {%- endif -%}
 
         {# Non-reference data set that will NOT be used #}
@@ -373,7 +373,7 @@
       </ul>
       </div>
     {%- else -%}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> the existing datasets considered for re-use, including any sources that were considered but discarded.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"reuse-sources\" data-status=\"missing\"><strong>Information not provided:</strong> the existing datasets considered for re-use, including any sources that were considered but discarded.</p>") }}{% endif %}
     {%- endif -%}
 
     {# Constrains - Data Harmonization #}
@@ -394,7 +394,7 @@
       {%- endif -%}
       .</p>
     {%- elif dataHarmoReply == uuids.dataHarmoNoAUuid -%}
-      <p>We do not need to harmonize existing data from different sources before reuse.</p>
+      <p>{{ pgettext("questions/01-how-data", "We do not need to harmonize existing data from different sources before reuse.") }}</p>
     {%- endif -%}
 
     {# Constrains - (Re)made data computer readable #}
@@ -415,13 +415,13 @@
       {%- endif -%}
       <p>
       {%- if dataCompReadItselfReply == uuids.dataCompReadItselfYesAUuid -%}
-        Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others through a standard repository.
+        {{ pgettext("questions/01-how-data", "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others through a standard repository.") }}
       {%- elif dataCompReadItselfReply == uuids.dataCompReadItselfYesOtherAUuid -%}
-        Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others.
+        {{ pgettext("questions/01-how-data", "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others.") }}
       {%- elif dataCompReadItselfReply == uuids.dataCompReadItselfNoAUuid -%}
-        Before reuse, we will need to convert the data into a machine-readable form but will not make this version available to others.
+        {{ pgettext("questions/01-how-data", "Before reuse, we will need to convert the data into a machine-readable form but will not make this version available to others.") }}
       {%- else -%}
-        Before reuse, we will need to convert the data into a machine-readable form.
+        {{ pgettext("questions/01-how-data", "Before reuse, we will need to convert the data into a machine-readable form.") }}
       {%- endif -%}
       {%- if dataCompReadOthersReply == uuids.dataCompReadOthersYesAUuid -%}
         {%- set dataCompReadWhichMetadataStandardPath = [dataCompReadOthers, uuids.dataCompReadOthersYesAUuid, uuids.dataCompReadOthersYesStandardsQUuid]|reply_path -%}
@@ -444,12 +444,12 @@
       {%- endif -%}
       </p>
     {%- elif dataCompReadReply == uuids.dataCompReadNoAUuid -%}
-      <p>We will not use existing data that needs to be converted into a machine-readable form before reuse.</p>
+      <p>{{ pgettext("questions/01-how-data", "We will not use existing data that needs to be converted into a machine-readable form before reuse.") }}</p>
     {%- endif -%}
   {%- elif preexistingAUuid == uuids.preexistingNoAUuid -%}
-    <p data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="explicit-no">No existing datasets will be re-used.</p>
+    <p data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="explicit-no">{{ pgettext("questions/01-how-data", "No existing datasets will be re-used.") }}</p>
   {%- else -%}
-    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="missing"><strong>Information not provided:</strong> whether existing data will be re-used, including constraints or reasons for discarding candidate sources.</p>{% endif %}
+    {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"reuse-sources\" data-status=\"missing\"><strong>Information not provided:</strong> whether existing data will be re-used, including constraints or reasons for discarding candidate sources.</p>") }}{% endif %}
   {%- endif -%}
 
   {# Provenance (lab notebooks)#}
@@ -461,11 +461,11 @@
       {%- if provenanceAUuid %}
         {% set provenanceContent %}
         {%- if provenanceAUuid == uuids.provenanceLabNotebooksAUuid -%}
-          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We will use lab notebooks to document the provenance of the data analysis.</p>
+          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">{{ pgettext("questions/01-how-data", "We will use lab notebooks to document the provenance of the data analysis.") }}</p>
         {%- elif provenanceAUuid == uuids.provenanceELabNotebookAUuid -%}
-          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We will use an electronic lab notebook to document the provenance of the data analysis.</p>
+          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">{{ pgettext("questions/01-how-data", "We will use an electronic lab notebook to document the provenance of the data analysis.") }}</p>
         {%- elif provenanceAUuid == uuids.provenanceSystemAUuid -%}
-          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">Our computing workflow system records provenance information about the data analysis.</p>
+          <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">{{ pgettext("questions/01-how-data", "Our computing workflow system records provenance information about the data analysis.") }}</p>
         {%- elif provenanceAUuid == uuids.provenanceOtherAUuid -%}
           {%- set provenanceOtherPath = [provenancePath, uuids.provenanceOtherAUuid, uuids.provenanceOtherQUuid]|reply_path -%}
           {%- set provenanceOther = repliesMap[provenanceOtherPath]|reply_str_value -%}
@@ -476,14 +476,14 @@
           {%- else -%}
             {%- set activeProvenancePath = activeAnswer.path([uuids.creatingCUuid, uuids.metadataQUuid, uuids.metadataExploreAUuid, uuids.provenanceQUuid], 'OptionsQuestion') if km is defined else provenancePath -%}
             {%- if activeProvenancePath and (km is not defined or (provenanceAUuid in km.entities.questions[uuids.provenanceQUuid].answerUuids and provenanceAUuid in km.entities.answers)) and (repliesMap[provenancePath].value is not defined or repliesMap[provenancePath].value.type is not defined or repliesMap[provenancePath].value.type == 'AnswerReply') -%}
-              <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We use other arrangements to document data provenance.</p>
+              <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">{{ pgettext("questions/01-how-data", "We use other arrangements to document data provenance.") }}</p>
             {%- endif -%}
-            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance-detail" data-status="missing"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>{% endif %}
+            {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance-detail\" data-status=\"missing\"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>") }}{% endif %}
           {%- endif -%}
         {%- endif -%}
         {% endset %}
         {% if output_profile|default('review') != 'submission' or provenanceContent|striptags|trim or '<img' in provenanceContent|lower or '<table' in provenanceContent|lower %}
-          <h4>Provenance</h4>
+          <h4>{{ pgettext("questions/01-how-data", "Provenance") }}</h4>
           {{ provenanceContent }}
         {% endif %}
       {%- else -%}

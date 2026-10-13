@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context %}
 <div id="q-what-data" class="question">
-  <h3>2. What data (for example the kinds, formats, and volumes) will be collected or produced?</h3>
+  <h3>{{ pgettext("questions/02-what-data", "2. What data (for example the kinds, formats, and volumes) will be collected or produced?") }}</h3>
   <div class="answer">
 
   {%- set measuredPath = [uuids.creatingCUuid, uuids.measuredQUuid]|reply_path -%}
@@ -11,7 +11,7 @@
     {# Measured datasets #}
     {%- if measuredDataItems|length > 0 -%}
       <div>
-      <h4>Instrument datasets</h4>
+      <h4>{{ pgettext("questions/02-what-data", "Instrument datasets") }}</h4>
         {%- for datasetItem in measuredDataItems -%}
           {%- set pathPrefix = [measuredDataPath, datasetItem]|reply_path -%}
           <div class="collection-dataset" data-item-id="{{ datasetItem }}">
@@ -27,17 +27,17 @@
             {%- set ownershipMissing = false -%}
             {# Who will collect #}
             {%- if measuredDataWhoAUuid == uuids.measuredDataWhoExpertsOwnAUuid -%}
-              {%- do collectionSentences.append("This dataset will be collected by experts in the project, with our own equipment.") -%}
+              {%- do collectionSentences.append(pgettext("questions/02-what-data", "This dataset will be collected by experts in the project, with our own equipment.")) -%}
             {%- elif measuredDataWhoAUuid == uuids.measuredDataWhoExpertsOutAUuid -%}
-              {%- do collectionSentences.append("This dataset will be collected by experts in the project, at a specialized infrastructure.") -%}
+              {%- do collectionSentences.append(pgettext("questions/02-what-data", "This dataset will be collected by experts in the project, at a specialized infrastructure.")) -%}
             {%- elif measuredDataWhoAUuid == uuids.measuredDataWhoExternalAUuid -%}
               {%- set mdExternalOwnershipPath = [measuredDataWhoPath, uuids.measuredDataWhoExternalAUuid, uuids.mdExternalOwnershipQUuid]|reply_path -%}
               {%- set mdExternalOwnershipAUuid = repliesMap[mdExternalOwnershipPath]|reply_str_value -%}
-              {%- do collectionSentences.append("This dataset will be collected by an external party.") -%}
+              {%- do collectionSentences.append(pgettext("questions/02-what-data", "This dataset will be collected by an external party.")) -%}
                 {% if mdExternalOwnershipAUuid == uuids.mdExternalOwnershipPartyAUuid -%}
-                  {%- do collectionSentences.append("The ownership of the resulting data will remain with the external party.") -%}
+                  {%- do collectionSentences.append(pgettext("questions/02-what-data", "The ownership of the resulting data will remain with the external party.")) -%}
                 {%- elif mdExternalOwnershipAUuid == uuids.mdExternalOwnershipPartnersAUuid -%}
-                  {%- do collectionSentences.append("The project partners acquire full ownership of the data.") -%}
+                  {%- do collectionSentences.append(pgettext("questions/02-what-data", "The project partners acquire full ownership of the data.")) -%}
                 {%- elif mdExternalOwnershipAUuid == uuids.mdExternalOwnershipOtherAUuid -%}
                   {%- set mdExternalOwnershipOtherPath = [mdExternalOwnershipPath, uuids.mdExternalOwnershipOtherAUuid, uuids.mdExternalOwnershipOtherQUuid]|reply_path -%}
                   {%- set mdExternalOwnershipOther = repliesMap[mdExternalOwnershipOtherPath]|reply_str_value -%}
@@ -49,24 +49,24 @@
             {%- endif -%}
             {# Equipment standard? #}
             {% if measuredDataEquipAUuid == uuids.measuredDataEquipDescribedAUuid -%}
-              {%- do collectionSentences.append("The equipment is very well described and known.") -%}
+              {%- do collectionSentences.append(pgettext("questions/02-what-data", "The equipment is very well described and known.")) -%}
             {%- elif measuredDataEquipAUuid == uuids.measuredDataEquipCareAUuid -%}
-              {%- do collectionSentences.append("The equipment is less well described or not completely standard, so we will need to take extra care documenting the process.") -%}
+              {%- do collectionSentences.append(pgettext("questions/02-what-data", "The equipment is less well described or not completely standard, so we will need to take extra care documenting the process.")) -%}
             {%- endif -%}
             {% if collectionSentences %}
               <p class="collection-summary">Data collection for <strong>{{ collectionName }}</strong>: {{ collectionSentences|join(" ") }}</p>
             {% else %}
-              {% if output_profile|default('review') != 'submission' %}<p class="collection-summary">Data collection for <strong>{{ collectionName }}</strong> has not yet been described.</p>{% else %}<p class="collection-context"><strong>{{ collectionName }}</strong></p>{% endif %}
+              {% if output_profile|default('review') != 'submission' %}<p class="collection-summary">{{ pgettext("questions/02-what-data", "Data collection for <strong>%(collectionName)s</strong> has not yet been described.", collectionName=collectionName) }}</p>{% else %}<p class="collection-context"><strong>{{ collectionName }}</strong></p>{% endif %}
             {% endif %}
             {% if measuredDataWhoAUuid not in [uuids.measuredDataWhoExpertsOwnAUuid, uuids.measuredDataWhoExpertsOutAUuid, uuids.measuredDataWhoExternalAUuid] %}
-              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="data-collector" data-status="missing">Information not provided: who will collect this dataset.</p>{% endif %}
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="data-collector" data-status="missing">{{ pgettext("questions/02-what-data", "Information not provided: who will collect this dataset.") }}</p>{% endif %}
             {% endif %}
             {% if measuredDataEquipAUuid not in [uuids.measuredDataEquipDescribedAUuid, uuids.measuredDataEquipCareAUuid] %}
-              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="equipment-documentation" data-status="missing">Information not provided: whether the equipment is adequately documented or needs additional process documentation.</p>{% endif %}
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="equipment-documentation" data-status="missing">{{ pgettext("questions/02-what-data", "Information not provided: whether the equipment is adequately documented or needs additional process documentation.") }}</p>{% endif %}
             {% endif %}
             {% if ownershipOther|trim %}
               <div class="answer-detail" data-fact-id="external-ownership" data-status="complete">
-                <div class="answer-lead"><p>Data ownership arrangements:</p></div>
+                <div class="answer-lead"><p>{{ pgettext("questions/02-what-data", "Data ownership arrangements:") }}</p></div>
                 {{ answerMarkdown.markdown(ownershipOther) }}
               </div>
             {% elif ownershipMissing %}
@@ -74,10 +74,10 @@
                 {%- import 'src/active-answer.j2' as activeAnswer with context -%}
                 {%- set activeOwnershipPath = activeAnswer.path(mdExternalOwnershipPath.split('.'), 'OptionsQuestion') if km is defined else mdExternalOwnershipPath -%}
                 {%- if activeOwnershipPath and (km is not defined or (mdExternalOwnershipAUuid in km.entities.questions[uuids.mdExternalOwnershipQUuid].answerUuids and mdExternalOwnershipAUuid in km.entities.answers)) and (repliesMap[mdExternalOwnershipPath].value is not defined or repliesMap[mdExternalOwnershipPath].value.type is not defined or repliesMap[mdExternalOwnershipPath].value.type == 'AnswerReply') -%}
-                  <p data-fact-id="external-ownership" data-status="complete">Other arrangements have been made for ownership of this dataset.</p>
+                  <p data-fact-id="external-ownership" data-status="complete">{{ pgettext("questions/02-what-data", "Other arrangements have been made for ownership of this dataset.") }}</p>
                 {%- endif -%}
               {%- endif -%}
-              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="external-ownership" data-status="missing">Information not provided: ownership arrangements for data collected by the external party.</p>{% endif %}
+              {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="external-ownership" data-status="missing">{{ pgettext("questions/02-what-data", "Information not provided: ownership arrangements for data collected by the external party.") }}</p>{% endif %}
             {% endif %}
           </div>
         {%- endfor -%}
@@ -116,12 +116,12 @@
     {%- set eRecords = neqDataERecordsAUuid == uuids.neqDataERecordsYesAUuid -%}
     {%- if questionnaires or caseReport or eRecords or neqDataSetsItems|length > 0 -%}
       <div>
-      <h4>Non-equipment datasets</h4>
+      <h4>{{ pgettext("questions/02-what-data", "Non-equipment datasets") }}</h4>
       {# Types #}
       {%- set typesNames = [] -%}
-      {%- if questionnaires -%}{%- do typesNames.append("questionnaires") -%}{%- endif -%}
-      {%- if caseReport -%}{%- do typesNames.append("case report forms") -%}{%- endif -%}
-      {%- if eRecords -%}{%- do typesNames.append("electronic patient records") -%}{%- endif -%}
+      {%- if questionnaires -%}{%- do typesNames.append(pgettext("questions/02-what-data", "questionnaires")) -%}{%- endif -%}
+      {%- if caseReport -%}{%- do typesNames.append(pgettext("questions/02-what-data", "case report forms")) -%}{%- endif -%}
+      {%- if eRecords -%}{%- do typesNames.append(pgettext("questions/02-what-data", "electronic patient records")) -%}{%- endif -%}
       {%- set typesCount = typesNames|length -%}
       {%- if typesCount > 0 %}
       <p>
@@ -137,7 +137,7 @@
       {%- endif %}
         {# Datasets #}
         {%- if neqDataSetsItems|length > 0 -%}
-          <div class="answer-lead"><p>The non-equipment datasets are:</p></div>
+          <div class="answer-lead"><p>{{ pgettext("questions/02-what-data", "The non-equipment datasets are:") }}</p></div>
           <ul>
           {%- for neqDataSetItem in neqDataSetsItems -%}
             {%- set pathPrefix = [neqDataSetsPath, neqDataSetItem]|reply_path -%}
@@ -174,13 +174,13 @@
             {%- set captureSentences = [] -%}
             {%- set entryOther = '' -%}
             {%- if capture == uuids.neqDataSetsCaptureDigitalAUuid -%}
-              {%- do captureSentences.append("All data in this dataset will be captured immediately in digital form.") -%}
+              {%- do captureSentences.append(pgettext("questions/02-what-data", "All data in this dataset will be captured immediately in digital form.")) -%}
             {%- elif capture == uuids.neqDataSetsCapturePaperAUuid -%}
-              {%- do captureSentences.append("Data in this dataset will first be captured on paper.") -%}
+              {%- do captureSentences.append(pgettext("questions/02-what-data", "Data in this dataset will first be captured on paper.")) -%}
               {%- if entry == uuids.neqDataSetsEntryTeamAUuid -%}
-                {%- do captureSentences.append("A specialized team will perform the data entry.") -%}
+                {%- do captureSentences.append(pgettext("questions/02-what-data", "A specialized team will perform the data entry.")) -%}
               {%- elif entry == uuids.neqDataSetsEntryMemberAUuid -%}
-                {%- do captureSentences.append("A member of the project team will perform the data entry.") -%}
+                {%- do captureSentences.append(pgettext("questions/02-what-data", "A member of the project team will perform the data entry.")) -%}
               {%- elif entry == uuids.neqDataSetsEntryOtherAUuid -%}
                 {%- set entryOtherPath = activeAnswer.path(paperParts + [uuids.neqDataSetsEntryQUuid, uuids.neqDataSetsEntryOtherAUuid, uuids.neqDataSetsEntryOtherQUuid], 'ValueQuestion') -%}
                 {%- if entryOtherPath and km.entities.questions[uuids.neqDataSetsEntryOtherQUuid].valueType in ['TextQuestionValueType', 'StringQuestionValueType'] -%}
@@ -190,30 +190,30 @@
                   {%- endif -%}
                 {%- endif -%}
                 {%- if not entryOther|trim -%}
-                  {%- do captureSentences.append("Other arrangements have been made for data entry.") -%}
+                  {%- do captureSentences.append(pgettext("questions/02-what-data", "Other arrangements have been made for data entry.")) -%}
                 {%- endif -%}
               {%- endif -%}
               {%- if available == uuids.neqDataSetsAvailableYesAUuid -%}
-                {%- do captureSentences.append("We have arranged for someone to make this dataset available in digital form.") -%}
+                {%- do captureSentences.append(pgettext("questions/02-what-data", "We have arranged for someone to make this dataset available in digital form.")) -%}
               {%- elif available == uuids.neqDataSetsAvailableNotYetAUuid -%}
-                {%- do captureSentences.append("We have not yet arranged for someone to make this dataset available in digital form.") -%}
+                {%- do captureSentences.append(pgettext("questions/02-what-data", "We have not yet arranged for someone to make this dataset available in digital form.")) -%}
               {%- endif -%}
             {%- endif -%}
             <li data-item-id="{{ neqDataSetItem }}">
               {% if neqDataSetsDesc|trim or captureSentences or entryOther|trim %}<div class="answer-lead"><p>{% endif %}
-              <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName|trim %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ (neqDataSetsName if neqDataSetsName|trim else "(no name given)")|e }}{% endif %}</strong>
+              <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName|trim %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ (neqDataSetsName if neqDataSetsName|trim else pgettext("questions/02-what-data", "(no name given)"))|e }}{% endif %}</strong>
               {# Keep the authored body out of automatic first-paragraph lead styling. #}
               {% if neqDataSetsDesc|trim or captureSentences or entryOther|trim %}</p></div>{% endif %}
               {% if neqDataSetsDesc|trim %}<div class="answer-detail"><div>{{ answerMarkdown.markdown(neqDataSetsDesc) }}</div></div>{% endif %}
               {% if captureSentences %}<p class="collection-summary" data-fact-id="non-equipment-capture">{{ captureSentences|join(" ") }}</p>{% endif %}
-              {% if entryOther|trim %}<div class="answer-lead"><p>Other data-entry arrangements:</p></div><div class="answer-detail" data-fact-id="non-equipment-data-entry-other"><div>{{ answerMarkdown.markdown(entryOther) }}</div></div>{% endif %}
+              {% if entryOther|trim %}<div class="answer-lead"><p>{{ pgettext("questions/02-what-data", "Other data-entry arrangements:") }}</p></div><div class="answer-detail" data-fact-id="non-equipment-data-entry-other"><div>{{ answerMarkdown.markdown(entryOther) }}</div></div>{% endif %}
             </li>
           {%- endfor -%}
           </ul>
         {%- endif -%}
       </div>
     {%- else -%}
-      <p>The project includes data capture that does not use measurement equipment.</p>
+      <p>{{ pgettext("questions/02-what-data", "The project includes data capture that does not use measurement equipment.") }}</p>
     {%- endif -%}
   {%- endif -%}
   {# Existing datasets #}

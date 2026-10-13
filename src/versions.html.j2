@@ -2,12 +2,12 @@
   <table>
     <thead>
       <tr>
-        <th colspan="3" class="title">History of changes</th>
+        <th colspan="3" class="title">{{ pgettext("versions", "History of changes") }}</th>
       </tr>
       <tr>
-        <th>Version</th>
-        <th>Publication date</th>
-        <th>Changes</th>
+        <th>{{ pgettext("versions", "Version") }}</th>
+        <th>{{ pgettext("versions", "Publication date") }}</th>
+        <th>{{ pgettext("versions", "Changes") }}</th>
       </tr>
     </thead>
     <tbody>
@@ -19,7 +19,7 @@
         </tr>
       {% else %}
         <tr>
-          <td colspan="3" class="no-versions">There are no named versions</tr>
+          <td colspan="3" class="no-versions">{{ pgettext("versions", "There are no named versions") }}</tr>
         </tr>
       {% endfor %}
     </tbody>

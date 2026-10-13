@@ -41,34 +41,34 @@
 {%- set conditionsChoice = selected(uuids.nrefDataConditionsQUuid) -%}
 {%- set scopeSentence -%}
   {%- if scopeChoice == uuids.nrefDataCompleteUseAUuid -%}
-    The project will reuse the complete dataset.
+    {{ pgettext("reuse-summary", "The project will reuse the complete dataset.") }}
   {%- elif scopeChoice == uuids.nrefDataCompleteDocumentAUuid -%}
-    The project will reuse a subset of the data and document the filtering or selection process.
+    {{ pgettext("reuse-summary", "The project will reuse a subset of the data and document the filtering or selection process.") }}
   {%- elif scopeChoice == uuids.nrefDataCompleteSubsetAUuid -%}
-    The project will reuse a selected subset of the data and make it available with the research results.
+    {{ pgettext("reuse-summary", "The project will reuse a selected subset of the data and make it available with the research results.") }}
   {%- endif -%}
 {%- endset -%}
 {%- set formatSentence -%}
   {%- if formatChoice == uuids.nrefDataFormatConvertAUuid -%}
-    The data format needs to be converted before reuse.
+    {{ pgettext("reuse-summary", "The data format needs to be converted before reuse.") }}
   {%- elif formatChoice == uuids.nrefDataFormatUseAUuid -%}
-    The data can be reused without format conversion.
+    {{ pgettext("reuse-summary", "The data can be reused without format conversion.") }}
   {%- endif -%}
 {%- endset -%}
 {%- set stabilitySentence -%}
   {%- if stabilityChoice == uuids.nrefDataFixedFixedAUuid -%}
-    The dataset is fixed, so changes to the source data will not affect the reproducibility of the research results.
+    {{ pgettext("reuse-summary", "The dataset is fixed, so changes to the source data will not affect the reproducibility of the research results.") }}
   {%- elif stabilityChoice == uuids.nrefDataFixedChangeAUuid -%}
-    The dataset may change, which could affect the reproducibility of the research results.
+    {{ pgettext("reuse-summary", "The dataset may change, which could affect the reproducibility of the research results.") }}
   {%- endif -%}
 {%- endset -%}
 {%- set conditionsSentence -%}
   {%- if conditionsChoice == uuids.nrefDataConditionsCC0AUuid -%}
-    The dataset is freely available for any use.
+    {{ pgettext("reuse-summary", "The dataset is freely available for any use.") }}
   {%- elif conditionsChoice == uuids.nrefDataConditionsCCBYAUuid -%}
-    The dataset is freely available provided that the source is cited.
+    {{ pgettext("reuse-summary", "The dataset is freely available provided that the source is cited.") }}
   {%- elif conditionsChoice == uuids.nrefDataConditionsOtherAUuid -%}
-    Use of this dataset is subject to restrictions, which the project will observe.
+    {{ pgettext("reuse-summary", "Use of this dataset is subject to restrictions, which the project will observe.") }}
   {%- endif -%}
 {%- endset -%}
 {# Translation expansion may add surrounding indentation to captured literals.
@@ -97,11 +97,11 @@
     {%- set authored = repliesMap[detailPath]|reply_str_value -%}
     {%- if authored|trim -%}
       <div class="answer-detail" data-fact-id="reuse-conditions-detail" data-status="complete">
-        <p><strong>Conditions of use</strong></p>
+        {{ pgettext("reuse-summary", "<p><strong>Conditions of use</strong></p>") }}
         {{- answerMarkdown.markdown(authored) -}}
       </div>
     {%- elif output_profile|default('review') != 'submission' -%}
-      <p class="data-gap" data-fact-id="reuse-conditions-detail" data-status="missing">Information not provided: the specific conditions of use.</p>
+      <p class="data-gap" data-fact-id="reuse-conditions-detail" data-status="missing">{{ pgettext("reuse-summary", "Information not provided: the specific conditions of use.") }}</p>
     {%- endif -%}
   {%- endif -%}
 {%- endif -%}

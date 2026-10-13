@@ -7,53 +7,53 @@
 {% if measuredDataName|trim %}
   {% set qualityName = measuredDataName|e %}
 {% else %}
-  {% set qualityName %}{% if output_profile|default('review') == 'submission' %}<span>{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}</span>{% else %}<span>(no name given)</span>{% endif %}{% endset %}
+  {% set qualityName %}{% if output_profile|default('review') == 'submission' %}<span>{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}</span>{% else %}<span>{{ pgettext("quality-control", "(no name given)") }}</span>{% endif %}{% endset %}
 {% endif %}
 {% if qualityAnswer == uuids.measuredDataQualityNoAUuid %}
-  <p class="quality-summary" data-fact-id="quality-control" data-status="explicit-no">No quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>
+  <p class="quality-summary" data-fact-id="quality-control" data-status="explicit-no">{{ pgettext("quality-control", "No quality control processes will be used for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>
 {% elif qualityAnswer == uuids.measuredDataQualityYesAUuid %}
   {% set mdqPrefix = [measuredDataQualityPath, uuids.measuredDataQualityYesAUuid]|reply_path %}
   {% set qualityMethods = [] %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityCalibratingQUuid]|reply_path]|reply_str_value == uuids.mdQualityCalibratingYesAUuid %}
-    {% do qualityMethods.append("measurement calibration") %}
+    {% do qualityMethods.append(pgettext("quality-control", "measurement calibration")) %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityRepetitionQUuid]|reply_path]|reply_str_value == uuids.mdQualityRepetitionYesAUuid %}
-    {% do qualityMethods.append("repeat sampling or measurement") %}
+    {% do qualityMethods.append(pgettext("quality-control", "repeat sampling or measurement")) %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityStandardizedQUuid]|reply_path]|reply_str_value == uuids.mdQualityStandardizedYesAUuid %}
-    {% do qualityMethods.append("standardized data capture or recording") %}
+    {% do qualityMethods.append(pgettext("quality-control", "standardized data capture or recording")) %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityValidationQUuid]|reply_path]|reply_str_value == uuids.mdQualityValidationYesAUuid %}
-    {% do qualityMethods.append("data entry validation") %}
+    {% do qualityMethods.append(pgettext("quality-control", "data entry validation")) %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityPeerReviewQUuid]|reply_path]|reply_str_value == uuids.mdQualityPeerReviewYesAUuid %}
-    {% do qualityMethods.append("data peer review") %}
+    {% do qualityMethods.append(pgettext("quality-control", "data peer review")) %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityVocabulariesQUuid]|reply_path]|reply_str_value == uuids.mdQualityVocabulariesYesAUuid %}
-    {% do qualityMethods.append("use of controlled vocabularies") %}
+    {% do qualityMethods.append(pgettext("quality-control", "use of controlled vocabularies")) %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityConsistencyQUuid]|reply_path]|reply_str_value == uuids.mdQualityConsistencyYesAUuid %}
-    {% do qualityMethods.append("measurement of samples with known outcomes to monitor consistency") %}
+    {% do qualityMethods.append(pgettext("quality-control", "measurement of samples with known outcomes to monitor consistency")) %}
   {% endif %}
   {% set otherPath = [mdqPrefix, uuids.mdQualityOtherQUuid]|reply_path %}
   {% set otherAnswer = repliesMap[otherPath]|reply_str_value %}
   {% set otherText = repliesMap[[otherPath, uuids.mdQualityOtherYesAUuid, uuids.mdQualityOtherWhatQUuid]|reply_path]|reply_str_value if otherAnswer == uuids.mdQualityOtherYesAUuid else '' %}
-{% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText|trim %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}Quality control measures planned for <strong>{{ qualityName }}</strong>: <span data-fact-id="quality-methods" data-status="complete">{{ qualityMethods|join(", ") }}</span> and other quality control methods.{% else %}Other quality control methods are planned for <strong>{{ qualityName }}</strong>.{% endif %}</p>{% else %}  {% if qualityMethods %}
+{% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText|trim %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}Quality control measures planned for <strong>{{ qualityName }}</strong>: <span data-fact-id="quality-methods" data-status="complete">{{ qualityMethods|join(", ") }}</span> and other quality control methods.{% else %}{{ pgettext("quality-control", "Other quality control methods are planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}{% endif %}</p>{% else %}  {% if qualityMethods %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">Quality control measures for <strong>{{ qualityName }}</strong>: {{ qualityMethods|join(", ") }}.</p>
   {% elif not otherText|trim %}
     {% if output_profile|default('review') == 'submission' %}
-    <p class="quality-summary" data-fact-id="quality-methods" data-status="partial">Quality control is planned for <strong>{{ qualityName }}</strong>.</p>
+    <p class="quality-summary" data-fact-id="quality-methods" data-status="partial">{{ pgettext("quality-control", "Quality control is planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>
     {% else %}
-    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-methods" data-status="missing">Quality control is planned for <strong>{{ qualityName }}</strong>, but the methods have not been specified.</p>{% endif %}
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-methods" data-status="missing">{{ pgettext("quality-control", "Quality control is planned for <strong>%(qualityName)s</strong>, but the methods have not been specified.", qualityName=qualityName) }}</p>{% endif %}
     {% endif %}
   {% endif %}
   {% if otherText|trim %}
-    <div class="answer-lead"><p>Additional quality control details for <strong>{{ qualityName }}</strong>:</p></div>
+    <div class="answer-lead"><p>{{ pgettext("quality-control", "Additional quality control details for <strong>%(qualityName)s</strong>:", qualityName=qualityName) }}</p></div>
     {# Let long authored paragraphs split; do not bind the first two paragraphs. #}
     <div class="answer-detail" data-fact-id="quality-other" data-status="complete"><div>{{ answerMarkdown.markdown(otherText) }}</div></div>
   {% elif otherAnswer == uuids.mdQualityOtherYesAUuid %}
-    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">Other quality control methods were selected for <strong>{{ qualityName }}</strong>, but the details have not been provided.</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">Other quality control methods are planned for <strong>{{ qualityName }}</strong>.</p>{% endif %}
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">{{ pgettext("quality-control", "Other quality control methods were selected for <strong>%(qualityName)s</strong>, but the details have not been provided.", qualityName=qualityName) }}</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{{ pgettext("quality-control", "Other quality control methods are planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>{% endif %}
   {% endif %}{% endif %}
 {% else %}
-  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-control" data-status="missing">It has not been specified whether quality control processes will be used for <strong>{{ qualityName }}</strong>.</p>{% elif not qualityNameAlreadyRendered|default(false) %}<p class="quality-context"><strong>{{ qualityName }}</strong></p>{% endif %}
+  {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-control" data-status="missing">{{ pgettext("quality-control", "It has not been specified whether quality control processes will be used for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>{% elif not qualityNameAlreadyRendered|default(false) %}<p class="quality-context"><strong>{{ qualityName }}</strong></p>{% endif %}
 {% endif %}

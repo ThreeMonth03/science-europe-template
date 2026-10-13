@@ -1,12 +1,12 @@
-<h2>History of changes</h2>
+<h2>{{ pgettext("word/versions", "History of changes") }}</h2>
 
 {% if dc.project.versions|length > 0 %}
 <table class="version-history">
   <thead>
     <tr>
-      <th>Version</th>
-      <th>Publication date</th>
-      <th>Changes</th>
+      <th>{{ pgettext("word/versions", "Version") }}</th>
+      <th>{{ pgettext("word/versions", "Publication date") }}</th>
+      <th>{{ pgettext("word/versions", "Changes") }}</th>
     </tr>
   </thead>
   <tbody>
@@ -20,5 +20,5 @@
   </tbody>
 </table>
 {% else %}
-<p><em>There are no named versions.</em></p>
+{{ pgettext("word/versions", "<p><em>There are no named versions.</em></p>") }}
 {% endif %}

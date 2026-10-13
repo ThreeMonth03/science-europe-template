@@ -26,10 +26,16 @@ def validate(po_path):
     po = polib.pofile(str(po_path))
     assert po.metadata['Language'] == 'zh-Hant'
     live = [entry for entry in po if not entry.obsolete]
-    ids = [entry.msgid for entry in live]
-    assert len(ids) == len(set(ids)), 'Duplicate active message IDs'
-    marked = {m.id for m in extracted.catalog if m.id}
-    assert marked == set(ids), {'missing': sorted(marked - set(ids)), 'obsolete': sorted(set(ids) - marked)}
+    # Stock DSW 4.35 passes Babel's pgettext keyword mapping ((1, 'c'), 2)
+    # through to Catalog.add(context=...). Match the PO context as well as its
+    # English message; identical English in different contexts is intentional.
+    # None is the original gettext namespace, not an empty-string context.
+    keys = [(entry.msgctxt, entry.msgid) for entry in live]
+    assert len(keys) == len(set(keys)), 'Duplicate active (msgctxt, msgid) pairs'
+    marked = {(message.context, message.id) for message in extracted.catalog if message.id}
+    describe = lambda pairs: [dict(msgctxt=context, msgid=msgid) for context, msgid in
+                             sorted(pairs, key=lambda pair: (pair[0] is not None, pair[0] or '', pair[1]))]
+    assert marked == set(keys), {'missing': describe(marked - set(keys)), 'obsolete': describe(set(keys) - marked)}
     for entry in live:
         assert entry.msgstr.strip() and 'fuzzy' not in entry.flags, entry.msgid
         token = r'%\(([^)]+)\)([-+#0 ]*\d*(?:\.\d+)?[diouxXeEfFgGcrsa])'
@@ -43,8 +49,10 @@ def validate(po_path):
             bindings = {name: ('example' if conversion[-1] in 'sra' else 'A' if conversion[-1] == 'c' else 7)
                         for name, conversion in parameters(value)}
             value % bindings
-        assert not Message(entry.msgid, entry.msgstr, flags=['python-format']).check(), entry.msgid
-    return {'passed': True, 'marked_messages': len(ids), 'parsed_template_files': len(files),
+        assert not Message(entry.msgid, entry.msgstr, flags=['python-format'], context=entry.msgctxt).check(), entry.msgid
+    return {'passed': True, 'marked_messages': len(keys), 'parsed_template_files': len(files),
+            'contexted_messages': sum(context is not None for context, _ in keys),
+            'uncontexted_messages': sum(context is None for context, _ in keys),
             'dsw_templating': importlib.metadata.version('dsw-templating'),
             'coverage': 'All marked messages only; not a complete Chinese locale.'}
 

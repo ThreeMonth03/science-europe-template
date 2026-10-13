@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-docs-metadata" class="question">
-  <h3>3. What metadata and documentation (for example the methodology of data collection and way of organising data) will accompany the data?</h3>
+  <h3>{{ pgettext("questions/03-docs-metadata", "3. What metadata and documentation (for example the methodology of data collection and way of organising data) will accompany the data?") }}</h3>
 
   <div class="answer">
   {% set answerContent %}
@@ -40,7 +40,7 @@
           {%- do metadataStandards.append("DataCite") -%}
         {%- endif -%}
         {%- if metadataStandardsDDIAUuid == uuids.metadataStandardsDDIYesAUuid -%}
-          {%- do metadataStandards.append("DDI (Data Documentation Initiative)") -%}
+          {%- do metadataStandards.append(pgettext("questions/03-docs-metadata", "DDI (Data Documentation Initiative)")) -%}
         {%- endif -%}
         {%- if metadataStandards|length == 1 -%}
           {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ " metadata standard.") -%}
@@ -50,14 +50,14 @@
           {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ ", " ~ metadataStandards[1] ~ ", and " ~ metadataStandards[2] ~ " metadata standards.") -%}
         {%- endif -%}
         {%- if metadataStandardsKeywordsAUuid == uuids.metadataStandardsKeywordsYesAUuid -%}
-          {%- do metadataSentences.append("We will include keywords or relevant ontology references to optimize the possibility for discovery and potential reuse.") -%}
+          {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will include keywords or relevant ontology references to optimize the possibility for discovery and potential reuse.")) -%}
         {%- endif -%}
       {%- endif -%}
 
       {%- set provenanceW3CPath = [metadataPath, uuids.metadataExploreAUuid, uuids.provenanceW3CQUuid]|reply_path -%}
       {%- set provenanceW3CAUuid = repliesMap[provenanceW3CPath]|reply_str_value -%}
       {%- if provenanceW3CAUuid == uuids.provenanceW3CYesAUuid -%}
-          {%- do metadataSentences.append("The provenance will be captured using W3C PROV.") -%}
+          {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "The provenance will be captured using W3C PROV.")) -%}
       {%- endif -%}
 
       {%- if metadataSentences|length > 0 -%}
@@ -66,15 +66,15 @@
       {# This answer is independent of standards and metadata publication. #}
       {%- set dictionary = repliesMap[[metadataPath, uuids.metadataExploreAUuid, uuids.metadataDictionaryQUuid]|reply_path]|reply_str_value -%}
       {%- if dictionary == uuids.metadataDictionaryYesAUuid -%}
-        <p data-fact-id="metadata-dictionary" data-status="complete">We will create a data/variable dictionary.</p>
+        <p data-fact-id="metadata-dictionary" data-status="complete">{{ pgettext("questions/03-docs-metadata", "We will create a data/variable dictionary.") }}</p>
       {%- elif dictionary == uuids.metadataDictionaryNoAUuid -%}
-        <p data-fact-id="metadata-dictionary" data-status="explicit-no">We will not create a data/variable dictionary.</p>
+        <p data-fact-id="metadata-dictionary" data-status="explicit-no">{{ pgettext("questions/03-docs-metadata", "We will not create a data/variable dictionary.") }}</p>
       {%- elif output_profile|default('review') != 'submission' -%}
         <div class="reading-gap">
           {%- if dictionary|trim -%}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-dictionary" data-status="needs-review">The selected data-dictionary option cannot be represented by this template; please review it.</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-dictionary" data-status="needs-review">{{ pgettext("questions/03-docs-metadata", "The selected data-dictionary option cannot be represented by this template; please review it.") }}</p>{% endif %}
           {%- else -%}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-dictionary" data-status="missing">Information not provided: whether a data/variable dictionary will be created.</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-dictionary" data-status="missing">{{ pgettext("questions/03-docs-metadata", "Information not provided: whether a data/variable dictionary will be created.") }}</p>{% endif %}
           {%- endif -%}
         </div>
       {%- endif -%}
@@ -85,29 +85,29 @@
     {%- set metadataOpenAUuid = repliesMap[metadataOpenPath]|reply_str_value -%}
     {%- if metadataOpenAUuid == uuids.metadataOpenNoAUuid %}
       {%- set explanation = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenNoExplainQUuid]|reply_path]|reply_str_value -%}
-      <p>Metadata will not be available openly.</p>
+      <p>{{ pgettext("questions/03-docs-metadata", "Metadata will not be available openly.") }}</p>
       {%- if explanation|trim -%}
                 <div class="answer-detail" data-fact-id="metadata-access-explanation">{{ answerMarkdown.markdown(explanation) }}</div>
       {%- elif output_profile|default('review') != 'submission' -%}
-        <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-explanation" data-status="missing">Information not provided: why the metadata will not be openly available.</p>{% endif %}</div>
+        <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-explanation" data-status="missing">{{ pgettext("questions/03-docs-metadata", "Information not provided: why the metadata will not be openly available.") }}</p>{% endif %}</div>
       {%- endif -%}
     {%- elif metadataOpenAUuid == uuids.metadataOpenYesAUuid -%}
       {%- set metadataOpenInstrAUuid = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenInstrQUuid]|reply_path]|reply_str_value -%}
       {%- set metadataOpenFormAUuid = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenFormQUuid]|reply_path]|reply_str_value -%}
       <p>
       {%- if metadataOpenInstrAUuid == uuids.metadataOpenInstrYesAUuid %}
-        Metadata will be openly available, including instructions on how to access the data.
+        {{ pgettext("questions/03-docs-metadata", "Metadata will be openly available, including instructions on how to access the data.") }}
       {%- elif metadataOpenInstrAUuid == uuids.metadataOpenInstrNoAUuid %}
-        Metadata will be openly available without instructions on how to access the data.
+        {{ pgettext("questions/03-docs-metadata", "Metadata will be openly available without instructions on how to access the data.") }}
       {%- else %}
-        Metadata will be openly available.
+        {{ pgettext("questions/03-docs-metadata", "Metadata will be openly available.") }}
       {%- endif %}
       {%- if metadataOpenFormAUuid == uuids.metadataOpenFormNoAUuid %}
-        It will not be provided in a form that can be harvested and indexed.
+        {{ pgettext("questions/03-docs-metadata", "It will not be provided in a form that can be harvested and indexed.") }}
       {%- elif metadataOpenFormAUuid == uuids.metadataOpenFormYesRepoAUuid %}
-        The selected repository or repositories will provide it in a form that can be harvested and indexed.
+        {{ pgettext("questions/03-docs-metadata", "The selected repository or repositories will provide it in a form that can be harvested and indexed.") }}
       {%- elif metadataOpenFormAUuid == uuids.metadataOpenFormYesCareAUuid %}
-        It will also be provided in a form that can be harvested and indexed.
+        {{ pgettext("questions/03-docs-metadata", "It will also be provided in a form that can be harvested and indexed.") }}
       {%- endif %}
       </p>
       {%- set instructionKnown = metadataOpenInstrAUuid in [uuids.metadataOpenInstrYesAUuid, uuids.metadataOpenInstrNoAUuid] -%}
@@ -117,20 +117,20 @@
         {%- if not metadataOpenInstrAUuid|trim and not metadataOpenFormAUuid|trim -%}
           {%- set metadataInstructionsGap -%}<span data-fact-id="metadata-access-instructions" data-status="missing">whether the metadata will include instructions for accessing the data</span>{%- endset -%}
           {%- set metadataHarvestGap -%}<span data-fact-id="metadata-harvestable" data-status="missing">whether the metadata will be available in a form that can be harvested and indexed</span>{%- endset -%}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap metadata-publication-gap">Information not provided: {{ metadataInstructionsGap }}; {{ metadataHarvestGap }}.</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap metadata-publication-gap">{{ pgettext("questions/03-docs-metadata", "Information not provided: %(metadataInstructionsGap)s; %(metadataHarvestGap)s.", metadataInstructionsGap=metadataInstructionsGap, metadataHarvestGap=metadataHarvestGap) }}</p>{% endif %}
         {%- else -%}
         {%- if not instructionKnown -%}
           {%- if metadataOpenInstrAUuid|trim -%}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-instructions" data-status="needs-review">The selected metadata access-instructions option cannot be represented by this template; please review it.</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-instructions" data-status="needs-review">{{ pgettext("questions/03-docs-metadata", "The selected metadata access-instructions option cannot be represented by this template; please review it.") }}</p>{% endif %}
           {%- else -%}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-instructions" data-status="missing">Information not provided: whether the metadata will include instructions for accessing the data.</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-instructions" data-status="missing">{{ pgettext("questions/03-docs-metadata", "Information not provided: whether the metadata will include instructions for accessing the data.") }}</p>{% endif %}
           {%- endif -%}
         {%- endif -%}
         {%- if not formKnown -%}
           {%- if metadataOpenFormAUuid|trim -%}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-harvestable" data-status="needs-review">The selected metadata harvesting and indexing option cannot be represented by this template; please review it.</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-harvestable" data-status="needs-review">{{ pgettext("questions/03-docs-metadata", "The selected metadata harvesting and indexing option cannot be represented by this template; please review it.") }}</p>{% endif %}
           {%- else -%}
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-harvestable" data-status="missing">Information not provided: whether the metadata will be available in a form that can be harvested and indexed.</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-harvestable" data-status="missing">{{ pgettext("questions/03-docs-metadata", "Information not provided: whether the metadata will be available in a form that can be harvested and indexed.") }}</p>{% endif %}
           {%- endif -%}
         {%- endif -%}
         {%- endif -%}
@@ -158,20 +158,20 @@
       <div class="dataset-policy storage-conventions-policy">
       {# Storage space #}
       {%- if storageSpaceAUuid == uuids.storageSpaceLittleAUuid -%}
-        <p>The project will require so little storage space for all data and software (including temporary storage) that it is not a problem.</p>
+        <p>{{ pgettext("questions/03-docs-metadata", "The project will require so little storage space for all data and software (including temporary storage) that it is not a problem.") }}</p>
       {%- elif storageSpaceAUuid == uuids.storageSpaceSpecifyAUuid -%}
         {%- set size = repliesMap[[storageSpacePath, storageSpaceAUuid, uuids.storageSpaceSpecifyQUuid]|reply_path]|reply_str_value -%}
         {%- if size|trim -%}
-        <p>We estimate the storage space that the project will require for all data and software (including temporary storage) to be {{ size|e }} gigabytes.</p>
+        <p>{{ pgettext("questions/03-docs-metadata", "We estimate the storage space that the project will require for all data and software (including temporary storage) to be %(size)s gigabytes.", size=size|e) }}</p>
         {%- elif output_profile|default('review') != 'submission' -%}
         <div class="reading-gap">
-          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="storage-capacity" data-status="missing">Information not provided: the estimated storage space for all project data and software, including temporary storage (GB).</p>{% endif %}
+          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="storage-capacity" data-status="missing">{{ pgettext("questions/03-docs-metadata", "Information not provided: the estimated storage space for all project data and software, including temporary storage (GB).") }}</p>{% endif %}
         </div>
         {%- endif -%}
       {%- endif -%}
       {# File System #}
       {%- if storageConvFSysAUuid == uuids.storageConvFSysNoAUuid -%}
-        <p>We will not use a filesystem with files and folders.</p>
+        <p>{{ pgettext("questions/03-docs-metadata", "We will not use a filesystem with files and folders.") }}</p>
       {%- elif storageConvFSysAUuid == uuids.storageConvFSysYesAUuid -%}
         {%- set scFSysPrefix = [storageConvFSysPath, uuids.storageConvFSysYesAUuid]|reply_path -%}
         {# Folder types #}
@@ -186,38 +186,38 @@
         {%- set workflowStepFolders = scFSysWorkflowStepFoldersAUuid == uuids.scFSysWorkflowStepFoldersYesAUuid -%}
         {%- set folders = [subjectFolders, analysisFolders, workflowStepFolders] -%}
         {%- if folders|any -%}
-          <p>We will use a filesystem with files and folders with the following folder conventions:</p>
+          <p>{{ pgettext("questions/03-docs-metadata", "We will use a filesystem with files and folders with the following folder conventions:") }}</p>
           <ul>
             {%- if subjectFolders -%}
               {%- set scFSysSubjFoldersConvs = repliesMap[[scFSysSubjFoldersPath, uuids.scFSysSubjFoldersYesAUuid, uuids.scFSysSubjFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
-                <div{% if scFSysSubjFoldersConvs|trim %} class="answer-lead"{% endif %}><p style="margin:0">There will be a <strong>folder for each sample/subject</strong>.</p></div>
+                <div{% if scFSysSubjFoldersConvs|trim %} class="answer-lead"{% endif %}>{{ pgettext("questions/03-docs-metadata", "<p style=\"margin:0\">There will be a <strong>folder for each sample/subject</strong>.</p>") }}</div>
                 {% if scFSysSubjFoldersConvs|trim %}
-                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ answerMarkdown.markdown(scFSysSubjFoldersConvs) }}</div>
+                  <div class="answer-detail"><div class="answer-lead">{{ pgettext("questions/03-docs-metadata", "<p>Each of those will use the following conventions:</p>") }}</div>{{ answerMarkdown.markdown(scFSysSubjFoldersConvs) }}</div>
                 {%- endif -%}
               </li>
             {%- endif -%}
             {%- if analysisFolders -%}
               {%- set scFSysAnalysisFoldersConvs = repliesMap[[scFSysAnalysisFoldersPath, uuids.scFSysAnalysisFoldersYesAUuid, uuids.scFSysAnalysisFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
-                <div{% if scFSysAnalysisFoldersConvs|trim %} class="answer-lead"{% endif %}><p style="margin:0">There will be  a <strong>(sub)folder for each (repeated) analysis</strong>. </p></div>
+                <div{% if scFSysAnalysisFoldersConvs|trim %} class="answer-lead"{% endif %}>{{ pgettext("questions/03-docs-metadata", "<p style=\"margin:0\">There will be  a <strong>(sub)folder for each (repeated) analysis</strong>. </p>") }}</div>
                 {% if scFSysAnalysisFoldersConvs|trim %}
-                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ answerMarkdown.markdown(scFSysAnalysisFoldersConvs) }}</div>
+                  <div class="answer-detail"><div class="answer-lead">{{ pgettext("questions/03-docs-metadata", "<p>Each of those will use the following conventions:</p>") }}</div>{{ answerMarkdown.markdown(scFSysAnalysisFoldersConvs) }}</div>
                 {%- endif -%}
               </li>
             {%- endif -%}
             {%- if workflowStepFolders -%}
               {%- set scFSysWorkflowStepFoldersConvs = repliesMap[[scFSysWorkflowStepFoldersPath, uuids.scFSysWorkflowStepFoldersYesAUuid, uuids.scFSysWorkflowStepFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
-                <div{% if scFSysWorkflowStepFoldersConvs|trim %} class="answer-lead"{% endif %}><p style="margin:0">There will be a <strong>(sub)folder for each step in the analysis workflow</strong>.</p></div>
+                <div{% if scFSysWorkflowStepFoldersConvs|trim %} class="answer-lead"{% endif %}>{{ pgettext("questions/03-docs-metadata", "<p style=\"margin:0\">There will be a <strong>(sub)folder for each step in the analysis workflow</strong>.</p>") }}</div>
                 {% if scFSysWorkflowStepFoldersConvs|trim %}
-                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ answerMarkdown.markdown(scFSysWorkflowStepFoldersConvs) }}</div>
+                  <div class="answer-detail"><div class="answer-lead">{{ pgettext("questions/03-docs-metadata", "<p>Each of those will use the following conventions:</p>") }}</div>{{ answerMarkdown.markdown(scFSysWorkflowStepFoldersConvs) }}</div>
                 {%- endif -%}
               </li>
             {%- endif -%}
           </ul>
         {%- else -%}
-          <p>We will use a filesystem with files and folders.</p>
+          <p>{{ pgettext("questions/03-docs-metadata", "We will use a filesystem with files and folders.") }}</p>
         {%- endif -%}
         {# Versioning #}
         {%- set scDocumentVersioningParts = [uuids.processingCUuid, uuids.storageConvQUuid, uuids.storageConvExploreAUuid, uuids.storageConvFSysQUuid, uuids.storageConvFSysYesAUuid, uuids.scDocumentVersioningQUuid] -%}
@@ -227,49 +227,49 @@
           {%- set scDocumentVersioningAUuid = '' -%}
         {%- endif -%}
         {%- if scDocumentVersioningAUuid == uuids.scDocumentVersioningYesAUuid %}
-          <p>We document how we manage file versioning for files and folders.</p>
+          <p>{{ pgettext("questions/03-docs-metadata", "We document how we manage file versioning for files and folders.") }}</p>
         {%- elif scDocumentVersioningAUuid == uuids.scDocumentVersioningNoAUuid %}
-          <p>We have not documented how we manage file versioning for files and folders.</p>
+          <p>{{ pgettext("questions/03-docs-metadata", "We have not documented how we manage file versioning for files and folders.") }}</p>
         {%- endif -%}
         {# Other appointments #}
         {%- set scFSysAppointmentsPath = [scFSysPrefix, uuids.scFSysAppointmentsQUuid]|reply_path -%}
         {%- set scFSysAppointments = repliesMap[scFSysAppointmentsPath]|reply_str_value -%}
         {%- if scFSysAppointments|trim %}
-          <div class="answer-detail" data-fact-id="file-naming"><div class="answer-lead"><p>File naming conventions:</p></div>{{ answerMarkdown.markdown(scFSysAppointments) }}</div>
+          <div class="answer-detail" data-fact-id="file-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "File naming conventions:") }}</p></div>{{ answerMarkdown.markdown(scFSysAppointments) }}</div>
         {%- endif -%}
       {%- endif -%}
       {# Object and Document Store #}
       {%- if storageConvObjStoreAUuid == uuids.storageConvObjStoreNoAUuid -%}
-        <p>We will not be storing data in an "object/document store" system.</p>
+        <p>{{ pgettext("questions/03-docs-metadata", "We will not be storing data in an \"object/document store\" system.") }}</p>
       {%- elif storageConvObjStoreAUuid == uuids.storageConvObjStoreYesAUuid -%}
         {%- set scObjStoreNamingQUuid = [storageConvObjStorePath, uuids.storageConvObjStoreYesAUuid, uuids.scObjStoreNamingQUuid]|reply_path -%}
         {%- set scObjStoreNaming = repliesMap[scObjStoreNamingQUuid]|reply_str_value -%}
-        <p>We will be storing data in an "object/document store" system.</p>
+        <p>{{ pgettext("questions/03-docs-metadata", "We will be storing data in an \"object/document store\" system.") }}</p>
         {%- if scObjStoreNaming|trim -%}
-          <div class="answer-detail" data-fact-id="object-naming"><div class="answer-lead"><p>Object naming conventions:</p></div>{{ answerMarkdown.markdown(scObjStoreNaming) }}</div>
+          <div class="answer-detail" data-fact-id="object-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "Object naming conventions:") }}</p></div>{{ answerMarkdown.markdown(scObjStoreNaming) }}</div>
         {%- endif -%}
       {%- endif -%}
       {# Databases #}
       {%- if storageConvRelDbAUuid == uuids.storageConvRelDbNoAUuid -%}
-        <p>We will not use a database system to store project data.</p>
+        <p>{{ pgettext("questions/03-docs-metadata", "We will not use a database system to store project data.") }}</p>
       {%- elif storageConvRelDbAUuid == uuids.storageConvRelDbYesAUuid -%}
         <p>
-        We will use a database system to store project data.
+        {{ pgettext("questions/03-docs-metadata", "We will use a database system to store project data.") }}
         {%- set scRelDbHandleChangesPath = [storageConvRelDbPath, uuids.storageConvRelDbYesAUuid, uuids.scRelDbHandleChangesQUuid]|reply_path -%}
         {%- set scRelDbHandleChangesAUuid = repliesMap[scRelDbHandleChangesPath]|reply_str_value -%}
         {%- if scRelDbHandleChangesAUuid == uuids.scRelDbReadOnlyAnswerUuid %}
-          Data in the database will be read-only.
+          {{ pgettext("questions/03-docs-metadata", "Data in the database will be read-only.") }}
         {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbCrudAnswerUuid %}
-          We will be allowing Create, Update and Delete operations for data in the database.
+          {{ pgettext("questions/03-docs-metadata", "We will be allowing Create, Update and Delete operations for data in the database.") }}
         {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbExpireAnswerUuid %}
-          Modifications will be made by <em>Expiring</em> the existing data and <em>Adding</em> updated data.
+          {{ pgettext("questions/03-docs-metadata", "Modifications will be made by <em>Expiring</em> the existing data and <em>Adding</em> updated data.") }}
         {%- endif -%}
         </p>
       {%- endif -%}
       </div>
       {% endset %}
       {% if output_profile|default('review') != 'submission' or storageContent|striptags|trim or '<img' in storageContent or '<table' in storageContent %}
-      <h4>Data storage and file conventions</h4>
+      <h4>{{ pgettext("questions/03-docs-metadata", "Data storage and file conventions") }}</h4>
       {{ storageContent }}
       {% endif %}
     {%- endif -%}
@@ -279,7 +279,7 @@
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
   {% elif output_profile|default('review') != 'submission' %}
-    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-2a" data-status="missing-output">This document does not yet contain an answer about metadata and documentation.</p>{% endif %}
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-2a" data-status="missing-output">{{ pgettext("questions/03-docs-metadata", "This document does not yet contain an answer about metadata and documentation.") }}</p>{% endif %}
   {% endif %}
   </div>
 </div>

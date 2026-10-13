@@ -4,22 +4,22 @@
 {% set archive = repliesMap[archivePath]|reply_str_value %}
 {% if archive in [uuids.archivedAfterYesAUuid, uuids.archivedAfterNoAUuid] %}
 <div class="post-project-archive" data-scope="project">
-<h4>Project-wide cold storage after the project</h4>
+<h4>{{ pgettext("post-project-archive", "Project-wide cold storage after the project") }}</h4>
 <div class="dataset-policy">
 {% if archive == uuids.archivedAfterNoAUuid %}
-  <p data-fact-id="post-project-archive" data-status="explicit-no">The project will not use cold storage after it finishes. This answer does not rule out other forms of preservation.</p>
+  <p data-fact-id="post-project-archive" data-status="explicit-no">{{ pgettext("post-project-archive", "The project will not use cold storage after it finishes. This answer does not rule out other forms of preservation.") }}</p>
 {% else %}
-  <p data-fact-id="post-project-archive" data-status="complete">The project will keep copies of its data in cold storage after it finishes.</p>
+  <p data-fact-id="post-project-archive" data-status="complete">{{ pgettext("post-project-archive", "The project will keep copies of its data in cold storage after it finishes.") }}</p>
   {% set archivePrefix = [archivePath, uuids.archivedAfterYesAUuid]|reply_path %}
   {% set payer = repliesMap[[archivePrefix, uuids.archivedAfterPayerQUuid]|reply_path]|reply_str_value %}
   {% if payer == uuids.archivedAfterPayerGrantAUuid %}
-    <p data-fact-id="archive-payer" data-status="complete">The grant will pay for this long-term storage.</p>
+    <p data-fact-id="archive-payer" data-status="complete">{{ pgettext("post-project-archive", "The grant will pay for this long-term storage.") }}</p>
   {% elif payer == uuids.archivedAfterPayerDepartmentAUuid %}
-    <p data-fact-id="archive-payer" data-status="complete">Departmental budgets of one or more project participants will pay for this long-term storage.</p>
+    <p data-fact-id="archive-payer" data-status="complete">{{ pgettext("post-project-archive", "Departmental budgets of one or more project participants will pay for this long-term storage.") }}</p>
   {% elif payer == uuids.archivedAfterPayerInstituteAUuid %}
-    <p data-fact-id="archive-payer" data-status="complete">One or more participating institutes have budgeted for this long-term storage service.</p>
+    <p data-fact-id="archive-payer" data-status="complete">{{ pgettext("post-project-archive", "One or more participating institutes have budgeted for this long-term storage service.") }}</p>
   {% else %}
-    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-payer" data-status="missing">The payer for post-project cold storage has not been specified.</p>{% endif %}</div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-payer" data-status="missing">{{ pgettext("post-project-archive", "The payer for post-project cold storage has not been specified.") }}</p>{% endif %}</div>
   {% endif %}
   {% set periodPath = [archivePrefix, uuids.archivedAfterPeriodQUuid]|reply_path %}
   {% set period = repliesMap[periodPath]|reply_str_value %}
@@ -31,42 +31,42 @@
     {% set years = repliesMap[[periodPath, uuids.archivedAfterPeriodYearsAUuid, uuids.archivedAfterYearsQUuid]|reply_path]|reply_str_value %}
   {% endif %}
   {% if years|trim %}
-    {% set archiveDuration %}{{ macros.quantity(years, 'years') }}{% endset %}
-    <p data-fact-id="archive-minimum-period" data-status="complete">The archive will be kept for at least {{ archiveDuration }}.</p>
+    {% set archiveDuration %}{{ macros.quantity(years, pgettext("post-project-archive", "years")) }}{% endset %}
+    <p data-fact-id="archive-minimum-period" data-status="complete">{{ pgettext("post-project-archive", "The archive will be kept for at least %(archiveDuration)s.", archiveDuration=archiveDuration) }}</p>
   {% elif period == uuids.archivedAfterPeriodOtherAUuid %}
     {% set arrangement = repliesMap[[periodPath, uuids.archivedAfterPeriodOtherAUuid, uuids.archivedAfterPeriodOtherQUuid]|reply_path]|reply_str_value %}
     {% if arrangement|trim or output_profile|default('review') != 'submission' %}
-      <div class="answer-lead"><p>Other arrangements for the archive's minimum lifetime:</p></div>
+      <div class="answer-lead"><p>{{ pgettext("post-project-archive", "Other arrangements for the archive's minimum lifetime:") }}</p></div>
     {% endif %}
     {% if arrangement|trim %}
       <div class="answer-detail" data-fact-id="archive-minimum-period" data-status="complete">{{ answerMarkdown.markdown(arrangement) }}</div>
     {% else %}
-      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The other arrangements for the archive's minimum lifetime have not been described.</p>{% endif %}</div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">{{ pgettext("post-project-archive", "The other arrangements for the archive's minimum lifetime have not been described.") }}</p>{% endif %}</div>
     {% endif %}
   {% else %}
-    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">The archive's minimum lifetime has not been provided.</p>{% endif %}</div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-minimum-period" data-status="missing">{{ pgettext("post-project-archive", "The archive's minimum lifetime has not been provided.") }}</p>{% endif %}</div>
   {% endif %}
   {% set extensionPath = [archivePrefix, uuids.archivedAfterExtendQUuid]|reply_path %}
   {% set extension = repliesMap[extensionPath]|reply_str_value %}
   {% if extension == uuids.archivedAfterExtendNoAUuid %}
-    <p data-fact-id="archive-extension" data-status="explicit-no">The archival period cannot be extended.</p>
+    <p data-fact-id="archive-extension" data-status="explicit-no">{{ pgettext("post-project-archive", "The archival period cannot be extended.") }}</p>
     {% set limit = repliesMap[[extensionPath, uuids.archivedAfterExtendNoAUuid, uuids.archivedAfterExtendNoReasonQUuid]|reply_path]|reply_str_value %}
     {% if limit == uuids.archivedAfterExtendNoLegalAUuid %}
-      <p data-fact-id="archive-extension-limit" data-status="complete">The archival period is limited by law or contract.</p>
+      <p data-fact-id="archive-extension-limit" data-status="complete">{{ pgettext("post-project-archive", "The archival period is limited by law or contract.") }}</p>
     {% elif limit == uuids.archivedAfterExtendNoBudgetAUuid %}
-      <p data-fact-id="archive-extension-limit" data-status="complete">The archival period is limited by the budget.</p>
+      <p data-fact-id="archive-extension-limit" data-status="complete">{{ pgettext("post-project-archive", "The archival period is limited by the budget.") }}</p>
     {% else %}
-      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-limit" data-status="missing">The reason the archival period cannot be extended has not been specified.</p>{% endif %}</div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-limit" data-status="missing">{{ pgettext("post-project-archive", "The reason the archival period cannot be extended has not been specified.") }}</p>{% endif %}</div>
     {% endif %}
   {% elif extension == uuids.archivedAfterExtendYesAUuid %}
-    <p data-fact-id="archive-extension" data-status="complete">The archival period can be extended.</p>
+    <p data-fact-id="archive-extension" data-status="complete">{{ pgettext("post-project-archive", "The archival period can be extended.") }}</p>
     {% set authority = repliesMap[[extensionPath, uuids.archivedAfterExtendYesAUuid, uuids.archivedAfterExtendWhoQUuid]|reply_path]|reply_str_value %}
     {% if authority == uuids.archivedAfterExtendWhoPiAUuid %}
-      <p data-fact-id="archive-extension-authority" data-status="complete">A principal investigator involved in the project will decide on an extension.</p>
+      <p data-fact-id="archive-extension-authority" data-status="complete">{{ pgettext("post-project-archive", "A principal investigator involved in the project will decide on an extension.") }}</p>
     {% elif authority == uuids.archivedAfterExtendWhoArchiveAUuid %}
-      <p data-fact-id="archive-extension-authority" data-status="complete">Library or archive staff will decide on an extension.</p>
+      <p data-fact-id="archive-extension-authority" data-status="complete">{{ pgettext("post-project-archive", "Library or archive staff will decide on an extension.") }}</p>
     {% else %}
-      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-authority" data-status="missing">The person or team responsible for deciding on an extension has not been specified.</p>{% endif %}</div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-authority" data-status="missing">{{ pgettext("post-project-archive", "The person or team responsible for deciding on an extension has not been specified.") }}</p>{% endif %}</div>
     {% endif %}
     {% set basis = repliesMap[[extensionPath, uuids.archivedAfterExtendYesAUuid, uuids.archivedAfterExtendBasisQUuid]|reply_path]|reply_items %}
     {# Only the three fixed choices form a sentence; no authored blocks join it.
@@ -74,43 +74,43 @@
     {% set basisItems = [] %}
     {% set basisChoices = [uuids.archivedAfterExtendBasisActualChoiceUuid, uuids.archivedAfterExtendBasisPredictedChoiceUuid, uuids.archivedAfterExtendBasisBudgetChoiceUuid] %}
     {% if uuids.archivedAfterExtendBasisActualChoiceUuid in basis %}
-      {% set basisItem %}<span data-fact-id="archive-extension-actual-use" data-status="complete">actual use of the archived data</span>{% endset %}
+      {% set basisItem %}<span data-fact-id="archive-extension-actual-use" data-status="complete">{{ pgettext("post-project-archive", "actual use of the archived data") }}</span>{% endset %}
       {% do basisItems.append(basisItem) %}
     {% endif %}
     {% if uuids.archivedAfterExtendBasisPredictedChoiceUuid in basis %}
-      {% set basisItem %}<span data-fact-id="archive-extension-predicted-use" data-status="complete">predicted use of the archived data</span>{% endset %}
+      {% set basisItem %}<span data-fact-id="archive-extension-predicted-use" data-status="complete">{{ pgettext("post-project-archive", "predicted use of the archived data") }}</span>{% endset %}
       {% do basisItems.append(basisItem) %}
     {% endif %}
     {% if uuids.archivedAfterExtendBasisBudgetChoiceUuid in basis %}
-      {% set basisItem %}<span data-fact-id="archive-extension-budget" data-status="complete">available budget</span>{% endset %}
+      {% set basisItem %}<span data-fact-id="archive-extension-budget" data-status="complete">{{ pgettext("post-project-archive", "available budget") }}</span>{% endset %}
       {% do basisItems.append(basisItem) %}
     {% endif %}
     {% if basisItems %}
       <div class="archive-extension-basis-summary"><p>Basis for extending the archival period: {{ basisItems|join(", ") }}.</p></div>
     {% endif %}
     {% if not basis %}
-      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-basis" data-status="missing">The basis for deciding on an extension has not been specified.</p>{% endif %}</div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-basis" data-status="missing">{{ pgettext("post-project-archive", "The basis for deciding on an extension has not been specified.") }}</p>{% endif %}</div>
     {% elif basis|reject("in", basisChoices)|list %}
-      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-basis" data-status="needs-review">Some selected reasons for extending the archival period cannot be interpreted by this template. Please review the answer.</p>{% endif %}</div>
+      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-basis" data-status="needs-review">{{ pgettext("post-project-archive", "Some selected reasons for extending the archival period cannot be interpreted by this template. Please review the answer.") }}</p>{% endif %}</div>
     {% endif %}
   {% else %}
-    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension" data-status="missing">It has not been specified whether the archival period can be extended.</p>{% endif %}</div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension" data-status="missing">{{ pgettext("post-project-archive", "It has not been specified whether the archival period can be extended.") }}</p>{% endif %}</div>
   {% endif %}
   {% set formats = repliesMap[[archivePrefix, uuids.archivedAfterFormatsQUuid]|reply_path]|reply_str_value %}
   {% if formats == uuids.archivedAfterFormatsYesAUuid %}
-    <p data-fact-id="archive-format-migration" data-status="complete">Obsolete data formats in cold storage will be upgraded.</p>
+    <p data-fact-id="archive-format-migration" data-status="complete">{{ pgettext("post-project-archive", "Obsolete data formats in cold storage will be upgraded.") }}</p>
   {% elif formats == uuids.archivedAfterFormatsNoAUuid %}
-    <p data-fact-id="archive-format-migration" data-status="explicit-no">Obsolete data formats in cold storage will not be upgraded.</p>
+    <p data-fact-id="archive-format-migration" data-status="explicit-no">{{ pgettext("post-project-archive", "Obsolete data formats in cold storage will not be upgraded.") }}</p>
   {% else %}
-    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-format-migration" data-status="missing">The arrangement for obsolete data formats in cold storage has not been specified.</p>{% endif %}</div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-format-migration" data-status="missing">{{ pgettext("post-project-archive", "The arrangement for obsolete data formats in cold storage has not been specified.") }}</p>{% endif %}</div>
   {% endif %}
   {% set media = repliesMap[[archivePrefix, uuids.archivedAfterMediaQUuid]|reply_path]|reply_str_value %}
   {% if media == uuids.archivedAfterMediaYesAUuid %}
-    <p data-fact-id="archive-media-migration" data-status="complete">Archived data will be migrated regularly to more modern storage media.</p>
+    <p data-fact-id="archive-media-migration" data-status="complete">{{ pgettext("post-project-archive", "Archived data will be migrated regularly to more modern storage media.") }}</p>
   {% elif media == uuids.archivedAfterMediaNoAUuid %}
-    <p data-fact-id="archive-media-migration" data-status="explicit-no">Archived data will not be migrated regularly to more modern storage media.</p>
+    <p data-fact-id="archive-media-migration" data-status="explicit-no">{{ pgettext("post-project-archive", "Archived data will not be migrated regularly to more modern storage media.") }}</p>
   {% else %}
-    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-media-migration" data-status="missing">The arrangement for migration to more modern storage media has not been specified.</p>{% endif %}</div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-media-migration" data-status="missing">{{ pgettext("post-project-archive", "The arrangement for migration to more modern storage media has not been specified.") }}</p>{% endif %}</div>
   {% endif %}
 {% endif %}
 </div>

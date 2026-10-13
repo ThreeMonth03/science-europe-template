@@ -9,7 +9,7 @@
 {% import "src/globals.j2" as globals with context %}
 <html lang="{{ document_language }}">
   <head>
-    <title>Data Management Plan</title>
+    <title>{{ pgettext("index", "Data Management Plan") }}</title>
     <meta charset="utf-8">
     <style>
       {% if document_language == 'zh-Hant' %}{% include 'src/locales/zh-Hant/style.css' %}{% else %}{% include "src/style.css" %}{% endif %}

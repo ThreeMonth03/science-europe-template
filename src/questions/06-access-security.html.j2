@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-access-security" class="question">
-  <h3>6. How will data security and protection of sensitive data be taken care of during the research?</h3>
+  <h3>{{ pgettext("questions/06-access-security", "6. How will data security and protection of sensitive data be taken care of during the research?") }}</h3>
 
   <div class="answer">
   {% set answerContent %}
@@ -70,34 +70,34 @@
           Project members store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
         {%- endif -%}
         {%- if risksCarryHomeAUuid == uuids.risksCarryHomeNoAUuid %}
-          Project members do not carry data with them (e.g. on laptops, USB sticks, or other external media).
+          {{ pgettext("questions/06-access-security", "Project members do not carry data with them (e.g. on laptops, USB sticks, or other external media).") }}
         {%- elif risksCarryHomeAUuid == uuids.risksCarryHomeYesAUuid %}
-          Project members carry data with them (e.g. on laptops, USB sticks, or other external media).
+          {{ pgettext("questions/06-access-security", "Project members carry data with them (e.g. on laptops, USB sticks, or other external media).") }}
         {%- endif -%}
         {%- if homeEncrypted %}
-          All data carriers are encrypted.
+          {{ pgettext("questions/06-access-security", "All data carriers are encrypted.") }}
         {%- elif homeNotEncrypted %}
-          Not all data carriers are encrypted.
+          {{ pgettext("questions/06-access-security", "Not all data carriers are encrypted.") }}
         {%- endif -%}
         {%- if homePassword %}
-          Accounts on laptops are password-protected.
+          {{ pgettext("questions/06-access-security", "Accounts on laptops are password-protected.") }}
         {%- elif homeNotPassword %}
-          Not all laptop accounts are password-protected.
+          {{ pgettext("questions/06-access-security", "Not all laptop accounts are password-protected.") }}
         {%- endif -%}
         {%- if risksCertificationsAUuid == uuids.risksCertificationsYesAUuid %}
-          All data centres that store project data hold appropriate certifications.
+          {{ pgettext("questions/06-access-security", "All data centres that store project data hold appropriate certifications.") }}
         {%- elif risksCertificationsAUuid == uuids.risksCertificationsNoAUuid %}
-          Not all data centres that store project data hold appropriate certifications.
+          {{ pgettext("questions/06-access-security", "Not all data centres that store project data hold appropriate certifications.") }}
         {%- endif -%}
         {%- if risksHttpsAUuid == uuids.risksHttpsYesAUuid %}
-          All project web services are accessible through HTTPS.
+          {{ pgettext("questions/06-access-security", "All project web services are accessible through HTTPS.") }}
         {%- elif risksHttpsAUuid == uuids.risksHttpsNoAUuid %}
-          Not all project web services are accessible through HTTPS.
+          {{ pgettext("questions/06-access-security", "Not all project web services are accessible through HTTPS.") }}
         {%- endif -%}
         {%- if risksInstructedAUuid == uuids.risksInstructedYesAUuid %}
-          Project members have been instructed about both generic and specific risks to the project.
+          {{ pgettext("questions/06-access-security", "Project members have been instructed about both generic and specific risks to the project.") }}
         {%- elif risksInstructedAUuid == uuids.risksInstructedNoAUuid %}
-          Project members have not received instruction covering both generic and project-specific risks.
+          {{ pgettext("questions/06-access-security", "Project members have not received instruction covering both generic and project-specific risks.") }}
         {%- endif -%}
       </p>
     {%- endif -%}
@@ -139,13 +139,13 @@
       {%- if values|length == 1 -%}
         {{ values[0] }}
       {%- elif riskLoss in values and riskDisclosure in values and riskTampering in values -%}
-        data loss, data disclosure, and data tampering
+        {{ pgettext("questions/06-access-security", "data loss, data disclosure, and data tampering") }}
       {%- elif riskLoss in values and riskDisclosure in values -%}
-        data loss and data disclosure
+        {{ pgettext("questions/06-access-security", "data loss and data disclosure") }}
       {%- elif riskLoss in values and riskTampering in values -%}
-        data loss and data tampering
+        {{ pgettext("questions/06-access-security", "data loss and data tampering") }}
       {%- elif riskDisclosure in values and riskTampering in values -%}
-        data disclosure and data tampering
+        {{ pgettext("questions/06-access-security", "data disclosure and data tampering") }}
       {%- endif -%}
     {%- endmacro -%}
 
@@ -199,7 +199,7 @@
     {%- set risksPersonalDataPath = [risksPathPrefix, uuids.risksPersonalDataQUuid]|reply_path -%}
     {%- set risksPersonalDataAUuid = repliesMap[risksPersonalDataPath]|reply_str_value -%}
     {%- if risksPersonalDataAUuid == uuids.risksPersonalDataNotUsingAUuid -%}
-      <p>We are not using any personal information.</p>
+      <p>{{ pgettext("questions/06-access-security", "We are not using any personal information.") }}</p>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataPseudoAUuid -%}
       {%- set risksPseudonymizationPath = [risksPersonalDataPath, uuids.risksPersonalDataPseudoAUuid, uuids.risksPseudonymizationQUuid]|reply_path -%}
       {%- set risksPseudonymizationAUuid = repliesMap[risksPseudonymizationPath]|reply_str_value -%}
@@ -225,11 +225,11 @@
       {%- set custodian = repliesMap[custodianPath]|reply_str_value if custodianValid.value else '' -%}
       <div class="answer-detail">
       <div{% if hasPseudonymizationDetail or custodian|trim %} class="answer-lead"{% endif %}><p>
-        All personal data will be processed in pseudonymized form only.
+        {{ pgettext("questions/06-access-security", "All personal data will be processed in pseudonymized form only.") }}
         {%- if risksPseudonymizationAUuid == uuids.risksPseudonymizationInsideAUuid %}
-          Pseudonymization is performed within the project, and only a limited number of people can access the re-identification keys.
+          {{ pgettext("questions/06-access-security", "Pseudonymization is performed within the project, and only a limited number of people can access the re-identification keys.") }}
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationPartyAUuid %}
-          Pseudonymization is performed by an independent party to enable data linkage.
+          {{ pgettext("questions/06-access-security", "Pseudonymization is performed by an independent party to enable data linkage.") }}
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationAnotherAUuid %}
           We use a specific pseudonymization method{{ ":" if hasPseudonymizationDetail else "." }}
         {%- endif -%}
@@ -237,15 +237,15 @@
       {% if hasPseudonymizationDetail %}{{ answerMarkdown.markdown(risksPseudonymizationAnother) }}{% endif %}
       {% if custodian|trim %}
         <div class="answer-detail" data-fact-id="pseudonymization-key-custodian" data-status="complete">
-          <div class="answer-lead"><p>Independent party that keeps the pseudonymization keys:</p></div>
+          <div class="answer-lead"><p>{{ pgettext("questions/06-access-security", "Independent party that keeps the pseudonymization keys:") }}</p></div>
           {{ answerMarkdown.markdown(custodian) }}
         </div>
       {% endif %}
       </div>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataAnonymousAUuid -%}
-      <p>All personal data will be collected anonymously.</p>
+      <p>{{ pgettext("questions/06-access-security", "All personal data will be collected anonymously.") }}</p>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataAnonymizedAUuid -%}
-      <p>All personal data will be anonymized as early as possible.</p>
+      <p>{{ pgettext("questions/06-access-security", "All personal data will be anonymized as early as possible.") }}</p>
     {%- endif -%}
     
 
@@ -259,15 +259,15 @@
     {%- set sharedAccessControlPath = activeAnswer.path(sharedAccessControlParts, 'OptionsQuestion') if km is defined else sharedAccessControlParts|reply_path -%}
     {%- set sharedAccessControlAUuid = repliesMap[sharedAccessControlPath]|reply_str_value if sharedAccessControlPath else '' -%}
     {%- if sharedWorkspaceAUuid == uuids.sharedWorkspaceYesAUuid and sharedAccessControlAUuid in [uuids.sharedAccessControlMembersRWAUuid, uuids.sharedAccessControlInstituteRAUuid, uuids.sharedAccessControlMembersRAUuid, uuids.sharedAccessControlMembersRequestAUuid] and (km is not defined or (sharedAccessControlAUuid in km.entities.questions[uuids.sharedAccessControlQUuid].answerUuids and sharedAccessControlAUuid in km.entities.answers)) -%}
-      <h4>Access to data during research</h4>
+      <h4>{{ pgettext("questions/06-access-security", "Access to data during research") }}</h4>
       {%- if sharedAccessControlAUuid == uuids.sharedAccessControlMembersRWAUuid -%}
-        <p>All project members, and no one else, have read and write access to the data.</p>
+        <p>{{ pgettext("questions/06-access-security", "All project members, and no one else, have read and write access to the data.") }}</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlInstituteRAUuid -%}
-        <p>Everyone at the institute has read access to the data; all project members have read and write access.</p>
+        <p>{{ pgettext("questions/06-access-security", "Everyone at the institute has read access to the data; all project members have read and write access.") }}</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlMembersRAUuid -%}
-        <p>Only project members have read access; only designated project members can modify the data.</p>
+        <p>{{ pgettext("questions/06-access-security", "Only project members have read access; only designated project members can modify the data.") }}</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlMembersRequestAUuid -%}
-        <p>Everyone at the institute can read the data; only project members can request write access.</p>
+        <p>{{ pgettext("questions/06-access-security", "Everyone at the institute can read the data; only project members can request write access.") }}</p>
       {%- endif -%}
     {%- endif -%}
 
@@ -296,8 +296,8 @@
         {%- endfor -%}
       {% endset %}
       {% if policyEntries|trim %}
-      <h4>Policies and Procedures</h4>
-      <div class="answer-lead"><p>We will use the following policies and procedures:</p></div>
+      <h4>{{ pgettext("questions/06-access-security", "Policies and Procedures") }}</h4>
+      <div class="answer-lead"><p>{{ pgettext("questions/06-access-security", "We will use the following policies and procedures:") }}</p></div>
       <ul>{{ policyEntries }}</ul>
       {% endif %}
     {%- endif -%}
@@ -305,11 +305,11 @@
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
   {% else %}
-    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3b" data-status="missing-output">This document does not yet contain an answer about data security and protection of sensitive data.</p>{% endif %}
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3b" data-status="missing-output">{{ pgettext("questions/06-access-security", "This document does not yet contain an answer about data security and protection of sensitive data.") }}</p>{% endif %}
   {% endif %}
   {# A cross-reference is not an answer to Q6; do not let it hide the gap above. #}
   {% if repliesMap[[uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path]|reply_str_value == uuids.archivedDuringYesAUuid %}
-    <p class="answer-reference"><a href="#q-store-backup">See question 5 for archival and backup arrangements.</a></p>
+    {{ pgettext("questions/06-access-security", "<p class=\"answer-reference\"><a href=\"#q-store-backup\">See question 5 for archival and backup arrangements.</a></p>") }}
   {% endif %}
   </div>
 </div>

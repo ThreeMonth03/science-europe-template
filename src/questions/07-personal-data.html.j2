@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-personal-data" class="question">
-    <h3>7. If personal data are processed, how will compliance with legislation on personal data and on security be ensured?</h3>
+    <h3>{{ pgettext("questions/07-personal-data", "7. If personal data are processed, how will compliance with legislation on personal data and on security be ensured?") }}</h3>
 
     <div class="answer">
     {% set answerContent %}
@@ -17,25 +17,25 @@
                 {%- set personalDataLegalBasisOtherQUuid = [personalDataLegalBasisQUuid, uuids.cpersGdprLegalBasisOtherAUuid, uuids.cpersGdprLegalBasisOtherWhichQUuid]|reply_path -%}
                 {%- set personalDataLegalBasisOtherReply = repliesMap[personalDataLegalBasisOtherQUuid]|reply_str_value -%}
                 {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid and not personalDataLegalBasisOtherReply -%}
-                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-other-legal-basis" data-status="missing"><strong>Information not provided:</strong> the alternative legal basis selected for collecting and processing personal data.</p>{% endif %}
+                    {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-other-legal-basis\" data-status=\"missing\"><strong>Information not provided:</strong> the alternative legal basis selected for collecting and processing personal data.</p>") }}{% endif %}
                 {%- elif not personalDataLegalBasisReply -%}
-                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-legal-basis" data-status="missing"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>{% endif %}
+                    {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-legal-basis\" data-status=\"missing\"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>") }}{% endif %}
                 {%- else -%}
-                    <h4>Legal basis for collecting and processing personal data</h4>
+                    <h4>{{ pgettext("questions/07-personal-data", "Legal basis for collecting and processing personal data") }}</h4>
                     <p> We are collecting and processing personal data{{+" "}}
                     {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisPublicAUuid -%}
-                        because the processing is necessary to perform a task carried out in the public interest.
+                        {{ pgettext("questions/07-personal-data", "because the processing is necessary to perform a task carried out in the public interest.") }}
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisAskAUuid -%}
-                        with the consent of the data subjects.
+                        {{ pgettext("questions/07-personal-data", "with the consent of the data subjects.") }}
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid -%}
                         {%- if personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichContractAUuid -%}
-                            because the processing is necessary to perform a contract.
+                            {{ pgettext("questions/07-personal-data", "because the processing is necessary to perform a contract.") }}
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichLegitAUuid -%}
-                            because the processing is necessary for legitimate interests.
+                            {{ pgettext("questions/07-personal-data", "because the processing is necessary for legitimate interests.") }}
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichVitalAUuid -%}
-                            because the processing is necessary to protect vital interests.
+                            {{ pgettext("questions/07-personal-data", "because the processing is necessary to protect vital interests.") }}
                         {%- elif personalDataLegalBasisOtherReply == uuids.cpersGdprLegalBasisOtherWhichLegalAUuid -%}
-                            because the processing is necessary to comply with a legal obligation.
+                            {{ pgettext("questions/07-personal-data", "because the processing is necessary to comply with a legal obligation.") }}
                         {%- endif -%}
                     {%- endif -%}
                     </p>
@@ -47,29 +47,29 @@
 
                 {%- if personalDataSafeguardReply == uuids.cpersGdprSafeguardsAUuid -%}
 
-                    {% set personalDataSafeguardsHeading %}<h4>Technical and procedural measures</h4>{% endset %}
+                    {% set personalDataSafeguardsHeading %}<h4>{{ pgettext("questions/07-personal-data", "Technical and procedural measures") }}</h4>{% endset %}
                     {% set personalDataSafeguardsContent %}
 
                     {%- set personalDataSafeguardLvlIdentifQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardsIdentifQUuid]|reply_path -%}
                     {%- set personalDataSafeguardLvlIdentifReply = repliesMap[personalDataSafeguardLvlIdentifQUuid]|reply_str_value -%}
 
                     {%- if personalDataSafeguardLvlIdentifReply == uuids.cpersGdprSafeguardsIdentifAnonymAUuid -%}
-                        <p>The stored data are irrevocably anonymized.</p>
+                        <p>{{ pgettext("questions/07-personal-data", "The stored data are irrevocably anonymized.") }}</p>
                     {%- elif personalDataSafeguardLvlIdentifReply == uuids.cpersGdprSafeguardsIdentifPseudoAUuid -%}
-                        <p>The stored data are pseudonymized.</p>
+                        <p>{{ pgettext("questions/07-personal-data", "The stored data are pseudonymized.") }}</p>
                     {%- elif personalDataSafeguardLvlIdentifReply == uuids.cpersGdprSafeguardsIdentifIdentifiableAUuid -%}
-                        <p>The stored data are identifiable.</p>
+                        <p>{{ pgettext("questions/07-personal-data", "The stored data are identifiable.") }}</p>
                     {%- elif not personalDataSafeguardLvlIdentifReply -%}
-                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-identifiability" data-status="missing"><strong>Information not provided:</strong> whether the stored data are anonymized, pseudonymized, or identifiable.</p>{% endif %}
+                        {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-identifiability\" data-status=\"missing\"><strong>Information not provided:</strong> whether the stored data are anonymized, pseudonymized, or identifiable.</p>") }}{% endif %}
                     {%- endif -%}
 
                     {%- set personalDataSafeguardElaborateQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardElaborateQUuid ]|reply_path  -%}
                     {%- set personalDataSafeguardElaborateReply = repliesMap[personalDataSafeguardElaborateQUuid]|reply_str_value -%}
                     {%- if personalDataSafeguardElaborateReply|trim -%}
-                        <div class="answer-lead"><p>Other technical and procedural safeguards:</p></div>
+                        <div class="answer-lead"><p>{{ pgettext("questions/07-personal-data", "Other technical and procedural safeguards:") }}</p></div>
                         <div class="answer-detail" data-fact-id="personal-data-additional-safeguards" data-status="complete">{{ answerMarkdown.markdown(personalDataSafeguardElaborateReply) }}</div>
                     {%- else -%}
-                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-additional-safeguards" data-status="missing"><strong>Information not provided:</strong> details of any other technical and procedural safeguards.</p>{% endif %}
+                        {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-additional-safeguards\" data-status=\"missing\"><strong>Information not provided:</strong> details of any other technical and procedural safeguards.</p>") }}{% endif %}
                     {%- endif -%}
 
                     {%- set personalDataSafeguardTransferQUuid = [personalDataSafeguardsQUuid, uuids.cpersGdprSafeguardsAUuid, uuids.cpersGdprSafeguardsTransferQUuid]|reply_path -%}
@@ -79,16 +79,16 @@
 
                     {%- if personalDataSafeguardTransferReply == uuids.cpersGdprSafeguardsTransferYesAUuid -%}
                         {%- if personalDataSafeguardTransferMeasuresReply|trim -%}
-                            <div class="answer-lead"><p>We plan to transfer data outside the EU/EEA with the following protection measures:</p></div>
+                            <div class="answer-lead"><p>{{ pgettext("questions/07-personal-data", "We plan to transfer data outside the EU/EEA with the following protection measures:") }}</p></div>
                             <div class="answer-detail" data-fact-id="personal-data-transfer-measures" data-status="complete">{{ answerMarkdown.markdown(personalDataSafeguardTransferMeasuresReply) }}</div>
                         {%- else -%}
-                            <p>We plan to transfer data outside the EU/EEA.</p>
-                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer-measures" data-status="missing"><strong>Information not provided:</strong> the measures for protecting data transferred outside the EU/EEA.</p>{% endif %}
+                            <p>{{ pgettext("questions/07-personal-data", "We plan to transfer data outside the EU/EEA.") }}</p>
+                            {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-transfer-measures\" data-status=\"missing\"><strong>Information not provided:</strong> the measures for protecting data transferred outside the EU/EEA.</p>") }}{% endif %}
                         {%- endif -%}
                     {%- elif personalDataSafeguardTransferReply == uuids.cpersGdprSafeguardsTransferNoAUuid -%}
-                        <p>We do not plan to transfer data outside the EU/EEA.</p>
+                        <p>{{ pgettext("questions/07-personal-data", "We do not plan to transfer data outside the EU/EEA.") }}</p>
                     {%- elif not personalDataSafeguardTransferReply -%}
-                        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-transfer" data-status="missing"><strong>Information not provided:</strong> whether data will be transferred outside the EU/EEA.</p>{% endif %}
+                        {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-transfer\" data-status=\"missing\"><strong>Information not provided:</strong> whether data will be transferred outside the EU/EEA.</p>") }}{% endif %}
                     {%- endif -%}
                     {% endset %}
                     {% if personalDataSafeguardsContent|striptags|trim or '<img' in personalDataSafeguardsContent|lower or '<table' in personalDataSafeguardsContent|lower %}
@@ -96,11 +96,11 @@
                       {{ personalDataSafeguardsContent }}
                     {% endif %}
                 {%- elif not personalDataSafeguardReply -%}
-                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-safeguards" data-status="missing"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>{% endif %}
+                    {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-safeguards\" data-status=\"missing\"><strong>Information not provided:</strong> the technical and procedural measures for protecting personal data.</p>") }}{% endif %}
                 {%- endif -%}
             {%- endif -%}
         {%- elif personalDataReply == uuids.collectPersonalNoAUuid -%}
-        <p>We will not collect any data related to individuals.</p>
+        <p>{{ pgettext("questions/07-personal-data", "We will not collect any data related to individuals.") }}</p>
         {%- endif -%}
 
         {# Managed access procedure to personal data #}
@@ -115,15 +115,15 @@
             {%- set notOpenLegalReasonsPrivacyReply = repliesMap[notOpenLegalReasonsPrivacyQUuid]|reply_str_value if notOpenLegalReasonsPrivacyQUuid else '' -%}
 
             {%- if notOpenLegalReasonsPrivacyReply == uuids.notOpenLegalReasonsPrivacyYesAUuid and (km is not defined or (notOpenLegalReasonsPrivacyReply in km.entities.questions[uuids.notOpenLegalReasonsPrivacyQUuid].answerUuids and notOpenLegalReasonsPrivacyReply in km.entities.answers)) -%}
-                <p data-fact-id="personal-data-privacy-restriction" data-status="complete">Privacy restrictions prevent some project data from being made openly available.</p>
+                <p data-fact-id="personal-data-privacy-restriction" data-status="complete">{{ pgettext("questions/07-personal-data", "Privacy restrictions prevent some project data from being made openly available.") }}</p>
 
                 {%- set procedureParts = privacyParts + [uuids.notOpenLegalReasonsPrivacyYesAUuid, uuids.notOpenLegalReasonsPrivacyAccessQUuid] -%}
                 {%- set personalDataManagedAccessQUuid = activeAnswer.path(procedureParts, 'ValueQuestion') if km is defined else procedureParts|reply_path -%}
                 {%- set personalDataManagedAccessReply = repliesMap[personalDataManagedAccessQUuid]|reply_str_value if personalDataManagedAccessQUuid else '' -%}
                 
                 {%- if personalDataManagedAccessReply|trim -%}
-                    <h4>Access procedure to personal data</h4>
-                    <p>There is a procedure for users to access private data as follows: {{personalDataManagedAccessReply}}</p>
+                    <h4>{{ pgettext("questions/07-personal-data", "Access procedure to personal data") }}</h4>
+                    <p>{{ pgettext("questions/07-personal-data", "There is a procedure for users to access private data as follows: %(personalDataManagedAccessReply)s", personalDataManagedAccessReply=personalDataManagedAccessReply) }}</p>
                 {%- endif -%}
             {%- endif -%}
         {%- endif -%}
@@ -132,7 +132,7 @@
     {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
       {{ answerContent }}
     {% else %}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-status="missing-output">This document does not yet contain an answer about personal-data protection and compliance.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-status="missing-output">{{ pgettext("questions/07-personal-data", "This document does not yet contain an answer about personal-data protection and compliance.") }}</p>{% endif %}
     {% endif %}
     </div>
 </div>

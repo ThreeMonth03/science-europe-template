@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-data-preservation" class="question">
-  <h3>11. How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?</h3>
+  <h3>{{ pgettext("questions/11-data-preservation", "11. How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?") }}</h3>
 
   <div class="answer">
   {% import 'src/active-answer.j2' as activeAnswer with context %}
@@ -34,12 +34,12 @@
         {% set preservationPolicy %}
           {# If will be published #}
           {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
-            <p>This dataset will not be published.</p>
+            <p>{{ pgettext("questions/11-data-preservation", "This dataset will not be published.") }}</p>
             {% include "src/preservation-publication-reason.html.j2" %}
           {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
-            <p>This dataset will be published.</p>
+            <p>{{ pgettext("questions/11-data-preservation", "This dataset will be published.") }}</p>
           {% else %}
-            <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="preservation-publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}</div>
+            <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="preservation-publication-decision" data-status="missing">{{ pgettext("questions/11-data-preservation", "It has not yet been specified whether this dataset will be published.") }}</p>{% endif %}</div>
           {% endif -%}
           {# How long will be stored + Metadata FAIRness #}
             {% if publishedDataHowLongAUuid == uuids.publishedDataHowLongTechnicalAUuid -%}
@@ -65,20 +65,20 @@
             {%- endif -%}
           {%- if publishedDataMetadataPersistentPath and publishedDataMetadataPersistentAUuid in km.entities.questions[uuids.publishedDataMetadataPersistentQUuid].answerUuids and publishedDataMetadataPersistentAUuid in km.entities.answers %}
             {%- if publishedDataMetadataPersistentAUuid == uuids.publishedDataMetadataPersistentYesAUuid %}
-              <p data-fact-id="preservation-metadata-persistence" data-status="complete">The metadata will be available even when the data no longer exists.</p>
+              <p data-fact-id="preservation-metadata-persistence" data-status="complete">{{ pgettext("questions/11-data-preservation", "The metadata will be available even when the data no longer exists.") }}</p>
             {%- elif publishedDataMetadataPersistentAUuid == uuids.publishedDataMetadataPersistentNoAUuid %}
-              <p data-fact-id="preservation-metadata-persistence" data-status="explicit-no">The metadata will not remain available once the data no longer exists.</p>
+              <p data-fact-id="preservation-metadata-persistence" data-status="explicit-no">{{ pgettext("questions/11-data-preservation", "The metadata will not remain available once the data no longer exists.") }}</p>
             {%- endif -%}
           {%- endif -%}
           {# Catalogue decisions are fixed prose in the same preservation summary,
              not a detached paragraph after repository or authored detail blocks. #}
           {%- if publishedDataCataloguePath and publishedDataCatalogueAUuid in km.entities.questions[uuids.publishedDataCatalogueQUuid].answerUuids and publishedDataCatalogueAUuid in km.entities.answers -%}
             {%- if publishedDataCatalogueAUuid == uuids.publishedDataCatalogueYesAUuid -%}
-              <p data-fact-id="preservation-catalogue" data-status="complete">We will add a reference to the published data in at least one data catalogue.</p>
+              <p data-fact-id="preservation-catalogue" data-status="complete">{{ pgettext("questions/11-data-preservation", "We will add a reference to the published data in at least one data catalogue.") }}</p>
             {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCatalogueNoAUuid -%}
-              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a reference to the published data in a data catalogue.</p>
+              <p data-fact-id="preservation-catalogue" data-status="explicit-no">{{ pgettext("questions/11-data-preservation", "We will not add a reference to the published data in a data catalogue.") }}</p>
             {%- elif publishedDataCatalogueAUuid == uuids.publishedDataCataloguePrimeAUuid -%}
-              <p data-fact-id="preservation-catalogue" data-status="explicit-no">We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field.</p>
+              <p data-fact-id="preservation-catalogue" data-status="explicit-no">{{ pgettext("questions/11-data-preservation", "We will not add a separate data catalogue reference because the repository is the main source of reusable data in this field.") }}</p>
             {%- endif -%}
           {%- endif -%}
         {% endset %}
@@ -104,8 +104,8 @@
               {% if repositoryKnown or output_profile|default('review') != 'submission' %}
                 <li class="repository-distribution" data-item-id="{{ j }}">
                   {% if repositoryOtherContact %}<div class="answer-lead repository-contact-heading"><p>{% endif %}
-                  {% if distrosItems|length > 1 %}<span class="repository-label">Distribution {{ loop.index }}:</span> {% endif %}
-                  {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}Domain-specific repository{%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
+                  {% if distrosItems|length > 1 %}{{ pgettext("questions/11-data-preservation", "<span class=\"repository-label\">Distribution %(loop_index)s:</span>", loop_index=loop.index) }} {% endif %}
+                  {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}{{ pgettext("questions/11-data-preservation", "Domain-specific repository") }}{%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
                     {%- set domainSpecificRepoNameReply = repliesMap[domainSpecificRepoNamePath] -%}
                     {%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim -%}
                       : {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.
@@ -114,44 +114,44 @@
                     {% if repositoryOtherContact %}</p></div>{% endif %}
                     {# Contact the repository #}
                     {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid %}
-                      We do not need to contact the repository in advance because depositing data there is routine for us.
+                      {{ pgettext("questions/11-data-preservation", "We do not need to contact the repository in advance because depositing data there is routine for us.") }}
                     {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesAlreadyAUuid %}
-                      We have already contacted the repository.
+                      {{ pgettext("questions/11-data-preservation", "We have already contacted the repository.") }}
                     {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesWillAUuid %}
-                      We are going to contact the repository.
+                      {{ pgettext("questions/11-data-preservation", "We are going to contact the repository.") }}
                     {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeOtherAUuid %}
                       {%- set repositoryReading.simple = false -%}
                       {%- set domainSpecificRepoContactBeforeOtherPath = [domainSpecificRepoContactBeforePath, uuids.domainSpecificRepoContactBeforeOtherAUuid, uuids.domainSpecificRepoContactBeforeOtherQUuid]|reply_path -%}
                       {%- set domainSpecificRepoContactBeforeOther = repliesMap[domainSpecificRepoContactBeforeOtherPath]|reply_str_value %}
                       <div class="repository-contact" id="repository-contact-{{ repositoryDatasetIndex }}-{{ loop.index }}">
                         {% if domainSpecificRepoContactBeforeOther|trim %}
-                          <div class="answer-lead"><p>Other repository contact arrangements:</p></div>
+                          <div class="answer-lead">{{ pgettext("questions/11-data-preservation", "<p>Other repository contact arrangements:</p>") }}</div>
                           <div class="answer-detail" data-fact-id="repository-contact-arrangements" data-status="complete">{{ answerMarkdown.markdown(domainSpecificRepoContactBeforeOther) }}</div>
                         {% else %}
                           {%- set activeContactPath = activeAnswer.path(domainSpecificRepoContactBeforePath.split('.'), 'OptionsQuestion') if km is defined else domainSpecificRepoContactBeforePath -%}
                           {%- if activeContactPath and (km is not defined or (domainSpecificRepoContactBeforeAUuid in km.entities.questions[uuids.domainSpecificRepoContactBeforeQUuid].answerUuids and domainSpecificRepoContactBeforeAUuid in km.entities.answers)) and (repliesMap[domainSpecificRepoContactBeforePath].value is not defined or repliesMap[domainSpecificRepoContactBeforePath].value.type is not defined or repliesMap[domainSpecificRepoContactBeforePath].value.type == 'AnswerReply') -%}
-                            <p data-fact-id="repository-contact-arrangements" data-status="complete">Other arrangements have been made for contacting the repository.</p>
+                            {{ pgettext("questions/11-data-preservation", "<p data-fact-id=\"repository-contact-arrangements\" data-status=\"complete\">Other arrangements have been made for contacting the repository.</p>") }}
                           {%- endif -%}
-                          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="repository-contact-arrangements" data-status="missing">The other repository contact arrangements have not been described.</p>{% endif %}
+                          {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/11-data-preservation", "<p class=\"data-gap\" data-fact-id=\"repository-contact-arrangements\" data-status=\"missing\">The other repository contact arrangements have not been described.</p>") }}{% endif %}
                         {% endif %}
                       </div>
                     {%- endif -%}
-                  {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}<em>General-purpose repository</em>{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
+                  {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}{{ pgettext("questions/11-data-preservation", "<em>General-purpose repository</em>") }}{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                     {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
                     {%- if macros.integrationFairSharing(generalPurposeRepoNameReply)|striptags|trim -%}
                       : {{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}.
                     {%- else -%}.
                     {% endif -%}
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid %}
-                    Our national repository.
+                    {{ pgettext("questions/11-data-preservation", "Our national repository.") }}
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryInstitutionalAUuid %}
-                    Our institutional repository.
+                    {{ pgettext("questions/11-data-preservation", "Our institutional repository.") }}
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid %}
                     {%- include 'src/repository-special.html.j2' with context -%}
                   {%- elif distroRepositoryKindAUuid %}
-                    <span data-requirement-id="SE-5b" data-fact-id="repository-destination" data-status="needs-review">The selected repository type cannot be described by this template.</span>
+                    {{ pgettext("questions/11-data-preservation", "<span data-requirement-id=\"SE-5b\" data-fact-id=\"repository-destination\" data-status=\"needs-review\">The selected repository type cannot be described by this template.</span>") }}
                   {%- else %}
-                    <span data-requirement-id="SE-5b" data-fact-id="repository-destination" data-status="missing">The repository for this distribution has not been specified.</span>
+                    {{ pgettext("questions/11-data-preservation", "<span data-requirement-id=\"SE-5b\" data-fact-id=\"repository-destination\" data-status=\"missing\">The repository for this distribution has not been specified.</span>") }}
                   {%- endif -%}
                 </li>
               {% endif %}
@@ -166,7 +166,7 @@
             {% set repositoryText = (repositoryItems|striptags).split()|join(' ') %}
             {% if repositoryText %}
             <div class="repository-destinations{{ ' short-repository-list' if repositoryReading.simple and distrosItems|length <= 3 and repositoryText|length <= 900 else '' }}">
-              <div class="answer-lead"><p>Preservation destinations by distribution:</p></div>
+              <div class="answer-lead"><p>{{ pgettext("questions/11-data-preservation", "Preservation destinations by distribution:") }}</p></div>
               <ul>{{ repositoryItems }}</ul>
             </div>
             {% endif %}
@@ -216,7 +216,7 @@
             {{ record.context }}
             {% if group and group.number %}
               {% set policyReference %}<a href="#preservation-policy-{{ group.number }}">Shared preservation policy {{ group.number }}</a>{% endset %}
-              <p class="preservation-policy-reference">Preservation policy: see {{ policyReference }}.</p>
+              <p class="preservation-policy-reference">{{ pgettext("questions/11-data-preservation", "Preservation policy: see %(policyReference)s.", policyReference=policyReference) }}</p>
             {% else %}{{ record.policy }}{% endif %}
           </div>
           {{ record.tail }}
@@ -227,8 +227,8 @@
         {% if group.number %}
         {% set policyMemberIndices = group.members|map(attribute='index')|join(', ') %}
         <div class="preservation-shared-policy" id="preservation-policy-{{ group.number }}" data-member-ids="{{ group.members|map(attribute='id')|join(' ') }}">
-          <h4>Shared preservation policy {{ group.number }}</h4>
-          <div class="answer-lead"><p>This policy applies separately to produced datasets {{ policyMemberIndices }}.</p></div>
+          <h4>{{ pgettext("questions/11-data-preservation", "Shared preservation policy %(group_number)s", group_number=group.number) }}</h4>
+          <div class="answer-lead"><p>{{ pgettext("questions/11-data-preservation", "This policy applies separately to produced datasets %(policyMemberIndices)s.", policyMemberIndices=policyMemberIndices) }}</p></div>
           <div class="dataset-policy">{{ group.policy }}</div>
         </div>
         {% endif %}
@@ -245,7 +245,7 @@
       {%- set repoChargesAUuid = '' -%}
     {%- endif -%}
     {%- if repoChargesAUuid == uuids.repoChargesNoAUuid -%}
-      <p>The repositories we use do not charge for their services.</p>
+      <p>{{ pgettext("questions/11-data-preservation", "The repositories we use do not charge for their services.") }}</p>
     {%- elif repoChargesAUuid == uuids.repoChargesYesAUuid -%}
       {%- set repoChargesHowPayParts = [uuids.preservingCUuid, uuids.repoChargesQUuid, uuids.repoChargesYesAUuid, uuids.repoChargesHowPayQUuid] -%}
       {%- set repoChargesHowPayPath = activeAnswer.path(repoChargesHowPayParts, 'OptionsQuestion') if km is defined else repoChargesHowPayParts|reply_path -%}
@@ -254,20 +254,20 @@
         {%- set repoChargesHowPayAUuid = '' -%}
       {%- endif -%}
       {%- if repoChargesHowPayAUuid == uuids.repoChargesHowPayBudgetedAUuid -%}
-        <p>The project budget includes the repository service fees.</p>
+        <p>{{ pgettext("questions/11-data-preservation", "The project budget includes the repository service fees.") }}</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayDepartmentAUuid -%}
-        <p>A participating department will cover the repository service fees.</p>
+        <p>{{ pgettext("questions/11-data-preservation", "A participating department will cover the repository service fees.") }}</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayInstituteAUuid -%}
-        <p>A participating institute will cover the repository service fees.</p>
+        <p>{{ pgettext("questions/11-data-preservation", "A participating institute will cover the repository service fees.") }}</p>
       {%- elif repoChargesHowPayAUuid == uuids.repoChargesHowPayOtherAUuid -%}
         {%- set repoChargesHowPayOtherParts = [uuids.preservingCUuid, uuids.repoChargesQUuid, uuids.repoChargesYesAUuid, uuids.repoChargesHowPayQUuid, uuids.repoChargesHowPayOtherAUuid, uuids.repoChargesHowPayOtherQUuid] -%}
         {%- set repoChargesHowPayOtherPath = activeAnswer.path(repoChargesHowPayOtherParts, 'ValueQuestion') if km is defined else repoChargesHowPayOtherParts|reply_path -%}
         {%- set repoChargesHowPayOther = repliesMap[repoChargesHowPayOtherPath]|reply_str_value if repoChargesHowPayOtherPath else '' -%}
         {%- if repoChargesHowPayOther|trim -%}
-          <div class="answer-lead"><p>Other arrangements for paying repository costs:</p></div>
+          <div class="answer-lead"><p>{{ pgettext("questions/11-data-preservation", "Other arrangements for paying repository costs:") }}</p></div>
           <div class="answer-detail">{{ answerMarkdown.markdown(repoChargesHowPayOther) }}</div>
         {%- else -%}
-          <p>Other arrangements are planned for paying repository service fees.</p>
+          <p>{{ pgettext("questions/11-data-preservation", "Other arrangements are planned for paying repository service fees.") }}</p>
         {%- endif -%}
       {%- endif -%}
     {%- endif -%}
@@ -279,22 +279,22 @@
       {%- set budgetTimeEffortAUuid = '' -%}
     {%- endif -%}
     {%- if budgetTimeEffortAUuid == uuids.budgetTimeEffortYesAUuid -%}
-      <p>We have allocated funds for the time and effort needed to prepare the data for publication.</p>
+      <p>{{ pgettext("questions/11-data-preservation", "We have allocated funds for the time and effort needed to prepare the data for publication.") }}</p>
       {%- set budgetTimeEffortAmountParts = [uuids.preservingCUuid, uuids.budgetTimeEffortQUuid, uuids.budgetTimeEffortYesAUuid, uuids.budgetTimeEffortAmountQUuid] -%}
       {%- set budgetTimeEffortAmountPath = activeAnswer.path(budgetTimeEffortAmountParts, 'ValueQuestion') if km is defined else budgetTimeEffortAmountParts|reply_path -%}
       {%- set budgetTimeEffortAmount = repliesMap[budgetTimeEffortAmountPath]|reply_str_value if budgetTimeEffortAmountPath else '' -%}
       {%- if budgetTimeEffortAmount|trim -%}
-        <div class="answer-lead"><p>Budget for making data or other research outputs FAIR:</p></div>
+        <div class="answer-lead"><p>{{ pgettext("questions/11-data-preservation", "Budget for making data or other research outputs FAIR:") }}</p></div>
         <div class="answer-detail" data-fact-id="preparation-budget-amount" data-status="complete">{{ budgetTimeEffortAmount|markdown }}</div>
       {%- endif -%}
     {%- elif budgetTimeEffortAUuid == uuids.budgetTimeEffortNoAUuid -%}
-      <p>We have not budgeted for the time and effort needed to prepare the data for publication.</p>
+      <p>{{ pgettext("questions/11-data-preservation", "We have not budgeted for the time and effort needed to prepare the data for publication.") }}</p>
     {%- endif -%}
     </div>
     {% endset %}
     {% if resourceContent|striptags|trim or '<img' in resourceContent or '<table' in resourceContent %}
       {% if (sharedPolicies is defined and sharedPolicies.count) or archiveChoice in [uuids.archivedAfterYesAUuid, uuids.archivedAfterNoAUuid] %}
-        <h4>Repository costs and publication preparation</h4>
+        <h4>{{ pgettext("questions/11-data-preservation", "Repository costs and publication preparation") }}</h4>
       {% endif %}
       {{ resourceContent }}
     {% endif %}
@@ -303,10 +303,10 @@
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
     {%- if output_profile|default('review') != 'submission' -%}
-    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5b" data-fact-id="preservation-selection-review" data-status="needs-review">Preservation selection still requires review: publication decisions and archive renewal criteria do not by themselves explain which datasets and versions must be retained or destroyed.</p>{% endif %}</div>
+    <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5b" data-fact-id="preservation-selection-review" data-status="needs-review">{{ pgettext("questions/11-data-preservation", "Preservation selection still requires review: publication decisions and archive renewal criteria do not by themselves explain which datasets and versions must be retained or destroyed.") }}</p>{% endif %}</div>
     {%- endif -%}
   {% else %}
-    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5b" data-status="missing-output">This document does not yet contain an answer about data selection and long-term preservation.</p>{% endif %}
+    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5b" data-status="missing-output">{{ pgettext("questions/11-data-preservation", "This document does not yet contain an answer about data selection and long-term preservation.") }}</p>{% endif %}
   {% endif %}
   </div>
 </div>

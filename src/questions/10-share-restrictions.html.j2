@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-share-restrictions" class="question">
-  <h3>10. How and when will data be shared? Are there possible restrictions to data sharing or embargo reasons?</h3>
+  <h3>{{ pgettext("questions/10-share-restrictions", "10. How and when will data be shared? Are there possible restrictions to data sharing or embargo reasons?") }}</h3>
 
   <div class="answer">
     {% set answerContent %}
@@ -43,19 +43,19 @@
                             {%- set identifierLabel = 'URL' -%}
                         {%- elif identifierTypeAUuid == uuids.dataIdentifierTypeOtherAUuid -%}
                             {%- set identifierLabel = repliesMap[[identifierTypePath, uuids.dataIdentifierTypeOtherAUuid, uuids.dataIdentifierTypeOtherTypeQUuid]|reply_path]|reply_str_value|trim -%}
-                            {%- if not identifierLabel -%}{%- set identifierLabel -%}Other identifier{%- endset -%}{%- endif -%}
+                            {%- if not identifierLabel -%}{%- set identifierLabel -%}{{ pgettext("questions/10-share-restrictions", "Other identifier") }}{%- endset -%}{%- endif -%}
                         {%- elif identifierValue -%}
                             {%- set identifierLabel -%}Identifier{%- endset -%}
                         {%- endif -%}
                         {%- if noPersistentIdentifier -%}
-                            <li><p>We do not assign persistent identifiers to this dataset.</p>{% if identifierValue %}<p>Recorded identifier: <strong>{{ identifierValue|e }}</strong></p>{% endif %}</li>
+                            <li>{{ pgettext("questions/10-share-restrictions", "<p>We do not assign persistent identifiers to this dataset.</p>") }}{% if identifierValue %}{{ pgettext("questions/10-share-restrictions", "<p>Recorded identifier: <strong>%(identifierValue)s</strong></p>", identifierValue=identifierValue|e) }}{% endif %}</li>
                         {%- elif identifierLabel -%}
                             <li>{{ identifierLabel|e }}{% if identifierValue %}: <strong>{% if identifierTypeAUuid == uuids.dataIdentifierTypeDoiAUuid %}<a href="https://doi.org/{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% elif identifierTypeAUuid == uuids.dataIdentifierTypeUrlAUuid %}<a href="{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% else %}{{ identifierValue|e }}{% endif %}</strong>{% endif %}</li>
                         {%- endif -%}
                     {%- endfor -%}
                 {%- endset -%}
                 {%- if identifierEntries|trim -%}
-                    <div class="answer-lead"><p>Identifier information for this dataset:</p></div>
+                    <div class="answer-lead"><p>{{ pgettext("questions/10-share-restrictions", "Identifier information for this dataset:") }}</p></div>
                     <ul>{{ identifierEntries }}</ul>
                 {%- endif -%}
             {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
@@ -71,13 +71,13 @@
                         {%- set distroShareAUuid = repliesMap[distroSharePath]|reply_str_value -%}
                         {% set distributionContent %}
                             {%- if distroShareAUuid == uuids.publishedDistroShareOpenAUuid %}
-                                <p data-fact-id="distribution-access" data-status="complete">Open access: this distribution will be shared with anyone.</p>
+                                <p data-fact-id="distribution-access" data-status="complete">{{ pgettext("questions/10-share-restrictions", "Open access: this distribution will be shared with anyone.") }}</p>
                             {%- elif distroShareAUuid == uuids.publishedDistroShareSharedAUuid %}
-                                <p data-fact-id="distribution-access" data-status="complete">Access will be limited to a predefined group of people.</p>
+                                <p data-fact-id="distribution-access" data-status="complete">{{ pgettext("questions/10-share-restrictions", "Access will be limited to a predefined group of people.") }}</p>
                             {%- elif distroShareAUuid == uuids.publishedDistroShareClosedAUuid %}
-                                <p data-fact-id="distribution-access" data-status="explicit-no">This distribution is not intended for sharing.</p>
+                                <p data-fact-id="distribution-access" data-status="explicit-no">{{ pgettext("questions/10-share-restrictions", "This distribution is not intended for sharing.") }}</p>
                             {% else %}
-                                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-access" data-status="missing">The access arrangement for this distribution has not been provided.</p>{% endif %}</div>
+                                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-access" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The access arrangement for this distribution has not been provided.") }}</p>{% endif %}</div>
                             {%- endif %}
                             <div class="repository-arrangement{{ ' joined-policy' if distroRepositoryKindAUuid in [uuids.publishedDataRepositoryNationalAUuid, uuids.publishedDataRepositoryInstitutionalAUuid, uuids.publishedDataRepositorySpecialAUuid] else '' }}">
                             {% if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
@@ -86,37 +86,37 @@
                                 {%- set domainSpecificRepoContactBeforePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoContactBeforeQUuid]|reply_path -%}
                                 {%- set domainSpecificRepoContactBeforeAUuid = repliesMap[domainSpecificRepoContactBeforePath]|reply_str_value -%}
                                 {%- set repositorySentences = [] -%}
-                                {%- set repositoryDestinationSentence -%}Domain-specific repository{%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim %}: {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.{%- else %}.{%- endif -%}{%- endset -%}
+                                {%- set repositoryDestinationSentence -%}{{ pgettext("questions/10-share-restrictions", "Domain-specific repository") }}{%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim %}: {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.{%- else %}.{%- endif -%}{%- endset -%}
                                 {%- do repositorySentences.append(repositoryDestinationSentence) -%}
                                 {# Contact the repository #}
                                 {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid %}
-                                  {%- set repositoryContactSentence -%}We do not need to contact the repository in advance because depositing data there is routine for us.{%- endset -%}
+                                  {%- set repositoryContactSentence -%}{{ pgettext("questions/10-share-restrictions", "We do not need to contact the repository in advance because depositing data there is routine for us.") }}{%- endset -%}
                                   {%- do repositorySentences.append(repositoryContactSentence) -%}
                                 {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesAlreadyAUuid %}
-                                  {%- set repositoryContactSentence -%}We have already contacted the repository.{%- endset -%}
+                                  {%- set repositoryContactSentence -%}{{ pgettext("questions/10-share-restrictions", "We have already contacted the repository.") }}{%- endset -%}
                                   {%- do repositorySentences.append(repositoryContactSentence) -%}
                                 {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesWillAUuid %}
-                                  {%- set repositoryContactSentence -%}We are going to contact the repository.{%- endset -%}
+                                  {%- set repositoryContactSentence -%}{{ pgettext("questions/10-share-restrictions", "We are going to contact the repository.") }}{%- endset -%}
                                   {%- do repositorySentences.append(repositoryContactSentence) -%}
                                 {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeOtherAUuid %}
-                                  {%- set repositoryContactSentence -%}<span class="repository-contact-reference"><a href="#repository-contact-{{ repositoryDatasetIndex }}-{{ loop.index }}">{% if distrosItems|length > 1 %}For repository contact arrangements, see Question 11, distribution {{ loop.index }} of this dataset.{% else %}For repository contact arrangements, see Question 11 under this dataset.{% endif %}</a></span>{%- endset -%}
+                                  {%- set repositoryContactSentence -%}<span class="repository-contact-reference"><a href="#repository-contact-{{ repositoryDatasetIndex }}-{{ loop.index }}">{% if distrosItems|length > 1 %}{{ pgettext("questions/10-share-restrictions", "For repository contact arrangements, see Question 11, distribution %(loop_index)s of this dataset.", loop_index=loop.index) }}{% else %}{{ pgettext("questions/10-share-restrictions", "For repository contact arrangements, see Question 11 under this dataset.") }}{% endif %}</a></span>{%- endset -%}
                                   {%- do repositorySentences.append(repositoryContactSentence) -%}
                                 {%- endif -%}
                                 {{- repositorySentences|join(" ") -}}
-                            {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}General-purpose repository{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
+                            {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}{{ pgettext("questions/10-share-restrictions", "General-purpose repository") }}{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                                 {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
                                 {%- if macros.integrationFairSharing(generalPurposeRepoNameReply)|striptags|trim -%}
                                     : {{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}.
                                 {%- else -%}.
                                 {%- endif -%}
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid %}
-                                <p>This distribution will be deposited in a national repository.</p>
+                                <p>{{ pgettext("questions/10-share-restrictions", "This distribution will be deposited in a national repository.") }}</p>
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryInstitutionalAUuid %}
-                                <p>This distribution will be deposited in an institutional repository.</p>
+                                <p>{{ pgettext("questions/10-share-restrictions", "This distribution will be deposited in an institutional repository.") }}</p>
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid %}
-                                <p>This distribution will be deposited in a special-purpose repository for the project.</p>
+                                <p>{{ pgettext("questions/10-share-restrictions", "This distribution will be deposited in a special-purpose repository for the project.") }}</p>
                             {% else %}
-                                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-repository" data-status="missing">The repository for this distribution has not been provided.</p>{% endif %}
+                                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-repository" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The repository for this distribution has not been provided.") }}</p>{% endif %}
                             {%- endif -%}
                             </div>
                         {# Licenses #}
@@ -133,14 +133,14 @@
                                 {% set licenseSummary %}
                                 {% if licenseStart|trim %}
                                     {% set licenseDate = macros.calendarDate(licenseStart) %}
-                                    <p>Licence start date: {{ licenseDate }}.</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "Licence start date: %(licenseDate)s.", licenseDate=licenseDate) }}</p>
                                 {% endif %}
                                 {%- if publishedDataLicenseAUuid == uuids.publishedDataLicenseCC0AUuid %}
-                                    <p>Freely available for any use (public domain or CC0).</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "Freely available for any use (public domain or CC0).") }}</p>
                                 {%- elif publishedDataLicenseAUuid == uuids.publishedDataLicenseCCBYAUuid %}
-                                    <p>Freely available with an obligation to cite the source (e.g. CC BY).</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "Freely available with an obligation to cite the source (e.g. CC BY).") }}</p>
                                 {%- elif publishedDataLicenseAUuid == uuids.publishedDataLicenseRestrictAUuid %}
-                                    <p>Access to this distribution is subject to restrictions.</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "Access to this distribution is subject to restrictions.") }}</p>
                                 {% endif %}
                                 {% endset %}
                                 {% if licenseSummary|striptags|trim %}
@@ -161,35 +161,35 @@
                                     {% if licenseRestrictConditions|trim %}
                                       <div class="answer-detail">{{ answerMarkdown.markdown(licenseRestrictConditions) }}</div>
                                     {% else %}
-                                      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">The conditions of restricted access have not been provided.</p>{% endif %}
+                                      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The conditions of restricted access have not been provided.") }}</p>{% endif %}
                                     {% endif %}
                                     <div class="restriction-process dataset-policy">
                                     {%- if licenseRestrictAccessAUuid == uuids.licenseRestrictAccessRequestAUuid %}
-                                    <p>Re-users will be able to get access by request to the contact person.</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "Re-users will be able to get access by request to the contact person.") }}</p>
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessCommitteeAUuid %}
-                                    <p>Re-users can request access through the project's Data Access Committee.</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "Re-users can request access through the project's Data Access Committee.") }}</p>
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessAnotherAUuid -%}
                                     {%- set licenseRestrictAccessAnotherPath = [licenseRestrictAccessPath, uuids.licenseRestrictAccessAnotherAUuid, uuids.licenseRestrictAccessAnotherQUuid]|reply_path -%}
                                     {%- set licenseRestrictAccessAnother = repliesMap[licenseRestrictAccessAnotherPath]|reply_str_value %}
-                                    <div{% if licenseRestrictAccessAnother|trim %} class="answer-lead"{% endif %}><p>Access requests will follow a specialized process.</p></div>
+                                    <div{% if licenseRestrictAccessAnother|trim %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/10-share-restrictions", "Access requests will follow a specialized process.") }}</p></div>
                                     {% if licenseRestrictAccessAnother|trim %}
                                       <div class="answer-detail" data-fact-id="restriction-custom-process" data-status="complete">{{ answerMarkdown.markdown(licenseRestrictAccessAnother) }}</div>
                                     {% else %}
-                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-custom-process" data-status="missing">The specialized access process has not been described.</p>{% endif %}</div>
+                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-custom-process" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The specialized access process has not been described.") }}</p>{% endif %}</div>
                                     {% endif %}
                                     {% else %}
-                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-access-process" data-status="missing">How to request restricted access has not been specified.</p>{% endif %}</div>
+                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-access-process" data-status="missing">{{ pgettext("questions/10-share-restrictions", "How to request restricted access has not been specified.") }}</p>{% endif %}</div>
                                     {%- endif -%}
                                     {%- if licenseRestrictMetadataAUuid == uuids.licenseRestrictMetadataYesAUuid %}
-                                    <p>The conditions will be published as part of open metadata.</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "The conditions will be published as part of open metadata.") }}</p>
                                     {% elif licenseRestrictMetadataAUuid == uuids.licenseRestrictMetadataNoAUuid %}
-                                    <p>The conditions will not be published as part of open metadata.</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "The conditions will not be published as part of open metadata.") }}</p>
                                     {% else %}
-                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-metadata-publication" data-status="missing">It has not been specified whether the access conditions will be included in open metadata.</p>{% endif %}</div>
+                                      <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-metadata-publication" data-status="missing">{{ pgettext("questions/10-share-restrictions", "It has not been specified whether the access conditions will be included in open metadata.") }}</p>{% endif %}</div>
                                     {%- endif -%}
                                     {% if licenseRestrictLink|trim %}
                                     {% set restrictionLink %}<a href="{{ licenseRestrictLink|e }}" target="_blank">{{ licenseRestrictLink|e }}</a>{% endset %}
-                                    <p>Restriction details: {{ restrictionLink }}.</p>
+                                    <p>{{ pgettext("questions/10-share-restrictions", "Restriction details: %(restrictionLink)s.", restrictionLink=restrictionLink) }}</p>
                                     {% endif %}
                                     </div>
                                 {% else %}
@@ -203,16 +203,16 @@
                         {% endset %}
                         {% if output_profile|default('review') != 'submission' or distributionContent|striptags|trim %}
                         <div class="distribution-section" data-item-id="{{ j }}">
-                        {% if distrosItems|length > 1 %}<p class="answer-lead"><strong>Distribution {{ loop.index }}</strong></p>{% endif %}
+                        {% if distrosItems|length > 1 %}<p class="answer-lead">{{ pgettext("questions/10-share-restrictions", "<strong>Distribution %(loop_index)s</strong>", loop_index=loop.index) }}</p>{% endif %}
                         <div class="distribution-reading-unit{{ ' short-reading-unit' if distributionContent|striptags|trim|length <= 500 and 'answer-detail' not in distributionContent else '' }}">{{ distributionContent }}</div>
                         </div>
                         {% endif %}
                     {%- endfor -%}
                 {% else %}
-                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-distributions" data-status="missing">The publication locations have not been listed.</p>{% endif %}
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-distributions" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The publication locations have not been listed.") }}</p>{% endif %}
                 {%- endif -%}
             {% elif isPublishedDataAUuid != uuids.isPublishedDataNoAUuid %}
-                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}
+                {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">{{ pgettext("questions/10-share-restrictions", "It has not yet been specified whether this dataset will be published.") }}</p>{% endif %}
             {%- endif -%}
             {# Qualified references #}
             {%- set publishedQReferencesParts = [uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedQReferencesQUuid] -%}
@@ -241,7 +241,7 @@
                 {%- endfor -%}
             {%- endif -%}
             {%- if qreferences|length > 0 -%}
-                <div class="answer-lead"><p>References to other datasets:</p></div>
+                <div class="answer-lead"><p>{{ pgettext("questions/10-share-restrictions", "References to other datasets:") }}</p></div>
                 <ul>
                     {%- for qref in qreferences -%}
                     <li>
@@ -253,9 +253,9 @@
                     {%- endfor -%}
                 </ul>
             {%- elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesYesAUuid -%}
-                <p data-fact-id="qualified-references" data-status="complete">This dataset has qualified references to other datasets.</p>
+                <p data-fact-id="qualified-references" data-status="complete">{{ pgettext("questions/10-share-restrictions", "This dataset has qualified references to other datasets.") }}</p>
             {%- elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesNoAUuid -%}
-                <p data-fact-id="qualified-references" data-status="explicit-no">This dataset has no qualified references to other datasets.</p>
+                <p data-fact-id="qualified-references" data-status="explicit-no">{{ pgettext("questions/10-share-restrictions", "This dataset has no qualified references to other datasets.") }}</p>
             {%- endif -%}
             {% endset %}
             {% if output_profile|default('review') != 'submission' or publicationDatasetContent|striptags|trim or '<img' in publicationDatasetContent or '<table' in publicationDatasetContent %}
@@ -280,7 +280,7 @@
         {%- set embargoPeriodPath = [embargoPath, embargoAUuid, uuids.limitedEmbargoPeriodQUuid]|reply_path -%}
         {%- set embargoPeriod = repliesMap[embargoPeriodPath]|reply_str_value -%}
         <p>
-          Data not subject to legal restrictions will be released openly after a fixed time period.
+          {{ pgettext("questions/10-share-restrictions", "Data not subject to legal restrictions will be released openly after a fixed time period.") }}
           {%- if embargoPeriod|trim %}
             The embargo period will be {{ embargoPeriod|dot }}
           {%- endif %}
@@ -308,19 +308,19 @@
         {%- set hasAuthorizationDetails = authorizationDetails|trim != '' -%}
         {% set authorizationLead %}
         <p data-fact-id="authenticated-access">
-          We will permit authenticated access to the data.
+          {{ pgettext("questions/10-share-restrictions", "We will permit authenticated access to the data.") }}
           {%- if legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeMemberAUuid %}
-            People can apply to one of the project members.
+            {{ pgettext("questions/10-share-restrictions", "People can apply to one of the project members.") }}
           {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeNewCommitteeAUuid %}
-            People can apply to the data access committee that we will set up.
+            {{ pgettext("questions/10-share-restrictions", "People can apply to the data access committee that we will set up.") }}
           {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeOldCommitteeAUuid %}
             {%- if hasAuthorizationDetails %}
-              People can apply to the following data access committee:
+              {{ pgettext("questions/10-share-restrictions", "People can apply to the following data access committee:") }}
             {%- else %}
-              People can apply to an existing data access committee.
+              {{ pgettext("questions/10-share-restrictions", "People can apply to an existing data access committee.") }}
             {%- endif -%}
           {%- elif legalReasonsAuthorizeAUuid == uuids.legalReasonsAuthorizeOtherAUuid %}
-            {% if hasAuthorizationDetails %}For the authorization of potential users, we will make special arrangements:{% else %}For the authorization of potential users, we will make special arrangements.{% endif %}
+            {% if hasAuthorizationDetails %}{{ pgettext("questions/10-share-restrictions", "For the authorization of potential users, we will make special arrangements:") }}{% else %}{{ pgettext("questions/10-share-restrictions", "For the authorization of potential users, we will make special arrangements.") }}{% endif %}
           {%- endif -%}
         </p>
         {% endset %}
@@ -331,30 +331,30 @@
           <div class="authorization-details">{{ answerMarkdown.markdown(authorizationDetails) }}</div>
         {% else %}{{ authorizationLead }}{% endif %}
       {%- elif repliesMap[legalReasonsPath]|reply_str_value == uuids.notOpenLegalReasonsYesAUuid and legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthenticatedNoAUuid -%}
-        <p data-fact-id="authenticated-access" data-status="explicit-no">We will not permit authenticated access to the data.</p>
+        <p data-fact-id="authenticated-access" data-status="explicit-no">{{ pgettext("questions/10-share-restrictions", "We will not permit authenticated access to the data.") }}</p>
       {%- endif -%}
     {%- endif -%}
 
     {%- set collabPath = [uuids.creatingCUuid, uuids.collabQUuid]|reply_path -%}
     {%- set collabAUuid = repliesMap[collabPath]|reply_str_value -%}
     {%- if collabAUuid == uuids.collabNoAUuid -%}
-      <p>This project does not involve collaboration between different groups or institutions. Therefore, no collaboration agreement for data access is needed.</p>
+      <p>{{ pgettext("questions/10-share-restrictions", "This project does not involve collaboration between different groups or institutions. Therefore, no collaboration agreement for data access is needed.") }}</p>
     {%- elif collabAUuid == uuids.collabYesAUuid -%}
       {%- set collabAgreePath = [collabPath, collabAUuid, uuids.collabAgreeQUuid]|reply_path -%}
       {%- set collabAgreeAUuid = repliesMap[collabAgreePath]|reply_str_value -%}
       {%- if collabAgreeAUuid == uuids.collabAgreeNoAUuid -%}
-        <p>This project involves collaboration between different groups and institutions. However, no collaboration agreement is in place to specify who can access which project data.</p>
+        <p>{{ pgettext("questions/10-share-restrictions", "This project involves collaboration between different groups and institutions. However, no collaboration agreement is in place to specify who can access which project data.") }}</p>
       {%- elif collabAgreeAUuid == uuids.collabAgreeYesAUuid -%}
-        <p>This project involves collaboration between different groups and institutions. A collaboration agreement is in place to specify who can access which project data.</p>
+        <p>{{ pgettext("questions/10-share-restrictions", "This project involves collaboration between different groups and institutions. A collaboration agreement is in place to specify who can access which project data.") }}</p>
       {%- else -%}
-        <p>This project involves collaboration between different groups and institutions.</p>
+        <p>{{ pgettext("questions/10-share-restrictions", "This project involves collaboration between different groups and institutions.") }}</p>
       {%- endif -%}
     {%- endif -%}
     {% endset %}
     {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
       {{ answerContent }}
     {% else %}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5a" data-status="missing-output">This document does not yet describe how and when data will be shared, or any restrictions.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5a" data-status="missing-output">{{ pgettext("questions/10-share-restrictions", "This document does not yet describe how and when data will be shared, or any restrictions.") }}</p>{% endif %}
     {% endif %}
   </div>
 </div>

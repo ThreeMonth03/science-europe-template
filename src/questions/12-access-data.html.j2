@@ -1,5 +1,5 @@
 <div id="q-access-data" class="question">
-  <h3>12. What methods or software tools are needed to access and use data?</h3>
+  <h3>{{ pgettext("questions/12-access-data", "12. What methods or software tools are needed to access and use data?") }}</h3>
 
   {% import 'src/active-answer.j2' as activeAnswer with context %}
   {% macro softwareDetails(parts) -%}
@@ -10,13 +10,13 @@
       {%- if answerPath and selected in km.entities.questions[question].answerUuids and selected in km.entities.answers -%}
         {%- set sentence -%}
           {%- if question == uuids.publishedSpecSwDocumentationQUuid and selected == uuids.publishedSpecSwDocumentationYesAUuid -%}
-            <span data-fact-id="software-documentation" data-status="complete">Documentation for this software will be included in the metadata.</span>
+            <span data-fact-id="software-documentation" data-status="complete">{{ pgettext("questions/12-access-data", "Documentation for this software will be included in the metadata.") }}</span>
           {%- elif question == uuids.publishedSpecSwDocumentationQUuid and selected == uuids.publishedSpecSwDocumentationNoAUuid -%}
-            <span data-fact-id="software-documentation" data-status="explicit-no">Documentation for this software will not be included in the metadata.</span>
+            <span data-fact-id="software-documentation" data-status="explicit-no">{{ pgettext("questions/12-access-data", "Documentation for this software will not be included in the metadata.") }}</span>
           {%- elif question == uuids.publishedSpecSwIncludedQUuid and selected == uuids.publishedSpecSwIncludedYesAUuid -%}
-            <span data-fact-id="software-included" data-status="complete">This software will be included.</span>
+            <span data-fact-id="software-included" data-status="complete">{{ pgettext("questions/12-access-data", "This software will be included.") }}</span>
           {%- elif question == uuids.publishedSpecSwIncludedQUuid and selected == uuids.publishedSpecSwIncludedNoAUuid -%}
-            <span data-fact-id="software-included" data-status="explicit-no">This software will not be included.</span>
+            <span data-fact-id="software-included" data-status="explicit-no">{{ pgettext("questions/12-access-data", "This software will not be included.") }}</span>
           {%- endif -%}
         {%- endset -%}
         {%- if sentence|trim -%}{%- do facts.append(sentence) -%}{%- endif -%}
@@ -27,7 +27,7 @@
     {%- set reason = repliesMap[reasonPath]|reply_str_value if reasonPath else '' -%}
     {%- if reason|trim -%}
       <div class="answer-detail" data-fact-id="software-documentation-reason" data-status="complete">
-        <p><strong>Reason for not including software documentation:</strong></p>
+        {{ pgettext("questions/12-access-data", "<p><strong>Reason for not including software documentation:</strong></p>") }}
         {{ reason|markdown }}
       </div>
     {%- endif -%}
@@ -63,13 +63,13 @@
          answer. Never combine different dataset records, even equal names. #}
       {% set accessSummary %}
         {% if isPublishedDataAUuid == uuids.isPublishedDataNoAUuid %}
-          <span data-fact-id="publication-decision" data-status="explicit-no">This dataset will not be published.</span>
+          <span data-fact-id="publication-decision" data-status="explicit-no">{{ pgettext("questions/12-access-data", "This dataset will not be published.") }}</span>
         {% elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
           {% if isPublishedDataSwAUuid == uuids.publishedSpecSwUseNoAUuid %}
-            <span data-fact-id="required-software-decision" data-status="explicit-no">No specific software is required to access or use this dataset.</span>
+            <span data-fact-id="required-software-decision" data-status="explicit-no">{{ pgettext("questions/12-access-data", "No specific software is required to access or use this dataset.") }}</span>
           {% elif isPublishedDataSwAUuid == uuids.publishedSpecSwUseYesAUuid %}
-            {% if visibleSoftwareItems %}<span data-fact-id="required-software-list" data-status="complete">Software required to use this dataset:</span>
-            {% else %}<span data-fact-id="required-software-list" data-status="partial">Specific software is required to use this dataset.</span>{% endif %}
+            {% if visibleSoftwareItems %}<span data-fact-id="required-software-list" data-status="complete">{{ pgettext("questions/12-access-data", "Software required to use this dataset:") }}</span>
+            {% else %}<span data-fact-id="required-software-list" data-status="partial">{{ pgettext("questions/12-access-data", "Specific software is required to use this dataset.") }}</span>{% endif %}
           {% endif %}
         {% endif %}
       {% endset %}
@@ -89,34 +89,34 @@
                 {% for swItem in visibleSoftwareItems %}
                   {% set swNameReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatNameQUuid]|reply_path]|reply_str_value %}
                   {% set swPIDReply = repliesMap[[isPublishedSWPath, swItem, uuids.publishedSpecSwUseWhatPIDQUuid]|reply_path]|reply_str_value %}
-                  <li data-item-id="{{ swItem|e }}"><p><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}(no name given){% endif %}</strong></p>
-                    {% if swPIDReply|trim %}<div class="software-location">Available at: {{ swPIDReply|e }}</div>
-                    {% elif output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="software-location" data-status="missing">An access location for this tool has not been provided.</p>{% endif %}
+                  <li data-item-id="{{ swItem|e }}"><p><strong class="item-label">{% if swNameReply|trim %}{{ swNameReply|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.softwareLabel(isPublishedSwItems.index(swItem) + 1) }}{% else %}{{ pgettext("questions/12-access-data", "(no name given)") }}{% endif %}</strong></p>
+                    {% if swPIDReply|trim %}<div class="software-location">{{ pgettext("questions/12-access-data", "Available at: %(swPIDReply)s", swPIDReply=swPIDReply|e) }}</div>
+                    {% elif output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="software-location" data-status="missing">{{ pgettext("questions/12-access-data", "An access location for this tool has not been provided.") }}</p>{% endif %}
                     {{ softwareDetailsByItem[swItem] }}
                   </li>
                 {% endfor %}
               </ul>
             {% elif output_profile|default('review') != 'submission' %}
-              <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-list" data-status="missing">Software is required, but the tools have not yet been listed.</p>
+              <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-list" data-status="missing">{{ pgettext("questions/12-access-data", "Software is required, but the tools have not yet been listed.") }}</p>
             {% endif %}
           {% elif isPublishedDataSwAUuid == uuids.publishedSpecSwUseNoAUuid %}
             {% set softwareNotRequiredParts = [uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedSpecSwUseQUuid, uuids.publishedSpecSwUseNoAUuid, uuids.publishedSpecSwUseNoReasonQUuid] %}
             {% set softwareNotRequiredPath = activeAnswer.path(softwareNotRequiredParts, 'ValueQuestion') if km is defined else softwareNotRequiredParts|reply_path %}
             {% set softwareNotRequiredReason = repliesMap[softwareNotRequiredPath]|reply_str_value if softwareNotRequiredPath else '' %}
             {% if softwareNotRequiredReason|trim %}
-              <div class="answer-lead"><p>Reason why specific software is not required:</p></div>
+              <div class="answer-lead"><p>{{ pgettext("questions/12-access-data", "Reason why specific software is not required:") }}</p></div>
               <div class="answer-detail" data-fact-id="software-not-required-reason" data-status="complete">{{ softwareNotRequiredReason|markdown }}</div>
             {% endif %}
           {% elif output_profile|default('review') != 'submission' %}
-            <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-decision" data-status="missing">It has not yet been specified whether software is required to use this dataset.</p>
+            <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="required-software-decision" data-status="missing">{{ pgettext("questions/12-access-data", "It has not yet been specified whether software is required to use this dataset.") }}</p>
           {% endif %}
         {% elif isPublishedDataAUuid != uuids.isPublishedDataNoAUuid and output_profile|default('review') != 'submission' %}
-          <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>
+          <p class="data-gap" data-requirement-id="SE-5c" data-fact-id="publication-decision" data-status="missing">{{ pgettext("questions/12-access-data", "It has not yet been specified whether this dataset will be published.") }}</p>
         {% endif %}
       </div>
       {% endif %}
     {%- else -%}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5c" data-status="missing-output">This document does not yet identify the datasets to be shared or the tools needed to use them.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5c" data-status="missing-output">{{ pgettext("questions/12-access-data", "This document does not yet identify the datasets to be shared or the tools needed to use them.") }}</p>{% endif %}
     {%- endfor -%}
   </div>
 </div>

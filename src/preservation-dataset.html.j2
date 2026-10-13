@@ -8,11 +8,11 @@
 {% set stagePath = [pathPrefix, uuids.producedDataStageQUuid]|reply_path %}
 {% set stage = repliesMap[stagePath]|reply_str_value %}
 {% if stage == uuids.producedDataStageRawAUuid %}
-  <p data-fact-id="preservation-data-stage" data-status="complete">This dataset contains raw data.</p>
+  <p data-fact-id="preservation-data-stage" data-status="complete">{{ pgettext("preservation-dataset", "This dataset contains raw data.") }}</p>
 {% elif stage == uuids.producedDataStageIntermediateAUuid %}
-  <p data-fact-id="preservation-data-stage" data-status="complete">This dataset contains intermediate data.</p>
+  <p data-fact-id="preservation-data-stage" data-status="complete">{{ pgettext("preservation-dataset", "This dataset contains intermediate data.") }}</p>
 {% elif stage == uuids.producedDataStageUnpublishableAUuid %}
-  <p data-fact-id="preservation-data-stage" data-status="complete">This dataset contains processed data leading to unpublishable results.</p>
+  <p data-fact-id="preservation-data-stage" data-status="complete">{{ pgettext("preservation-dataset", "This dataset contains processed data leading to unpublishable results.") }}</p>
 {% elif stage == uuids.producedDataStagePublishedAUuid %}
-  <p data-fact-id="preservation-data-stage" data-status="complete">This dataset contains processed data leading to published results.</p>
+  <p data-fact-id="preservation-data-stage" data-status="complete">{{ pgettext("preservation-dataset", "This dataset contains processed data leading to published results.") }}</p>
 {% endif %}

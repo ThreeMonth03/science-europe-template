@@ -35,9 +35,9 @@
       {%- set value = reply.value.value.value %}
       {%- set orcid = value.split('ORCID:')[-1].strip().split()[0]|replace("**", "")|markdown|replace("<p>", "")|replace("</p>", "") if 'ORCID:' in value else None %}
       {%- if orcid and orcid|length >= 15 -%}
-        <span class="contact-orcid">ORCID: {{ orcid }}</span>
+        <span class="contact-orcid">{{ pgettext("macros", "ORCID: %(orcid)s", orcid=orcid) }}</span>
       {%- else -%}
-        <span class="contact-orcid">ORCID: Not found</span>
+        <span class="contact-orcid">{{ pgettext("macros", "ORCID: Not found") }}</span>
       {%- endif -%}
     {%- endif -%}
   {%- elif reply and reply.value.value.type == "PlainType" -%}
@@ -143,20 +143,20 @@
 {%- set DATASET_NON_REFERENCE = "non-reference" -%}
 {%- set DATASET_NON_EQUIPMENT = "non-equipment" -%}
 {%- set DATASET_PRODUCED = "produced" -%}
-{%- macro datasetLabel(kind, index) -%}<span class="dataset-label" data-list-kind="{{ kind }}" data-list-index="{{ index }}">{%- if kind == "instrument" -%}Instrument dataset{%- elif kind == "reference" -%}Reference dataset{%- elif kind == "non-reference" -%}Non-reference dataset{%- elif kind == "non-equipment" -%}Non-equipment dataset{%- elif kind == "produced" -%}Produced dataset{%- endif %} {{ index }}</span>{%- endmacro -%}
+{%- macro datasetLabel(kind, index) -%}<span class="dataset-label" data-list-kind="{{ kind }}" data-list-index="{{ index }}">{%- if kind == "instrument" -%}{{ pgettext("macros", "Instrument dataset") }}{%- elif kind == "reference" -%}{{ pgettext("macros", "Reference dataset") }}{%- elif kind == "non-reference" -%}{{ pgettext("macros", "Non-reference dataset") }}{%- elif kind == "non-equipment" -%}{{ pgettext("macros", "Non-equipment dataset") }}{%- elif kind == "produced" -%}{{ pgettext("macros", "Produced dataset") }}{%- endif %} {{ index }}</span>{%- endmacro -%}
 
-{%- macro projectLabel(index) -%}Project {{ index }}{%- endmacro -%}
+{%- macro projectLabel(index) -%}{{ pgettext("macros", "Project %(index)s", index=index) }}{%- endmacro -%}
 
-{%- macro resourceLabel(index) -%}Resource {{ index }}{%- endmacro -%}
+{%- macro resourceLabel(index) -%}{{ pgettext("macros", "Resource %(index)s", index=index) }}{%- endmacro -%}
 
-{%- macro softwareLabel(index) -%}Software tool {{ index }}{%- endmacro -%}
+{%- macro softwareLabel(index) -%}{{ pgettext("macros", "Software tool %(index)s", index=index) }}{%- endmacro -%}
 
-{%- macro contributorLabel(index) -%}Contributor {{ index }}{%- endmacro -%}
+{%- macro contributorLabel(index) -%}{{ pgettext("macros", "Contributor %(index)s", index=index) }}{%- endmacro -%}
 
 {# Original list indices remain stable when submission omits entirely empty rows. #}
 {%- macro instrumentEntry(index, name, description) -%}
-  <strong>{% if name|trim %}{{ name }}{% else %}Instrument {{ index }}{% endif %}</strong>
+  <strong>{% if name|trim %}{{ name }}{% else %}{{ pgettext("macros", "Instrument %(index)s", index=index) }}{% endif %}</strong>
   {% if description|trim -%}<span class="separator">&ndash;</span>{%- endif %}
   {{ description }}
-  {% if not name|trim and not description|trim %}<span class="data-gap" data-fact-id="instrument-details" data-status="missing">Information not provided: instrument name and description.</span>{% endif %}
+  {% if not name|trim and not description|trim %}<span class="data-gap" data-fact-id="instrument-details" data-status="missing">{{ pgettext("macros", "Information not provided: instrument name and description.") }}</span>{% endif %}
 {%- endmacro -%}

@@ -28,23 +28,23 @@
         {%- set grantNumber = repliesMap[grantNumberPath]|reply_str_value -%}
         {%- set funderStatusPath = active.path(funderParts + [fundersItem, uuids.funderStatusQUuid], 'OptionsQuestion') -%}
         {%- set funderStatus = repliesMap[funderStatusPath]|reply_str_value -%}
-        {% set fundingStatus %}{% if funderStatusPath and funderStatus in km.entities.questions[uuids.funderStatusQUuid].answerUuids and funderStatus in km.entities.answers %}{% if funderStatus == uuids.funderStatusPlannedAUuid %}(planned){% elif funderStatus == uuids.funderStatusAppliedAUuid %}(applied){% elif funderStatus == uuids.funderStatusGrantedAUuid %}(granted){% elif funderStatus == uuids.funderStatusRejectedAUuid %}(rejected){% endif %}{% endif %}{% endset %}
+        {% set fundingStatus %}{% if funderStatusPath and funderStatus in km.entities.questions[uuids.funderStatusQUuid].answerUuids and funderStatus in km.entities.answers %}{% if funderStatus == uuids.funderStatusPlannedAUuid %}{{ pgettext("projects", "(planned)") }}{% elif funderStatus == uuids.funderStatusAppliedAUuid %}{{ pgettext("projects", "(applied)") }}{% elif funderStatus == uuids.funderStatusGrantedAUuid %}{{ pgettext("projects", "(granted)") }}{% elif funderStatus == uuids.funderStatusRejectedAUuid %}{{ pgettext("projects", "(rejected)") }}{% endif %}{% endif %}{% endset %}
         {% if output_profile|default('review') != 'submission' or funderLabel|striptags|trim or grantNumber|trim or fundingStatus|trim %}
           <li data-item-id="{{ fundersItem }}">{% if funderLabel|striptags|trim %}{{ funderLabel }}{% endif %}{% if grantNumber|trim or output_profile|default('review') != 'submission' %}{% if funderLabel|striptags|trim %}: {% endif %}{{ grantNumber|e if grantNumber|trim else "grant number not yet given" }}{% endif %}{% if fundingStatus|trim %} {{ fundingStatus }}{% endif %}</li>
         {% endif %}
       {% endfor %}
     {% endset %}
       {% if projectAcronym|trim or projectNumber|trim or projectStart|trim or projectEnd|trim or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
-        {% if projectAcronym|trim %}<tr data-fact-id="project-acronym" data-status="complete"><th scope="row">Project acronym</th><td>{{ projectAcronym|e }}</td></tr>{% endif %}
-        {% if projectNumber|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-number"><th scope="row">Project Number</th><td>{{ projectNumber|e if projectNumber|trim else "N/A" }}</td></tr>{% endif %}
-        {% if projectStart|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-start"><th scope="row">Start date</th><td>{{ projectStart|e if projectStart|trim else "N/A" }}</td></tr>{% endif %}
-        {% if projectEnd|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-end"><th scope="row">End date</th><td>{{ projectEnd|e if projectEnd|trim else "N/A" }}</td></tr>{% endif %}
+        {% if projectAcronym|trim %}<tr data-fact-id="project-acronym" data-status="complete"><th scope="row">{{ pgettext("projects", "Project acronym") }}</th><td>{{ projectAcronym|e }}</td></tr>{% endif %}
+        {% if projectNumber|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-number"><th scope="row">{{ pgettext("projects", "Project Number") }}</th><td>{{ projectNumber|e if projectNumber|trim else "N/A" }}</td></tr>{% endif %}
+        {% if projectStart|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-start"><th scope="row">{{ pgettext("projects", "Start date") }}</th><td>{{ projectStart|e if projectStart|trim else "N/A" }}</td></tr>{% endif %}
+        {% if projectEnd|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-end"><th scope="row">{{ pgettext("projects", "End date") }}</th><td>{{ projectEnd|e if projectEnd|trim else "N/A" }}</td></tr>{% endif %}
       </tbody></table>{% endif %}
-      {% if fundingItems|trim or output_profile|default('review') != 'submission' %}<div class="project-funding" data-fact-id="project-funding"><h4>Funding</h4>
+      {% if fundingItems|trim or output_profile|default('review') != 'submission' %}<div class="project-funding" data-fact-id="project-funding"><h4>{{ pgettext("projects", "Funding") }}</h4>
           {%- if fundingItems|trim %}
             <ul>{{ fundingItems }}</ul>
           {%- else -%}
-            <p>Funding information has not been provided.</p>
+            <p>{{ pgettext("projects", "Funding information has not been provided.") }}</p>
           {%- endif -%}
       </div>{% endif %}
 
@@ -61,18 +61,18 @@
         {%- if projectName|trim and projectsItems|length > 1 -%}
           <h3>{{ projectName|e }}</h3>
         {%- elif not projectName|trim -%}
-          {% if output_profile|default('review') == 'submission' %}<h3>{{ macros.projectLabel(projectsItems.index(projectsItem) + 1) }}</h3>{% else %}<h3 class="empty-value">(project name not given)</h3>{% endif %}
+          {% if output_profile|default('review') == 'submission' %}<h3>{{ macros.projectLabel(projectsItems.index(projectsItem) + 1) }}</h3>{% else %}<h3 class="empty-value">{{ pgettext("projects", "(project name not given)") }}</h3>{% endif %}
         {%- endif -%}
         {{ projectContent }}
       </div>
     {% endif %}
   {% else %}
-    <div style="font-style:italic;">There are no projects described for this DMP.</div>
+    <div style="font-style:italic;">{{ pgettext("projects", "There are no projects described for this DMP.") }}</div>
   {% endfor %}
   {% endset %}
   {% if output_profile|default('review') != 'submission' or projectOverviewContent|striptags|trim or '<img' in projectOverviewContent|lower or '<table' in projectOverviewContent|lower %}
     <div id="dmp-projects">
-      <h2>Research overview</h2>
+      <h2>{{ pgettext("projects", "Research overview") }}</h2>
       {{ projectOverviewContent }}
     </div>
   {% endif %}
