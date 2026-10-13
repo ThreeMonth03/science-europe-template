@@ -1,0 +1,43 @@
+{
+  "status": "local-tool-language-forwarding-tested-not-released",
+  "tool_base_commit": "25e339fbdfb1d20796471055790aad6a4226b6ed",
+  "tool_commit": "233403bee7914705e7d2e5b24f5e47f68d8cbda7",
+  "tool_worktree": "/home/trc/.local/share/dsw-tool-po-language435.LqikVyia/worktree",
+  "checkout_mode": "Isolated detached worktree; no new branch or remote operations. Original dirty Tool checkout remains unchanged.",
+  "scope": [
+    "DSWApiClient.create_document optional language keyword, omitted from the request when None",
+    "RegressionConfig.language -> document workflow -> POST /documents language",
+    "Explicit requested language recorded in the regression report; omitted by default",
+    "Configured language requires document mode and released_id for every subject, checked before authentication/upload",
+    "Invalid locale strings rejected; server locale errors propagate without an English retry"
+  ],
+  "limitations": [
+    "Explicit language requires DSW 4.35+ and the locale already installed on the actual released DT",
+    "No PO upload/replacement/copy implementation",
+    "Local staged ZIPs and draft previews are not supported for explicit language selection",
+    "Standalone render-project CLI remains unchanged and does not offer this official PO path",
+    "The existing regression command downloads HTML; generation success is not translation or PDF/Word visual acceptance",
+    "No real Server/Worker generation through this new Tool commit in this step; prior runtime evidence remains bound to its original inputs"
+  ],
+  "checks": {
+    "unit_and_infra_tests_passed": 418,
+    "request_test_languages": [null, "en", "zh-Hant"],
+    "request_test_identifiers": ["documentTemplateUuid", "documentTemplateId"],
+    "request_test_snapshots": [null, "snapshot-uuid"],
+    "workflow_test": "YAML -> service.run -> actual API body builder; simulated API transport, readiness and download responses",
+    "rejected_locale_test": "Exactly one document POST, error propagates, no report in the fresh test directory, no base-language fallback request",
+    "ruff_full_lint": "passed with 0.15.21",
+    "ruff_changed_python_format": "8 files passed",
+    "sphinx_warnings_as_errors": "passed",
+    "git_diff_check": "passed",
+    "read_only_agent_review": "No substantive issues found"
+  },
+  "evidence_root": "/home/trc/.local/share/dsw-tool-po-language435.LqikVyia",
+  "junit_file": "tests.xml",
+  "junit_sha256": "79f87d3aa98ea80bf136ff73a0caf160b24dee87e0f658f2be65d23b9665f9ec",
+  "test_environment": "Borrowed existing Tool venv dependencies through PYTHONPATH pointing at the isolated source. A temporary .venv symlink enabled existing CLI smoke tests; removed after tests. Initial infra run had five missing-entrypoint/TDK-path failures; after this environment setup all 418 passed. No product fix or CI change was made for those environment failures.",
+  "preservation": "Frozen receipt confirms original EN 624, ZH 13296 and Tool 201 file hashes, HEADs and dirty statuses unchanged. Frozen handoff ZIP sha256 ae0cd12e0f3bb682172f5f539a9ffba525ce352498e70f07922cc60c308ee5c7 unchanged.",
+  "template_artifacts": "No render source, ZIP, PO, MO or prepared assets changed in this step. Current pair remains in metadata.json.",
+  "next_step": "Exercise this Tool commit against the isolated stock DSW 4.35 stack with the current immutable template/PO pair. Then agree one Chinese PO authority and adapt the existing workflow, not a parallel CI. Production publication requires a new immutable version; never overwrite legacy meeting 0.3.78.",
+  "remote_operations": false
+}
