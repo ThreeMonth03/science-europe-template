@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+{%- set document_language -%}{%- include 'src/locales/language.j2' -%}{%- endset -%}
 {%- set km = ctx.knowledgeModel -%}
 {%- set repliesMap = ctx.project.replies -%}
 {%- set report = ctx.report -%}
@@ -6,12 +7,12 @@
 {% import "src/macros.html.j2" as macros with context %}
 {% import "src/uuids.j2" as uuids with context %}
 {% import "src/globals.j2" as globals with context %}
-<html lang="en">
+<html lang="{{ document_language }}">
   <head>
     <title>Data Management Plan</title>
     <meta charset="utf-8">
     <style>
-      {% include "src/style.css" %}
+      {% if document_language == 'zh-Hant' %}{% include 'src/locales/zh-Hant/style.css' %}{% else %}{% include "src/style.css" %}{% endif %}
       {% include "src/layout.css" %}
     </style>
   </head>

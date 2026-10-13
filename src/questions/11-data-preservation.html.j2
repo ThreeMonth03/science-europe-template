@@ -43,24 +43,24 @@
           {% endif -%}
           {# How long will be stored + Metadata FAIRness #}
             {% if publishedDataHowLongAUuid == uuids.publishedDataHowLongTechnicalAUuid -%}
-              <p>This data set will be kept available as long as technically possible.</p>
+              <p>{{ gettext("This data set will be kept available as long as technically possible.") }}</p>
             {%- elif publishedDataHowLongAUuid == uuids.publishedDataHowLongDeletedAUuid -%}
-              <p> This data set will be kept available until it needs to be deleted for legal, contractual or regulatory reasons.</p>
+              <p> {{ gettext("This data set will be kept available until it needs to be deleted for legal, contractual or regulatory reasons.") }}</p>
             {%- elif publishedDataHowLongAUuid == uuids.publishedDataHowLongFixedAUuid -%}
               {%- set publishedDataHowLongFixedPath = [publishedDataHowLongPath, uuids.publishedDataHowLongFixedAUuid, uuids.publishedDataHowLongFixedQUuid]|reply_path -%}
               {%- set publishedDataHowLongFixed = repliesMap[publishedDataHowLongFixedPath]|reply_str_value -%}
               {% if publishedDataHowLongFixed|trim %}
-                <p>Retention period (prepaid): {{ publishedDataHowLongFixed|e }}.</p>
+                <p>{{ gettext("Retention period (prepaid): %(period)s.", period=publishedDataHowLongFixed|e) }}</p>
               {% else %}
-                <p>This data set will be kept available for a fixed period (prepaid).</p>
+                <p>{{ gettext("This data set will be kept available for a fixed period (prepaid).") }}</p>
               {% endif %}
               {% if not publishedDataHowLongFixed|trim %}
-                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="missing-output">The retention period has not been provided.</p>{% endif %}</div>
+                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="missing-output">{{ gettext("The retention period has not been provided.") }}</p>{% endif %}</div>
               {% elif (publishedDataHowLongFixed|string|trim).replace('.', '', 1).isdigit() %}
-                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="needs-review">Please specify a time unit for the retention period.</p>{% endif %}</div>
+                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-period" data-status="needs-review">{{ gettext("Please specify a time unit for the retention period.") }}</p>{% endif %}</div>
               {% endif %}
               {% if repliesMap[[uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path]|reply_str_value == uuids.repoChargesNoAUuid %}
-                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-payment" data-status="needs-review">Please check how the prepaid retention period relates to the answer that repository services have no charges.</p>{% endif %}</div>
+                <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="retention-payment" data-status="needs-review">{{ gettext("Please check how the prepaid retention period relates to the answer that repository services have no charges.") }}</p>{% endif %}</div>
               {% endif %}
             {%- endif -%}
           {%- if publishedDataMetadataPersistentPath and publishedDataMetadataPersistentAUuid in km.entities.questions[uuids.publishedDataMetadataPersistentQUuid].answerUuids and publishedDataMetadataPersistentAUuid in km.entities.answers %}

@@ -163,34 +163,33 @@
                         
                           {%- set projectCostItemAllocations = [] -%}
                           {%- if uuids.costAllocationFindabilityAUuid in projectCostItemAllocationItems -%}
-                          {%- do projectCostItemAllocations.append("findability") -%}
+                          {%- do projectCostItemAllocations.append(gettext("findability")) -%}
                           {%- endif -%}
                           {%- if uuids.costAllocationAccessibilityAUuid in projectCostItemAllocationItems -%}
-                          {%- do projectCostItemAllocations.append("accessibility") -%}
+                          {%- do projectCostItemAllocations.append(gettext("accessibility")) -%}
                           {%- endif -%}
                           {%- if uuids.costAllocationInteroperabilityAUuid in projectCostItemAllocationItems -%}
-                          {%- do projectCostItemAllocations.append("interoperability") -%}
+                          {%- do projectCostItemAllocations.append(gettext("interoperability")) -%}
                           {%- endif -%}
                           {%- if uuids.costAllocationReusabilityAUuid in projectCostItemAllocationItems -%}
-                          {%- do projectCostItemAllocations.append("reusability") -%}
+                          {%- do projectCostItemAllocations.append(gettext("reusability")) -%}
                           {%- endif -%}
                           {%- if uuids.costManagementAUuid in projectCostItemAllocationItems -%}
-                          {%- do projectCostItemAllocations.append("management") -%}
+                          {%- do projectCostItemAllocations.append(gettext("management")) -%}
                           {%- endif -%}
                         
                         {%- if projectCostItemAllocations|length > 0 -%}
                           <p>
-                            This resource supports{{+" "}}
                             {%- if projectCostItemAllocations|length > 2 -%}
-                              {{ projectCostItemAllocations[0:-1]|join(", ") }}, and {{ projectCostItemAllocations[-1] }} of data.
+                              {{ gettext("This resource supports %(activities)s, and %(last_activity)s of data.", activities=projectCostItemAllocations[0:-1]|join(gettext(", ")), last_activity=projectCostItemAllocations[-1]) }}
                             {%- elif projectCostItemAllocations|length == 2 -%}
-                              {{ projectCostItemAllocations[0] }} and {{ projectCostItemAllocations[1] }} of data.
+                              {{ gettext("This resource supports %(first_activity)s and %(second_activity)s of data.", first_activity=projectCostItemAllocations[0], second_activity=projectCostItemAllocations[1]) }}
                             {%- else -%}
-                              {{ projectCostItemAllocations[0] }} of data.
+                              {{ gettext("This resource supports %(activity)s of data.", activity=projectCostItemAllocations[0]) }}
                             {%- endif %}
                           </p>
                         {%- else -%}
-                          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-allocation" data-status="missing"><strong>Information not provided:</strong> which FAIR or data-management activities this resource supports.</p>{% endif %}
+                          {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-allocation" data-status="missing">{{ gettext("<strong>Information not provided:</strong> which FAIR or data-management activities this resource supports.") }}</p>{% endif %}
                         {%- endif -%}
                        
  

@@ -1,0 +1,197 @@
+# Partial migration prototype. NOT a complete/releasable Chinese locale.
+msgid ""
+msgstr ""
+"Project-Id-Version: science-europe-enhanced 0.3.78\n"
+"Language: zh-Hant\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "This document does not yet list the data types, formats and estimated volumes."
+msgstr "本文件尚未列出資料種類、格式及預估資料量。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "Data formats and types"
+msgstr "資料格式與類型"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "Data format: <strong>%(formatName)s</strong>."
+msgstr "資料格式：<strong>%(formatName)s</strong>。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "Data format %(loop_index)s."
+msgstr "資料格式 %(loop_index)s。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "Unnamed data format %(loop_index)s."
+msgstr "資料格式 %(loop_index)s（名稱尚待補充）。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "It is a standardized format suitable for long-term archiving."
+msgstr "採用標準化格式，適合長期封存。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "It is a standardized format."
+msgstr "此格式為標準化格式。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "We are not using a standardized format because there is no standardized format for this data type."
+msgstr "此類型的資料尚無標準化格式，因此本計畫採用非標準化格式。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "We are not using a standardized format but it is optimized for processing speed and/or volume."
+msgstr "本計畫採用的非標準化格式已針對資料處理速度、資料量或兩者進行最佳化。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "We are not using a standardized format."
+msgstr "本計畫採用非標準化格式。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "This is a suitable format for long-term archiving."
+msgstr "此格式適合長期封存。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "This is not a suitable format for long-term archiving; however, we plan to convert it to a suitable format before the end of the project."
+msgstr "此格式不適合長期封存；本計畫預計在結束前，將資料轉換為適合長期封存的格式。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "This format is not suitable for long-term archiving, and we do not plan to convert it to a suitable format."
+msgstr "此格式不適合長期封存，且本計畫未規劃將資料轉換為適合長期封存的格式。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "This format is not suitable for long-term archiving."
+msgstr "此格式不適合長期封存。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "Only a small volume of data is expected."
+msgstr "預估資料量不大。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "The estimated data volume is %(formatTotalQuantity)s."
+msgstr "預估資料量為 %(formatTotalQuantity)s。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "We expect %(formatsVolumeFiles)s files, with an estimated average size of %(formatAverageQuantity)s."
+msgstr "預估共有 %(formatsVolumeFiles)s 個檔案，平均每個檔案約 %(formatAverageQuantity)s。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "We expect %(formatsVolumeFiles)s files."
+msgstr "預估共有 %(formatsVolumeFiles)s 個檔案。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "The estimated average file size is %(formatAverageQuantity)s."
+msgstr "每個檔案的平均大小預計為 %(formatAverageQuantity)s。"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "Reason for using a non-standard format:"
+msgstr "採用非標準化格式的原因："
+
+#. Q2 current approved Chinese; same as baseline
+msgid "data format name"
+msgstr "資料格式名稱"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "whether the format is standardized"
+msgstr "此格式是否為標準化格式"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "reason for using a non-standard format"
+msgstr "採用非標準化格式的原因"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "suitability for long-term archiving"
+msgstr "此格式是否適合長期封存"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "whether the data will be converted to a suitable archival format"
+msgstr "是否將資料轉換為適合長期封存的格式"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "estimated total volume (GB)"
+msgstr "預估資料總量（GB）"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "estimated number of files"
+msgstr "預估檔案數"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "estimated average file size (GB)"
+msgstr "預估平均檔案大小（GB）"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "estimated data volume"
+msgstr "預估資料量"
+
+#. Q2 current approved Chinese; same as baseline
+msgid "Information still needed: %(formatGaps)s."
+msgstr "尚待補充：%(formatGaps)s。"
+
+#. Locale-specific activity enumeration separator; also shared with Q2 gaps. Not sentence-fragment translation.
+msgid ", "
+msgstr "、"
+
+#. Q11 technical feasibility; not an invented retention guarantee.
+msgid "This data set will be kept available as long as technically possible."
+msgstr "只要技術上可行，此資料集將持續提供。"
+
+#. Q11 preserve legal, contractual and regulatory deletion conditions.
+msgid "This data set will be kept available until it needs to be deleted for legal, contractual or regulatory reasons."
+msgstr "此資料集將持續提供，直到因法律、契約或監管要求而必須刪除。"
+
+#. Q11 user-entered period; preserve verbatim, including zero and its own unit, escaped once.
+msgid "Retention period (prepaid): %(period)s."
+msgstr "保存期間：%(period)s（費用已預付）。"
+
+#. Q11 fixed prepaid period without an entered duration.
+msgid "This data set will be kept available for a fixed period (prepaid)."
+msgstr "此資料集將在預付費用涵蓋的固定期間內持續提供。"
+
+#. Q11 missing period, review-only visibility remains outside gettext.
+msgid "The retention period has not been provided."
+msgstr "尚待補充：資料保存期間。"
+
+#. Q11 original English review hint retained exactly; Chinese unchanged from approved baseline.
+msgid "Please specify a time unit for the retention period."
+msgstr "請補充保存期間的時間單位，例如年或月。"
+
+#. Q11 original English consistency hint; never reconcile user answers implicitly.
+msgid "Please check how the prepaid retention period relates to the answer that repository services have no charges."
+msgstr "請核對保存期間「費用已預付」與儲存庫「不收費」這兩項填答的關係。"
+
+#. Q15 translated activity noun in a parallel list; unchanged approved Chinese.
+msgid "findability"
+msgstr "資料搜尋與發現"
+
+#. Q15 translated activity noun in a parallel list; unchanged approved Chinese.
+msgid "accessibility"
+msgstr "資料取用"
+
+#. Q15 translated activity noun in a parallel list; unchanged approved Chinese.
+msgid "interoperability"
+msgstr "資料互通"
+
+#. Q15 translated activity noun in a parallel list; unchanged approved Chinese.
+msgid "reusability"
+msgstr "資料再利用"
+
+#. Q15 translated activity noun in a parallel list; unchanged approved Chinese.
+msgid "management"
+msgstr "資料管理"
+
+#. Q15 complete sentence; named activity variables may be reordered. No fabricated FAIR guarantees.
+msgid "This resource supports %(activities)s, and %(last_activity)s of data."
+msgstr "支援工作：%(activities)s、%(last_activity)s。"
+
+#. Q15 complete sentence; named activity variables may be reordered. No fabricated FAIR guarantees.
+msgid "This resource supports %(first_activity)s and %(second_activity)s of data."
+msgstr "支援工作：%(first_activity)s、%(second_activity)s。"
+
+#. Q15 complete sentence; named activity variables may be reordered. No fabricated FAIR guarantees.
+msgid "This resource supports %(activity)s of data."
+msgstr "支援工作：%(activity)s。"
+
+#. Q15 empty selection, whole review hint. English keeps original strong prefix; approved Chinese intentionally has no strong tag. Profile logic unchanged.
+msgid "<strong>Information not provided:</strong> which FAIR or data-management activities this resource supports."
+msgstr "尚待補充：這項資源將支援哪些 FAIR 或資料管理工作。"

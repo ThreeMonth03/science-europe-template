@@ -1,0 +1,10 @@
+{# Selected document locale takes precedence; never infer output language from the KM/project.
+   The stock context exposes document.locale.code and document.language separately.
+   Native callers must keep the selected catalog and these fields consistent. #}
+{%- set document = ctx.document|default({}, true) -%}
+{%- set locale = document.locale|default({}, true) -%}
+{%- set code = locale.code|default('', true) or document.language|default('', true) or 'en' -%}
+{%- if code not in ['en', 'zh-Hant'] -%}
+  {{- unsupported_document_locale.raise_error() -}}
+{%- endif -%}
+{{- code -}}

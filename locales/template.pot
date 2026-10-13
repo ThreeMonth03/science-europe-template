@@ -1,0 +1,218 @@
+# English translations for local:official-po-prototype.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: local:official-po-prototype 0.3.78\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-10-13 02:37+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: src/questions/02-what-data.html.j2:341
+#: src/questions/15-required-resources.html.j2:184
+msgid ", "
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:192
+msgid "<strong>Information not provided:</strong> which FAIR or data-management activities this resource supports."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:267
+#, python-format
+msgid "Data format %(loop_index)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:265
+#, python-format
+msgid "Data format: <strong>%(formatName)s</strong>."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:239
+msgid "Data formats and types"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:341
+#, python-format
+msgid "Information still needed: %(formatGaps)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:271
+msgid "It is a standardized format suitable for long-term archiving."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:273
+msgid "It is a standardized format."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:297
+msgid "Only a small volume of data is expected."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:63
+msgid "Please check how the prepaid retention period relates to the answer that repository services have no charges."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:60
+msgid "Please specify a time unit for the retention period."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:315
+msgid "Reason for using a non-standard format:"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:53
+#, python-format
+msgid "Retention period (prepaid): %(period)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:309
+#, python-format
+msgid "The estimated average file size is %(formatAverageQuantity)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:300
+#, python-format
+msgid "The estimated data volume is %(formatTotalQuantity)s."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:58
+msgid "The retention period has not been provided."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:46
+msgid "This data set will be kept available as long as technically possible."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:55
+msgid "This data set will be kept available for a fixed period (prepaid)."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:48
+msgid "This data set will be kept available until it needs to be deleted for legal, contractual or regulatory reasons."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:236
+msgid "This document does not yet list the data types, formats and estimated volumes."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:290
+msgid "This format is not suitable for long-term archiving, and we do not plan to convert it to a suitable format."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:292
+msgid "This format is not suitable for long-term archiving."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:285
+msgid "This is a suitable format for long-term archiving."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:288
+msgid "This is not a suitable format for long-term archiving; however, we plan to convert it to a suitable format before the end of the project."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:184
+#, python-format
+msgid "This resource supports %(activities)s, and %(last_activity)s of data."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:188
+#, python-format
+msgid "This resource supports %(activity)s of data."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:186
+#, python-format
+msgid "This resource supports %(first_activity)s and %(second_activity)s of data."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:267
+#, python-format
+msgid "Unnamed data format %(loop_index)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:276
+msgid "We are not using a standardized format because there is no standardized format for this data type."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:278
+msgid "We are not using a standardized format but it is optimized for processing speed and/or volume."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:280
+msgid "We are not using a standardized format."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:305
+#, python-format
+msgid "We expect %(formatsVolumeFiles)s files, with an estimated average size of %(formatAverageQuantity)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:307
+#, python-format
+msgid "We expect %(formatsVolumeFiles)s files."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:169
+msgid "accessibility"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:321
+msgid "data format name"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:337
+msgid "estimated average file size (GB)"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:339
+msgid "estimated data volume"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:336
+msgid "estimated number of files"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:334
+msgid "estimated total volume (GB)"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:166
+msgid "findability"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:172
+msgid "interoperability"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:178
+msgid "management"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:326
+msgid "reason for using a non-standard format"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:175
+msgid "reusability"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:329
+msgid "suitability for long-term archiving"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:331
+msgid "whether the data will be converted to a suitable archival format"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:324
+msgid "whether the format is standardized"
+msgstr ""
+
