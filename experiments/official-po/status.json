@@ -82,11 +82,11 @@
   "not_verified": [
     "Adoption of the locally rehearsed packaging path into the existing production CI/release workflow",
     "Existing general CI under updated 4.35 dependencies",
-    "Wizard locale upload/UI/cache/S3",
+    "Wizard locale installation/UI/cache/S3 at runtime (official 4.35 API/UI source contract is now reviewed)",
     "Native Microsoft Word",
     "Arbitrary questionnaire inputs"
   ],
   "packaging_rehearsal": "See experiments/official-po/packaging.json. Template metadata additionally restores root-zh-hant eligibility; it does not alter rendering or questionnaire mappings. Native acceptance still refers to the unchanged render inputs.",
-  "next_step": "Resolve the official locale installation/selection contract with server maintainers and approve the single PO authority before replacing the current Chinese workflow. Keep exact source/catalog/toolchain/artifact pairing and use new immutable release versions. Do not mix this migration with further prose/layout changes.",
+  "next_step": "Rehearse real installation and fresh document generation in an isolated local 4.35 stack using the reviewed installation.json contract; do not use the current Tool request without explicit language support. Then approve the single PO authority and existing-workflow cutover. Keep no-delete/new-version pairing and do not mix in prose/layout changes.",
   "remote_operations": false
 }

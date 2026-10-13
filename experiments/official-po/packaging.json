@@ -21,14 +21,14 @@
     "output_storage": "Hashes only for matching HTML; no duplicated large HTML or new native output documents."
   },
   "publication_guard": "Experimental 0.3.78 coordinates are not authorized for upload or overwriting any existing release. Assign a new immutable release identity and rebind acceptance before publication.",
-  "official_locale_boundary": "Stock Worker reads MO (or compiles PO fallback), selecting by locale UUID and invalidating cache by updatedAt. Its loader does not validate the source template commit/hash. A separate paired release receipt is still required. Server locale DTO/UI/source binding has not been established by this experiment.",
+  "official_locale_boundary": "Source-reviewed Server 4.35 attaches PO to an exact released DT UUID; the Worker selects that locale UUID and caches by updatedAt. Neither verifies a Git source/POT hash. The DT ZIP does not include locales, so new DT versions/imports need a new PO attachment. See installation.json for the reviewed API/UI contract and untested runtime boundaries.",
   "locale_contract_for_server_maintainers_to_verify": {
     "selected_locale_code": "zh-Hant",
     "runtime_translation_filename": "translation.mo",
     "document_context_fields": ["document.language", "document.locale.uuid", "document.locale.name", "document.locale.code", "document.locale.updatedAt"],
-    "translation_update": "A changed catalog must update locale.updatedAt so Worker invalidates its cached MO. Do not reuse an unchanged stamp for new bytes.",
-    "source_pairing": "Bind the installed locale to the approved template/PO/MO pair outside the Worker loader; the local experiment does not establish how the Server API enforces or stores this association.",
-    "user_selection": "Confirm how users select the official locale and how template/format names appear. Do not assume the old separate Chinese DT or current Tool render-project request selects it automatically."
+    "translation_update": "4.35 has no locale PUT. Duplicate code POST fails; API replacement requires an explicitly authorized delete/create with a new UUID/stamp. This rehearsal refuses replacement. Do not mutate Worker/S3 directly or treat an old preview as fresh translation evidence.",
+    "source_pairing": "Resolve the actual new DT UUID after installing a new immutable template version, then bind its PO/MO/source hashes in the release receipt. Server UUID association does not check msgid compatibility.",
+    "user_selection": "Document language is separate from UI/KM language. Switching DT resets it to the new DT base language, so explicitly choose/save zh-Hant. PO does not translate template/format metadata names. The current Tool request omits language."
   },
   "proposed_authority_after_cutover_not_applied": {
     "english_repository": "Shared marked Jinja, KM mappings, complete English message units, generated POT and locale-aware layout/Word helpers.",
@@ -40,12 +40,12 @@
   "version_and_branch_policy": {
     "branches": "One maintained default branch per repository; short-lived codex/* changes, not permanent branches per language/version. This experiment remains on codex/official-po.",
     "versions": "English source and Chinese locale can version independently; version names or matching branch names are not pairing guarantees.",
-    "pairing_fields": ["Full English input commit", "PO commit/hash and MO hash", "Exact official tooling versions", "Stock Worker digest", "Prepared reference/font hashes", "Template/locale coordinates", "Final artifacts and acceptance hashes"],
+    "pairing_fields": ["Full English input commit", "PO commit/hash and MO hash", "Exact official tooling versions", "Stock Worker digest", "Prepared reference/font hashes", "Template coordinates and installed DT UUID plus locale UUID/code", "Final artifacts and acceptance hashes"],
     "candidate_rules": "Dirty sources are previews, not candidates. Candidate artifacts are immutable and acceptance must bind to their exact bytes."
   },
   "existing_workflow_not_migrated": "Existing repositories remain on their current release/translation workflows. Their old runtime declaration or Tool SHA alone does not prove a fully locked 4.35 dependency set.",
   "required_before_cutover": [
-    "Verify official locale creation/import/selection and metadata/format labels with the server maintainers; never assume embedding PO in the template ZIP is enough.",
+    "Exercise the source-reviewed locale installation/selection contract in an isolated local 4.35 stack, then agree metadata/format labels and rollout with server maintainers. Source review and offline requests are not real HTTP/UI acceptance.",
     "Transfer the approved PO to exactly one authoritative location and replace the legacy translation generation path once, without dual-write synchronization.",
     "Promote exact tooling/runtime and paired artifact guards into the existing workflow without adding parallel CI pipelines.",
     "Choose new immutable publication versions, then bind acceptance to the final artifacts."
