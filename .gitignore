@@ -1,4 +1,5 @@
 env/
+.venv-po/
 .env
 template.zip
 template*.zip

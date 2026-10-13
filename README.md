@@ -1,5 +1,11 @@
 # Science Europe DMP
 
+The local PO work now has a generated **DSW 4.34 Traditional Chinese compatibility
+package**, so translation work does not wait for a server upgrade. Maintain the
+English Jinja and one PO; do not edit the generated Chinese ZIP. See the
+[compatibility build instructions](docs/testing.md#po-translation-and-dsw-434-compatibility).
+The 4.35 native-PO path stays separate. Neither path automatically deploys.
+
 For the current candidate repairs, see the [shared testing guide](docs/testing.md).
 It replaces eight per-round development notes; the release history below is unchanged.
 

@@ -1,8 +1,19 @@
-.PHONY: test verify check check-current package audit-upstream knowledge-models
+.PHONY: test verify check check-current package audit-upstream knowledge-models export-compat434 test-compat434
 .DEFAULT_GOAL := test
 
 PYTHON ?= python3
 DSW_TDK ?= dsw-tdk
+PO ?= locales/zh-Hant.po
+ENGLISH_ZIP ?=
+COMPAT_VERSION ?=
+COMPAT_OUTPUT ?= outputs/compat434/template.zip
+SOURCE_COMMIT ?=
+
+export-compat434:
+	$(PYTHON) scripts/export_legacy_locale.py --source-zip "$(ENGLISH_ZIP)" --po "$(PO)" --output "$(COMPAT_OUTPUT)" --version "$(COMPAT_VERSION)" $(if $(SOURCE_COMMIT),--source-commit "$(SOURCE_COMMIT)")
+
+test-compat434:
+	$(PYTHON) -m unittest discover -s experiments/legacy434 -v
 
 knowledge-models:
 	$(PYTHON) scripts/prepare_knowledge_models.py

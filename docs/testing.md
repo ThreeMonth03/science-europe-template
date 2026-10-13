@@ -1,5 +1,73 @@
 # Maintaining the current bilingual repairs
 
+## PO translation and DSW 4.34 compatibility
+
+Server 4.35 is not required for ongoing translation work. In this local PO
+worktree, `locales/zh-Hant.po` is the single editable catalog for the new PO
+outputs. Keep context keys and named parameters intact, translate whole clauses,
+and review the resulting prose. The old translation-tree delivery and meeting
+packages stay preserved as fallback/history; do not maintain a parallel new
+translation there. The exporter accepts `--po` from another repository, so a
+later move of the authoritative PO to the Chinese repo does not require a new
+conversion algorithm or duplicate catalog.
+
+Install the optional build dependencies in an isolated environment:
+
+```sh
+python3 -m venv .venv-po
+.venv-po/bin/python -m pip install -r requirements-po.txt
+make test-compat434 PYTHON=.venv-po/bin/python
+make export-compat434 PYTHON=.venv-po/bin/python \
+  ENGLISH_ZIP=/path/to/prepared-english-template.zip \
+  PO=locales/zh-Hant.po COMPAT_VERSION=0.3.79 \
+  COMPAT_OUTPUT=outputs/compat434/template.zip
+```
+
+The input is an official TDK English package with its fonts/reference already
+prepared, not a raw source directory. Never prepare that reference a second
+time. Optional `SOURCE_COMMIT=<full-hash>` records caller-supplied provenance;
+the exporter checks its format, not its correspondence to the ZIP. The ZIP and
+PO hashes are always recorded in `template.zip.json`.
+
+The generated 4.34 profile embeds the approved PO as a compiled MO asset, enables
+legacy i18n on every Jinja/enrich-docx step and fixes its generated language
+helper to `zh-Hant`. All other Jinja and existing binary assets retain their
+bytes. The package exposes the six supported review/submission HTML, PDF and
+Word formats with Chinese labels. LaTeX and ODT are not included in this profile.
+Missing, extra, fuzzy, untranslated or placeholder-mismatched catalog entries
+fail the build instead of silently falling back to English. Plural messages need
+a separately reviewed export rule and are currently rejected.
+
+Translation revisions can be released even when the English source is unchanged.
+Use a new `COMPAT_VERSION` for each published source/PO pair and tag it; use
+short-lived development branches, not one permanent branch per language or
+runtime. The `-zhtw-compat434` template ID is distinct from the meeting and official
+templates. The exporter refuses existing local ZIP/sidecar paths, but does not
+query the server: an operator must also reject an already-installed coordinate.
+Do not overwrite an existing DT/UUID or its installed absolute MO path because
+both Worker asset caching and Python gettext caching can retain the old catalog.
+The package-relative MO path stays fixed. Generated ZIPs are build
+outputs, never a second translation source. No additional CI workflow is added.
+
+Validate with stock Worker 4.34 before uploading: complete, partial and empty
+questionnaires; all 15 questions; no submission hints; untouched authored answers;
+HTML escaping/parameters; native PDF/Word plus individual page reading. 4.35
+acceptance is not a substitute for this check. A local adapted-context Worker test
+is also not evidence of a real 4.34 Server/browser installation.
+
+The bounded [local compatibility acceptance](../experiments/legacy434/acceptance.json)
+records the tested ZIP/PO/Worker hashes. Its three synthetic cases produced nine
+documents; all 27 PDF/Word-preview pages match the accepted 4.35 output in text
+and pixels and were individually read. This is a local candidate, not a production
+installation or arbitrary-input bug-free guarantee.
+
+When the server eventually upgrades, use the shared English DT plus attached PO
+and explicit document language. The 4.34 package is not a 4.35 fallback: 4.35
+ignores its removed legacy i18n options. The maintained PO and English source
+remain usable; only the deployment profile changes.
+
+## Historical translation-tree repair baseline
+
 The `fix/answer-mapping` repairs currently include local preview 0.3.78,
 not a deployed release. English Jinja remains the shared source; Chinese
 is produced by the existing translation pipeline, not a second Jinja fork.
