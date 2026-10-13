@@ -19,6 +19,67 @@ def fixture(n=12, question='q-required-resources', table='resource-table', detai
 
 
 class BudgetSpacingTests(unittest.TestCase):
+    def test_bounded_budget_spacing_and_fixed_lead_are_owned(self):
+        css = (ROOT / 'src/layout.css').read_text()
+        scoped = [line for line in css.splitlines() if line.startswith('html body #q-required-resources > .answer > .project-resources > table.resource-table.pdf-bounded-budget')]
+        self.assertEqual([line.split(' {', 1)[1].lstrip() for line in scoped], [
+            'margin: .3em 0; }', 'padding-top: .25em; padding-bottom: .25em; }',
+            'margin-bottom: .2em; }', 'margin: .2em 0; }'])
+        rule = next(line for line in css.splitlines() if line.startswith('html body #q-required-resources > .answer:has(table.resource-table.pdf-bounded-budget'))
+        selector, properties = rule.split(' {', 1)
+        self.assertEqual(properties.lstrip(), 'break-after: avoid; }')
+        source = ('<html><body><div id="q-required-resources"><div class="answer">'
+                  '<div class="answer-detail"><p>Training remains breakable.</p></div>'
+                  '<p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="explicit-no">Known hardware fact. '
+                  '<span data-fact-id="repository-charges" data-status="complete">Known charge.</span></p>'
+                  '<h4>Budget</h4><div class="project-resources"><table class="resource-table pdf-bounded-budget">'
+                  '<tbody><tr><td>Original purpose.</td><td>0 TWD</td><td></td></tr></tbody></table></div>'
+                  '</div></div></body></html>')
+        self.assertEqual(len(BeautifulSoup(source, 'html.parser').select(selector)), 1)
+        for invalid in [source.replace('q-required-resources', 'q-other'),
+                        source.replace('pdf-bounded-budget', 'other-budget'),
+                        source.replace('data-status="explicit-no"', 'data-status="partial"'),
+                        source.replace('data-status="complete"', 'data-status="unknown"'),
+                        source.replace('<h4>Budget</h4>', '<p>Intervening authored prose.</p><h4>Budget</h4>'),
+                        source.replace('</table></div>', '</table><p>Extra authored prose.</p></div>'),
+                        source.replace('</div></div></body>', '<div class="project-resources"></div></div></div></body>')]:
+            self.assertFalse(BeautifulSoup(invalid, 'html.parser').select(selector))
+
+    def test_terminal_training_spacing_is_local_and_keeps_long_answers_breakable(self):
+        css = (ROOT / 'src/layout.css').read_text()
+        lines = [line for line in css.splitlines() if line.endswith('{ padding-top: .3em; padding-bottom: .3em; }')]
+        self.assertEqual(len(lines), 1)
+        selector = lines[0].split(' {', 1)[0]
+        self.assertIn(':has(thead > tr:only-child):has(tbody > tr:nth-child(2):last-child)', selector)
+        self.assertIn(':not(:has(tr > :nth-child(3), tr > :only-child, tfoot, th *, td *, [colspan], [rowspan]))', selector)
+        table = '<table><thead><tr><th>Training</th><th>Evidence</th></tr></thead><tbody><tr><td>Data stewardship</td><td>Reviewed plan</td></tr><tr><td>Record validation</td><td>0 unresolved checks</td></tr></tbody></table>'
+        source = ('<html><body><div id="q-required-resources"><div class="answer">'
+                  '<div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete">'
+                  + table + '<ol><li>Preserve the original records.</li></ol><p>Keep the literal A&lt;B&amp;C&gt;D.</p></div>'
+                  '<p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="partial">Known hardware requirement.</p>'
+                  '</div></div></body></html>')
+        self.assertEqual(len(BeautifulSoup(source, 'html.parser').select(selector)), 6)
+        for value in [source.replace('Keep the literal A&lt;B&amp;C&gt;D.', 'Long authored paragraph. ' * 1000),
+                      source.replace('Reviewed plan', 'Long cell text. ' * 1000)]:
+            self.assertEqual(len(BeautifulSoup(value, 'html.parser').select(selector)), 6)
+        for value in [source.replace('q-required-resources', 'q-other'),
+                      source.replace('data-status="partial"', 'data-status="complete"'),
+                      source.replace('data-fact-id="specialist-expertise-detail"', 'data-fact-id="authored-other"'),
+                      source.replace('</div></div></body>', '<p class="data-gap">Next fact.</p></div></div></body>'),
+                      source.replace('<p data-requirement-id="SE-6b"', '<div class="answer-detail" data-requirement-id="SE-6b"').replace('Known hardware requirement.</p>', '<p>Long hardware details.</p></div>'),
+                      source.replace('<td>Reviewed plan</td>', '<td><a href="https://example.org/">Original link</a></td>'),
+                      source.replace('<td>Reviewed plan</td>', '<td colspan="2">Original span</td>'),
+                      source.replace('</tbody>', '<tr><td>Next row</td><td>Keep</td></tr></tbody>'),
+                      source.replace('<th>Evidence</th>', '<th>Evidence</th><th>Third column</th>'),
+                      source.replace(table, '<div>' + table + '</div>')]:
+            self.assertFalse(BeautifulSoup(value, 'html.parser').select(selector))
+        # The new rules only change margins/padding: never bind a long free answer,
+        # lock an authored table, change type size or alter the page geometry.
+        scoped = [line for line in css.splitlines() if line.startswith('html body #q-required-resources > .answer > .answer-detail[data-fact-id="specialist-expertise-detail"]')]
+        self.assertEqual(len(scoped), 3)
+        self.assertEqual([line.split(' {', 1)[1].lstrip() for line in scoped],
+                         ['margin-bottom: 0; }', 'margin-bottom: 0; }', 'padding-top: .3em; padding-bottom: .3em; }'])
+
     def test_list_closing_keep_is_scoped_without_locking_whole_resource(self):
         selector = ('html body #q-required-resources .resource-table > tbody > '
                     'tr[data-item-id] > td:first-child > '

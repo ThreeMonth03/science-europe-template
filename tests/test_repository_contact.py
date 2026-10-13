@@ -43,12 +43,32 @@ class RepositoryContactTests(unittest.TestCase):
         self.assertNotIn('instead of contacting', soup.get_text())
         self.assertFalse(soup.select('p p, p div, p ul, p table'))
 
-    def test_blank_other_answer_has_target_and_missing_not_complete(self):
+    def test_blank_other_answer_keeps_known_arrangement_and_review_only_missing_detail(self):
         for value in [None, '', '  \n ']:
-            soup = render_pair(contact_replies(value))
-            self.assertEqual(3, len(soup.select('.repository-contact-reference')))
-            self.assertEqual(['missing'] * 3, [n['data-status'] for n in soup.select('[data-fact-id="repository-contact-arrangements"]')])
-            self.assertFalse(soup.select('.repository-contact .answer-detail'))
+            for profile in ('review', 'submission'):
+                with self.subTest(value=value, profile=profile):
+                    soup = BeautifulSoup(''.join(render_question(
+                        f'src/questions/{q}.html.j2', contact_replies(value), output_profile=profile)
+                        for q in ['10-share-restrictions', '11-data-preservation']), 'html.parser')
+                    refs = soup.select('.repository-contact-reference a')
+                    self.assertEqual(3, len(refs))
+                    for index, ref in enumerate(refs, 1):
+                        self.assertEqual(f'#repository-contact-1-{index}', ref['href'])
+                        targets = soup.select(ref['href'])
+                        self.assertEqual(1, len(targets))
+                        target = targets[0]
+                        self.assertEqual(ref.find_parent(class_='distribution-section')['data-item-id'],
+                                         target.find_parent(class_='repository-distribution')['data-item-id'])
+                        facts = target.select('[data-fact-id="repository-contact-arrangements"]')
+                        self.assertEqual(['complete', 'missing'] if profile == 'review' else ['complete'],
+                                         [node['data-status'] for node in facts])
+                        self.assertEqual('Other arrangements have been made for contacting the repository.', facts[0].get_text())
+                        if profile == 'review':
+                            self.assertEqual('The other repository contact arrangements have not been described.', facts[1].get_text())
+                            self.assertIn('data-gap', facts[1]['class'])
+                        else:
+                            self.assertFalse(target.select('.data-gap,.data-review'))
+                        self.assertFalse(target.select('.answer-detail'))
 
     def test_inactive_parents_and_other_choices_do_not_leak_stale_answers(self):
         for pub, repo, choice in [(None, 'DomainSpecific', 'Other'), ('No', 'DomainSpecific', 'Other'), ('Yes', 'National', 'Other'), ('Yes', 'DomainSpecific', None), ('Yes', 'DomainSpecific', 'YesAlready'), ('Yes', 'DomainSpecific', 'future-choice')]:

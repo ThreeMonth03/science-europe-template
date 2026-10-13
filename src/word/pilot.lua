@@ -162,6 +162,19 @@ local function keep_q8_reference_labels(div)
                 -- DOCX ignores custom styles on Plain; preserve all inlines in
                 -- one Para so the existing keep-with-next style reaches Word.
                 label.content[1] = pandoc.Para(label.content[1].content)
+                -- A restricted permission introduces its own nonempty terms,
+                -- not the next dataset. Keep only this fixed paragraph with
+                -- the first body line; never style or chain the authored body.
+                local detail = item[3]
+                local text = pandoc.utils.stringify(permission)
+                if #item == 3 and (text:sub(-1) == ":" or text:sub(-3) == "：") and
+                   detail.t == "Div" and detail.identifier == "" and #detail.classes == 1 and
+                   detail.classes:includes("answer-detail") and #detail.attributes == 0 and
+                   #detail.content > 0 and (pandoc.utils.stringify(detail):match("%S") or
+                     (detail.content[1].t == "CodeBlock" and detail.content[1].text:match("%S"))) then
+                  item[2] = pandoc.Div({pandoc.Para(permission.content)},
+                    pandoc.Attr("", {}, {["custom-style"] = "Pilot List Lead"}))
+                end
               end
             end
           end
@@ -244,6 +257,44 @@ local function keep_q9_dataset_labels(div)
   if changed then return div end
 end
 
+-- Two adjacent, explicitly owned terminal review prompts may share a paragraph.
+-- Preserve both prefixes and all inlines; reject free/long/complex content.
+local function join_q15_terminal_gaps(div)
+  if #div.content ~= 2 or div.content[1].t ~= "Header" or div.content[1].level ~= 3 then return div end
+  local answer = div.content[2]
+  if answer.t ~= "Div" or not answer.classes:includes("answer") or #answer.content < 3 then return div end
+  local first, last = answer.content[#answer.content-1], answer.content[#answer.content]
+  local function paragraph(block, fact)
+    if block.t ~= "Div" or block.identifier ~= "" or #block.classes ~= 1 or block.classes[1] ~= "q15-terminal-gap" or
+       #block.attributes ~= 2 or block.attributes["fact-id"] ~= fact or block.attributes["status"] ~= "missing" or
+       #block.content ~= 1 or block.content[1].t ~= "Para" then return nil end
+    local p = block.content[1]
+    if #p.content == 0 then return nil end
+    for index, inline in ipairs(p.content) do
+      -- The maintained Chinese translation has a plain prefix, while English
+      -- retains Strong. The owned marker, not that decorative choice, is proof.
+      if index == 1 and inline.t == "Strong" then
+        if #inline.content == 0 then return nil end
+        for _, prefix in ipairs(inline.content) do
+          if prefix.t ~= "Str" and prefix.t ~= "Space" then return nil end
+        end
+      elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return nil end
+    end
+    return p
+  end
+  local left, right = paragraph(first, "repository-charges"), paragraph(last, "resources-costing")
+  if not left or not right then return div end
+  local units = 0
+  for _, code in utf8.codes(pandoc.utils.stringify({left, right})) do units = units + (code >= 0x2E80 and 2 or 1) end
+  if units > 240 then return div end
+  local joined = pandoc.List(); joined:extend(left.content)
+  if not cjk_sentence_boundary(left, right) then joined:insert(pandoc.Space()) end
+  joined:extend(right.content)
+  first.content = {pandoc.Para(joined)}
+  answer.content:remove(#answer.content)
+  return div
+end
+
 -- Q15: keep only a short answer without a budget together. A budget has its own
 -- repeating heading and bounded row guards; linking the overview to that table
 -- can push the whole question to a new page and leave half the previous blank.
@@ -288,6 +339,107 @@ local function keep_short_budget_overview(div)
   if not simple or not short_without_budget then return div end
   for _, item in ipairs(leading) do
     item.blocks[item.index] = pandoc.Div({pandoc.Para(item.block.content)}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+  end
+  return div
+end
+
+-- A short terminal overview may lead one bounded budget, not the whole Q15.
+-- Keep its immediately preceding paragraph and bounded body rows together.
+-- Large/rich budgets, long prose, multiple projects and unknown structures flow.
+local function keep_short_budget_narrative(div)
+  if FORMAT ~= "docx" and FORMAT ~= "json" then return div end
+  local function width(value)
+    local total = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(value)) do
+      total = total + (code >= 0x2E80 and 2 or 1)
+    end
+    return total
+  end
+  local function inline_ok(items, charges)
+    for _, item in ipairs(items) do
+      if item.t == "Strong" or item.t == "Emph" then
+        if not inline_ok(item.content, charges) then return false end
+      elseif charges and item.t == "Span" and item.identifier == "" and #item.classes == 0 and
+             #item.attributes == 2 and item.attributes["fact-id"] == "repository-charges" and
+             item.attributes["status"] == "complete" then
+        if not inline_ok(item.content, false) then return false end
+      elseif item.t ~= "Str" and item.t ~= "Space" and item.t ~= "SoftBreak" then return false end
+      if item.t == "Str" then
+        for token in item.text:gmatch("[A-Za-z0-9_.-]+") do if #token > 40 then return false end end
+      end
+    end
+    return true
+  end
+  local paragraphs
+  paragraphs = function(blocks)
+    local count = 0
+    for _, block in ipairs(blocks) do
+      if block.t == "Para" or block.t == "Plain" then
+        if not inline_ok(block.content, false) then return nil end
+        count = count + 1
+      elseif block.t == "Div" and block.identifier == "" then
+        local style = block.attributes["custom-style"]
+        if #block.classes > 1 or (#block.classes == 1 and not block.classes:includes("answer-detail")) or
+           (style and style ~= "Pilot Label" and style ~= "Pilot Lead") then return nil end
+        for name, _ in pairs(block.attributes) do
+          if name ~= "custom-style" and name ~= "fact-id" and name ~= "status" and name ~= "requirement-id" then return nil end
+        end
+        local children = paragraphs(block.content)
+        if not children then return nil end
+        count = count + children
+      else return nil end
+    end
+    return count
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.identifier == "" and #answer.classes == 1 and
+       answer.classes:includes("answer") and #answer.attributes == 0 then
+      local heading, projects = nil, 0
+      for index, block in ipairs(answer.content) do
+        if block.t == "Header" and block.level == 4 and #block.classes == 1 and
+           block.classes:includes("word-budget-heading") and #block.attributes == 0 then
+          if heading then return div end
+          heading = index
+        elseif block.t == "Div" and block.classes:includes("project-resources") then projects = projects + 1 end
+      end
+      local lead = heading and answer.content[heading - 1]
+      local project = heading and answer.content[heading + 1]
+      if projects ~= 1 or not lead or lead.t ~= "Para" or width(lead) == 0 or width(lead) > 320 or
+         not inline_ok(lead.content, true) or heading + 1 ~= #answer.content or not project or
+         project.t ~= "Div" or project.identifier ~= "" or #project.classes ~= 1 or
+         not project.classes:includes("project-resources") or #project.content ~= 1 or
+         (#project.attributes > 0 and (#project.attributes ~= 1 or not project.attributes["item-id"])) then return div end
+      local tbl = project.content[1]
+      if tbl.t ~= "Table" or tbl.identifier ~= "" or #tbl.attributes ~= 0 or
+         not tbl.classes:includes("resource-table") or #tbl.classes > 2 or
+         (#tbl.classes == 2 and not tbl.classes:includes("word-short-budget")) or
+         #tbl.colspecs ~= 3 or #tbl.head.rows ~= 1 or #tbl.head.rows[1].cells ~= 3 or
+         #tbl.foot.rows ~= 0 or #tbl.caption.long ~= 0 or tbl.caption.short ~= nil or
+         #tbl.bodies ~= 1 or #tbl.bodies[1].head ~= 0 or tbl.bodies[1].row_head_columns ~= 0 or
+         #tbl.bodies[1].body < 1 or #tbl.bodies[1].body > 3 or width(tbl) > 900 then return div end
+      for _, cell in ipairs(tbl.head.rows[1].cells) do
+        if cell.row_span ~= 1 or cell.col_span ~= 1 or cell.identifier ~= "" or
+           #cell.classes ~= 0 or (#cell.attributes > 0 and
+             (#cell.attributes ~= 1 or cell.attributes["scope"] ~= "col")) or
+           paragraphs(cell.contents) ~= 1 then return div end
+      end
+      for _, row in ipairs(tbl.bodies[1].body) do
+        if #row.cells ~= 3 or row.identifier ~= "" or #row.classes ~= 0 or
+           (#row.attributes > 0 and (#row.attributes ~= 1 or not row.attributes["item-id"])) then return div end
+        for column, cell in ipairs(row.cells) do
+          local count = paragraphs(cell.contents)
+          if cell.row_span ~= 1 or cell.col_span ~= 1 or cell.identifier ~= "" or
+             #cell.classes ~= 0 or #cell.attributes ~= 0 or not count or count == 0 or
+             count > (column == 1 and 4 or 3) or width(cell.contents) > ({320, 80, 160})[column] then return div end
+        end
+      end
+      answer.content[heading - 1] = pandoc.Div({lead}, pandoc.Attr("", {}, {["custom-style"]="Pilot Lead"}))
+      for index = 1, #tbl.bodies[1].body - 1 do
+        tbl.bodies[1].body[index].cells[1].contents:insert(1,
+          pandoc.RawBlock("openxml", "<!--DSW:SE:bounded-budget-next-row:v1-->"))
+      end
+      return div
+    end
   end
   return div
 end
@@ -491,6 +643,28 @@ local function keep_q5_context(div)
 end
 -- END short Q5 context
 
+-- The compact joined Q5 context above already owns its lead. Other review
+-- answers still need the diagnostic introduction paired with its real list.
+-- Inspect only the direct template diagnostic, leaving authored blocks intact.
+local function keep_q5_diagnostic_lead(div)
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.classes:includes("answer") then
+      for _, limits in ipairs(answer.content) do
+        if limits.t == "Div" and limits.identifier == "" and #limits.classes == 3 and
+           limits.classes:includes("data-gap") and limits.classes:includes("template-gap") and
+           limits.classes:includes("storage-detail-limits") and #limits.attributes == 0 and
+           #limits.content == 2 and limits.content[1].t == "Para" and
+           limits.content[2].t == "BulletList" and #limits.content[2].content == 2 and
+           short_automatic_lead(limits.content[1]) then
+          limits.content[1] = pandoc.Div({limits.content[1]},
+            pandoc.Attr("", {}, {["custom-style"] = "Pilot Lead"}))
+        end
+      end
+    end
+  end
+  return div
+end
+
 -- Keep the owned budget title/project label inside the first table's repeating
 -- header. A paragraph keepNext can instead try to keep an entire large table,
 -- leaving the title on its own page. Move original blocks, never rewrite text,
@@ -662,7 +836,9 @@ local function align_budget_cells(div)
     end
     local first = row.cells[1].contents
     local index = first[1] and first[1].t == "RawBlock" and
-      first[1].format == "openxml" and first[1].text == "<!--DSW:SE:budget-row:v1-->" and 2 or 1
+      first[1].format == "openxml" and
+      (first[1].text == "<!--DSW:SE:budget-row:v1-->" or
+       first[1].text == "<!--DSW:SE:bounded-budget-next-row:v1-->") and 2 or 1
     local label = first[index]
     if not label or label.t ~= "Div" or label.identifier ~= "" or #label.classes ~= 0 or
        #label.attributes ~= 1 or label.attributes["custom-style"] ~= "Pilot Label" or
@@ -745,6 +921,32 @@ local function provenance_text(inlines)
     end
   end
   return true
+end
+
+-- The current review footer has four scalar paragraphs, or five with phase.
+-- Keep only that small generated shape; arbitrary long/complex values flow.
+local function short_review_provenance(blocks)
+  local count, total, links = #blocks, 0, 0
+  if count ~= 4 and count ~= 5 then return false end
+  for index, block in ipairs(blocks) do
+    if block.t ~= "Para" or not provenance_text(block.content) or
+       not pandoc.utils.stringify(block):match("%S") then return false end
+    local width = 0
+    for _, code in utf8.codes(pandoc.utils.stringify(block)) do width = width + (code >= 0x2E80 and 2 or 1) end
+    if width > 320 then return false end
+    total = total + width
+    for _, inline in ipairs(block.content) do
+      if inline.t == "Link" then
+        if index ~= count or inline.identifier ~= "" or #inline.classes ~= 0 or #inline.attributes ~= 0 or
+           not pandoc.utils.stringify(inline):match("%S") then return false end
+        for _, child in ipairs(inline.content) do
+          if child.t ~= "Str" and child.t ~= "Space" and child.t ~= "SoftBreak" then return false end
+        end
+        links = links + 1
+      end
+    end
+  end
+  return links == 1 and total <= 900
 end
 
 -- Only generated Q15 two-cell funding metadata, followed by its own real body.
@@ -843,28 +1045,39 @@ function Div(div)
   if div.classes:includes("word-rich-resource-funding") then
     return separate_authored_resource_tables(div)
   end
-  -- Pandoc discards <aside>; the Word entry supplies this owned wrapper.
-  -- Join only the short two-paragraph provenance, retaining every inline/link.
+  -- The Word entry supplies the outer owner; Pandoc 4.35 retains its aside.
+  -- Join only a bounded legacy pair or current scalar metadata block.
+  -- Retain every inline/link and never keep the following body with it.
   -- Long or structurally different metadata stays free to paginate.
   if div.identifier == "dmp-provenance" and #div.classes == 1 and
-     div.classes:includes("document-provenance") and #div.attributes == 0 and
-     #div.content == 2 and div.content[1].t == "Para" and div.content[2].t == "Para" and
-     provenance_text(div.content[1].content) and provenance_text(div.content[2].content) and
-     utf8.len(pandoc.utils.stringify(div)) <= 240 then
-    local inlines = pandoc.List()
-    inlines:extend(div.content[1].content)
-    inlines:insert(pandoc.LineBreak())
-    inlines:extend(div.content[2].content)
-    div.content = {pandoc.Para(inlines)}
-    div.attributes["custom-style"] = "Pilot Provenance"
-    return div
+     div.classes:includes("document-provenance") and #div.attributes == 0 then
+    local target = div
+    local child = div.content[1]
+    if #div.content == 1 and child.t == "Div" and child.identifier == "" and #child.attributes == 0 and
+       child.classes:includes("aside") and (#child.classes == 1 or
+       (#child.classes == 2 and child.classes:includes("document-provenance"))) then target = child end
+    local blocks = target.content
+    if (#blocks == 2 and blocks[1].t == "Para" and blocks[2].t == "Para" and
+        provenance_text(blocks[1].content) and provenance_text(blocks[2].content) and
+        utf8.len(pandoc.utils.stringify(target)) <= 240) or short_review_provenance(blocks) then
+      local inlines = pandoc.List()
+      for index, paragraph in ipairs(blocks) do
+        if index > 1 then inlines:insert(pandoc.LineBreak()) end
+        inlines:extend(paragraph.content)
+      end
+      target.content = {pandoc.Para(inlines)}
+      div.attributes["custom-style"] = "Pilot Provenance"
+      return div
+    end
   end
-  if div.identifier == "q-store-backup" then return keep_q5_context(div) end
+  if div.identifier == "q-store-backup" then return keep_q5_diagnostic_lead(keep_q5_context(div)) end
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
   if div.identifier == "q-required-resources" then div = expand_long_budget_tables(div) end
   if div.identifier == "q-required-resources" then div = keep_funding_metadata_leads(div) end
+  if div.identifier == "q-required-resources" then div = join_q15_terminal_gaps(div) end
+  if div.identifier == "q-required-resources" then div = keep_short_budget_narrative(div) end
   if div.identifier == "q-required-resources" then return keep_rich_resource_leads(align_budget_cells(keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div))))) end
   if div.classes:includes("identifier-heading") then
     -- Q13 only: combine the existing distribution number and repository type.
@@ -985,14 +1198,23 @@ function Div(div)
     end
     return div
   end
-  -- Q14: the name already keeps with the following paragraph. Keep the lines
-  -- of a short owned summary together as well; keepNext alone permits a split
-  -- in its body. Do not chain different people or bind a long person record.
-  if div.classes:includes("person-responsibilities") and div.classes:includes("short-reading-unit") and
-     utf8.len(pandoc.utils.stringify(div)) <= 500 and #div.content == 2 and
-     div.content[1].t == "Div" and div.content[1].classes:includes("answer-lead") and
-     div.content[2].t == "Para" then
-    div.content[2] = pandoc.Div({div.content[2]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Responsibility Summary"}))
+  -- Q14 now names the actor in its complete summary, not a separate lead.
+  -- Keep one bounded paragraph's lines, never the next person or a missing-name
+  -- hint. Reject other shapes here rather than falling into the generic chain.
+  if div.classes:includes("person-responsibilities") then
+    local index = div.attributes["contributor-index"]
+    if div.identifier == "" and #div.classes == 2 and div.classes:includes("short-reading-unit") and
+       #div.attributes == 2 and div.attributes["contributor-id"] ~= nil and
+       div.attributes["contributor-id"] ~= "" and index and index:match("^[1-9]%d*$") and
+       utf8.len(pandoc.utils.stringify(div)) <= 500 and #div.content == 1 and div.content[1].t == "Para" then
+      local simple = true
+      for _, inline in ipairs(div.content[1].content) do
+        if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then simple = false end
+      end
+      if simple then
+        div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Responsibility Summary"}))
+      end
+    end
     return div
   end
   if div.classes:includes("short-reading-unit") and utf8.len(pandoc.utils.stringify(div)) <= 500 then

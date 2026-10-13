@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 {# Four related, explicitly selected facts form one paragraph per dataset.
    Never concatenate authored Markdown or facts belonging to another dataset.
    When a compiled KM is available, reject filtered or detached descendants. #}
@@ -97,7 +98,7 @@
     {%- if authored|trim -%}
       <div class="answer-detail" data-fact-id="reuse-conditions-detail" data-status="complete">
         <p><strong>Conditions of use</strong></p>
-        {{- authored|markdown -}}
+        {{- answerMarkdown.markdown(authored) -}}
       </div>
     {%- elif output_profile|default('review') != 'submission' -%}
       <p class="data-gap" data-fact-id="reuse-conditions-detail" data-status="missing">Information not provided: the specific conditions of use.</p>

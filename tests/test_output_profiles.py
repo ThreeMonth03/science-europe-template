@@ -11,6 +11,17 @@ from generate_pilot_fixtures import IDS, path
 
 
 class OutputProfilesTests(unittest.TestCase):
+    def test_package_overrides_retain_the_synthetic_markdown_adapter(self):
+        overrides = {
+            'src/answer-markdown.html.j2': (ROOT / 'src/answer-markdown.html.j2').read_text(),
+            'probe.html.j2': '{% import "src/answer-markdown.html.j2" as answer with context %}{{ answer.markdown(value) }}',
+        }
+        for escape in (False, True):
+            with self.subTest(autoescape=escape):
+                rendered = environment(ROOT, escape, overrides).get_template('probe.html.j2').render(
+                    value='<p>Pre-rendered fixture answer.</p>')
+                self.assertEqual(rendered, '<p>Pre-rendered fixture answer.</p>')
+
     def test_fixtures_review_unchanged_and_only_declared_submission_delta(self):
         # Keep the historical partial-profile oracle, on verified 0.3.43 bytes.
         # Current 0.3.44 behavior is covered by test_submission_preview.py.

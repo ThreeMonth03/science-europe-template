@@ -1,14 +1,25 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-copyright-ipr" class="question">
   <h3>8. How will other legal issues, such as intellectual property rights and ownership, be managed? What legislation is applicable?
 </h3>
 
   <div class="answer">
+    {%- import 'src/active-answer.j2' as activeAnswer with context -%}
     {% set legalContent %}
     {# Open philosophy #}
-    {%- set asOpenAsPossiblePath = [uuids.accessCUuid, uuids.asOpenAsPossibleQUuid]|reply_path -%}
-    {%- set asOpenAsPossibleAUuid = repliesMap[asOpenAsPossiblePath]|reply_str_value -%}
+    {%- set asOpenAsPossibleParts = [uuids.accessCUuid, uuids.asOpenAsPossibleQUuid] -%}
+    {%- set asOpenAsPossiblePath = activeAnswer.path(asOpenAsPossibleParts, 'OptionsQuestion') if km is defined else asOpenAsPossibleParts|reply_path -%}
+    {%- set asOpenAsPossibleAUuid = repliesMap[asOpenAsPossiblePath]|reply_str_value if asOpenAsPossiblePath else '' -%}
+    {%- if asOpenAsPossiblePath in repliesMap and repliesMap[asOpenAsPossiblePath].value is defined and repliesMap[asOpenAsPossiblePath].value.type is defined and repliesMap[asOpenAsPossiblePath].value.type != 'AnswerReply' -%}
+      {%- set asOpenAsPossibleAUuid = '' -%}
+    {%- endif -%}
+    {%- if km is defined and asOpenAsPossiblePath and (asOpenAsPossibleAUuid not in km.entities.questions[uuids.asOpenAsPossibleQUuid].answerUuids or asOpenAsPossibleAUuid not in km.entities.answers) -%}
+      {%- set asOpenAsPossibleAUuid = '' -%}
+    {%- endif -%}
     {%- if asOpenAsPossibleAUuid == uuids.asOpenAsPossibleYesAUuid -%}
       <p>We will manage our data according to the principle <em>as open as possible</em>.</p>
+    {%- elif asOpenAsPossibleAUuid == uuids.asOpenAsPossibleNoAUuid -%}
+      <p data-fact-id="openness-principle" data-status="explicit-no">We will not manage our data according to the principle of being as open as possible.</p>
     {%- endif -%}
 
     {# Can open data #}
@@ -47,11 +58,13 @@
           {%- elif businessReasonsPatents %}
             The data cannot be made fully open because of patent-related commercial considerations.
           {%- elif businessReasonsOther %}
-            The data cannot be made fully open because of commercial considerations unrelated to patents{{ ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "." }}
+            <div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>The data cannot be made fully open because of commercial considerations unrelated to patents{{ ":" if notOpenBusinessReasonsOther else "." }}</p></div>
+            {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}
           {%- elif otherReasonsPapers %}
             The data cannot be made fully open because papers need to be submitted first.
           {%- elif otherReasonsOther %}
-            The data cannot be made fully open because of reasons other than publishing a paper{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "." }}
+            <div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>The data cannot be made fully open because of reasons other than publishing a paper{{ ":" if notOpenOtherReasonsOther else "." }}</p></div>
+            {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}
           {%- endif -%}
         {%- else %}
           <div class="answer-lead"><p>The data cannot be made fully open for the following reasons:</p></div>
@@ -62,12 +75,14 @@
             {%- if businessReasonsPatents %}
               <li>patent-related commercial considerations</li>
             {%- elif businessReasonsOther %}
-              <li>commercial considerations unrelated to patents{{ ": " ~ notOpenBusinessReasonsOther|markdown if notOpenBusinessReasonsOther else "" }}</li>
+              <li><div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>commercial considerations unrelated to patents{{ ":" if notOpenBusinessReasonsOther else "" }}</p></div>
+                {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}</li>
             {%- endif -%}
             {%- if otherReasonsPapers %}
               <li>papers need to be submitted first</li>
             {%- elif otherReasonsOther -%}
-              <li>reasons other than publishing a paper{{ ": " ~ notOpenOtherReasonsOther|markdown if notOpenOtherReasonsOther else "" }}</li>
+              <li><div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>reasons other than publishing a paper{{ ":" if notOpenOtherReasonsOther else "" }}</p></div>
+                {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}</li>
             {%- endif -%}
           </ul>
         {%- endif -%}
@@ -95,7 +110,7 @@
             {%- set legalReasonsAuthenticatedCommitteeReply = repliesMap[legalReasonsAuthenticatedCommitteeQUuid]|reply_str_value -%}
             
             {%- if legalReasonsAuthenticatedCommitteeReply|trim -%}
-              <div class="answer-detail">We will make use of an existing data committee: {{legalReasonsAuthenticatedCommitteeReply|markdown}}</div>
+              <div class="answer-detail"><div class="answer-lead"><p>We will make use of an existing data committee:</p></div>{{ answerMarkdown.markdown(legalReasonsAuthenticatedCommitteeReply) }}</div>
             {%- else -%}
               <p>We will make use of an existing data committee.</p>
             {%- endif -%}
@@ -105,7 +120,7 @@
             {%- set legalReasonsAuthenticatedOtherReply = repliesMap[legalReasonsAuthenticatedOtherQUuid]|reply_str_value -%}
 
             {%- if legalReasonsAuthenticatedOtherReply|trim -%}
-              <div class="answer-detail"><div class="answer-lead"><p>We will use the following authorization arrangements:</p></div>{{legalReasonsAuthenticatedOtherReply|markdown}}</div>
+              <div class="answer-detail"><div class="answer-lead"><p>We will use the following authorization arrangements:</p></div>{{ answerMarkdown.markdown(legalReasonsAuthenticatedOtherReply) }}</div>
             {%- else -%}
               <p>We will make other arrangements for authorizing potential users.</p>
               {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="authorization-details" data-status="missing"><strong>Information not provided:</strong> details of the authorization arrangements.</p>{% endif %}
@@ -159,7 +174,10 @@
       {%- set ownershipOtherPath = activeAnswer.path(ownershipOtherParts, 'ValueQuestion') if km is defined else ownershipOtherParts|reply_path -%}
       {%- set ownershipOther = repliesMap[ownershipOtherPath]|reply_str_value if ownershipOtherPath else '' -%}
       {%- if ownershipOther|trim -%}
-        <div class="answer-detail">We have made the following arrangements regarding data ownership: {{ ownershipOther|markdown }}</div>
+        <div class="answer-detail">
+          <div class="answer-lead"><p>We have made the following arrangements regarding data ownership:</p></div>
+          {{ answerMarkdown.markdown(ownershipOther) }}
+        </div>
       {%- else -%}
         <p>Rights to the collected data are arranged in another way.</p>
       {%- endif -%}
@@ -215,7 +233,8 @@
                   {%- set refDataConditionsOtherPath = [refDataConditionsPath, uuids.refDataConditionsOtherAUuid, uuids.refDataConditionsOtherQUuid]|reply_path -%}
                   {%- set refDataConditionsOther = repliesMap[refDataConditionsOtherPath]|reply_str_value -%}
                   {%- set refDataConditionsOther = refDataConditionsOther if refDataConditionsOther|trim else '' -%}
-                  It is available under specific restrictions, which we will follow in our project{{ ": " ~ refDataConditionsOther|markdown if refDataConditionsOther else "." }}
+                  <p{% if refDataConditionsOther %} class="answer-lead"{% endif %}>It is available under specific restrictions, which we will follow in our project{{ ":" if refDataConditionsOther else "." }}</p>
+                  {% if refDataConditionsOther %}<div class="answer-detail">{{ answerMarkdown.markdown(refDataConditionsOther) }}</div>{% endif %}
                 {%- endif -%}
               </li>
             {%- endif -%}
@@ -242,7 +261,8 @@
                   {%- set nrefDataConditionsOtherPath = [nrefDataConditionsPath, uuids.nrefDataConditionsOtherAUuid, uuids.nrefDataConditionsOtherQUuid]|reply_path -%}
                   {%- set nrefDataConditionsOther = repliesMap[nrefDataConditionsOtherPath]|reply_str_value -%}
                   {%- set nrefDataConditionsOther = nrefDataConditionsOther if nrefDataConditionsOther|trim else '' -%}
-                  It is available under specific restrictions, which we will follow in our project{{ ": " ~ nrefDataConditionsOther|markdown if nrefDataConditionsOther else "." }}
+                  <p{% if nrefDataConditionsOther %} class="answer-lead"{% endif %}>It is available under specific restrictions, which we will follow in our project{{ ":" if nrefDataConditionsOther else "." }}</p>
+                  {% if nrefDataConditionsOther %}<div class="answer-detail">{{ answerMarkdown.markdown(nrefDataConditionsOther) }}</div>{% endif %}
                 {%- endif -%}
               </li>
             {%- endif -%}

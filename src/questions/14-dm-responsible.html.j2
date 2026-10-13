@@ -16,10 +16,10 @@
         {%- set roles = repliesMap[[personPath, uuids.contributorRoleQUuid]|reply_path]|reply_items -%}
         {% set responsibilitySentences = [] %}
         {% set mappedRoles = [] %}
+        {%- set responsibilityActor = (name if name|trim else macros.contributorLabel(contributorIndex))|e -%}
         {% include 'src/responsibility-sentences.j2' with context %}
         {%- if responsibilitySentences -%}
           {% set personContent %}
-            <div class="answer-lead"><p class="responsible-person"><strong>{% if name|trim %}{{ name|e }}{% else %}{{ macros.contributorLabel(contributorIndex) }}{% endif %}</strong></p></div>
             <p class="responsibility-summary" data-fact-id="data-management-responsibilities" data-role-uuids="{{ mappedRoles|join(' ') }}">{{ responsibilitySentences|join(" ") }}</p>
             {% if not name|trim and output_profile|default('review') != 'submission' %}
               <p class="data-gap" data-fact-id="responsible-person-name" data-status="missing">Please provide the name of the person or team assigned these responsibilities.</p>

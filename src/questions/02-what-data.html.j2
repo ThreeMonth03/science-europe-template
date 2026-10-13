@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context %}
 <div id="q-what-data" class="question">
   <h3>2. What data (for example the kinds, formats, and volumes) will be collected or produced?</h3>
   <div class="answer">
@@ -66,9 +67,16 @@
             {% if ownershipOther|trim %}
               <div class="answer-detail" data-fact-id="external-ownership" data-status="complete">
                 <div class="answer-lead"><p>Data ownership arrangements:</p></div>
-                {{ ownershipOther|markdown }}
+                {{ answerMarkdown.markdown(ownershipOther) }}
               </div>
             {% elif ownershipMissing %}
+              {%- if measuredDataWhoAUuid == uuids.measuredDataWhoExternalAUuid and mdExternalOwnershipAUuid == uuids.mdExternalOwnershipOtherAUuid -%}
+                {%- import 'src/active-answer.j2' as activeAnswer with context -%}
+                {%- set activeOwnershipPath = activeAnswer.path(mdExternalOwnershipPath.split('.'), 'OptionsQuestion') if km is defined else mdExternalOwnershipPath -%}
+                {%- if activeOwnershipPath and (km is not defined or (mdExternalOwnershipAUuid in km.entities.questions[uuids.mdExternalOwnershipQUuid].answerUuids and mdExternalOwnershipAUuid in km.entities.answers)) and (repliesMap[mdExternalOwnershipPath].value is not defined or repliesMap[mdExternalOwnershipPath].value.type is not defined or repliesMap[mdExternalOwnershipPath].value.type == 'AnswerReply') -%}
+                  <p data-fact-id="external-ownership" data-status="complete">Other arrangements have been made for ownership of this dataset.</p>
+                {%- endif -%}
+              {%- endif -%}
               {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b" data-fact-id="external-ownership" data-status="missing">Information not provided: ownership arrangements for data collected by the external party.</p>{% endif %}
             {% endif %}
           </div>
@@ -196,9 +204,9 @@
               <strong class="item-label">{% if output_profile|default('review') == 'submission' and not neqDataSetsName|trim %}{{ macros.datasetLabel(macros.DATASET_NON_EQUIPMENT, neqDataSetsItems.index(neqDataSetItem) + 1) }}{% else %}{{ (neqDataSetsName if neqDataSetsName|trim else "(no name given)")|e }}{% endif %}</strong>
               {# Keep the authored body out of automatic first-paragraph lead styling. #}
               {% if neqDataSetsDesc|trim or captureSentences or entryOther|trim %}</p></div>{% endif %}
-              {% if neqDataSetsDesc|trim %}<div class="answer-detail"><div>{{ neqDataSetsDesc|markdown }}</div></div>{% endif %}
+              {% if neqDataSetsDesc|trim %}<div class="answer-detail"><div>{{ answerMarkdown.markdown(neqDataSetsDesc) }}</div></div>{% endif %}
               {% if captureSentences %}<p class="collection-summary" data-fact-id="non-equipment-capture">{{ captureSentences|join(" ") }}</p>{% endif %}
-              {% if entryOther|trim %}<div class="answer-lead"><p>Other data-entry arrangements:</p></div><div class="answer-detail" data-fact-id="non-equipment-data-entry-other"><div>{{ entryOther|markdown }}</div></div>{% endif %}
+              {% if entryOther|trim %}<div class="answer-lead"><p>Other data-entry arrangements:</p></div><div class="answer-detail" data-fact-id="non-equipment-data-entry-other"><div>{{ answerMarkdown.markdown(entryOther) }}</div></div>{% endif %}
             </li>
           {%- endfor -%}
           </ul>
@@ -305,7 +313,7 @@
           {% if formatsIsStandardAUuid == uuids.formatsIsStandardNoAUuid and formatsWhyNonStandardAUuid == uuids.formatsWhyNSAnotherReasonAUuid and formatsWhyNSAnotherReason|trim %}
             <div class="answer-detail" data-fact-id="nonstandard-reason" data-status="complete">
               <p class="answer-lead">Reason for using a non-standard format:</p>
-              {{ formatsWhyNSAnotherReason|markdown }}
+              {{ answerMarkdown.markdown(formatsWhyNSAnotherReason) }}
             </div>
           {% endif %}
           {% set formatGaps = [] %}

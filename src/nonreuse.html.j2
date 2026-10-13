@@ -1,5 +1,6 @@
 {# Source/location is metadata, never an unfinished sentence prefix. Authored
    reasons remain Markdown blocks outside the template-owned paragraph. #}
+{%- import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 {%- macro render(source, reason, detail, noData, noAspect, noQuality, noConditions, other) -%}
   {%- set nonreuseSentences = [] -%}
   {%- set decisionSentence -%}This dataset was considered but will not be re-used.{%- endset -%}
@@ -20,7 +21,7 @@
   <p class="nonreuse-summary" data-fact-id="reuse-decision" data-status="explicit-no">{{ nonreuseSentences|join(" ") }}</p>
   {{ location(source) }}
   {% if reason == other and detail|trim %}
-    <div class="answer-detail" data-fact-id="nonreuse-reason" data-status="complete"><p><strong>Reason for not re-using this dataset</strong></p>{{ detail|markdown }}</div>
+    <div class="answer-detail" data-fact-id="nonreuse-reason" data-status="complete"><p><strong>Reason for not re-using this dataset</strong></p>{{ answerMarkdown.markdown(detail) }}</div>
   {% elif reason not in [noData, noAspect, noQuality, noConditions] and output_profile|default('review') != 'submission' %}
     {% set reasonStatus = 'needs-review' if reason and reason != other else 'missing' %}
     <p class="data-gap" data-fact-id="nonreuse-reason" data-status="{{ reasonStatus }}"><strong>Information not provided:</strong> why this dataset will not be re-used.</p>

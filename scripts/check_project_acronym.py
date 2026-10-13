@@ -244,7 +244,8 @@ def check(root, language):
                 replies[path(LISTING, 'project-b', 'projectNameQUuid')] = 'SECOND'
             soup = render(headed, km, replies, profile)
             visible = bool((name or '').strip())
-            assert soup.h1.get_text() == (name if visible and not multiple else DOCUMENT_NAME)
+            plan_name = 'Data Management Plan' if language == 'en' else '資料管理方案'
+            assert soup.h1.get_text() == (name if visible and not multiple else plan_name)
             assert soup.h1.find(True) is None
             heading = soup.select_one('.project[data-item-id="project-a"] h3')
             if multiple and visible: assert heading.get_text() == name and heading.find(True) is None
@@ -252,7 +253,9 @@ def check(root, language):
                 if profile=='submission': assert heading is None
                 else: assert heading.get_text().strip() == ('(project name not given)' if language=='en' else '（尚未提供專案名稱）')
             else: assert heading is None
-            assert DOCUMENT_NAME in soup.header.get_text()
+            # The workspace label is not submission metadata. It may still
+            # appear when the user explicitly supplied that research title.
+            assert (DOCUMENT_NAME in soup.header.get_text()) == (visible and not multiple and name == DOCUMENT_NAME)
             counts['project_titles'] += 1
 
         for states, profile in itertools.product(itertools.product([False, True], repeat=3), ['review','submission']):
@@ -285,7 +288,7 @@ def check(root, language):
                 dict(uuid='old',name='STALE-VERSION',created_at='')]), document=dict(created_at=''))
             soup = render(headed, km, replies, profile, dc, dict(phaseUuid='phase-a',project=dict(versionUuid='version-a')))
             assert version in soup.header.get_text() and 'STALE-VERSION' not in soup.get_text()
-            assert (phase in soup.header.get_text()) == known_phase
+            assert phase not in soup.header.get_text()
             assert not soup.header.select('a, b, img, script')
             counts['header_metadata'] += 1
 

@@ -29,4 +29,21 @@
   {%- set repositoryServiceSentence -%}The repository will provide an advanced processing service.{%- endset -%}
   {%- do repositorySentences.append(repositoryServiceSentence) -%}
 {%- endif -%}
+{# Server maintenance belongs to this active special-purpose distribution. #}
+{%- set specialRepoMaintenanceParts = distroRepositoryKindPath.split('.') + [uuids.publishedDataRepositorySpecialAUuid, uuids.specialRepoMaintenanceQUuid] -%}
+{%- set specialRepoMaintenancePath = activeAnswer.path(specialRepoMaintenanceParts, 'OptionsQuestion') if km is defined else specialRepoMaintenanceParts|reply_path -%}
+{%- set specialRepoMaintenanceAUuid = repliesMap[specialRepoMaintenancePath]|reply_str_value if specialRepoMaintenancePath else '' -%}
+{%- if specialRepoMaintenancePath in repliesMap and repliesMap[specialRepoMaintenancePath].value is defined and repliesMap[specialRepoMaintenancePath].value.type is defined and repliesMap[specialRepoMaintenancePath].value.type != 'AnswerReply' -%}
+  {%- set specialRepoMaintenanceAUuid = '' -%}
+{%- endif -%}
+{%- if km is defined and specialRepoMaintenancePath and (specialRepoMaintenanceAUuid not in km.entities.questions[uuids.specialRepoMaintenanceQUuid].answerUuids or specialRepoMaintenanceAUuid not in km.entities.answers) -%}
+  {%- set specialRepoMaintenanceAUuid = '' -%}
+{%- endif -%}
+{%- if specialRepoMaintenanceAUuid == uuids.specialRepoMaintenanceYesAUuid -%}
+  {%- set repositoryMaintenanceSentence -%}<span data-requirement-id="SE-5b" data-fact-id="repository-server-maintenance" data-status="complete">We have arranged system administration (at least security updates) and hardware maintenance for the repository servers.</span>{%- endset -%}
+  {%- do repositorySentences.append(repositoryMaintenanceSentence) -%}
+{%- elif specialRepoMaintenanceAUuid == uuids.specialRepoMaintenanceNotYetAUuid -%}
+  {%- set repositoryMaintenanceSentence -%}<span data-requirement-id="SE-5b" data-fact-id="repository-server-maintenance" data-status="not-yet">We have not yet completed the arrangements for system administration (at least security updates) and hardware maintenance for the repository servers.</span>{%- endset -%}
+  {%- do repositorySentences.append(repositoryMaintenanceSentence) -%}
+{%- endif -%}
 {{- repositorySentences|join(" ") -}}

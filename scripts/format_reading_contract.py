@@ -100,11 +100,12 @@ def scenarios():
 def check_roots(root, frozen, language):
     from jinja2 import Environment, FileSystemLoader, ChoiceLoader, DictLoader
     import test_science_europe_contract as adapter
+    from current_support import MARKDOWN_ADAPTER
     question='src/questions/02-what-data.html.j2'
     wrapper="{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include '"+question+"' %}"
     checks=0
     for escape in [False,True]:
-        env=Environment(loader=FileSystemLoader(root),extensions=['jinja2.ext.do'],autoescape=escape)
+        env=Environment(loader=ChoiceLoader([DictLoader(MARKDOWN_ADAPTER), FileSystemLoader(root)]),extensions=['jinja2.ext.do'],autoescape=escape)
         env.filters.update(reply_path=adapter.reply_path,reply_items=adapter.reply_items,reply_str_value=adapter.reply_str_value,markdown=lambda v:v)
         old=env.overlay(loader=ChoiceLoader([DictLoader({question:frozen.read_text()}),env.loader]))
         templates=[old.from_string(wrapper),env.from_string(wrapper)]

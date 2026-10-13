@@ -30,6 +30,130 @@ def storage_matrix():
 
 
 class AnswerStateTests(unittest.TestCase):
+    def test_reused_negative_facts_and_openness_are_active_answers_not_missing_values(self):
+        from check_sentence_layout import partial_fixture
+        cases = [
+            ('src/questions/01-how-data.html.j2',
+             'reusingCUuid preexistingQUuid preexistingYesAUuid refDataQUuid ITEM '
+             'refDataUseQUuid refDataUseYesAUuid refDataVersionedQUuid',
+             'refDataVersionedYesAUuid', 'refDataVersionedNoAUuid', 'dataset-versioning',
+             'This reference dataset is not versioned.'),
+            ('src/questions/01-how-data.html.j2',
+             'reusingCUuid preexistingQUuid preexistingYesAUuid nrefDataQUuid ITEM '
+             'nrefDataUseQUuid nrefDataUseYesAUuid nrefDataPersonalQUuid',
+             'nrefDataPersonalYesAUuid', 'nrefDataPersonalNoAUuid', 'reuse-personal-data',
+             'This dataset does not contain personal data.'),
+            ('src/questions/08-copyright-ipr.html.j2',
+             'accessCUuid asOpenAsPossibleQUuid',
+             'asOpenAsPossibleYesAUuid', 'asOpenAsPossibleNoAUuid', 'openness-principle',
+             'We will not manage our data according to the principle of being as open as possible.'),
+        ]
+        for template, chain, yes, no, fact, sentence in cases:
+            km, base, leaf = partial_fixture(chain)
+            question = IDS[chain.split()[-1]]
+            km['entities']['questions'][question].update(
+                questionType='OptionsQuestion', answerUuids=[IDS[yes], IDS[no]])
+            km['entities']['answers'].update({IDS[yes]: {'followUpUuids': []},
+                                             IDS[no]: {'followUpUuids': []}})
+            for schema, profile, choice in itertools.product(({}, {'km': km}),
+                    ('review', 'submission'), (IDS[no], IDS[yes], None, '', 'unknown')):
+                values = dict(base)
+                if choice is not None: values[leaf] = choice
+                with self.subTest(fact=fact, profile=profile, choice=choice, schema=bool(schema)):
+                    soup = BeautifulSoup(render_question(template, values, output_profile=profile, **schema), 'html.parser')
+                    node = soup.select_one('[data-fact-id="'+fact+'"]')
+                    status = ('explicit-no' if choice == IDS[no] else 'complete'
+                              if fact == 'dataset-versioning' and choice == IDS[yes] else None)
+                    self.assertEqual(status is not None, bool(node))
+                    if node:
+                        self.assertEqual(status, node['data-status'])
+                        self.assertEqual(sentence if status == 'explicit-no' else
+                                         'This reference dataset is versioned.', node.get_text(' ', strip=True))
+                    if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review'))
+            for profile, mutation in itertools.product(('review', 'submission'),
+                    ('removed-question', 'removed-choice', 'dangling-answer', 'wrong-type', 'wrong-reply-type')):
+                altered = deepcopy(km)
+                values = {**base, leaf: IDS[no]}
+                if mutation == 'removed-question': del altered['entities']['questions'][question]
+                elif mutation == 'removed-choice': altered['entities']['questions'][question]['answerUuids'] = [IDS[yes]]
+                elif mutation == 'dangling-answer': del altered['entities']['answers'][IDS[no]]
+                elif mutation == 'wrong-type': altered['entities']['questions'][question]['questionType'] = 'ValueQuestion'
+                else: values[leaf] = {'value': {'type': 'StringReply', 'value': IDS[no]}}
+                soup = BeautifulSoup(render_question(template, values, output_profile=profile, km=altered), 'html.parser')
+                self.assertFalse(soup.select('[data-fact-id="'+fact+'"]'), (fact, mutation))
+            for ancestor in base:
+                values = {**base, leaf: IDS[no]}
+                values.pop(ancestor)
+                soup = BeautifulSoup(render_question(template, values, output_profile='submission', km=km), 'html.parser')
+                self.assertFalse(soup.select('[data-fact-id="'+fact+'"]'), (fact, ancestor))
+
+    def test_reference_versioning_yes_survives_only_missing_detail_siblings(self):
+        from check_sentence_layout import partial_fixture
+        from check_answer_mapping import question
+        from current_support import PREFIX, environment
+        chain = ('reusingCUuid preexistingQUuid preexistingYesAUuid refDataQUuid ITEM '
+                 'refDataUseQUuid refDataUseYesAUuid refDataVersionedQUuid')
+        km, base, leaf = partial_fixture(chain)
+        yes, no = IDS['refDataVersionedYesAUuid'], IDS['refDataVersionedNoAUuid']
+        km['entities']['questions'][IDS['refDataVersionedQUuid']].update(
+            questionType='OptionsQuestion', answerUuids=[yes, no])
+        km['entities']['answers'].update({yes: {'followUpUuids': []}, no: {'followUpUuids': []}})
+        children = km['entities']['answers'][yes]['followUpUuids']
+        question(km, children, IDS['refDataVersionedWhichQUuid'], 'ValueQuestion')
+        policies = [IDS['refDataVersionedChange'+name+'AUuid'] for name in ('Stay', 'New', 'All')]
+        policy_texts = ['the current version will continue to be used.',
+                        'it will be used for new analyses.',
+                        'all analyses will be repeated using it.']
+        question(km, children, IDS['refDataVersionedChangeQUuid'], 'OptionsQuestion', policies)
+        which = path(leaf, 'refDataVersionedYesAUuid', 'refDataVersionedWhichQUuid')
+        policy = path(leaf, 'refDataVersionedYesAUuid', 'refDataVersionedChangeQUuid')
+        env = environment(ROOT)
+        old_str, old_items = env.filters['reply_str_value'], env.filters['reply_items']
+        # This local adapter decodes typed envelopes; the production type guard,
+        # not a fixture's dict representation, must reject a wrong reply type.
+        env.filters['reply_str_value'] = lambda r: r['value'].get('value', '') if isinstance(r, dict) and isinstance(r.get('value'), dict) else old_str(r)
+        env.filters['reply_items'] = lambda r: r['value'].get('value', []) if isinstance(r, dict) and isinstance(r.get('value'), dict) else old_items(r)
+        template = env.from_string(PREFIX + "{% include 'src/questions/01-how-data.html.j2' %}")
+        render = lambda values, profile, schema: BeautifulSoup(template.render(
+            repliesMap=values, output_profile=profile, **schema), 'html.parser')
+        details = [(None, None), ('', None), (' \t\n\u3000', 'unknown'),
+                   ('Version-082', None), (None, policies[0]), (None, policies[1]),
+                   (None, policies[2]), ('Version-082', policies[0])]
+        for schema, profile, (version, change) in itertools.product(({}, {'km': km}),
+                ('review', 'submission'), details):
+            values = {**base, leaf: yes}
+            values[which], values[policy] = version, change
+            soup = render(values, profile, schema)
+            fact = soup.select('[data-fact-id="dataset-versioning"][data-status="complete"]')
+            expected = not (version or '').strip() and change not in policies
+            self.assertEqual(int(expected), len(fact), (profile, version, change, bool(schema)))
+            if fact: self.assertEqual('This reference dataset is versioned.', fact[0].get_text(strip=True))
+            self.assertEqual(version == 'Version-082', 'Version-082' in soup.get_text())
+            for selected, text in zip(policies, policy_texts):
+                self.assertEqual(change == selected, text in soup.get_text())
+            if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review'))
+            else:
+                self.assertEqual(not (version or '').strip(), bool(soup.select('[data-fact-id="dataset-version"][data-status="missing"]')))
+                self.assertEqual(change not in policies, bool(soup.select('[data-fact-id="dataset-version-policy"][data-status="missing"]')))
+        typed = {key: {'value': {'type': 'ItemListReply' if isinstance(value, list) else 'AnswerReply', 'value': value}}
+                 for key, value in {**base, leaf: yes}.items()}
+        for profile in ('review', 'submission'):
+            self.assertEqual(1, len(render(typed, profile, {'km': km}).select('[data-fact-id="dataset-versioning"][data-status="complete"]')))
+            for mutation in ('missing', 'empty', 'unknown', 'wrong-reply-type',
+                             'removed-question', 'removed-choice', 'dangling-answer', 'wrong-question-type'):
+                altered, values = deepcopy(km), deepcopy(typed)
+                if mutation == 'missing': values.pop(leaf)
+                elif mutation in ('empty', 'unknown'): values[leaf]['value']['value'] = '' if mutation == 'empty' else 'unknown'
+                elif mutation == 'wrong-reply-type': values[leaf]['value']['type'] = 'StringReply'
+                elif mutation == 'removed-question': del altered['entities']['questions'][IDS['refDataVersionedQUuid']]
+                elif mutation == 'removed-choice': altered['entities']['questions'][IDS['refDataVersionedQUuid']]['answerUuids'] = [no]
+                elif mutation == 'dangling-answer': del altered['entities']['answers'][yes]
+                else: altered['entities']['questions'][IDS['refDataVersionedQUuid']]['questionType'] = 'ValueQuestion'
+                self.assertFalse(render(values, profile, {'km': altered}).select('[data-fact-id="dataset-versioning"]'), mutation)
+            for ancestor in base:
+                values = deepcopy(typed); values.pop(ancestor)
+                self.assertFalse(render(values, profile, {'km': km}).select('[data-fact-id="dataset-versioning"]'), ancestor)
+
     def test_instrument_acquisition_survives_missing_or_empty_dataset_list(self):
         measured = path('creatingCUuid', 'measuredQUuid')
         datasets = path(measured, 'measuredYesAUuid', 'measuredDataQUuid')
@@ -52,23 +176,38 @@ class AnswerStateTests(unittest.TestCase):
         carry = path(prefix, 'risksCarryHomeQUuid')
         enc = path(carry, 'risksCarryHomeYesAUuid', 'risksCarryHomeEncQUuid')
         password = path(carry, 'risksCarryHomeYesAUuid', 'risksCarryHomePassQUuid')
-        for encryption, protection, profile in itertools.product(('Yes', 'No', None, 'unknown'),
+        for carrying, encryption, protection, profile in itertools.product(
+                ('Yes', 'No', None, 'unknown'), ('Yes', 'No', None, 'unknown'),
                 ('Yes', 'No', None, 'unknown'), ('review', 'submission')):
-            replies = {risk: IDS['risksExploreAUuid'], carry: IDS['risksCarryHomeYesAUuid'],
+            replies = {risk: IDS['risksExploreAUuid'],
                 path(prefix, 'risksHttpsQUuid'): IDS['risksHttpsYesAUuid']}
+            if carrying is not None: replies[carry] = IDS.get('risksCarryHome'+carrying+'AUuid', carrying)
             if encryption is not None: replies[enc] = IDS.get('risksCarryHomeEnc'+encryption+'AUuid', encryption)
             if protection is not None: replies[password] = IDS.get('risksCarryHomePass'+protection+'AUuid', protection)
-            with self.subTest(encryption=encryption, protection=protection, profile=profile):
+            with self.subTest(carrying=carrying, encryption=encryption, protection=protection, profile=profile):
                 soup = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', replies,
                     output_profile=profile), 'html.parser')
                 text = soup.get_text(' ', strip=True)
-                verb = 'can' if encryption == 'Yes' or protection == 'Yes' else 'will'
-                self.assertIn('Project members '+verb+' carry data with them', text)
-                self.assertEqual(encryption == 'Yes', 'on encrypted data carriers' in text)
-                self.assertEqual(encryption == 'No', 'Not all data carriers are encrypted.' in text)
-                self.assertEqual(protection == 'Yes', 'password-protected laptops' in text)
+                self.assertEqual(carrying == 'Yes', 'Project members carry data with them' in text)
+                self.assertEqual(carrying == 'No', 'Project members do not carry data with them' in text)
+                self.assertEqual(carrying == 'Yes' and encryption == 'Yes', 'All data carriers are encrypted.' in text)
+                self.assertEqual(carrying == 'Yes' and encryption == 'No', 'Not all data carriers are encrypted.' in text)
+                self.assertEqual(carrying == 'Yes' and protection == 'Yes', 'Accounts on laptops are password-protected.' in text)
+                self.assertEqual(carrying == 'Yes' and protection == 'No', 'Not all laptop accounts are password-protected.' in text)
+                self.assertNotIn('can carry data', text)
+                self.assertNotIn('will carry data', text)
+                self.assertNotIn('will not carry data', text)
                 self.assertIn('All project web services are accessible through HTTPS.', text)
                 if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review'))
+        for storing, profile in itertools.product(('Yes', 'No'), ('review', 'submission')):
+            replies = {risk: IDS['risksExploreAUuid'], carry: IDS['risksCarryHomeYesAUuid'],
+                       path(prefix, 'risksStoreLabQUuid'): IDS['risksStoreLab'+storing+'AUuid']}
+            soup = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', replies,
+                                 output_profile=profile), 'html.parser')
+            expected = ('Project members '+('store' if storing == 'Yes' else 'do not store')+
+                ' data or software on computers in the lab or external hard drives connected to those computers. '
+                'Project members carry data with them (e.g. on laptops, USB sticks, or other external media).')
+            self.assertEqual(expected, ' '.join(soup.select_one('.answer > p').get_text(' ', strip=True).split()))
 
     def test_risk_parent_gates_all_risk_facts_but_not_workspace_access(self):
         risk = path('processingCUuid', 'risksQUuid')
@@ -83,7 +222,7 @@ class AnswerStateTests(unittest.TestCase):
         values = {path(prefix, q): IDS[a] for q, a in choices.items()}
         values.update({workspace: IDS['sharedWorkspaceYesAUuid'],
             path(workspace, 'sharedWorkspaceYesAUuid', 'sharedAccessControlQUuid'): IDS['sharedAccessControlMembersRWAUuid']})
-        facts = ('will not store data or software', 'will not carry data with them',
+        facts = ('do not store data or software', 'do not carry data with them',
                  'accessible through HTTPS', 'have been instructed',
                  'The potential impact of data loss is small', 'We are not using any personal information.')
         for parent, profile in itertools.product((IDS['risksExploreAUuid'], None, '', 'unknown'), ('review', 'submission')):
@@ -94,11 +233,113 @@ class AnswerStateTests(unittest.TestCase):
                     output_profile=profile), 'html.parser')
                 text = soup.get_text(' ', strip=True)
                 for fact in facts: self.assertEqual(parent == IDS['risksExploreAUuid'], fact in text, fact)
-                self.assertIn('All project members have read and write access to the data.', text)
+                self.assertIn('All project members, and no one else, have read and write access to the data.', text)
                 self.assertFalse(soup.select('p p, p div, p ul'))
+
+    def test_independent_party_custodian_requires_active_typed_text_without_hiding_access(self):
+        from check_sentence_layout import partial_fixture
+        from check_answer_mapping import question
+        from current_support import PREFIX, environment
+        chain = ('processingCUuid risksQUuid risksExploreAUuid risksPersonalDataQUuid '
+                 'risksPersonalDataPseudoAUuid risksPseudonymizationQUuid '
+                 'risksPseudonymizationPartyAUuid risksPseudonymizationPartyQUuid')
+        km, base, leaf = partial_fixture(chain)
+        self.assertEqual('5d51a103-ec07-4c20-b269-f2f59f26d2cd', IDS['risksPseudonymizationPartyQUuid'])
+        km['entities']['questions'][IDS['risksPseudonymizationPartyQUuid']]['valueType'] = 'TextQuestionValueType'
+        # These alternate real choices make the retained Party child inactive.
+        for q, a in [('risksPersonalDataQUuid', 'risksPersonalDataNotUsingAUuid'),
+                     ('risksPseudonymizationQUuid', 'risksPseudonymizationInsideAUuid')]:
+            km['entities']['questions'][IDS[q]]['answerUuids'].append(IDS[a])
+            km['entities']['answers'][IDS[a]] = {'followUpUuids': []}
+        question(km, km['entities']['chapters'][IDS['processingCUuid']]['questionUuids'],
+                 IDS['sharedWorkspaceQUuid'], 'OptionsQuestion', [IDS['sharedWorkspaceYesAUuid']])
+        question(km, km['entities']['answers'][IDS['sharedWorkspaceYesAUuid']]['followUpUuids'],
+                 IDS['sharedAccessControlQUuid'], 'OptionsQuestion', [IDS['sharedAccessControlMembersRWAUuid']])
+        workspace = path('processingCUuid', 'sharedWorkspaceQUuid')
+        base.update({workspace: IDS['sharedWorkspaceYesAUuid'],
+            path(workspace, 'sharedWorkspaceYesAUuid', 'sharedAccessControlQUuid'): IDS['sharedAccessControlMembersRWAUuid']})
+        env = environment(ROOT)
+        old_str = env.filters['reply_str_value']
+        env.filters['reply_str_value'] = lambda r: r['value'].get('value', '') if isinstance(r, dict) and isinstance(r.get('value'), dict) else old_str(r)
+        template = env.from_string(PREFIX + "{% include 'src/questions/06-access-security.html.j2' %}")
+        render = lambda values, profile, schema: BeautifulSoup(template.render(
+            repliesMap=values, output_profile=profile, **schema), 'html.parser')
+        typed = lambda values: {key: {'value': {'type': 'StringReply' if key == leaf else 'AnswerReply',
+                                               'value': value}} for key, value in values.items()}
+        authored = '<p>University <strong>linkage unit</strong>, version 0.</p><ul><li>Keep the original conditions.</li></ul>'
+        generic = 'Pseudonymization is performed by an independent party to enable data linkage.'
+        exclusive = 'All project members, and no one else, have read and write access to the data.'
+        for profile, schema, value in itertools.product(('review', 'submission'), ({}, {'km': km}),
+                                                       (None, '', ' \t\n\u3000', '0', authored)):
+            values = dict(base)
+            if value is not None: values[leaf] = value
+            soup = render(typed(values) if schema else values, profile, schema)
+            detail = soup.select_one('[data-fact-id="pseudonymization-key-custodian"]')
+            self.assertEqual(bool(value and value.strip()), bool(detail), (profile, bool(schema), value))
+            self.assertEqual(1, soup.get_text(' ', strip=True).count(generic))
+            self.assertIn(exclusive, soup.get_text(' ', strip=True))
+            if detail:
+                self.assertEqual('complete', detail['data-status'])
+                self.assertIn('answer-detail', detail['class'])
+                lead = detail.find('div', recursive=False)
+                self.assertEqual(['answer-lead'], lead['class'])
+                self.assertEqual('Independent party that keeps the pseudonymization keys:', lead.p.get_text())
+                self.assertEqual(value, ''.join(str(node) for node in lead.next_siblings).strip())
+            if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review'))
+            self.assertFalse(soup.select('p p, p div, p ul'))
+        active = typed({**base, leaf: authored})
+        risk = path('processingCUuid', 'risksQUuid')
+        personal = path(risk, 'risksExploreAUuid', 'risksPersonalDataQUuid')
+        pseudo = path(personal, 'risksPersonalDataPseudoAUuid', 'risksPseudonymizationQUuid')
+        mutations = [('missing-main', pseudo), ('unknown-main', pseudo),
+                     ('alternate-personal', personal), ('alternate-pseudonymization', pseudo),
+                     *[('missing-ancestor', p) for p in (risk, personal)],
+                     *[('wrong-ancestor-reply', p) for p in (risk, personal, pseudo)],
+                     ('wrong-leaf-reply', leaf), ('wrong-leaf-value', leaf),
+                     ('wrong-value-type', leaf), ('wrong-question-type', leaf),
+                     ('removed-question', leaf), ('removed-followup', pseudo),
+                     ('removed-choice', pseudo), ('dangling-choice', pseudo)]
+        for profile, (mutation, target) in itertools.product(('review', 'submission'), mutations):
+            values, altered = deepcopy(active), deepcopy(km)
+            if mutation in ('missing-main', 'missing-ancestor'): values.pop(target)
+            elif mutation == 'unknown-main': values[target]['value']['value'] = 'unknown'
+            elif mutation == 'alternate-personal': values[target]['value']['value'] = IDS['risksPersonalDataNotUsingAUuid']
+            elif mutation == 'alternate-pseudonymization': values[target]['value']['value'] = IDS['risksPseudonymizationInsideAUuid']
+            elif mutation in ('wrong-ancestor-reply', 'wrong-leaf-reply'):
+                values[target]['value']['type'] = 'StringReply' if target != leaf else 'AnswerReply'
+            elif mutation == 'wrong-leaf-value': values[leaf]['value']['value'] = 0
+            elif mutation == 'wrong-value-type': altered['entities']['questions'][IDS['risksPseudonymizationPartyQUuid']]['valueType'] = 'StringQuestionValueType'
+            elif mutation == 'wrong-question-type': altered['entities']['questions'][IDS['risksPseudonymizationPartyQUuid']]['questionType'] = 'OptionsQuestion'
+            elif mutation == 'removed-question': del altered['entities']['questions'][IDS['risksPseudonymizationPartyQUuid']]
+            elif mutation == 'removed-followup': altered['entities']['answers'][IDS['risksPseudonymizationPartyAUuid']]['followUpUuids'] = []
+            elif mutation == 'removed-choice': altered['entities']['questions'][IDS['risksPseudonymizationQUuid']]['answerUuids'].remove(IDS['risksPseudonymizationPartyAUuid'])
+            else: del altered['entities']['answers'][IDS['risksPseudonymizationPartyAUuid']]
+            soup = render(values, profile, {'km': altered})
+            self.assertFalse(soup.select('[data-fact-id="pseudonymization-key-custodian"]'), (profile, mutation, target))
+            self.assertNotIn('linkage unit', soup.get_text(), (profile, mutation, target))
+            self.assertIn(exclusive, soup.get_text(' ', strip=True), (profile, mutation))
 
     def test_negative_followups_preserve_exact_no_and_active_yes_only(self):
         cases = [
+            ('src/questions/01-how-data.html.j2',
+             ('reusingCUuid', 'preexistingQUuid', 'preexistingYesAUuid', 'dataHarmoQUuid'),
+             'dataHarmoYesAUuid', 'dataHarmoNoAUuid',
+             '51b686f1-8a57-4d55-a1a5-30d77d074ada',
+             'Before reuse, we need to harmonize existing data from different sources',
+             'We do not need to harmonize existing data from different sources before reuse.'),
+            ('src/questions/01-how-data.html.j2',
+             ('reusingCUuid', 'preexistingQUuid', 'preexistingYesAUuid', 'dataCompReadQUuid'),
+             'dataCompReadYesAUuid', 'dataCompReadNoAUuid',
+             'd613ee29-a81b-44aa-83b5-2bf21ba43d22',
+             'Before reuse, we will need to convert the data into a machine-readable form.',
+             'We will not use existing data that needs to be converted into a machine-readable form before reuse.'),
+            ('src/questions/09-ethical-issues.html.j2',
+             ('creatingCUuid', 'collectPersonalQUuid', 'collectPersonalYesAUuid',
+              'cpersGdprQUuid', 'cpersGdprExploreAUuid', 'cpersGdprNeedDpiaQUuid'),
+             'cpersGdprNeedDpiaYesAUuid', 'cpersGdprNeedDpiaNoAUuid',
+             'd0741ff3-370b-44e7-860d-00b1f01e6254',
+             'According to the questionnaire, a data protection impact assessment (DPIA) is required.',
+             'According to the questionnaire, a data protection impact assessment (DPIA) is not required.'),
             ('src/questions/06-access-security.html.j2',
              ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksInfoLossQUuid'),
              'risksInfoLossSmallAUuid', 'risksInfoLossNoAUuid',
@@ -129,7 +370,7 @@ class AnswerStateTests(unittest.TestCase):
              'risksStoreLabYesAUuid', 'risksStoreLabNoAUuid',
              '17172079-ddce-40a7-b93a-f86dc6611452',
              'Project members store data or software on computers in the lab or external hard drives connected to those computers.',
-             'Project members will not store data or software on computers in the lab or external hard drives connected to those computers.'),
+             'Project members do not store data or software on computers in the lab or external hard drives connected to those computers.'),
             ('src/questions/06-access-security.html.j2',
              ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksInstructedQUuid'),
              'risksInstructedYesAUuid', 'risksInstructedNoAUuid',
@@ -147,7 +388,7 @@ class AnswerStateTests(unittest.TestCase):
               'risksCarryHomeYesAUuid', 'risksCarryHomePassQUuid'),
              'risksCarryHomePassYesAUuid', 'risksCarryHomePassNoAUuid',
              'f2d273c1-8e6e-4656-93ba-6b78d7d6785f',
-             'Project members can carry data with them on password-protected laptops.',
+             'Accounts on laptops are password-protected.',
              'Not all laptop accounts are password-protected.'),
             ('src/questions/06-access-security.html.j2',
              ('processingCUuid', 'risksQUuid', 'risksExploreAUuid', 'risksHttpsQUuid'),
@@ -166,7 +407,7 @@ class AnswerStateTests(unittest.TestCase):
               'risksCarryHomeYesAUuid', 'risksCarryHomeEncQUuid'),
              'risksCarryHomeEncYesAUuid', 'risksCarryHomeEncNoAUuid',
              '546d6e41-80ea-417b-b0e3-a1d9d75a3794',
-             'Project members can carry data with them on encrypted data carriers.',
+             'All data carriers are encrypted.',
              'Not all data carriers are encrypted.'),
             ('src/questions/03-docs-metadata.html.j2',
              ('processingCUuid', 'storageConvQUuid', 'storageConvExploreAUuid',
@@ -194,6 +435,7 @@ class AnswerStateTests(unittest.TestCase):
             ancestors = {path(*parts[:index]): parts[index]
                          for index in range(2, len(parts), 2)}
             inactive_answers = {
+                'collectPersonalQUuid': 'collectPersonalNoAUuid',
                 'openImmediatelyQUuid': 'openImmediatelyYesAUuid',
                 'notOpenLegalReasonsQUuid': 'notOpenLegalReasonsNoAUuid',
                 'risksCarryHomeQUuid': 'risksCarryHomeNoAUuid',
@@ -338,8 +580,9 @@ class AnswerStateTests(unittest.TestCase):
                   path(carry, 'risksCarryHomeYesAUuid', 'risksCarryHomePassQUuid'): IDS['risksCarryHomePassYesAUuid'],
                   path(risk_prefix, 'risksCertificationsQUuid'): IDS['risksCertificationsNoAUuid'],
                   path(risk_prefix, 'risksHttpsQUuid'): IDS['risksHttpsYesAUuid']}
-        expected = ('Project members can carry data with them on password-protected laptops. '
+        expected = ('Project members carry data with them (e.g. on laptops, USB sticks, or other external media). '
                     'Not all data carriers are encrypted. '
+                    'Accounts on laptops are password-protected. '
                     'Not all data centres that store project data hold appropriate certifications. '
                     'All project web services are accessible through HTTPS.')
         preexisting = path('reusingCUuid', 'preexistingQUuid')

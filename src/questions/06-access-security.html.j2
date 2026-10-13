@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-access-security" class="question">
   <h3>6. How will data security and protection of sensitive data be taken care of during the research?</h3>
 
@@ -64,25 +65,23 @@
     {%- if risksStoreLabAUuid in [uuids.risksStoreLabNoAUuid, uuids.risksStoreLabYesAUuid] or (risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid]) or (risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid]) or (risksHttpsAUuid in [uuids.risksHttpsYesAUuid, uuids.risksHttpsNoAUuid]) or (risksInstructedAUuid in [uuids.risksInstructedYesAUuid, uuids.risksInstructedNoAUuid]) %}
       <p>
         {%- if storeLab %}
-          Project members will not store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
+          Project members do not store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
         {%- elif risksStoreLabAUuid == uuids.risksStoreLabYesAUuid %}
           Project members store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
         {%- endif -%}
         {%- if risksCarryHomeAUuid == uuids.risksCarryHomeNoAUuid %}
-          {%- if storeLab -%}They{%- else -%}Project members{%- endif %} will not carry data with them (e.g. on laptops, USB sticks, or other external media).
-        {%- elif homeEncrypted and homePassword %}
-          {%- if storeLab -%}They{%- else -%}Project members{%- endif %} can carry data with them on encrypted data carriers and password-protected laptops.
-        {%- elif homeEncrypted %}
-          {%- if storeLab -%}They{%- else -%}Project members{%- endif %} can carry data with them on encrypted data carriers.
-        {%- elif homePassword %}
-          {%- if storeLab -%}They{%- else -%}Project members{%- endif %} can carry data with them on password-protected laptops.
+          Project members do not carry data with them (e.g. on laptops, USB sticks, or other external media).
         {%- elif risksCarryHomeAUuid == uuids.risksCarryHomeYesAUuid %}
-          {%- if storeLab -%}They{%- else -%}Project members{%- endif %} will carry data with them (e.g. on laptops, USB sticks, or other external media).
+          Project members carry data with them (e.g. on laptops, USB sticks, or other external media).
         {%- endif -%}
-        {%- if homeNotEncrypted %}
+        {%- if homeEncrypted %}
+          All data carriers are encrypted.
+        {%- elif homeNotEncrypted %}
           Not all data carriers are encrypted.
         {%- endif -%}
-        {%- if homeNotPassword %}
+        {%- if homePassword %}
+          Accounts on laptops are password-protected.
+        {%- elif homeNotPassword %}
           Not all laptop accounts are password-protected.
         {%- endif -%}
         {%- if risksCertificationsAUuid == uuids.risksCertificationsYesAUuid %}
@@ -202,21 +201,47 @@
     {%- if risksPersonalDataAUuid == uuids.risksPersonalDataNotUsingAUuid -%}
       <p>We are not using any personal information.</p>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataPseudoAUuid -%}
-      <p>
+      {%- set risksPseudonymizationPath = [risksPersonalDataPath, uuids.risksPersonalDataPseudoAUuid, uuids.risksPseudonymizationQUuid]|reply_path -%}
+      {%- set risksPseudonymizationAUuid = repliesMap[risksPseudonymizationPath]|reply_str_value -%}
+      {%- set risksPseudonymizationAnotherPath = [risksPseudonymizationPath, uuids.risksPseudonymizationAnotherAUuid, uuids.risksPseudonymizationAnotherQUuid]|reply_path -%}
+      {%- set risksPseudonymizationAnother = repliesMap[risksPseudonymizationAnotherPath]|reply_str_value -%}
+      {%- set hasPseudonymizationDetail = risksPseudonymizationAUuid == uuids.risksPseudonymizationAnotherAUuid and risksPseudonymizationAnother|trim -%}
+      {%- set custodianParts = [uuids.processingCUuid, uuids.risksQUuid, uuids.risksExploreAUuid, uuids.risksPersonalDataQUuid, uuids.risksPersonalDataPseudoAUuid, uuids.risksPseudonymizationQUuid, uuids.risksPseudonymizationPartyAUuid, uuids.risksPseudonymizationPartyQUuid] -%}
+      {%- set custodianPath = activeAnswer.path(custodianParts, 'ValueQuestion') if km is defined else custodianParts|reply_path -%}
+      {%- set custodianValid = namespace(value=risksPseudonymizationAUuid == uuids.risksPseudonymizationPartyAUuid and custodianPath) -%}
+      {%- for end in [2, 4, 6, 8] -%}
+        {%- set typedPath = custodianParts[:end]|reply_path -%}
+        {%- set expectedReply = 'StringReply' if end == 8 else 'AnswerReply' -%}
+        {%- if typedPath in repliesMap and repliesMap[typedPath].value is defined and repliesMap[typedPath].value.type is defined and repliesMap[typedPath].value.type != expectedReply -%}
+          {%- set custodianValid.value = false -%}
+        {%- endif -%}
+        {%- if end == 8 and typedPath in repliesMap and repliesMap[typedPath].value is defined and repliesMap[typedPath].value.type is defined and repliesMap[typedPath].value.value is not string -%}
+          {%- set custodianValid.value = false -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if km is defined and custodianPath and km.entities.questions[uuids.risksPseudonymizationPartyQUuid].valueType != 'TextQuestionValueType' -%}
+        {%- set custodianValid.value = false -%}
+      {%- endif -%}
+      {%- set custodian = repliesMap[custodianPath]|reply_str_value if custodianValid.value else '' -%}
+      <div class="answer-detail">
+      <div{% if hasPseudonymizationDetail or custodian|trim %} class="answer-lead"{% endif %}><p>
         All personal data will be processed in pseudonymized form only.
-        {%- set risksPseudonymizationPath = [risksPersonalDataPath, uuids.risksPersonalDataPseudoAUuid, uuids.risksPseudonymizationQUuid]|reply_path -%}
-        {%- set risksPseudonymizationAUuid = repliesMap[risksPseudonymizationPath]|reply_str_value -%}
         {%- if risksPseudonymizationAUuid == uuids.risksPseudonymizationInsideAUuid %}
           Pseudonymization is performed within the project, and only a limited number of people can access the re-identification keys.
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationPartyAUuid %}
           Pseudonymization is performed by an independent party to enable data linkage.
-        {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationAnotherAUuid -%}
-          {%- set risksPseudonymizationAnotherQUuid = [risksPseudonymizationPath, uuids.risksPseudonymizationAnotherAUuid, uuids.risksPseudonymizationAnotherQUuid]|reply_path -%}
-          {%- set risksPseudonymizationAnother = repliesMap[risksPseudonymizationAnotherQUuid]|reply_str_value %}
-          {%- set risksPseudonymizationAnother = risksPseudonymizationAnother if risksPseudonymizationAnother|trim else '' %}
-          We use a specific pseudonymization method{{ ": " ~ risksPseudonymizationAnother|markdown if risksPseudonymizationAnother else "." }}
+        {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationAnotherAUuid %}
+          We use a specific pseudonymization method{{ ":" if hasPseudonymizationDetail else "." }}
         {%- endif -%}
-      </p>
+      </p></div>
+      {% if hasPseudonymizationDetail %}{{ answerMarkdown.markdown(risksPseudonymizationAnother) }}{% endif %}
+      {% if custodian|trim %}
+        <div class="answer-detail" data-fact-id="pseudonymization-key-custodian" data-status="complete">
+          <div class="answer-lead"><p>Independent party that keeps the pseudonymization keys:</p></div>
+          {{ answerMarkdown.markdown(custodian) }}
+        </div>
+      {% endif %}
+      </div>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataAnonymousAUuid -%}
       <p>All personal data will be collected anonymously.</p>
     {%- elif risksPersonalDataAUuid == uuids.risksPersonalDataAnonymizedAUuid -%}
@@ -236,7 +261,7 @@
     {%- if sharedWorkspaceAUuid == uuids.sharedWorkspaceYesAUuid and sharedAccessControlAUuid in [uuids.sharedAccessControlMembersRWAUuid, uuids.sharedAccessControlInstituteRAUuid, uuids.sharedAccessControlMembersRAUuid, uuids.sharedAccessControlMembersRequestAUuid] and (km is not defined or (sharedAccessControlAUuid in km.entities.questions[uuids.sharedAccessControlQUuid].answerUuids and sharedAccessControlAUuid in km.entities.answers)) -%}
       <h4>Access to data during research</h4>
       {%- if sharedAccessControlAUuid == uuids.sharedAccessControlMembersRWAUuid -%}
-        <p>All project members have read and write access to the data.</p>
+        <p>All project members, and no one else, have read and write access to the data.</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlInstituteRAUuid -%}
         <p>Everyone at the institute has read access to the data; all project members have read and write access.</p>
       {%- elif sharedAccessControlAUuid == uuids.sharedAccessControlMembersRAUuid -%}
@@ -265,7 +290,7 @@
             {% if policiesProceduresItemNameReply|trim %}<strong>{{ policiesProceduresItemNameReply|e }}</strong>{% endif %}
             {% if policiesProceduresItemNameReply|trim and policiesProceduresItemLinkReply|trim %}<span class="separator">&ndash;</span>{% endif %}
             {% if policiesProceduresItemLinkReply|trim %}{{ policiesProceduresItemLinkReply|e }}{% endif %}
-            {% if policiesProceduresItemDescriptionReply|trim %}{{ policiesProceduresItemDescriptionReply|markdown }}{% endif %}
+            {% if policiesProceduresItemDescriptionReply|trim %}{{ answerMarkdown.markdown(policiesProceduresItemDescriptionReply) }}{% endif %}
           </li>
           {% endif %}
         {%- endfor -%}

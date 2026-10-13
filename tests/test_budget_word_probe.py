@@ -8,6 +8,102 @@ from probe_budget_word import allowed_changes,cases,heading_cases,verify_heading
 
 
 class BudgetProbeTests(unittest.TestCase):
+    def test_terminal_review_gaps_join_only_the_owned_short_pair_stock435(self):
+        import copy
+        from probe_budget_word import ROOT, RUNNER
+        image = 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'
+        lua = (ROOT / 'src/word/pilot.lua').read_text()
+        call = '  if div.identifier == "q-required-resources" then div = join_q15_terminal_gaps(div) end'
+        self.assertEqual(lua.count(call), 1)
+        authored = ('<div class="answer-detail"><p>' + 'Keep the original authored paragraph. ' * 120 + '</p>'
+                    '<ul><li>Keep the first item.<ul><li>Keep its child.</li></ul></li><li>Keep the second item.</li></ul>'
+                    '<table><tr><th>Action</th><th>Evidence</th></tr><tr><td>Keep records.</td><td>0 TWD</td></tr></table>'
+                    '<pre><code>A&lt;B&amp;C&gt;D\noriginal.csv</code></pre>'
+                    '<p><a href="https://example.org/?a=1&amp;b=2">Original link</a></p></div>')
+
+        def gap(fact, text, prefix='Information not provided:', status='missing', extra=''):
+            return ('<div class="q15-terminal-gap" data-fact-id="' + fact + '" data-status="' + status + '"' + extra + '>'
+                    '<p class="data-gap"><strong>' + prefix + '</strong> ' + text + '</p></div>')
+
+        def question(left, right, qid='q-required-resources', between='', ending='', outside=''):
+            return ('<div id="' + qid + '"><h3>15. Resources?</h3><div class="answer">' + authored +
+                    left + between + right + ending + '</div>' + outside + '</div>')
+
+        left = gap('repository-charges', 'whether repository service charges will be incurred.')
+        right = gap('resources-costing', 'the financial and time resources budgeted for data management and FAIR data.')
+        base = question(left, right)
+        zh_left = gap('repository-charges', '是否需支付資料儲存庫服務費。', '尚待補充：')
+        zh_right = gap('resources-costing', '資料管理及落實 FAIR 原則所編列的經費與時間。', '尚待補充：')
+        zh_plain = question(zh_left.replace('<strong>', '').replace('</strong>', ''),
+                            zh_right.replace('<strong>', '').replace('</strong>', ''))
+        cases = [('english', base, True), ('chinese', question(zh_left, zh_right), True),
+                 ('chinese-plain', zh_plain, True),
+                 ('wrong-question', question(left, right, qid='q-other'), False),
+                 ('missing-first-marker', base.replace('class="q15-terminal-gap"', 'class="original"', 1), False),
+                 ('missing-last-marker', question(left, right.replace('class="q15-terminal-gap"', 'class="original"')), False),
+                 ('known-first-status', question(gap('repository-charges', 'Known fees.', status='complete'), right), False),
+                 ('known-last-status', question(left, gap('resources-costing', 'Known budget.', status='complete')), False),
+                 ('first-extra-attribute', question(gap('repository-charges', 'Pending fees.', extra=' data-extra="original"'), right), False),
+                 ('last-extra-attribute', question(left, gap('resources-costing', 'Pending budget.', extra=' data-extra="original"')), False),
+                 ('extra-class', base.replace('class="q15-terminal-gap"', 'class="q15-terminal-gap original"', 1), False),
+                 ('reversed-order', question(right, left), False),
+                 ('intervening-author', question(left, right, between='<p>Keep this independent authored answer.</p>'), False),
+                 ('nested-pair', question('<div class="answer-detail">' + left, right + '</div>'), False),
+                 ('long-ascii', question(left, gap('resources-costing', 'x' * 241)), False),
+                 ('long-chinese', question(zh_left, gap('resources-costing', '中' * 121, '尚待補充：')), False),
+                 ('inline-link', question(left, gap('resources-costing', '<a href="https://example.org/budget">Original budget</a>')), False),
+                 ('inline-code', question(left, gap('resources-costing', '<code>0 TWD</code>')), False),
+                 ('emphasized-prefix', question(left, right.replace('<strong>', '<em>').replace('</strong>', '</em>')), False),
+                 ('two-paragraphs', question(left, right.replace('</p>', '</p><p>Keep this second paragraph.</p>')), False),
+                 ('next-answer-block', question(left, right, ending='<p>Keep this next answer.</p>'), False),
+                 ('next-question', question(left, right, outside='<h3>16. Original next question?</h3>'), False)]
+        self.assertEqual(len(cases), 22)
+        self.assertEqual(len({name for name, _, _ in cases}), len(cases))
+        html = ''.join('<div id="case-' + name + '">' + body + '</div>' for name, body, _ in cases)
+        runner = ('import contextlib,io,json,sys\np=json.load(sys.stdin);results=[]\n'
+                  'for source in p["sources"]:\n'
+                  ' sys.stdin=io.StringIO(json.dumps(dict(lua=source,html=p["html"])))\n'
+                  ' out=io.StringIO()\n'
+                  ' with contextlib.redirect_stdout(out): exec(' + repr(RUNNER) + ',{})\n'
+                  ' results.append(json.loads(out.getvalue()))\n'
+                  'print(json.dumps(results))')
+        raw = subprocess.check_output(
+            ['docker', 'run', '--rm', '--pull=never', '--network=none', '--cap-drop=ALL',
+             '--security-opt=no-new-privileges', '--log-driver=none', '-i', '--entrypoint', 'python', image, '-c', runner],
+            input=json.dumps(dict(html=html, sources=[lua.replace(call, ''), lua])).encode(), timeout=180)
+        before, after = json.loads(raw)
+        self.assertEqual(before['meta'], after['meta'])
+        self.assertEqual(len(before['blocks']), len(cases))
+        self.assertEqual(len(after['blocks']), len(cases))
+        for (name, _, selected), old, actual in zip(cases, before['blocks'], after['blocks']):
+            with self.subTest(case=name):
+                self.assertEqual(old['c'][0][0], 'case-' + name)
+                if not selected:
+                    self.assertEqual(actual, old, 'Rejected inputs must retain the entire AST')
+                    continue
+                expected = copy.deepcopy(old)
+                answer = expected['c'][1][0]['c'][1][1]
+                first, last = answer['c'][1][-2:]
+                self.assertEqual([block['t'] for block in (first, last)], ['Div', 'Div'])
+                self.assertEqual([block['c'][0] for block in (first, last)],
+                                 [['', ['q15-terminal-gap'], [['fact-id', fact], ['status', 'missing']]]
+                                  for fact in ('repository-charges', 'resources-costing')])
+                left_para, right_para = first['c'][1][0], last['c'][1][0]
+                self.assertEqual([p['t'] for p in (left_para, right_para)], ['Para', 'Para'])
+                if name == 'chinese-plain':
+                    self.assertTrue(all(node['t'] in ('Str', 'Space', 'SoftBreak')
+                                        for p in (left_para, right_para) for node in p['c']))
+                else:
+                    self.assertEqual([p['c'][0]['t'] for p in (left_para, right_para)], ['Strong', 'Strong'])
+                separator = [{'t': 'Space'}] if name == 'english' else []
+                first['c'][1] = [{'t': 'Para', 'c': left_para['c'] + separator + right_para['c']}]
+                answer['c'][1].pop()
+                self.assertEqual(actual, expected, 'Only the two owned prompt paragraphs may be concatenated')
+                if name == 'chinese-plain':
+                    joined = actual['c'][1][0]['c'][1][1]['c'][1][-1]['c'][1][0]['c']
+                    self.assertNotIn('Strong', [node['t'] for node in joined])
+                    self.assertEqual(''.join(node['c'] for node in joined if node['t'] == 'Str').count('尚待補充：'), 2)
+
     def test_authored_resource_rows_keep_only_bounded_owned_cells(self):
         import copy
         from probe_budget_word import ROOT, IMAGE, RUNNER
@@ -15,6 +111,9 @@ class BudgetProbeTests(unittest.TestCase):
         call = 'return keep_authored_resource_rows(div), false'
         self.assertEqual(source.count(call), 1)
         marker = '<!--DSW:SE:authored-resource-row:v1-->'
+        reuse_call = 'keep_authored_reuse_rows(keep_authored_authorization_rows(div))'
+        reuse_marker = '<!--DSW:SE:authored-reuse-row:v1-->'
+        self.assertEqual(source.count(reuse_call), 1)
         data = ''.join('<tr><td>ROW-%02d</td><td>10</td></tr>' % n for n in range(1, 49))
         def fixture(kind='purpose', rows=data, metadata=2):
             meta = ('<table class="word-rich-funding-metadata" data-item-id="cost-1">' if metadata == 2 else '<table class="resource-table word-rich-budget-metadata">')
@@ -41,17 +140,46 @@ class BudgetProbeTests(unittest.TestCase):
             ('styled', fixture(rows='<tr><td><div custom-style="Other"><p>Keep.</p></div></td><td>10</td></tr>')),
             ('nested-table', fixture(rows='<tr><td><table><tr><td>Keep nested.</td></tr></table></td><td>10</td></tr>')),
         ]]
+        def reuse(rows=data, records=1):
+            table = '<table><thead><tr><th>Action</th><th>Evidence</th></tr></thead><tbody>'+rows+'</tbody></table>'
+            item = '<li><div>Dataset 1</div><p class="answer-lead">Restrictions apply:</p><div class="answer-detail"><p>Original terms.</p>'+table+'</div></li>'
+            return '<div id="q-copyright-ipr"><div class="answer"><div class="answer-lead"><p>Conditions:</p></div><ul>'+item*records+'</ul></div></div>'
+        reuse_base = reuse()
+        cases += [('reuse-single', reuse_base, 48), ('reuse-multiple', reuse(records=2), 96),
+                  ('reuse-mixed', reuse(rows=mixed), 2),
+                  ('reuse-neutral-label', reuse_base.replace('Dataset 1', '<span class="dataset-label" data-list-kind="reference" data-list-index="1">Reference dataset 1</span>'), 48),
+                  ('reuse-literal-marker', reuse(rows='<tr><td>&lt;!--DSW:SE:authored-reuse-row:v1--&gt;</td><td>Evidence.</td></tr>'), 1)]
+        cases += [('reuse-'+name, value, 0) for name,value in [
+            ('other-question', reuse_base.replace('q-copyright-ipr', 'q-other')),
+            ('unowned-answer', reuse_base.replace('class="answer"', 'class="unowned"')),
+            ('unowned-detail', reuse_base.replace('class="answer-detail"', 'class="unowned"')),
+            ('extra-detail-attr', reuse_base.replace('class="answer-detail"', 'class="answer-detail" data-extra="unknown"')),
+            ('unowned-label', reuse_base.replace('<div>Dataset 1</div>', '<div class="original">Dataset 1</div>')),
+            ('permission-list', reuse_base.replace('<p class="answer-lead">Restrictions apply:</p>', '<ul><li>Original permission.</li></ul>')),
+            ('extra-item-block', reuse_base.replace('</div></li>', '</div><p>Original tail.</p></li>')),
+            ('nested-table', reuse_base.replace('<table><thead>', '<div><table><thead>').replace('</table></div></li>', '</table></div></div></li>')),
+            ('caption', reuse_base.replace('<table><thead>', '<table><caption>Original caption.</caption><thead>')),
+            ('table-attr', reuse_base.replace('<table><thead>', '<table class="original"><thead>')),
+            ('empty-cell', reuse(rows='<tr><td></td><td>Evidence.</td></tr>')),
+            ('merged', reuse(rows='<tr><td colspan="2">Keep merged.</td></tr>')),
+            ('two-paragraphs', reuse(rows='<tr><td><p>First.</p><p>Second.</p></td><td>Evidence.</td></tr>')),
+            ('styled-cell', reuse(rows='<tr><td><div custom-style="Other"><p>Keep.</p></div></td><td>Evidence.</td></tr>')),
+            ('code-cell', reuse(rows='<tr><td><code>Original.csv</code></td><td>Evidence.</td></tr>')),
+            ('nested-cell-table', reuse(rows='<tr><td><table><tr><td>Nested.</td></tr></table></td><td>Evidence.</td></tr>')),
+            ('reason-detail', reuse_base.replace('class="answer"', 'class="answer-detail"')),
+            ('no-table', reuse(rows='').replace('<table><thead><tr><th>Action</th><th>Evidence</th></tr></thead><tbody></tbody></table>', '')),
+        ]]
         # Exercise the real filter order in one offline container; compare the
         # complete AST, allowing only one generated marker per eligible row.
         native = RUNNER.replace('f.write_text(p["lua"])', 'f.write_text(p["lua"]);g=Path(tmp)/"before.lua";g.write_text(p["pilot"])').replace('"--lua-filter="+str(f)', '"--lua-filter="+str(g),"--lua-filter="+str(f)')
         runner = 'import contextlib,io,json,sys\np=json.load(sys.stdin)\nresults=[]\nfor source in p["sources"]:\n sys.stdin=io.StringIO(json.dumps(dict(html=p["html"],lua=source,pilot=p["pilot"])))\n out=io.StringIO()\n with contextlib.redirect_stdout(out): exec('+repr(native)+',{})\n results.append(json.loads(out.getvalue()))\nprint(json.dumps(results))'
-        payload = dict(html=''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases), pilot=(ROOT/'src/word/pilot.lua').read_text(), sources=[source.replace(call, 'return div, false'), source])
+        payload = dict(html=''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases), pilot=(ROOT/'src/word/pilot.lua').read_text(), sources=[source.replace(call, 'return div, false').replace(reuse_call, 'keep_authored_authorization_rows(div)'), source])
         raw = subprocess.check_output(['docker','run','--rm','--network','none','--log-driver','none','-i','--entrypoint','python',IMAGE,'-c',runner], input=json.dumps(payload).encode(), timeout=180)
         results = [{b['c'][0][0]:b for b in r['blocks']} for r in json.loads(raw)]
         def remove_markers(node):
             if isinstance(node, dict): return sum(remove_markers(value) for value in node.values())
             if isinstance(node, list):
-                kept = [v for v in node if v != {'t':'RawBlock','c':['openxml',marker]}]
+                kept = [v for v in node if v not in [{'t':'RawBlock','c':['openxml',m]} for m in (marker,reuse_marker)]]
                 count = len(node)-len(kept); node[:] = kept
                 return count+sum(remove_markers(v) for v in node)
             return 0
@@ -74,11 +202,14 @@ class BudgetProbeTests(unittest.TestCase):
         malformed = [before.replace(marker, marker*2), before.replace('</w:tr></w:tbl>', cell('Extra')+'</w:tr></w:tbl>'), before.replace('<w:tcPr />', '<w:tcPr><w:gridSpan w:val="2"/></w:tcPr>'), before.replace('<w:tcPr />', '<w:tcPr><w:vMerge/></w:tcPr>'), before.replace(marker+'<w:p>', marker+'<w:p><w:p/>'), before.replace(marker+'<w:p>', '<w:p>'+marker), before.replace('<w:tr>'+row, '<w:tr><w:trPr/>'+row), before.replace('<w:body>', '<w:body>'+marker)]
         for escape in (False, True):
             template = Environment(loader=FileSystemLoader(root),undefined=StrictUndefined,autoescape=escape).get_template('src/word/short-tables.xml')
-            self.assertEqual(template.render(content=before), expected)
-            self.assertEqual(template.render(content=before.replace(marker, '')), before.replace(marker, ''))
-            for value in malformed:
-                with self.subTest(autoescape=escape, source=value):
-                    with self.assertRaises(UndefinedError): template.render(content=value)
+            for current in (marker, '<!--DSW:SE:authored-reuse-row:v1-->'):
+                self.assertEqual(template.render(content=before.replace(marker, current)), expected)
+                literal = '&lt;!--DSW:SE:authored-reuse-row:v1--&gt;'
+                self.assertEqual(template.render(content=before.replace(marker,current).replace('ROW-01',literal)), expected.replace('ROW-01',literal))
+                self.assertEqual(template.render(content=before.replace(marker, '')), before.replace(marker, ''))
+                for value in malformed:
+                    with self.subTest(autoescape=escape, marker=current, source=value):
+                        with self.assertRaises(UndefinedError): template.render(content=value.replace(marker,current))
 
     def test_funding_metadata_ast_is_scoped_and_preserves_authored_blocks(self):
         import copy
@@ -325,6 +456,115 @@ class BudgetProbeTests(unittest.TestCase):
         verify_row_xml(before,after,1)
         for broken in [after.replace('0 TWD','100 TWD'),after.replace('<w:p>','<w:p><w:pPr><w:keepNext/></w:pPr>')]:
             with self.assertRaises(AssertionError): verify_row_xml(before,broken,1)
+
+    def test_current_budget_label_override_is_marked_first_paragraph_only(self):
+        from jinja2 import Environment,FileSystemLoader,StrictUndefined
+        from probe_budget_word import ROW_MARKER
+        root=Path(__file__).resolve().parents[1]
+        history='<!--DSW:SE:history-row:v1-->'
+        style='<w:pPr><w:pStyle w:val="PilotBudgetLabel" /></w:pPr>'
+        paragraph=lambda value,pr='': '<w:p>'+pr+'<w:r><w:t>'+value+'</w:t></w:r></w:p>'
+        cell=lambda value: '<w:tc><w:tcPr />'+value+'</w:tc>'
+        def row(marker=ROW_MARKER,first=None,header=False):
+            first=paragraph('Resource &amp; 1',style)+paragraph('Original purpose.') if first is None else first
+            return '<w:tr>'+('<w:trPr><w:tblHeader/></w:trPr>' if header else '')+cell(marker+first)+cell(paragraph('0 TWD'))+cell(paragraph('Institute.'))+'</w:tr>'
+        current=row(); historical=row(history)
+        controls=[row('',header=True),row(''),row('',paragraph('Long purpose. '*60,style)),
+                  row(first=paragraph('Original first.')+paragraph('Later label.',style)),
+                  row(first=paragraph('Different style.',style.replace('PilotBudgetLabel','PilotLabel'))),
+                  row(header=True)]
+        start='<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:tbl>'
+        before=start+current*8+historical+''.join(controls)+'</w:tbl></w:body></w:document>'
+        expected_current=current.replace(ROW_MARKER,'').replace('<w:tr>','<w:tr><w:trPr><w:cantSplit/></w:trPr>',1).replace('<w:pStyle w:val="PilotBudgetLabel" />','<w:pStyle w:val="PilotBudgetLabel" /><w:keepNext w:val="0"/>',1)
+        def old_output(value):
+            if ROW_MARKER not in value and history not in value:return value
+            value=value.replace(ROW_MARKER,'').replace(history,'')
+            return value.replace('</w:trPr>','<w:cantSplit/></w:trPr>',1) if '<w:trPr>' in value else value.replace('<w:tr>','<w:tr><w:trPr><w:cantSplit/></w:trPr>',1)
+        expected=start+expected_current*8+old_output(historical)+''.join(old_output(value) for value in controls)+'</w:tbl></w:body></w:document>'
+        for escape in (False,True):
+            template=Environment(loader=FileSystemLoader(root),undefined=StrictUndefined,autoescape=escape).get_template('src/word/short-tables.xml')
+            self.assertEqual(template.render(content=before),expected)
+        self.assertEqual(expected.count('<w:keepNext w:val="0"/>'),8)
+        verify_row_xml(before,expected,12,current_budget_labels=True)
+        with self.assertRaises(AssertionError): verify_row_xml(before,expected,12)
+        historic_before=start+historical+'</w:tbl></w:body></w:document>'
+        historic_after=start+old_output(historical)+'</w:tbl></w:body></w:document>'
+        verify_row_xml(historic_before,historic_after,1,current_budget_labels=True)
+        verify_row_xml(historic_before.replace(history,''),historic_after,1)
+        tail_before,tail_after=self.tail_xml_pair()
+        tail_before=tail_before.replace('<w:gridSpan w:val="3"/>','<w:gridSpan w:val="3" />')
+        tail_after=tail_after.replace('<w:gridSpan w:val="3"/>','<w:gridSpan w:val="3" />')
+        mixed_before=before.replace('<w:body>','<w:body>'+tail_before.split('<w:body>',1)[1].split('</w:body>',1)[0])
+        mixed_after=expected.replace('<w:body>','<w:body>'+tail_after.split('<w:body>',1)[1].split('</w:body>',1)[0])
+        # The prior tail capture makes content Markup under autoescape. Only
+        # the fixed XML replacement may be safe, never the authored payload.
+        for escape in (False,True):
+            template=Environment(loader=FileSystemLoader(root),undefined=StrictUndefined,autoescape=escape).get_template('src/word/short-tables.xml')
+            self.assertEqual(template.render(content=mixed_before),mixed_after)
+        verify_row_xml(mixed_before,mixed_after,12,current_tail=True,current_budget_labels=True)
+
+    def test_current_budget_label_oracle_rejects_other_keeps_and_content_changes(self):
+        from probe_budget_word import ROW_MARKER
+        start='<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:tbl><w:tr><w:tc><w:tcPr />'
+        label='<w:p><w:pPr><w:pStyle w:val="PilotBudgetLabel" /></w:pPr><w:r><w:t>Resource 1</w:t></w:r></w:p>'
+        rest='<w:p><w:r><w:t>Original purpose.</w:t></w:r></w:p></w:tc><w:tc><w:tcPr /><w:p><w:r><w:t>0 TWD</w:t></w:r></w:p></w:tc><w:tc><w:tcPr /><w:p><w:r><w:t>Institute.</w:t></w:r></w:p></w:tc></w:tr></w:tbl></w:body></w:document>'
+        before=start+ROW_MARKER+label+rest
+        after=(start+label+rest).replace('<w:tr>','<w:tr><w:trPr><w:cantSplit/></w:trPr>',1).replace('<w:pStyle w:val="PilotBudgetLabel" />','<w:pStyle w:val="PilotBudgetLabel" /><w:keepNext w:val="0"/>',1)
+        verify_row_xml(before,after,1,current_budget_labels=True)
+        for changed in [after.replace('0 TWD','5000 TWD'),after.replace('PilotBudgetLabel','PilotLabel'),
+                        after.replace('<w:keepNext w:val="0"/>',''),after.replace('w:val="0"','w:val="1"'),
+                        after.replace('<w:keepNext w:val="0"/>','<w:keepNext w:val="0"/>'*2),
+                        after.replace('<w:p><w:r><w:t>Original purpose.','<w:p><w:pPr><w:keepNext w:val="0"/></w:pPr><w:r><w:t>Original purpose.'),
+                        after.replace('<w:cantSplit/>','')]:
+            with self.subTest(changed=changed):
+                with self.assertRaises(AssertionError): verify_row_xml(before,changed,1,current_budget_labels=True)
+        with self.assertRaises(AssertionError): verify_row_xml(before.replace(ROW_MARKER,''),after,1,current_budget_labels=True)
+        with self.assertRaises(AssertionError): verify_row_xml(before.replace(ROW_MARKER,'<!--DSW:SE:history-row:v1-->'),after,1,current_budget_labels=True)
+
+    def test_bounded_budget_next_row_xml_keeps_only_owned_nonfinal_paragraphs(self):
+        from jinja2 import Environment, FileSystemLoader, StrictUndefined, UndefinedError
+        from lxml import etree as E
+        marker = '<!--DSW:SE:bounded-budget-next-row:v1-->'
+        old = '<!--DSW:SE:budget-row:v1-->'
+        ns = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+        paragraph = lambda text, style='': '<w:p>'+('<w:pPr><w:pStyle w:val="'+style+'" /></w:pPr>' if style else '')+'<w:r><w:t>'+text+'</w:t></w:r></w:p>'
+        cell = lambda text: '<w:tc><w:tcPr />'+text+'</w:tc>'
+        row = '<w:tr>'+cell(marker+paragraph('Resource &amp; 1', 'PilotBudgetLabel')+paragraph('Original purpose.'))+cell(paragraph('0 TWD', 'BodyText'))+cell(paragraph('Institute.'))+'</w:tr>'
+        last = row.replace(marker, old).replace('Resource &amp; 1', 'Resource 2')
+        start = '<w:document xmlns:w="'+ns['w']+'"><w:body><w:tbl>'
+        end = '</w:tbl>'+paragraph('Later content.')+'</w:body></w:document>'
+        for escape in (False, True):
+            template = Environment(loader=FileSystemLoader(Path(__file__).resolve().parents[1]), undefined=StrictUndefined, autoescape=escape).get_template('src/word/short-tables.xml')
+            for count in (1, 2, 3):
+                before = start+row*(count-1)+last+end
+                after = template.render(content=before)
+                root = E.fromstring(after.encode())
+                rows = root.findall('.//w:tr', ns)
+                self.assertEqual(len(rows), count)
+                self.assertEqual(len(root.findall('.//w:cantSplit', ns)), count)
+                for index, current in enumerate(rows):
+                    paragraphs = current.findall('.//w:p', ns)
+                    if index < count-1:
+                        self.assertEqual(len(paragraphs), 4)
+                        for p in paragraphs: self.assertEqual(E.tostring(p.find('w:pPr/w:keepNext', ns)), b'<w:keepNext xmlns:w="'+ns['w'].encode()+b'"/>')
+                    else:
+                        keeps = current.findall('.//w:keepNext', ns)
+                        self.assertEqual([k.get('{'+ns['w']+'}val') for k in keeps], ['0'])
+                self.assertIsNone(root.find('w:body/w:p/w:pPr/w:keepNext', ns))
+                restored = E.fromstring(after.encode())
+                for p in restored.findall('.//w:tr//w:p', ns):
+                    pr = p.find('w:pPr', ns)
+                    if pr is not None:
+                        for keep in pr.findall('w:keepNext', ns): pr.remove(keep)
+                        if len(pr) == 0: p.remove(pr)
+                for pr in restored.findall('.//w:trPr', ns): pr.getparent().remove(pr)
+                expected = E.fromstring(before.replace(marker, '').replace(old, '').encode())
+                self.assertEqual(E.tostring(restored), E.tostring(expected), 'Only the bounded row properties may change')
+            malformed = [row.replace(marker, marker*2), row.replace(marker, marker+old), row.replace('<w:tr>', '<w:tr><w:trPr><w:tblHeader/></w:trPr>'), row.replace('<w:tcPr />', '<w:tcPr><w:gridSpan w:val="2"/></w:tcPr>', 1), row.replace('<w:p>', '<w:p/>', 1), row.replace('</w:pPr>', '<w:keepNext/></w:pPr>', 1)]
+            for value in malformed:
+                with self.subTest(autoescape=escape, source=value):
+                    with self.assertRaises(UndefinedError): template.render(content=start+value+last+end)
+            with self.assertRaises(UndefinedError): template.render(content=start+marker+last+end)
 
     @staticmethod
     def tail_xml_pair(text='This resource supports findability of data.'):

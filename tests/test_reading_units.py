@@ -21,6 +21,32 @@ def collection(who=None, equipment=None):
 
 
 class ReadingUnitTests(unittest.TestCase):
+    def test_policy_table_lead_selector_is_owned_and_narrow(self):
+        import json
+        import subprocess
+        from test_science_europe_contract import ROOT
+        selector = 'html body #q-access-security > .answer > ul > li > strong:first-child:has(+ table)'
+        self.assertIn(selector + ' { display: block; break-after: avoid; }', (ROOT/'src/layout.css').read_text())
+        table = '<table><tr><td>Original cell.</td></tr></table>'
+        def question(body, qid='q-access-security'):
+            return '<div id="'+qid+'"><div class="answer"><ul><li>'+body+'</li></ul></div></div>'
+        cases = [
+            (question('<strong id="en">Record policy</strong>'+table), ['en']),
+            (question('<strong id="zh">資料管理政策</strong>'+table), ['zh']),
+            (question('<strong id="paragraph">Record policy</strong><p>Original prose.</p>'+table), []),
+            (question('<strong id="link">Record policy</strong><span>–</span>https://example.org/'+table), []),
+            (question('<strong id="nested">Record policy</strong><div>'+table+'</div>'), []),
+            (question('<p>Original <strong id="emphasis">emphasis</strong>.</p>'+table), []),
+            (question('<ul><li><strong id="authored">Authored label</strong>'+table+'</li></ul>'), []),
+            (question('<strong id="other">Record policy</strong>'+table, 'q-other'), []),
+            (question(table), []),
+        ]
+        runner = 'import json,sys,xml.etree.ElementTree as ET\nfrom cssselect2 import ElementWrapper,compile_selector_list\np=json.load(sys.stdin);s=compile_selector_list(p["selector"])\nprint(json.dumps([[n.etree_element.get("id") for n in ElementWrapper.from_html_root(ET.fromstring("<html><body>"+h+"</body></html>")).iter_subtree() if any(c.test(n) for c in s)] for h in p["html"]]))'
+        image = 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'
+        raw = subprocess.check_output(['docker','run','--rm','--pull=never','--network','none','--log-driver','none','-i','--entrypoint','python',image,'-c',runner],
+            input=json.dumps(dict(selector=selector,html=[html for html,_ in cases])).encode(),timeout=60)
+        self.assertEqual([expected for _,expected in cases], json.loads(raw))
+
     def assert_valid(self, output):
         probe = BlockProbe(); probe.feed(output)
         self.assertEqual([], probe.errors); self.assertEqual([], probe.stack)
@@ -89,9 +115,9 @@ class ReadingUnitTests(unittest.TestCase):
             self.assertEqual(AUTHORED, detail.decode_contents())
 
     def test_provenance_table_hint_is_conservative_and_lossless(self):
-        from jinja2 import Environment, FileSystemLoader
+        from current_support import environment
         from test_science_europe_contract import ROOT
-        env = Environment(loader=FileSystemLoader(ROOT), extensions=['jinja2.ext.do'])
+        env = environment(ROOT)
         env.filters['markdown'] = lambda v: v
         render = env.from_string("{% import 'src/macros.html.j2' as m %}{{ m.provenanceReading(value) }}").render
         def table(rows=2, cols=2, cell='Value'):

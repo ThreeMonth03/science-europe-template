@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-docs-metadata" class="question">
   <h3>3. What metadata and documentation (for example the methodology of data collection and way of organising data) will accompany the data?</h3>
 
@@ -86,7 +87,7 @@
       {%- set explanation = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenNoExplainQUuid]|reply_path]|reply_str_value -%}
       <p>Metadata will not be available openly.</p>
       {%- if explanation|trim -%}
-        <div class="answer-detail" data-fact-id="metadata-access-explanation">{{ explanation|markdown }}</div>
+                <div class="answer-detail" data-fact-id="metadata-access-explanation">{{ answerMarkdown.markdown(explanation) }}</div>
       {%- elif output_profile|default('review') != 'submission' -%}
         <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-explanation" data-status="missing">Information not provided: why the metadata will not be openly available.</p>{% endif %}</div>
       {%- endif -%}
@@ -190,27 +191,27 @@
             {%- if subjectFolders -%}
               {%- set scFSysSubjFoldersConvs = repliesMap[[scFSysSubjFoldersPath, uuids.scFSysSubjFoldersYesAUuid, uuids.scFSysSubjFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
-                There will be a <strong>folder for each sample/subject</strong>.
+                <div{% if scFSysSubjFoldersConvs|trim %} class="answer-lead"{% endif %}><p style="margin:0">There will be a <strong>folder for each sample/subject</strong>.</p></div>
                 {% if scFSysSubjFoldersConvs|trim %}
-                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ scFSysSubjFoldersConvs|markdown }}</div>
+                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ answerMarkdown.markdown(scFSysSubjFoldersConvs) }}</div>
                 {%- endif -%}
               </li>
             {%- endif -%}
             {%- if analysisFolders -%}
               {%- set scFSysAnalysisFoldersConvs = repliesMap[[scFSysAnalysisFoldersPath, uuids.scFSysAnalysisFoldersYesAUuid, uuids.scFSysAnalysisFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
-                There will be  a <strong>(sub)folder for each (repeated) analysis</strong>. 
+                <div{% if scFSysAnalysisFoldersConvs|trim %} class="answer-lead"{% endif %}><p style="margin:0">There will be  a <strong>(sub)folder for each (repeated) analysis</strong>. </p></div>
                 {% if scFSysAnalysisFoldersConvs|trim %}
-                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ scFSysAnalysisFoldersConvs|markdown }}</div>
+                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ answerMarkdown.markdown(scFSysAnalysisFoldersConvs) }}</div>
                 {%- endif -%}
               </li>
             {%- endif -%}
             {%- if workflowStepFolders -%}
               {%- set scFSysWorkflowStepFoldersConvs = repliesMap[[scFSysWorkflowStepFoldersPath, uuids.scFSysWorkflowStepFoldersYesAUuid, uuids.scFSysWorkflowStepFoldersConvsQUuid]|reply_path]|reply_str_value -%}
               <li>
-                There will be a <strong>(sub)folder for each step in the analysis workflow</strong>.
+                <div{% if scFSysWorkflowStepFoldersConvs|trim %} class="answer-lead"{% endif %}><p style="margin:0">There will be a <strong>(sub)folder for each step in the analysis workflow</strong>.</p></div>
                 {% if scFSysWorkflowStepFoldersConvs|trim %}
-                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ scFSysWorkflowStepFoldersConvs|markdown }}</div>
+                  <div class="answer-detail"><div class="answer-lead"><p>Each of those will use the following conventions:</p></div>{{ answerMarkdown.markdown(scFSysWorkflowStepFoldersConvs) }}</div>
                 {%- endif -%}
               </li>
             {%- endif -%}
@@ -234,7 +235,7 @@
         {%- set scFSysAppointmentsPath = [scFSysPrefix, uuids.scFSysAppointmentsQUuid]|reply_path -%}
         {%- set scFSysAppointments = repliesMap[scFSysAppointmentsPath]|reply_str_value -%}
         {%- if scFSysAppointments|trim %}
-          <div class="answer-detail" data-fact-id="file-naming"><div class="answer-lead"><p>File naming conventions:</p></div>{{ scFSysAppointments|markdown }}</div>
+          <div class="answer-detail" data-fact-id="file-naming"><div class="answer-lead"><p>File naming conventions:</p></div>{{ answerMarkdown.markdown(scFSysAppointments) }}</div>
         {%- endif -%}
       {%- endif -%}
       {# Object and Document Store #}
@@ -245,7 +246,7 @@
         {%- set scObjStoreNaming = repliesMap[scObjStoreNamingQUuid]|reply_str_value -%}
         <p>We will be storing data in an "object/document store" system.</p>
         {%- if scObjStoreNaming|trim -%}
-          <div class="answer-detail" data-fact-id="object-naming"><div class="answer-lead"><p>Object naming conventions:</p></div>{{ scObjStoreNaming|markdown }}</div>
+          <div class="answer-detail" data-fact-id="object-naming"><div class="answer-lead"><p>Object naming conventions:</p></div>{{ answerMarkdown.markdown(scObjStoreNaming) }}</div>
         {%- endif -%}
       {%- endif -%}
       {# Databases #}

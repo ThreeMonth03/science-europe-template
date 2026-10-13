@@ -1,0 +1,6 @@
+{# Transport reply strings only, not the full document or its embedded fonts. #}
+{%- for path, reply in ctx.project.replies.items() -%}
+  {%- if reply.value.type == 'StringReply' -%}
+    <pre id="dsw-md-{{ loop.index }}" class="dsw-answer-markdown"><code>{{ reply.value.value|tojson }}</code></pre>
+  {%- endif -%}
+{%- endfor -%}

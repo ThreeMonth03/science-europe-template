@@ -1,0 +1,26 @@
+{# Use the same immutable context iteration as the transport step. The current
+   template still owns every question, record, label and layout element. #}
+{%- macro markdown(value) -%}
+  {%- set match = namespace(id='') -%}
+  {%- for path, reply in ctx.project.replies.items() -%}
+    {%- if reply.value.type == 'StringReply' and reply.value.value == value and not match.id -%}
+      {%- set match.id = 'dsw-md-' ~ loop.index -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- set parsed = document.content.decode(document.safe_encoding) -%}
+  {%- set opening = '<div id="' ~ match.id ~ '"' -%}
+  {%- if match.id and parsed.count(opening) == 1 -%}
+    {%- set selected = parsed.split(opening, 1)[1] -%}
+    {%- set tag = selected.split('>', 1)[0] -%}
+    {%- set tail = selected.split('>', 1)[1] -%}
+    {%- set inner = tail.split('</div>', 1)[0] -%}
+    {%- set sourceAttribute = ' data-source-json="' -%}
+    {%- if tag.count(sourceAttribute) == 1 and '</div>' in tail and '<div' not in inner -%}
+      {%- set encoded = tag.split(sourceAttribute, 1)[1].split('"', 1)[0] -%}
+      {%- if json.loads((encoded|safe).unescape()) == value -%}{{- inner|safe -}}
+      {%- else -%}<pre class="answer-markdown-fallback">{{ value|e }}</pre>{%- endif -%}
+    {%- else -%}<pre class="answer-markdown-fallback">{{ value|e }}</pre>{%- endif -%}
+  {%- else -%}
+    <pre class="answer-markdown-fallback">{{ value|e }}</pre>
+  {%- endif -%}
+{%- endmacro -%}

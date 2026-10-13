@@ -1,4 +1,4 @@
-{# Consume only Lua-generated bounded-table markers in Pandoc 3.8.3 XML.
+{# Consume only Lua-generated bounded-table markers in stock Pandoc XML.
    A changed serialization fails the render; never globally rewrite all rows.
    User text is already XML-escaped by Pandoc. Never unescape or reinterpret it. #}
 {%- macro require(ok) -%}
@@ -6,6 +6,10 @@
 {%- endmacro -%}
 {# Independent Q15 authored-row contract. Lua has bounded each ordinary cell;
    preserve its two paragraphs/cells exactly and keep only this one body row. #}
+{#- Q8 uses the same exact two-cell contract after its independent ownership guard. -#}
+{%- set content = content.replace('<!--DSW:SE:authored-reuse-row:v1-->', '<!--DSW:SE:authored-resource-row:v1-->') -%}
+{#- Q10 authorization rows share the same independent bounded two-cell contract. -#}
+{%- set content = content.replace('<!--DSW:SE:authored-authorization-row:v1-->', '<!--DSW:SE:authored-resource-row:v1-->') -%}
 {%- set authored_marker = '<!--DSW:SE:authored-resource-row:v1-->' -%}
 {%- if authored_marker in content -%}
   {%- set authored_rows = content.split('<w:tr>') -%}
@@ -84,16 +88,22 @@
 {# Only Lua-validated short Q15 rows receive this marker. Preserve every cell,
    paragraph and run; long/complex rows and other tables remain unchanged. #}
 {%- set budget_marker = '<!--DSW:SE:budget-row:v1-->' -%}
-{# History rows use the same three-cell XML contract. The dedicated Lua marker
-   is normalized only here; authored text is XML-escaped and cannot match it. #}
-{%- set content = content.replace('<!--DSW:SE:history-row:v1-->', budget_marker) -%}
-{%- if budget_marker in content -%}
+{# Only the existing whole-short-budget guard emits this alias on nonfinal rows.
+   It joins at most three bounded rows, never a long table or later content. #}
+{%- set budget_next_marker = '<!--DSW:SE:bounded-budget-next-row:v1-->' -%}
+{# Keep marker identity until each row is checked: history rows must not receive
+   the budget-label override. Authored text cannot forge these escaped markers. #}
+{%- set history_marker = '<!--DSW:SE:history-row:v1-->' -%}
+{%- if budget_marker in content or history_marker in content or budget_next_marker in content -%}
   {%- set budget_rows = content.split('<w:tr>') -%}
-  {{- require(budget_marker not in budget_rows[0]) -}}
+  {{- require(budget_marker not in budget_rows[0] and history_marker not in budget_rows[0] and budget_next_marker not in budget_rows[0]) -}}
   {%- set content -%}
     {{- budget_rows[0]|safe -}}
     {%- for chunk in budget_rows[1:] -%}
       <w:tr>
+      {%- set history_row = history_marker in chunk -%}
+      {%- set budget_next_row = budget_next_marker in chunk -%}
+      {%- set chunk = chunk.replace(history_marker, budget_marker|safe).replace(budget_next_marker, budget_marker|safe) -%}
       {%- if budget_marker not in chunk -%}{{- chunk|safe -}}{%- else -%}
         {%- set parts = chunk.split('</w:tr>', 1) -%}
         {{- require(parts|length == 2 and parts[0].count(budget_marker) == 1 and budget_marker not in parts[1]) -}}
@@ -103,9 +113,39 @@
         {{- require(row.count('<w:tc>') == 3 and row.count('</w:tc>') == 3 and row.count('<w:p>') <= 10) -}}
         {{- require('<w:tbl>' not in row and '<w:cantSplit' not in row and '<w:gridSpan' not in row and '<w:vMerge' not in row) -}}
         {%- set row = row.replace(budget_marker, '', 1) -%}
+        {# cantSplit already keeps this bounded row intact. A label's inherited
+           keepNext can instead push the whole budget to the next page in Writer.
+           Override only its first paragraph; never headers or unbounded rows. #}
+        {%- set label_style = '<w:pPr><w:pStyle w:val="PilotBudgetLabel" />' -%}
+        {%- set first_cell = row.split('</w:tc>', 1)[0] -%}
+        {%- set first_paragraph = first_cell.split('<w:p>', 1)[1].split('</w:p>', 1)[0] if '<w:p>' in first_cell else '' -%}
+        {%- if budget_next_row -%}
+          {{- require(not history_row and '<w:tblHeader' not in row and '<w:keepNext' not in row) -}}
+          {{- require(3 <= row.count('<w:p>') <= 10 and row.count('</w:p>') == row.count('<w:p>')) -}}
+          {%- for token in row.split('<w:p')[1:] -%}
+            {{- require(token.startswith('>') or token.startswith('Pr>') or token.startswith('Style ')) -}}
+          {%- endfor -%}
+          {%- set paragraphs = row.split('<w:p>') -%}
+          {%- set row -%}
+            {{- paragraphs[0]|safe -}}
+            {%- for paragraph in paragraphs[1:] -%}
+              <w:p>
+              {%- if paragraph.startswith('<w:pPr>') -%}
+                {{- require(paragraph.count('<w:pPr>') == 1 and paragraph.count('</w:pPr>') == 1) -}}
+                {{- paragraph.replace('</w:pPr>', '<w:keepNext/></w:pPr>'|safe, 1)|safe -}}
+              {%- else -%}
+                {{- require('<w:pPr' not in paragraph) -}}
+                <w:pPr><w:keepNext/></w:pPr>{{- paragraph|safe -}}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endset -%}
+        {%- elif not history_row and '<w:tblHeader' not in row and first_paragraph.startswith(label_style) -%}
+          {{- require('<w:keepNext' not in first_paragraph) -}}
+          {%- set row = row.replace(label_style, (label_style + '<w:keepNext w:val="0"/>')|safe, 1) -%}
+        {%- endif -%}
         {%- if row.startswith('<w:trPr>') -%}
           {{- require(row.count('<w:trPr>') == 1 and row.count('</w:trPr>') == 1) -}}
-          {{- row.replace('</w:trPr>', '<w:cantSplit/></w:trPr>', 1)|safe -}}
+          {{- row.replace('</w:trPr>', '<w:cantSplit/></w:trPr>'|safe, 1)|safe -}}
         {%- else -%}
           {{- require(row.startswith('<w:tc>') and '<w:trPr' not in row) -}}
           <w:trPr><w:cantSplit/></w:trPr>{{- row|safe -}}
@@ -125,13 +165,22 @@
   {%- set break_paragraph = '\n    <w:p><w:r><w:br w:type="page"/></w:r></w:p>\n    ' -%}
   {{- require(body_parts[1].startswith(break_paragraph)) -}}
   {%- set first = body_parts[1][break_paragraph|length:].split('<w:p>', 1) -%}
-  {{- require(first|length == 2 and first[0].count('<w:bookmarkStart ') == 2 and ' w:name="sec-data-collection" />' in first[0]) -}}
+  {%- set outer_bookmarks = first[0].count('<w:bookmarkStart ') -%}
+  {{- require(first|length == 2 and outer_bookmarks in [1, 2] and ' w:name="sec-data-collection" />' in first[0]) -}}
   {%- for token in first[0].strip().splitlines() -%}
     {%- set token = token.strip() -%}
     {{- require((token.startswith('<w:bookmarkStart w:id="') and token.endswith(' />')) or token == '<!--DSW:SE:empty-section:v1:begin-->') -}}
   {%- endfor -%}
   {%- set first_style = '<w:pPr><w:pStyle w:val="Heading2" /></w:pPr>' -%}
   {{- require(first[1].startswith(first_style)) -}}
+  {# Pandoc 3.10 places the automatic heading bookmark inside its paragraph;
+     3.8 places it before the paragraph. Accept only either complete shape. #}
+  {%- if outer_bookmarks == 1 -%}
+    {%- set heading = first[1].split('</w:p>', 1)[0] -%}
+    {{- require(heading.startswith(first_style + '<w:bookmarkStart w:id="') and heading.count('<w:bookmarkStart ') == 1 and heading.count('<w:bookmarkEnd ') == 1) -}}
+    {%- set heading_id = heading[first_style|length:].split('"', 2)[1] -%}
+    {{- require(heading.endswith(('<w:bookmarkEnd w:id="'|safe) + heading_id + ('" />'|safe))) -}}
+  {%- endif -%}
   {%- set first_replacement = '<w:pPr><w:pStyle w:val="Heading2" /><w:pageBreakBefore/></w:pPr>'|safe -%}
   {%- set content -%}
     {{- body_parts[0]|safe -}}{{- body_marker|safe -}}{{- '\n    '|safe -}}{{- first[0]|safe -}}

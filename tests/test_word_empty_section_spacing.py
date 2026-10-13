@@ -110,6 +110,36 @@ class CurrentContentStartTests(unittest.TestCase):
             self.assertEqual({f'{{{self.NS["w"]}}}before':'60',f'{{{self.NS["w"]}}}after':'40'},first.find('w:spacing',self.NS).attrib)
             self.assertEqual(1,len(later))
 
+    def test_pandoc_310_inner_heading_bookmark_is_preserved(self):
+        for empty in [False, True]:
+            original = self.fixture(empty)
+            original = original.replace('<w:bookmarkStart w:id="3" w:name="first-heading" />\n    ', '', 1)
+            original = original.replace(self.STYLE, self.STYLE + '<w:bookmarkStart w:id="3" w:name="first-heading" />', 1)
+            first_end = original.index('</w:p>', original.index(self.STYLE))
+            original = original[:first_end] + '<w:bookmarkEnd w:id="3" />' + original[first_end:]
+            original = original.replace('<w:bookmarkEnd w:id="3"/><w:bookmarkEnd w:id="2"/>', '<w:bookmarkEnd w:id="2"/>', 1)
+            for submission in [False, True]:
+                for auto in [False, True]:
+                    result = self.render_current(original, submission, auto)
+                    self.assertEqual(result, self.render_current(Markup(original), submission, auto))
+                    root = etree.fromstring(result.encode())
+                    self.assertEqual(1, len(root.findall('.//w:pageBreakBefore', self.NS)))
+                    self.assertEqual(0, len(root.findall('.//w:br', self.NS)))
+                    paragraph = next(p for p in root.findall('.//w:p', self.NS)
+                                     if p.find('w:pPr/w:pageBreakBefore', self.NS) is not None)
+                    self.assertEqual('3', paragraph.find('w:bookmarkStart', self.NS).get('{'+self.NS['w']+'}id'))
+                    self.assertEqual('3', paragraph.find('w:bookmarkEnd', self.NS).get('{'+self.NS['w']+'}id'))
+                    self.assertIn('First &amp; 原始 &lt;w:p&gt; heading', result)
+                    if not empty:
+                        expected = original.replace(self.BREAK + '\n    ', '', 1).replace(
+                            self.STYLE, self.STYLE.replace('</w:pPr>', '<w:pageBreakBefore/></w:pPr>'), 1)
+                        self.assertEqual(result, expected)
+                    for bad in [original.replace('<w:bookmarkEnd w:id="3" />', ''),
+                                original.replace('<w:bookmarkEnd w:id="3" />', '<w:bookmarkEnd w:id="999" />'),
+                                original.replace('<w:bookmarkStart w:id="3"', '<w:bookmarkStart w:id="4"')]:
+                        with self.assertRaises(UndefinedError):
+                            self.render_current(bad, submission, auto)
+
     def test_current_absent_marker_and_authored_page_break_are_untouched(self):
         original=self.fixture().replace('w:name="dmp-content"','w:name="authored"')
         for auto in [False,True]:self.assertEqual(original,self.render_current(original,autoescape=auto))

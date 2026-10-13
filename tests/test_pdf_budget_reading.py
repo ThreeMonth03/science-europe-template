@@ -21,5 +21,6 @@ class PdfBudgetReadingTests(unittest.TestCase):
     def test_only_pdf_uses_the_pdf_entry(self):
         formats = json.loads((ROOT/'template.json').read_text())['formats']
         for fmt in formats:
-            template = fmt['steps'][0]['options']['template']
+            # Transport precedes the original layout entry; it is not a PDF layout.
+            template = fmt['steps'][2]['options']['template']
             self.assertEqual(template == 'src/pdf/index.html.j2', fmt['uuid'] == '68c26e34-5e77-4e15-9bf7-06ff92582257')

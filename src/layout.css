@@ -8,6 +8,8 @@ html body { font-size: 10.5pt; line-height: 1.5; color: #222; }
 html body h1 { font-size: 21pt; line-height: 1.25; }
 html body h2 { font-size: 15pt; line-height: 1.35; margin: 1.3em 0 .65em; }
 html body h3 { font-size: 11pt; font-weight: normal; line-height: 1.5; margin: .9em 0 .6em; color: #47565c; }
+/* Question prompts outrank dataset labels without enlarging ordinary answers. */
+html body .question > h3 { font-size: 11.5pt; font-weight: bold; color: #000; }
 html body h4 { font-size: 11.5pt; margin: .85em 0 .4em; }
 html body h5 { font-size: 10.5pt; margin: .75em 0 .3em; }
 html body h1, html body h2, html body h3, html body h4, html body h5 { break-after: avoid; break-inside: avoid; }
@@ -16,10 +18,19 @@ html body li { margin-bottom: .6em; }
 /* Only explicit item labels are blocks. :first-child ignores text nodes and
    would split a sentence such as "There will be a <strong>folder</strong>.". */
 html body li > strong.item-label { display: block; break-after: avoid; }
+/* A policy name stays with its opening table, not the full authored answer. */
+html body #q-access-security > .answer > ul > li > strong:first-child:has(+ table) { display: block; break-after: avoid; }
 html body ul { padding-left: 1.4em; margin: .4em 0 .8em; }
 html body .answer-detail { margin: .3em 0 .75em; }
 html body .answer-detail > p:first-child { break-after: avoid; }
 html body .answer-lead { break-after: avoid; }
+/* A terminal training table and a known hardware fact form one reading tail.
+   Remove duplicated paragraph/detail gaps, without keeping the free answer.
+   Only a plain 3x2 table gets slightly tighter vertical cell padding; long
+   text still wraps and rows retain their ordinary pagination rules. */
+html body #q-required-resources > .answer > .answer-detail[data-fact-id="specialist-expertise-detail"][data-status="complete"]:has(+ p[data-requirement-id="SE-6b"][data-fact-id="hardware-software"][data-status="partial"]:last-child):has(> table:first-child) { margin-bottom: 0; }
+html body #q-required-resources > .answer > .answer-detail[data-fact-id="specialist-expertise-detail"][data-status="complete"]:has(+ p[data-requirement-id="SE-6b"][data-fact-id="hardware-software"][data-status="partial"]:last-child):has(> table:first-child) > p:last-child { margin-bottom: 0; }
+html body #q-required-resources > .answer > .answer-detail[data-fact-id="specialist-expertise-detail"][data-status="complete"]:has(+ p[data-requirement-id="SE-6b"][data-fact-id="hardware-software"][data-status="partial"]:last-child) > table:first-child:has(thead > tr:only-child):has(tbody > tr:nth-child(2):last-child):not(:has(tr > :nth-child(3), tr > :only-child, tfoot, th *, td *, [colspan], [rowspan])) :is(th, td) { padding-top: .3em; padding-bottom: .3em; }
 html body a { overflow-wrap: anywhere; word-break: break-word; color: #185778; }
 /* Q12 also accepts plain access locations, not only linked URLs. */
 html body .software-location { overflow-wrap: anywhere; word-break: break-word; }
@@ -64,6 +75,8 @@ html body #dmp-projects .project-funding { overflow-wrap: anywhere; word-break: 
 html body .document-meta { font-size: 9pt; color: #526169; }
 html body .document-kind { font-size: 14pt; color: #526169; }
 html body .document-provenance { border-top: 1px solid #bcc6cc; margin-top: 2em; padding-top: .7em; font-size: 8.5pt; color: #526169; }
+/* Review's scalar metadata is one reading block; oversized values still flow. */
+html body aside.document-provenance { break-inside: avoid; }
 /* Long version identifiers and model names must not widen the page. */
 html body #dmp-versions td.version-name,
 html body #dmp-versions td.version-changes,
@@ -83,6 +96,11 @@ html body .paper-reference { overflow-wrap: anywhere; word-break: break-word; }
 html body .answer-detail ul { margin-top: .2em; }
 html body .answer-detail li { margin-bottom: .2em; }
 html body .answer-detail ul:has(> li:last-child:nth-child(-n+3)) { break-inside: avoid; }
+/* Q8 reasons with authored blocks are not a short list just because there
+   are few reasons. Flow only this owned outer list; keep its leads and rows.
+   The official worker's cssselect2 does not match multi-level :has(> li > ...),
+   so retain direct ownership outside :has and use its supported descendant form. */
+html body #q-copyright-ipr > .answer > .answer-detail > ul:has(li > div.answer-lead, li > table, li > pre, li > ul, li > ol) { break-inside: auto; }
 html body li > p:first-child { break-after: avoid; }
 html body .resource-table { font-size: 10pt; table-layout: fixed; }
 /* Manually entered amount/currency/funding text must stay in its own cell. */
@@ -102,6 +120,15 @@ html body .resource-table p { margin-bottom: .3em; }
 html body .resource-table ul { padding-left: 1.2em; }
 html body .resource-table .answer-detail { margin: .25em 0; }
 html body .resource-table .data-gap { padding: .2em .35em; }
+/* Only the content-bounded scalar budget uses compact spacing, not smaller
+   type. Long/unknown authored cells never receive the bounded hint. */
+html body #q-required-resources > .answer > .project-resources > table.resource-table.pdf-bounded-budget { margin: .3em 0; }
+html body #q-required-resources > .answer > .project-resources > table.resource-table.pdf-bounded-budget :is(th, td) { padding-top: .25em; padding-bottom: .25em; }
+html body #q-required-resources > .answer > .project-resources > table.resource-table.pdf-bounded-budget p { margin-bottom: .2em; }
+html body #q-required-resources > .answer > .project-resources > table.resource-table.pdf-bounded-budget .answer-detail { margin: .2em 0; }
+/* One fixed hardware/charges fact introduces one bounded budget. Keep only
+   this lead, never the training answer, whole question or an unbounded table. */
+html body #q-required-resources > .answer:has(table.resource-table.pdf-bounded-budget:only-child):has(> .project-resources:last-child):not(:has(> .project-resources ~ .project-resources)) > p[data-requirement-id="SE-6b"][data-fact-id="hardware-software"][data-status="explicit-no"]:has(> span[data-fact-id="repository-charges"][data-status="complete"]:last-child):has(+ h4) { break-after: avoid; }
 /* Authored funding tables get full width, never a table inside a narrow cell.
    Only the short identity/budget metadata attach to their next actual body. */
 html body #q-required-resources .pdf-rich-funding-metadata { font-size: 10pt; table-layout: fixed; break-after: avoid; }

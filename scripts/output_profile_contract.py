@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tests'))
 import test_science_europe_contract as adapter
 from probe_pdf_budget_reading import dom
+from current_support import MARKDOWN_ADAPTER
 
 # Compiler settings affect bytecode; never share escaped/unescaped entries.
 PROFILE_BYTECODE = {escape: adapter.QuestionBytecodeCache() for escape in (False, True)}
@@ -27,7 +28,8 @@ WRAPPER = ("{% import 'src/macros.html.j2' as macros with context %}"
 
 
 def environment(root, escape=False, overrides=None):
-    loaders = ([DictLoader(overrides)] if overrides else []) + [FileSystemLoader(root)]
+    # Whole-package overrides must not replace this synthetic HTML-only adapter.
+    loaders = [DictLoader(MARKDOWN_ADAPTER)] + ([DictLoader(overrides)] if overrides else []) + [FileSystemLoader(root)]
     env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=escape,
                       bytecode_cache=PROFILE_BYTECODE[escape])
     env.filters.update(reply_path=adapter.reply_path, reply_items=adapter.reply_items,

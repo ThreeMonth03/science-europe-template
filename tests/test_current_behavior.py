@@ -123,6 +123,11 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
                 "{% import 'src/budget-reading.html.j2' as budget %}{{ budget.short_table(original, rows, word) }}")
             for word in [False, True]:
                 for rows, bounded in [([row], True), ([row] * 3, True), ([row] * 4, False),
+                        ([dict(row, budget='', funding='  \n')], True),
+                        ([row, dict(row, funding='')], True),
+                        ([dict(row, title='')], False), ([dict(row, purpose='')], False),
+                        ([dict(row, funding='<p></p>')], False),
+                        ([dict(row, budget='<p style="height:1000px">0</p>')], False),
                         ([dict(row, purpose='<p>' + 'Long description. ' * 100 + '</p>')], False),
                         ([dict(row, purpose='<p>Paragraph</p>' * 16)], False),
                         ([dict(row, purpose='<p><img src="chart.png"></p>')], False)]:

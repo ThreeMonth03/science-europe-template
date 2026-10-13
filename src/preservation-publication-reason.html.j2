@@ -1,4 +1,5 @@
 {# This branch is a publication decision, never proof of destruction/non-preservation. #}
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context %}
 {% set reasonPath = [isPublishedDataPath, uuids.isPublishedDataNoAUuid, uuids.notPublishedReasonQUuid]|reply_path %}
 {% set reason = repliesMap[reasonPath]|reply_str_value %}
 {% if reason == uuids.notPublishedReasonRawAUuid %}
@@ -19,7 +20,7 @@
     <div class="answer-lead"><p>Other reasons for not publishing this dataset:</p></div>
   {% endif %}
   {% if reasonText|trim %}
-    <div class="answer-detail" data-fact-id="nonpublication-reason" data-status="complete">{{ reasonText|markdown }}</div>
+    <div class="answer-detail" data-fact-id="nonpublication-reason" data-status="complete">{{ answerMarkdown.markdown(reasonText) }}</div>
   {% else %}
     <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="nonpublication-reason" data-status="missing">The other reasons for not publishing have not been described.</p>{% endif %}</div>
   {% endif %}

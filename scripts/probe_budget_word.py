@@ -146,10 +146,50 @@ def short_row_cases():
     ]
 
 
-def verify_row_xml(before, after, count, *, current_tail=False):
+def verify_row_xml(before, after, count, *, current_tail=False, current_budget_labels=False):
     from lxml import etree as E
     ns={'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
     left,right=E.fromstring(before.encode()),E.fromstring(after.encode())
+    restored_source=before
+    if current_budget_labels:
+        # Current callers supply the independently checked marked XML. Only an
+        # original budget marker may authorize the label override; a history
+        # marker with the same style must retain the historical output.
+        history_marker='<!--DSW:SE:history-row:v1-->'
+        assert ROW_MARKER not in after and history_marker not in after
+        W='{'+ns['w']+'}'; rows=left.findall('.//w:tr',ns); targets=[]
+        for marker_text in (ROW_MARKER,history_marker):
+            markers=left.xpath('//comment()[.="'+marker_text[4:-3]+'"]')
+            assert before.count(marker_text)==len(markers), 'Malformed budget marker'
+            for marker in markers:
+                cell=marker.getparent(); assert cell is not None and cell.tag==W+'tc'
+                row=cell.getparent(); assert row is not None and row.tag==W+'tr'
+                cells=row.findall('w:tc',ns)
+                assert len(cells)==3 and cell is cells[0]
+                assert len(cell)>2 and cell[0].tag==W+'tcPr' and cell[1] is marker and cell[2].tag==W+'p'
+                assert not row.xpath('.//w:tbl|.//w:gridSpan|.//w:vMerge|.//w:cantSplit',namespaces=ns)
+                assert len(row.findall('.//w:p',ns))<=10
+                paragraph=cell[2]; properties=paragraph.find('w:pPr',ns)
+                style=properties.find('w:pStyle',ns) if properties is not None else None
+                if (marker_text==ROW_MARKER and row.find('w:trPr/w:tblHeader',ns) is None and
+                    not paragraph.attrib and properties is not None and not properties.attrib and
+                    paragraph[0] is properties and len(properties)>0 and properties[0] is style and
+                    style is not None and style.attrib=={W+'val':'PilotBudgetLabel'} and len(style)==0 and style.text is None):
+                    assert properties.find('w:keepNext',ns) is None, 'Existing label keep must not be overwritten'
+                    targets.append(rows.index(row))
+        assert len(targets)==len(set(targets)), 'Duplicate current budget label target'
+        restored_source=before.replace(ROW_MARKER,'').replace(history_marker,'')
+        left=E.fromstring(restored_source.encode())
+        actual_rows=right.findall('.//w:tr',ns)
+        assert len(rows)==len(actual_rows), 'Current labels changed row inventory'
+        for index in targets:
+            paragraph=actual_rows[index].findall('w:tc',ns)[0].find('w:p',ns)
+            assert paragraph is not None
+            properties=paragraph.find('w:pPr',ns); assert properties is not None
+            keeps=properties.findall('w:keepNext',ns)
+            assert len(keeps)==1 and keeps[0].attrib=={W+'val':'0'} and len(keeps[0])==0
+            assert keeps[0].text is None, 'Exact current budget label override required'
+            properties.remove(keeps[0])
     if current_tail:
         # Undo only the independently owned current tail delta. The historical
         # default and the strict short-row oracle below remain unchanged.
@@ -177,7 +217,7 @@ def verify_row_xml(before, after, count, *, current_tail=False):
             targets.append(rows.index(row))
         assert len(targets)==len(set(targets)), 'Duplicate current tail marker'
         # String removal retains the exact surrounding serialization whitespace.
-        left=E.fromstring(before.replace(TAIL_MARKER,'').encode())
+        left=E.fromstring(restored_source.replace(TAIL_MARKER,'').encode())
         restored_rows=left.findall('.//w:tr',ns); actual_rows=right.findall('.//w:tr',ns)
         assert len(restored_rows)==len(actual_rows), 'Current tail changed row inventory'
         for index in targets:
@@ -225,7 +265,8 @@ print(json.dumps(results))
         after=templates[0].render(content=marked)
         assert templates[1].render(content=marked)==after,(name,'Escaping changed XML')
         assert ROW_MARKER not in after
-        verify_row_xml(before,after,count,current_tail=True)
+        assert marked.replace(ROW_MARKER,'')==before,(name,'Only the current row marker may be added')
+        verify_row_xml(marked,after,count,current_tail=True,current_budget_labels=True)
         rows.append(dict(case=name,kept_rows=count,passed=True))
     return dict(passed=True,cases=len(rows),rows=rows)
 

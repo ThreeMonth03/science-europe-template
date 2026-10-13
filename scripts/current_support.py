@@ -9,6 +9,11 @@ ROOT = Path(__file__).resolve().parents[1]
 IDS = dict(re.findall(r'set\s+(\w+)\s*=\s*"([0-9a-f-]{36})"', (ROOT / 'src/uuids.j2').read_text()))
 PREFIX = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}"
 WRAPPER = PREFIX + "{% include 'src/projects.html.j2' %}{% include 'src/content.html.j2' %}"
+# Existing body tests receive pre-rendered HTML, not worker Markdown transport.
+# Keep this explicit test-only view out of the packaged source. Parser tests
+# and actual worker replays must load the real helper instead.
+MARKDOWN_ADAPTER = {'src/answer-markdown.html.j2':
+    '{%- macro markdown(value) -%}{{- value|markdown -}}{%- endmacro -%}'}
 
 
 def path(*names):
@@ -32,7 +37,7 @@ def reply_items(reply):
 
 
 def environment(root, escape=False, overrides=None):
-    loaders = ([DictLoader(overrides)] if overrides else []) + [FileSystemLoader(root)]
+    loaders = ([DictLoader(overrides)] if overrides else []) + [DictLoader(MARKDOWN_ADAPTER), FileSystemLoader(root)]
     env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=escape)
     env.filters.update(reply_path=lambda parts: '.'.join(map(str, parts)), reply_items=reply_items,
         reply_str_value=reply_str_value, markdown=lambda v: Markup(v) if escape else v,

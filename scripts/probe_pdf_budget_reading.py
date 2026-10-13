@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT / 'tests'))
 from test_science_europe_contract import reply_path, reply_items, reply_str_value
 from check_project_acronym import fixture as project_fixture
 from check_answer_mapping import question as km_question
+from current_support import MARKDOWN_ADAPTER
 
 QUESTION = 'src/questions/15-required-resources.html.j2'
 
@@ -79,7 +80,7 @@ def matrix(grouped=False):
 
 
 def render(root, replies, pdf=False, question=None, autoescape=False, word=False):
-    loaders = ([DictLoader({QUESTION: question})] if question is not None else []) + [FileSystemLoader(root)]
+    loaders = ([DictLoader({QUESTION: question})] if question is not None else []) + [DictLoader(MARKDOWN_ADAPTER), FileSystemLoader(root)]
     env = Environment(loader=ChoiceLoader(loaders), extensions=['jinja2.ext.do'], autoescape=autoescape)
     env.filters.update(reply_path=reply_path, reply_items=reply_items, reply_str_value=reply_str_value, markdown=lambda value: Markup(value) if autoescape else value)
     template = env.from_string("{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include '"+QUESTION+"' %}")

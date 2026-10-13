@@ -1,5 +1,6 @@
 import sys
 import unittest
+from copy import deepcopy
 from bs4 import BeautifulSoup
 from test_science_europe_contract import ROOT, render_question
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -8,6 +9,11 @@ from generate_pilot_fixtures import IDS, path
 
 
 def render(replies): return BeautifulSoup(render_question(Q11, replies), 'html.parser')
+
+MAINTENANCE = {
+    'Yes': 'We have arranged system administration (at least security updates) and hardware maintenance for the repository servers.',
+    'NotYet': 'We have not yet completed the arrangements for system administration (at least security updates) and hardware maintenance for the repository servers.',
+}
 
 
 class RepositoryReadingTests(unittest.TestCase):
@@ -67,6 +73,77 @@ class RepositoryReadingTests(unittest.TestCase):
             'for a sufficiently long time. The repository will provide an advanced processing service.',
             row.get_text(' ', strip=True),
         )
+        replies = support_replies(('Yes', 'Yes'), repository='Special')
+        for index, choice in enumerate(MAINTENANCE):
+            kind = next(p for p in replies if f'distro-{index}' in p and p.endswith(IDS['publishedDataRepositoryKindQUuid']))
+            replies[path(kind, 'publishedDataRepositorySpecialAUuid', 'specialRepoMaintenanceQUuid')] = IDS[f'specialRepoMaintenance{choice}AUuid']
+        for profile in ('review', 'submission'):
+            rows = BeautifulSoup(render_question(Q11, replies, output_profile=profile), 'html.parser').select('.repository-distribution')
+            self.assertEqual(2, len(rows))
+            for index, (row, choice) in enumerate(zip(rows, MAINTENANCE)):
+                self.assertEqual(f'distro-{index}', row['data-item-id'])
+                self.assertEqual(MAINTENANCE[choice], row.select_one('[data-fact-id="repository-server-maintenance"]').get_text())
+                self.assertIn('advanced processing service. ' + MAINTENANCE[choice], row.get_text(' ', strip=True))
+                self.assertEqual(1, row.get_text().count(MAINTENANCE[choice]))
+                self.assertNotIn(MAINTENANCE['NotYet' if choice == 'Yes' else 'Yes'], row.get_text())
+                self.assertFalse(row.select('p, div, ul, ol, table'))
+
+    def test_maintenance_requires_an_active_known_special_repository_answer(self):
+        from check_answer_mapping import question
+        from check_repository_profiles import preservation_schema
+        from current_support import PREFIX, environment
+        km = preservation_schema()
+        children = km['entities']['answers'][IDS['isPublishedDataYesAUuid']]['followUpUuids']
+        children = question(km, children, IDS['publishedDistrosQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+        question(km, children, IDS['publishedDataRepositoryKindQUuid'], 'OptionsQuestion',
+                 [IDS['publishedDataRepositorySpecialAUuid'], IDS['publishedDataRepositoryNationalAUuid']])
+        children = km['entities']['answers'][IDS['publishedDataRepositorySpecialAUuid']]['followUpUuids']
+        question(km, children, IDS['specialRepoMaintenanceQUuid'], 'OptionsQuestion',
+                 [IDS['specialRepoMaintenance' + choice + 'AUuid'] for choice in MAINTENANCE])
+        base = support_replies(('Yes',), repository='Special')
+        data = path('preservingCUuid', 'producedDataQUuid')
+        publication = path(data, 'dataset-a', 'isPublishedDataQUuid')
+        listing = path(publication, 'isPublishedDataYesAUuid', 'publishedDistrosQUuid')
+        kind = path(listing, 'distro-0', 'publishedDataRepositoryKindQUuid')
+        leaf = path(kind, 'publishedDataRepositorySpecialAUuid', 'specialRepoMaintenanceQUuid')
+        # The local adapter decodes typed leaves; the production guard must reject
+        # a wrong reply kind even when its scalar happens to contain a valid UUID.
+        env = environment(ROOT)
+        fallback = env.filters['reply_str_value']
+        env.filters['reply_str_value'] = lambda reply: reply['value']['value'] if isinstance(reply, dict) else fallback(reply)
+        template = env.from_string(PREFIX + "{% include '" + Q11 + "' %}")
+        controls = ('active', 'missing', 'empty', 'unknown', 'publication-missing', 'publication-no',
+                    'repository-missing', 'repository-other', 'dataset-removed', 'distribution-removed',
+                    'removed-question', 'removed-choice', 'dangling-choice', 'wrong-question-type', 'removed-followup')
+        for profile in ('review', 'submission'):
+            for choice in MAINTENANCE:
+                for control in controls:
+                    values, schema = dict(base, **{leaf: IDS['specialRepoMaintenance' + choice + 'AUuid']}), deepcopy(km)
+                    if control == 'missing': del values[leaf]
+                    elif control == 'empty': values[leaf] = ''
+                    elif control == 'unknown': values[leaf] = 'future-choice'
+                    elif control == 'publication-missing': del values[publication]
+                    elif control == 'publication-no': values[publication] = IDS['isPublishedDataNoAUuid']
+                    elif control == 'repository-missing': del values[kind]
+                    elif control == 'repository-other': values[kind] = IDS['publishedDataRepositoryNationalAUuid']
+                    elif control == 'dataset-removed': values[data] = []
+                    elif control == 'distribution-removed': values[listing] = []
+                    elif control == 'removed-question': del schema['entities']['questions'][IDS['specialRepoMaintenanceQUuid']]
+                    elif control == 'removed-choice': schema['entities']['questions'][IDS['specialRepoMaintenanceQUuid']]['answerUuids'].remove(values[leaf])
+                    elif control == 'dangling-choice': del schema['entities']['answers'][values[leaf]]
+                    elif control == 'wrong-question-type': schema['entities']['questions'][IDS['specialRepoMaintenanceQUuid']]['questionType'] = 'ValueQuestion'
+                    elif control == 'removed-followup': schema['entities']['answers'][IDS['publishedDataRepositorySpecialAUuid']]['followUpUuids'].clear()
+                    with self.subTest(profile=profile, choice=choice, control=control):
+                        soup = BeautifulSoup(template.render(repliesMap=values, km=schema, output_profile=profile), 'html.parser')
+                        self.assertEqual(control == 'active', bool(soup.select('[data-fact-id="repository-server-maintenance"]')))
+                        if control in ('missing', 'empty', 'unknown', 'removed-question', 'removed-choice', 'dangling-choice', 'wrong-question-type', 'removed-followup'):
+                            self.assertIn('We will be able to support this repository for a sufficiently long time.', soup.get_text())
+                            self.assertIn('The repository will provide an advanced processing service.', soup.get_text())
+                for reply_type in ('AnswerReply', 'StringReply', 'ItemListReply'):
+                    values = dict(base, **{leaf: {'value': {'type': reply_type, 'value': IDS['specialRepoMaintenance' + choice + 'AUuid']}}})
+                    with self.subTest(profile=profile, choice=choice, reply_type=reply_type):
+                        soup = BeautifulSoup(template.render(repliesMap=values, km=km, output_profile=profile), 'html.parser')
+                        self.assertEqual(reply_type == 'AnswerReply', MAINTENANCE[choice] in soup.get_text())
 
     def test_long_or_block_repository_name_cannot_enable_keep_hint(self):
         replies = support_replies(repository='GeneralPurpose')

@@ -4,6 +4,7 @@ This is provenance plumbing, not a release approval or a fuzzy hash exception.
 Every current source byte, path, support file and the registered package identity
 must match before an older contract receives the committed baseline bytes.
 """
+from copy import deepcopy
 from functools import lru_cache
 import hashlib
 import json
@@ -12,6 +13,18 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACT = json.loads((ROOT / 'requirements/current-repairs-delta.json').read_text())
+
+
+def answer_markdown_steps():
+    """Exact owned prefix; original entries and conversion engines stay intact."""
+    return [
+        {'name': 'jinja', 'options': {
+            'template': 'src/answer-markdown-inputs.html.j2',
+            'content-type': 'text/html', 'extension': 'html'}},
+        {'name': 'pandoc', 'options': {
+            'from': 'html', 'to': 'html',
+            'args': '--lua-filter=src/answer-markdown.lua --wrap=none'}},
+    ]
 
 
 def historical_version(version):
@@ -84,9 +97,13 @@ def _verify(sources, metadata):
     assert metadata == current_metadata, 'Candidate metadata differs from the registered checkout'
     assert metadata['version'] == CONTRACT['candidate_version'], 'Unregistered candidate version'
     assert baseline_metadata['version'] == CONTRACT['baseline_version']
-    # A new package identity is version-only; old source gates still receive
-    # exactly the sealed baseline metadata, never a relaxed format-step view.
-    assert current_metadata == dict(baseline_metadata, version=CONTRACT['candidate_version']), \
+    # Register only the exact fragment prefix. Never ignore arbitrary steps;
+    # historical gates still receive their complete original metadata.
+    expected = deepcopy(baseline_metadata)
+    expected['version'] = CONTRACT['candidate_version']
+    for fmt in expected['formats']:
+        fmt['steps'][:0] = answer_markdown_steps()
+    assert current_metadata == expected, \
         'Candidate identity or format step changed'
     for name in ('scripts/prepare_layout.py', 'PACKAGE_README.md', 'LICENSE'):
         verify_support(name)

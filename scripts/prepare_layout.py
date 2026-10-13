@@ -75,7 +75,7 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item.paragraph_format.space_before = Pt(0)
             item.paragraph_format.space_after = Pt(2 if name == "Compact" else 4)
             item.paragraph_format.widow_control = True
-    for level, size in enumerate((21, 15, 11, 11, 10.5), 1):
+    for level, size in enumerate((21, 15, 11.5, 11, 10.5), 1):
         if f"Heading {level}" in document.styles:
             item = document.styles[f"Heading {level}"]
             item.font.size, item.font.bold = Pt(size), True
@@ -86,8 +86,8 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
                 item.paragraph_format.line_spacing = Pt(26.25)
                 item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
             if level == 3:
-                item.font.bold = False
-                item.font.color.rgb = RGBColor.from_string("47565C")
+                item.font.bold = True
+                item.font.color.rgb = RGBColor.from_string("000000")
             item.paragraph_format.keep_with_next = True
             item.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
             item.paragraph_format.keep_together = True

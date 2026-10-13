@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-share-restrictions" class="question">
   <h3>10. How and when will data be shared? Are there possible restrictions to data sharing or embargo reasons?</h3>
 
@@ -27,6 +28,8 @@
                         {%- set identifierPrefix = [identifiersPath, j]|reply_path -%}
                         {%- set identifierTypePath = [identifierPrefix, uuids.dataIdentifierTypeQUuid]|reply_path -%}
                         {%- set identifierTypeAUuid = repliesMap[identifierTypePath]|reply_str_value -%}
+                        {%- set activeIdentifierTypePath = activeAnswer.path([uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.producedDataIdentifiersQUuid, j, uuids.dataIdentifierTypeQUuid], 'OptionsQuestion') if km is defined else identifierTypePath -%}
+                        {%- set noPersistentIdentifier = activeIdentifierTypePath and identifierTypeAUuid == uuids.dataIdentifierTypeNoPidAUuid and (km is not defined or (identifierTypeAUuid in km.entities.questions[uuids.dataIdentifierTypeQUuid].answerUuids and identifierTypeAUuid in km.entities.answers)) -%}
                         {%- set identifierValuePath = [identifierPrefix, uuids.dataIdentifierIdentifierQUuid]|reply_path -%}
                         {%- set identifierValue = repliesMap[identifierValuePath]|reply_str_value|trim -%}
                         {%- set identifierLabel = '' -%}
@@ -44,7 +47,9 @@
                         {%- elif identifierValue -%}
                             {%- set identifierLabel -%}Identifier{%- endset -%}
                         {%- endif -%}
-                        {%- if identifierLabel -%}
+                        {%- if noPersistentIdentifier -%}
+                            <li><p>We do not assign persistent identifiers to this dataset.</p>{% if identifierValue %}<p>Recorded identifier: <strong>{{ identifierValue|e }}</strong></p>{% endif %}</li>
+                        {%- elif identifierLabel -%}
                             <li>{{ identifierLabel|e }}{% if identifierValue %}: <strong>{% if identifierTypeAUuid == uuids.dataIdentifierTypeDoiAUuid %}<a href="https://doi.org/{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% elif identifierTypeAUuid == uuids.dataIdentifierTypeUrlAUuid %}<a href="{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% else %}{{ identifierValue|e }}{% endif %}</strong>{% endif %}</li>
                         {%- endif -%}
                     {%- endfor -%}
@@ -154,7 +159,7 @@
                                     {%- set licenseRestrictMetadataAUuid = repliesMap[licenseRestrictMetadataPath]|reply_str_value %}
                                     
                                     {% if licenseRestrictConditions|trim %}
-                                      <div class="answer-detail">{{ licenseRestrictConditions|markdown }}</div>
+                                      <div class="answer-detail">{{ answerMarkdown.markdown(licenseRestrictConditions) }}</div>
                                     {% else %}
                                       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-restriction-terms" data-status="missing">The conditions of restricted access have not been provided.</p>{% endif %}
                                     {% endif %}
@@ -166,9 +171,9 @@
                                     {%- elif licenseRestrictAccessAUuid == uuids.licenseRestrictAccessAnotherAUuid -%}
                                     {%- set licenseRestrictAccessAnotherPath = [licenseRestrictAccessPath, uuids.licenseRestrictAccessAnotherAUuid, uuids.licenseRestrictAccessAnotherQUuid]|reply_path -%}
                                     {%- set licenseRestrictAccessAnother = repliesMap[licenseRestrictAccessAnotherPath]|reply_str_value %}
-                                    <p>Access requests will follow a specialized process.</p>
+                                    <div{% if licenseRestrictAccessAnother|trim %} class="answer-lead"{% endif %}><p>Access requests will follow a specialized process.</p></div>
                                     {% if licenseRestrictAccessAnother|trim %}
-                                      <div class="answer-detail" data-fact-id="restriction-custom-process" data-status="complete">{{ licenseRestrictAccessAnother|markdown }}</div>
+                                      <div class="answer-detail" data-fact-id="restriction-custom-process" data-status="complete">{{ answerMarkdown.markdown(licenseRestrictAccessAnother) }}</div>
                                     {% else %}
                                       <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="restriction-custom-process" data-status="missing">The specialized access process has not been described.</p>{% endif %}</div>
                                     {% endif %}
@@ -210,8 +215,15 @@
                 {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="publication-decision" data-status="missing">It has not yet been specified whether this dataset will be published.</p>{% endif %}
             {%- endif -%}
             {# Qualified references #}
-            {%- set publishedQReferencesPath = [isPublishedDataPath, uuids.isPublishedDataYesAUuid, uuids.publishedQReferencesQUuid]|reply_path -%}
-            {%- set publishedQReferencesAUuid = repliesMap[publishedQReferencesPath]|reply_str_value -%}
+            {%- set publishedQReferencesParts = [uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.isPublishedDataQUuid, uuids.isPublishedDataYesAUuid, uuids.publishedQReferencesQUuid] -%}
+            {%- set publishedQReferencesPath = activeAnswer.path(publishedQReferencesParts, 'OptionsQuestion') if km is defined else publishedQReferencesParts|reply_path -%}
+            {%- set publishedQReferencesAUuid = repliesMap[publishedQReferencesPath]|reply_str_value if publishedQReferencesPath else '' -%}
+            {%- if publishedQReferencesPath in repliesMap and repliesMap[publishedQReferencesPath].value is defined and repliesMap[publishedQReferencesPath].value.type is defined and repliesMap[publishedQReferencesPath].value.type != 'AnswerReply' -%}
+                {%- set publishedQReferencesAUuid = '' -%}
+            {%- endif -%}
+            {%- if km is defined and publishedQReferencesPath and (publishedQReferencesAUuid not in km.entities.questions[uuids.publishedQReferencesQUuid].answerUuids or publishedQReferencesAUuid not in km.entities.answers) -%}
+                {%- set publishedQReferencesAUuid = '' -%}
+            {%- endif -%}
             {%- set qreferences = [] -%}
             {%- if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesYesAUuid -%}
                 {%- set publishedQReferencesItemsPath = [publishedQReferencesPath, uuids.publishedQReferencesYesAUuid, uuids.publishedQReferencesItemQUuid ]|reply_path -%}
@@ -219,7 +231,7 @@
                 {%- set qreferences = [] -%}
                 {%- for item in publishedQReferencesItems -%}
                     {%- set refId = repliesMap[[publishedQReferencesItemsPath, item, uuids.publishedQReferenceIdQUuid]|reply_path]|reply_str_value|e -%}
-                    {%- set refRel = repliesMap[[publishedQReferencesItemsPath, item, uuids.publishedQReferenceRelQUuid]|reply_path]|reply_str_value|e -%}
+                    {%- set refRel = repliesMap[[publishedQReferencesItemsPath, item, uuids.publishedQReferenceRelQUuid]|reply_path]|reply_str_value -%}
                     {%- if refId|trim or refRel|trim -%}
                     {%- do qreferences.append({
                         'id': refId,
@@ -236,10 +248,14 @@
                       {% if qref.id|trim %}
                         {% if qref.relation|trim %}<div class="answer-lead">{% endif %}<p><em>{{ qref.id|e }}</em></p>{% if qref.relation|trim %}</div>{% endif %}
                       {% endif %}
-                      {% if qref.relation|trim %}<div class="answer-detail">{{ qref.relation|markdown }}</div>{% endif %}
+                      {% if qref.relation|trim %}<div class="answer-detail">{{ answerMarkdown.markdown(qref.relation) }}</div>{% endif %}
                     </li>
                     {%- endfor -%}
                 </ul>
+            {%- elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesYesAUuid -%}
+                <p data-fact-id="qualified-references" data-status="complete">This dataset has qualified references to other datasets.</p>
+            {%- elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesNoAUuid -%}
+                <p data-fact-id="qualified-references" data-status="explicit-no">This dataset has no qualified references to other datasets.</p>
             {%- endif -%}
             {% endset %}
             {% if output_profile|default('review') != 'submission' or publicationDatasetContent|striptags|trim or '<img' in publicationDatasetContent or '<table' in publicationDatasetContent %}
@@ -312,7 +328,7 @@
            block Markdown inside a paragraph or bind the entire free answer. #}
         {% if hasAuthorizationDetails %}
           <div class="answer-lead">{{ authorizationLead }}</div>
-          <div class="authorization-details">{{ authorizationDetails|markdown }}</div>
+          <div class="authorization-details">{{ answerMarkdown.markdown(authorizationDetails) }}</div>
         {% else %}{{ authorizationLead }}{% endif %}
       {%- elif repliesMap[legalReasonsPath]|reply_str_value == uuids.notOpenLegalReasonsYesAUuid and legalReasonsAuthenticatedAUuid == uuids.legalReasonsAuthenticatedNoAUuid -%}
         <p data-fact-id="authenticated-access" data-status="explicit-no">We will not permit authenticated access to the data.</p>

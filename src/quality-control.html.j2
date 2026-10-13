@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 {# Shared by Q1/Q4. Only selected fixed methods form a sentence; free Markdown
    remains an independent block. The existing translator localizes join(", ").
    Do not join user-provided paragraphs or append punctuation to list entries. #}
@@ -20,7 +21,7 @@
     {% do qualityMethods.append("repeat sampling or measurement") %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityStandardizedQUuid]|reply_path]|reply_str_value == uuids.mdQualityStandardizedYesAUuid %}
-    {% do qualityMethods.append("standardized data capture and recording") %}
+    {% do qualityMethods.append("standardized data capture or recording") %}
   {% endif %}
   {% if repliesMap[[mdqPrefix, uuids.mdQualityValidationQUuid]|reply_path]|reply_str_value == uuids.mdQualityValidationYesAUuid %}
     {% do qualityMethods.append("data entry validation") %}
@@ -49,7 +50,7 @@
   {% if otherText|trim %}
     <div class="answer-lead"><p>Additional quality control details for <strong>{{ qualityName }}</strong>:</p></div>
     {# Let long authored paragraphs split; do not bind the first two paragraphs. #}
-    <div class="answer-detail" data-fact-id="quality-other" data-status="complete"><div>{{ otherText|markdown }}</div></div>
+    <div class="answer-detail" data-fact-id="quality-other" data-status="complete"><div>{{ answerMarkdown.markdown(otherText) }}</div></div>
   {% elif otherAnswer == uuids.mdQualityOtherYesAUuid %}
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">Other quality control methods were selected for <strong>{{ qualityName }}</strong>, but the details have not been provided.</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">Other quality control methods are planned for <strong>{{ qualityName }}</strong>.</p>{% endif %}
   {% endif %}{% endif %}

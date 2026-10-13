@@ -7,12 +7,13 @@ import sys
 import unittest
 from pathlib import Path
 
-from jinja2 import BytecodeCache, Environment, FileSystemLoader, Undefined
+from jinja2 import BytecodeCache, ChoiceLoader, DictLoader, Environment, FileSystemLoader, Undefined
 
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from check_project_acronym import fixture as project_fixture
+from current_support import MARKDOWN_ADAPTER
 CONTRACT = json.loads(
     (ROOT / "requirements" / "science-europe-2021.json").read_text(encoding="utf-8")
 )
@@ -64,7 +65,7 @@ QUESTION_BYTECODE = QuestionBytecodeCache()
 
 def render_question(path: str, replies: dict[str, object], **context) -> str:
     env = Environment(
-        loader=FileSystemLoader(ROOT),
+        loader=ChoiceLoader([DictLoader(MARKDOWN_ADAPTER), FileSystemLoader(ROOT)]),
         extensions=["jinja2.ext.do"],
         autoescape=False,
         bytecode_cache=QUESTION_BYTECODE,
@@ -87,6 +88,58 @@ def render_question(path: str, replies: dict[str, object], **context) -> str:
 
 
 class ScienceEuropeContractTests(unittest.TestCase):
+    def test_reference_version_flows_without_an_outer_information_table(self):
+        from bs4 import BeautifulSoup
+        from test_answer_retention import IDS, path
+        reused = path('reusingCUuid', 'preexistingQUuid')
+        listing = path(reused, 'preexistingYesAUuid', 'refDataQUuid')
+        used = path(listing, 'record', 'refDataUseQUuid')
+        version = path(used, 'refDataUseYesAUuid', 'refDataVersionedQUuid')
+        value = path(version, 'refDataVersionedYesAUuid', 'refDataVersionedWhichQUuid')
+        policy = path(version, 'refDataVersionedYesAUuid', 'refDataVersionedChangeQUuid')
+        base = {reused: IDS['preexistingYesAUuid'], listing: ['record'],
+                used: IDS['refDataUseYesAUuid'], version: IDS['refDataVersionedYesAUuid'],
+                policy: IDS['refDataVersionedChangeStayAUuid']}
+        # The body adapter supplies exact HTML, not proof of native conversion.
+        bodies = ['<p>2.1</p>', '<p>' + 'Original version note. ' * 80 + '</p>',
+                  '<p>Version opening.</p><table><tbody><tr><td>Original revision.</td>'
+                  '<td>Original evidence.</td></tr></tbody></table><p>Version ending.</p>']
+        for profile in ('submission', 'review'):
+            for body in bodies:
+                with self.subTest(profile=profile, body=body[:30]):
+                    output = render_question('src/questions/01-how-data.html.j2',
+                                             {**base, value: body}, output_profile=profile)
+                    soup = BeautifulSoup(output, 'html.parser')
+                    detail = soup.select_one('div.dataset-version[data-fact-id="dataset-version"]')
+                    self.assertIsNotNone(detail)
+                    self.assertEqual('complete', detail['data-status'])
+                    self.assertIsNone(detail.find_parent('table'))
+                    self.assertFalse(soup.select('table.dataset-version'))
+                    lead = detail.find('div', recursive=False)
+                    self.assertEqual(['answer-lead'], lead['class'])
+                    self.assertEqual('Version', lead.get_text())
+                    self.assertEqual(1, output.count(body))
+                    if '<table>' in body:
+                        self.assertEqual(detail, detail.table.parent)
+                    self.assertIn('the current version will continue to be used.', output)
+            for missing in (None, '', ' \t\n\u3000'):
+                values = dict(base)
+                if missing is not None: values[value] = missing
+                output = render_question('src/questions/01-how-data.html.j2', values,
+                                         output_profile=profile)
+                soup = BeautifulSoup(output, 'html.parser')
+                self.assertFalse(soup.select('.dataset-version'))
+                self.assertEqual(profile == 'review', bool(soup.select('[data-fact-id="dataset-version"]')))
+                self.assertIn('the current version will continue to be used.', output)
+            for stale in ('missing-version-selector', 'not-reused'):
+                values = {**base, value: bodies[2]}
+                if stale == 'missing-version-selector': del values[version]
+                else: values[used] = IDS['refDataUseNoAUuid']
+                output = render_question('src/questions/01-how-data.html.j2', values,
+                                         output_profile=profile)
+                self.assertNotIn('Original revision.', output)
+                self.assertFalse(BeautifulSoup(output, 'html.parser').select('.dataset-version'))
+
     def test_shared_reference_rules_keep_individual_purposes_and_versions(self):
         events = json.loads((ROOT / "fixtures/pilot/en/populated.events.json").read_text())
         replies = {event["path"]: event["value"]["value"] for event in events}

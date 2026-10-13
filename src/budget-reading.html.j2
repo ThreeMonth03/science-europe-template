@@ -38,9 +38,12 @@
   {%- set selection = namespace(short=1 <= rows|length <= 3, gap=false) -%}
   {%- for row in rows -%}
     {%- set selection.gap = selection.gap or 'data-fact-id="resource-amount" data-status="missing"' in row.budget -%}
-    {%- for value, limit, paragraphs in [(row.title, 80, 1), (row.purpose, 200, 2), (row.budget, 80, 3), (row.funding, 100, 3)] -%}
+    {%- for field, value, limit, paragraphs in [('title', row.title, 80, 1), ('purpose', row.purpose, 200, 2), ('budget', row.budget, 80, 3), ('funding', row.funding, 100, 3)] -%}
       {%- set visible = (value|striptags).split()|join(' ') -%}
-      {%- if not visible or visible|length > limit or value|length > 2000 or value.count('<p') > paragraphs -%}
+      {# Submission may omit scalar metadata. Truly empty cells add no height;
+         empty markup, titles/purposes and Word retain the original fallback. #}
+      {%- set emptyMetadata = not word and field in ['budget', 'funding'] and not value|trim -%}
+      {%- if (not visible and not emptyMetadata) or visible|length > limit or value|length > 2000 or value.count('<p') > paragraphs -%}
         {%- set selection.short = false -%}
       {%- endif -%}
       {%- for fragment in value.split('<')[1:] -%}

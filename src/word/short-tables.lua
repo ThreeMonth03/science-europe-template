@@ -1,4 +1,4 @@
--- Word-only Q9 short authored tables and bounded version-history rows.
+-- Word-only scoped Q8/Q9/Q10/Q15 authored tables and bounded version-history rows.
 -- The matching enrich-docx step consumes these exact generated XML comments.
 local begin_marker = "<!--DSW:SE:short-table:v1:begin-->"
 local end_marker = "<!--DSW:SE:short-table:v1:end-->"
@@ -54,6 +54,107 @@ local function bounded(tbl)
   return rows
 end
 
+local function short_authored_row(row)
+  if not empty_attr(row) or #row.cells ~= 2 then return false end
+  for _, cell in ipairs(row.cells) do
+    if not empty_attr(cell) or cell.row_span ~= 1 or cell.col_span ~= 1 or
+       #cell.contents ~= 1 or width(cell.contents) == 0 or width(cell.contents) > 80 then return false end
+    local block = cell.contents[1]
+    if (block.t ~= "Plain" and block.t ~= "Para") or not simple(block.content) then return false end
+    for token in pandoc.utils.stringify(block):gmatch("%S+") do
+      if token:match("^[%z\1-\127]+$") and #token > 40 then return false end
+    end
+  end
+  return true
+end
+
+-- Q8/Q10 authorization tables may continue, but bounded body rows must not
+-- leave a blank fragment. Q8 ownership requires its exact direct fact heading;
+-- other Q8 answer details and reuse lists remain outside this guard.
+local function keep_authored_authorization_rows(div)
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.identifier == "" and #answer.classes == 1 and
+       answer.classes:includes("answer") and #answer.attributes == 0 then
+      local authorization_headings = 0
+      for _, block in ipairs(answer.content) do
+        if block.t == "Header" and block.attributes["fact-id"] == "authorization-arrangements" then
+          authorization_headings = authorization_headings + 1
+        end
+      end
+      for index, detail in ipairs(answer.content) do
+        local heading = answer.content[index - 1]
+        local q8_authorization = div.identifier == "q-copyright-ipr" and authorization_headings == 1 and heading and
+          heading.t == "Header" and heading.level == 4 and #heading.classes == 0 and
+          #heading.attributes == 1 and heading.attributes["fact-id"] == "authorization-arrangements"
+        if detail.t == "Div" and detail.identifier == "" and #detail.classes == 1 and
+           #detail.attributes == 0 and
+           ((div.identifier == "q-share-restrictions" and detail.classes:includes("authorization-details")) or
+            (q8_authorization and detail.classes:includes("answer-detail"))) then
+          for _, tbl in ipairs(detail.content) do
+            if tbl.t == "Table" and empty_attr(tbl) and #tbl.colspecs == 2 and #tbl.head.rows <= 1 and
+               #tbl.foot.rows == 0 and #tbl.bodies == 1 and #tbl.bodies[1].head == 0 and
+               tbl.bodies[1].row_head_columns == 0 and #tbl.caption.long == 0 and tbl.caption.short == nil then
+              for _, row in ipairs(tbl.bodies[1].body) do
+                if short_authored_row(row) then
+                  row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:authored-authorization-row:v1-->"))
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
+-- Q8 reuse conditions live in a direct answer list, not in the custom-reason
+-- answer-detail above it. Only direct tables in each record's authored detail
+-- are eligible. Keep individual short rows, never the table or adjacent prose.
+local function keep_authored_reuse_rows(div)
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.identifier == "" and #answer.classes == 1 and
+       answer.classes:includes("answer") and #answer.attributes == 0 then
+      for _, list in ipairs(answer.content) do
+        if list.t == "BulletList" then
+          for _, item in ipairs(list.content) do
+            local label, permission, detail = item[1], item[2], item[3]
+            -- The earlier pilot filter may keep a fixed permission with its
+            -- authored terms. Recognize that exact one-paragraph wrapper for
+            -- ownership only; retain the wrapper and every existing row rule.
+            if permission and permission.t == "Div" and permission.identifier == "" and
+               #permission.classes == 0 and #permission.attributes == 1 and
+               permission.attributes["custom-style"] == "Pilot List Lead" and
+               #permission.content == 1 and permission.content[1].t == "Para" then
+              permission = permission.content[1]
+            end
+            local label_ok = label and label.t == "Div" and label.identifier == "" and #label.classes == 0 and
+              (#label.attributes == 0 or (#label.attributes == 1 and label.attributes["custom-style"] == "Pilot List Lead")) and
+              #label.content == 1 and (label.content[1].t == "Plain" or label.content[1].t == "Para")
+            if #item == 3 and label_ok and (permission.t == "Plain" or permission.t == "Para") then
+              if detail.t == "Div" and detail.identifier == "" and #detail.classes == 1 and
+                 detail.classes:includes("answer-detail") and #detail.attributes == 0 then
+                for _, tbl in ipairs(detail.content) do
+                  if tbl.t == "Table" and empty_attr(tbl) and #tbl.colspecs == 2 and #tbl.head.rows <= 1 and
+                     #tbl.foot.rows == 0 and #tbl.bodies == 1 and #tbl.bodies[1].head == 0 and
+                     tbl.bodies[1].row_head_columns == 0 and #tbl.caption.long == 0 and tbl.caption.short == nil then
+                    for _, row in ipairs(tbl.bodies[1].body) do
+                      if short_authored_row(row) then
+                        row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:authored-reuse-row:v1-->"))
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
+end
+
 -- Q15 authored tables may be long, but an individually short two-cell row
 -- should not leave a blank row fragment on the next page. Keep no prose or
 -- neighbouring row with it; long/complex cells retain their original AST.
@@ -78,19 +179,6 @@ local function keep_authored_resource_rows(div)
       return row.attributes["item-id"]
     end
     return nil
-  end
-  local function short_row(row)
-    if not empty_attr(row) or #row.cells ~= 2 then return false end
-    for _, cell in ipairs(row.cells) do
-      if not empty_attr(cell) or cell.row_span ~= 1 or cell.col_span ~= 1 or
-         #cell.contents ~= 1 or width(cell.contents) == 0 or width(cell.contents) > 80 then return false end
-      local block = cell.contents[1]
-      if (block.t ~= "Plain" and block.t ~= "Para") or not simple(block.content) then return false end
-      for token in pandoc.utils.stringify(block):gmatch("%S+") do
-        if token:match("^[%z\1-\127]+$") and #token > 40 then return false end
-      end
-    end
-    return true
   end
   for _, answer in ipairs(div.content) do
     if answer.t == "Div" and answer.identifier == "" and #answer.classes == 1 and
@@ -118,7 +206,7 @@ local function keep_authored_resource_rows(div)
                        #tbl.foot.rows == 0 and #tbl.bodies == 1 and #tbl.bodies[1].head == 0 and
                        tbl.bodies[1].row_head_columns == 0 and #tbl.caption.long == 0 and tbl.caption.short == nil then
                       for _, row in ipairs(tbl.bodies[1].body) do
-                        if short_row(row) then row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", marker)) end
+                        if short_authored_row(row) then row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", marker)) end
                       end
                     end
                   end
@@ -138,6 +226,10 @@ local function question(div)
   if div.classes:includes("answer") or div.classes:includes("answer-detail") or
      div.classes:includes("abstract") then return div, false end
   if div.identifier == "q-required-resources" then return keep_authored_resource_rows(div), false end
+  if div.identifier == "q-copyright-ipr" then
+    return keep_authored_reuse_rows(keep_authored_authorization_rows(div)), false
+  end
+  if div.identifier == "q-share-restrictions" then return keep_authored_authorization_rows(div), false end
   if div.identifier ~= "q-ethical-issues" then
     if div.classes:includes("question") then return div, false end
     return nil

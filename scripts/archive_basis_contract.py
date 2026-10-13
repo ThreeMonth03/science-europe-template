@@ -91,10 +91,11 @@ def check_roots(current, frozen, language):
     """Compare the entire Q11 DOM, with autoescape both off and on."""
     from jinja2 import Environment, FileSystemLoader, ChoiceLoader, DictLoader
     import test_science_europe_contract as adapter
+    from current_support import MARKDOWN_ADAPTER
     wrapper = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}{% include 'src/questions/11-data-preservation.html.j2' %}"
     rows = 0
     for autoescape in [False, True]:
-        env = Environment(loader=FileSystemLoader(current), extensions=['jinja2.ext.do'], autoescape=autoescape)
+        env = Environment(loader=ChoiceLoader([DictLoader(MARKDOWN_ADAPTER), FileSystemLoader(current)]), extensions=['jinja2.ext.do'], autoescape=autoescape)
         env.filters.update(reply_path=adapter.reply_path, reply_items=adapter.reply_items, reply_str_value=adapter.reply_str_value, markdown=lambda v:v)
         old = env.overlay(loader=ChoiceLoader([DictLoader({'src/post-project-archive.html.j2': frozen.read_text()}), env.loader]))
         before, after = old.from_string(wrapper), env.from_string(wrapper)

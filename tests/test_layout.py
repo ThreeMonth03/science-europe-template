@@ -18,28 +18,212 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
-    def test_word_provenance_keeps_only_the_owned_short_pair_and_all_inlines(self):
+    def test_word_terminal_budget_and_single_person_keeps_are_bounded(self):
+        import copy
         import sys
         sys.path.insert(0, str(ROOT / 'scripts'))
-        from probe_budget_word import IMAGE
+        from probe_budget_word import RUNNER
+        image = 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'
+        def budget(rows=2, purpose='Keep the original records.', tail='No extra equipment. Charges apply.'):
+            row = ('<tr><td><p><strong>Resource 2</strong></p>'
+                   '<div class="answer-detail" data-fact-id="resource-justification" data-status="complete"><p>' + purpose + '</p></div>'
+                   '<p>Findability and management.</p></td><td><p>0 TWD</p></td>'
+                   '<td><div class="answer-detail"><p>Institute.</p></div></td></tr>')
+            return ('<div id="q-required-resources"><h3>15. Resources?</h3><div class="answer">'
+                    '<p>Earlier overview.</p><p>' + tail + '</p><h4 class="word-budget-heading">Budget</h4>'
+                    '<div class="project-resources" data-item-id="project"><table class="resource-table">'
+                    '<thead><tr><th scope="col">Purpose</th><th scope="col">Amount</th><th scope="col">Funder</th></tr></thead><tbody>' + row * rows +
+                    '</tbody></table></div></div></div>')
+        base = budget()
+        cases = [('budget-en', base, 'Pilot Lead'),
+                 ('budget-zh', budget(tail='不需額外設備。資料儲存庫會收費。', purpose='保留原始紀錄。'), 'Pilot Lead'),
+                 ('budget-one', budget(rows=1), 'Pilot Lead'), ('budget-three', budget(rows=3), 'Pilot Lead'),
+                 ('budget-known-charge-span', budget(tail='No extra equipment.<span data-fact-id="repository-charges" data-status="complete">Charges apply.</span>'), 'Pilot Lead'),
+                 ('budget-long-earlier-answer', base.replace('<p>Earlier overview.</p>', '<div class="answer-detail"><p>'+'Keep the earlier authored answer. '*100+'</p></div>'), 'Pilot Lead'),
+                 ('budget-ascii-boundary', budget(tail='a '*159+'ab'), 'Pilot Lead'),
+                 ('budget-cjk-boundary', budget(tail='中'*160), 'Pilot Lead')]
+        rejected = {
+            'four-rows': budget(rows=4), 'long-cell': budget(purpose='a '*161),
+            'long-tail': budget(tail='a '*159+'abc'), 'long-cjk-tail': budget(tail='中'*161),
+            'long-token': budget(tail='A'*41), 'linked-tail': budget(tail='<a href="https://example.org">Keep.</a>'),
+            'unknown-span': budget(tail='<span data-extra="x">Keep.</span>'),
+            'list-cell': budget(purpose='<ul><li>Keep.</li></ul>'),
+            'linked-cell': budget(purpose='<a href="https://example.org">Keep.</a>'),
+            'nested-cell': budget(purpose='<table><tr><td>Keep.</td></tr></table>'),
+            'empty-amount': base.replace('<p>0 TWD</p>', ''),
+            'rich-budget': base.replace('class="resource-table"', 'class="resource-table word-rich-budget-metadata"'),
+            'wrong-question': base.replace('q-required-resources', 'q-other'),
+            'unowned-heading': base.replace(' class="word-budget-heading"', ''),
+            'unknown-project': base.replace('data-item-id="project"', 'data-item-id="project" data-extra="x"'),
+            'unknown-answer': base.replace('class="answer"', 'class="answer original"'),
+            'unknown-header': base.replace('scope="col"', 'scope="row"', 1),
+            'trailing-answer': base.replace('</table></div>', '</table></div><p>Keep later text.</p>'),
+            'two-projects': base.replace('</table></div>', '</table></div><div class="project-resources"><p>Other project.</p></div>'),
+        }
+        cases += [('budget-'+name, html, None) for name, html in rejected.items()]
+        def person(text='A. Example manages data. A. Example implements the plan.', ending='', attrs=''):
+            return ('<div class="person-responsibilities short-reading-unit" data-contributor-id="person" '
+                    'data-contributor-index="2"'+attrs+'><p>'+text+'</p>'+ending+'</div>')
+        cases += [('person-en', person(), 'Pilot Responsibility Summary'),
+                  ('person-zh', person('範例團隊負責資料管理。範例團隊負責執行資料管理方案。'), 'Pilot Responsibility Summary'),
+                  ('person-boundary', person('x'*500), 'Pilot Responsibility Summary'),
+                  ('person-long', person('x'*501), None),
+                  ('person-missing-name-hint', person(ending='<p class="data-gap">Please provide the name.</p>'), None),
+                  ('person-link', person('<a href="https://example.org">A. Example</a> manages data.'), None),
+                  ('person-extra-attribute', person(attrs=' data-extra="original"'), None),
+                  ('person-unmarked', person().replace(' short-reading-unit', ''), None),
+                  ('person-invalid-index', person().replace('contributor-index="2"', 'contributor-index="0"'), None)]
+        lua = (ROOT/'src/word/pilot.lua').read_text()
+        call = '  if div.identifier == "q-required-resources" then div = keep_short_budget_narrative(div) end'
+        guard = 'utf8.len(pandoc.utils.stringify(div)) <= 500 and #div.content == 1'
+        self.assertEqual(lua.count(call), 1); self.assertEqual(lua.count(guard), 1)
+        before = lua.replace(call, '').replace(guard, 'false and '+guard)
+        runner = 'import contextlib,io,json,sys\np=json.load(sys.stdin);results=[]\nfor source in p["sources"]:\n sys.stdin=io.StringIO(json.dumps(dict(lua=source,html=p["html"])))\n out=io.StringIO()\n with contextlib.redirect_stdout(out): exec('+repr(RUNNER)+',{})\n results.append(json.loads(out.getvalue()))\nprint(json.dumps(results))'
+        raw = subprocess.check_output(['docker','run','--rm','--pull=never','--network=none','--log-driver=none','-i','--entrypoint','python',image,'-c',runner],
+            input=json.dumps(dict(sources=[before,lua], html=''.join('<div id="case-'+name+'">'+html+'</div>' for name,html,_ in cases))).encode(), timeout=180)
+        old, new = json.loads(raw)
+        self.assertEqual(old['meta'], new['meta'])
+        next_marker = '<!--DSW:SE:bounded-budget-next-row:v1-->'
+        def restore_row_markers(node):
+            if isinstance(node, dict):
+                if node.get('t') == 'RawBlock' and node.get('c') == ['openxml', next_marker]:
+                    node['c'][1] = '<!--DSW:SE:budget-row:v1-->'
+                    return 1
+                return sum(restore_row_markers(value) for value in node.values())
+            return sum(restore_row_markers(value) for value in node) if isinstance(node, list) else 0
+        def only_wrapper(left, right, style):
+            if left == right: return 0
+            if isinstance(left, dict) and isinstance(right, dict):
+                if left.get('t') == 'Para' and right.get('t') == 'Div':
+                    self.assertEqual(right['c'], [['',[],[['custom-style',style]]],[left]])
+                    return 1
+                self.assertEqual(left.keys(), right.keys())
+                return sum(only_wrapper(left[k], right[k], style) for k in left)
+            self.assertIsInstance(left, list); self.assertIsInstance(right, list)
+            self.assertEqual(len(left), len(right))
+            return sum(only_wrapper(a,b,style) for a,b in zip(left,right))
+        self.assertEqual(len(cases), len(old['blocks'])); self.assertEqual(len(cases), len(new['blocks']))
+        for (name, _, style), left, right in zip(cases, old['blocks'], new['blocks']):
+            with self.subTest(case=name):
+                right = copy.deepcopy(right)
+                rows = 1 if name == 'budget-one' else 3 if name == 'budget-three' else 2
+                self.assertEqual(restore_row_markers(right), rows - 1 if name.startswith('budget-') and style else 0)
+                if style is None: self.assertEqual(left, right)
+                else: self.assertEqual(only_wrapper(left,right,style), 1)
+
+    def test_question_hierarchy_is_scoped_without_smaller_body_text(self):
+        css = (ROOT/'src/layout.css').read_text()
+        self.assertIn('html body .question > h3 { font-size: 11.5pt; font-weight: bold; color: #000; }', css)
+        self.assertIn('html body { font-size: 10.5pt; line-height: 1.5; color: #222; }', css)
+        self.assertIn('html body .dataset-list h5 { font-size: 11pt;', css)
+
+    def test_review_diagnostic_and_restricted_permission_keep_only_their_leads(self):
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from probe_budget_word import IMAGE, RUNNER
+        diagnostic = '<div class="data-gap template-gap storage-detail-limits"><p>Details not mapped:</p><ul><li>Storage locations.</li><li>Backup schedule.</li></ul></div>'
+        def q5(body=diagnostic, qid='q-store-backup'):
+            return '<div id="'+qid+'"><div class="answer"><p>Earlier answer.</p>'+body+'</div></div>'
+        def q8(body='<p>Original conditions.</p>', permission='Restrictions apply:', label='Dataset 1', attrs='class="answer-detail"', qid='q-copyright-ipr'):
+            return '<div id="'+qid+'"><div class="answer"><ul><li><div>'+label+'</div><p>'+permission+'</p><div '+attrs+'>'+body+'</div></li></ul></div></div>'
+        cases = [('q5',q5(),1),('q5-chinese',q5(diagnostic.replace('Details not mapped:', '下列細節未涵蓋：')),1),
+            ('q5-long-lead',q5(diagnostic.replace('Details not mapped:', 'x'*161)),0),
+            ('q5-other-question',q5(qid='q-other'),0),
+            ('q5-nested',q5('<div>'+diagnostic+'</div>'),0),
+            ('q5-extra-class',q5(diagnostic.replace('storage-detail-limits"','storage-detail-limits original"')),0),
+            ('q5-extra-attribute',q5(diagnostic.replace('storage-detail-limits"','storage-detail-limits" data-extra="original"')),0),
+            ('q8-short',q8(),1),('q8-long-paragraph',q8('<p>'+'Original terms. '*200+'</p>'),1),
+            ('q8-long-list',q8('<ul>'+'<li>Original terms.</li>'*12+'</ul>'),1),
+            ('q8-table',q8('<table><tr><td>Original cell.</td><td>Evidence.</td></tr></table>'),1),
+            ('q8-code',q8('<pre><code>Original.csv</code></pre>'),1),
+            ('q8-neutral',q8(label='<span class="dataset-label" data-list-kind="non-reference" data-list-index="2">Non-reference dataset 2</span>'),1),
+            ('q8-chinese',q8(permission='此資料的限制如下：',body='<p>原始條件。</p>'),1),
+            ('q8-no-introduction',q8(permission='Freely available.'),0),
+            ('q8-empty',q8(''),0),('q8-whitespace',q8('<p> </p>'),0),
+            ('q8-unowned',q8(attrs='class="original"'),0),
+            ('q8-extra-attribute',q8(attrs='class="answer-detail" data-extra="original"'),0),
+            ('q8-long-label',q8(label='x'*81),0),
+            ('q8-long-permission',q8(permission='x'*320+':'),0),
+            ('q8-other-question',q8(qid='q-other'),0)]
+        lua = (ROOT/'src/word/pilot.lua').read_text()
+        q5_call = 'return keep_q5_diagnostic_lead(keep_q5_context(div))'
+        q8_guard = 'if #item == 3 and (text:sub(-1) == ":"'
+        self.assertEqual(lua.count(q5_call),1); self.assertEqual(lua.count(q8_guard),1)
+        before = lua.replace(q5_call,'return keep_q5_context(div)').replace(q8_guard,'if false and #item == 3 and (text:sub(-1) == ":"')
+        html = ''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases)
+        runner = 'import contextlib,io,json,sys\np=json.load(sys.stdin);results=[]\nfor source in p["sources"]:\n sys.stdin=io.StringIO(json.dumps(dict(lua=source,html=p["html"])))\n out=io.StringIO()\n with contextlib.redirect_stdout(out): exec('+repr(RUNNER)+',{})\n results.append(json.loads(out.getvalue()))\nprint(json.dumps(results))'
+        raw = subprocess.check_output(['docker','run','--rm','--network','none','--log-driver','none','-i','--entrypoint','python',IMAGE,'-c',runner],
+            input=json.dumps(dict(sources=[before,lua],html=html)).encode(),timeout=180)
+        results = [r['blocks'] for r in json.loads(raw)]
+        def only_lead_wrapper(old,new):
+            if old == new: return 0
+            if isinstance(old,dict) and isinstance(new,dict):
+                if old.get('t') in ['Para','Plain'] and new.get('t') == 'Div':
+                    self.assertIn(new['c'][0], [['',[],[['custom-style','Pilot Lead']]],['',[],[['custom-style','Pilot List Lead']]]])
+                    self.assertEqual(new['c'][1],[dict(t='Para',c=old['c'])])
+                    return 1
+                self.assertEqual(old.keys(),new.keys())
+                return sum(only_lead_wrapper(old[k],new[k]) for k in old)
+            self.assertIsInstance(old,list); self.assertIsInstance(new,list); self.assertEqual(len(old),len(new))
+            return sum(only_lead_wrapper(a,b) for a,b in zip(old,new))
+        self.assertEqual(len(results[0]),len(cases)); self.assertEqual(len(results[1]),len(cases))
+        for (name,_,expected),old,new in zip(cases,*results):
+            with self.subTest(case=name): self.assertEqual(only_lead_wrapper(old,new),expected)
+
+    def test_word_provenance_keeps_only_owned_bounded_metadata_and_all_inlines(self):
+        import sys
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        image = 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'
         env = Environment(loader=FileSystemLoader(ROOT), autoescape=True)
+        env.filters['datetime_format'] = lambda value, fmt: '2026-09-22'
         provenance = env.get_template('src/document-provenance.html.j2').render(dc=dict(
+            project=dict(name='Workspace label'), document=dict(created_at=''),
             pkg=dict(name='Coastal KM', version='2.7.0', organization_id='dsw', km_id='root'),
-            config=dict(service_name='DMP service', service_url='https://example.org/?a=1&b=2')))
+            config=dict(service_name='DMP service', service_url='https://example.org/?a=1&b=2')),
+            ctx=dict(phaseUuid=None), output_profile='review')
+        short_pair = ('<aside><p>Knowledge model: Coastal KM, 2.7.0 (dsw:root:2.7.0)</p>'
+                      '<p>Generated with <a href="https://example.org/?a=1&amp;b=2">DMP service</a>.</p></aside>')
         def owned(body, attrs='id="dmp-provenance" class="document-provenance"'):
             return '<div '+attrs+'>'+body+'</div>'
+        def current(parts):
+            return ''.join('<p>'+text+'</p>' for text in parts)
+        final_link = '<a href="https://example.org/?a=1&amp;b=2">s</a>'
+        current_five = current(['Document: Original workspace', 'Created on 2026-09-22',
+            'Project phase: Planning', 'Knowledge model: Coastal KM', 'Generated with '+final_link+'.'])
         cases = [
-            ('real-include', owned(provenance), True),
+            ('real-include-four', owned(provenance), True),
+            ('current-five', owned(current_five), True),
+            ('current-chinese', owned(current(['文件名稱：原始名稱', '文件建立日期：2026-09-22',
+                '計畫階段：規劃', '問卷知識模型：沿岸觀測', '本文件由 '+final_link+' 產生。'])), True),
+            ('current-paragraph-boundary', owned(current(['x'*320, 'Date', 'KM', final_link])), True),
+            ('current-cjk-boundary', owned(current(['中'*160, '日期', '模型', final_link])), True),
+            ('current-total-boundary', owned(current(['x'*300, 'y'*300, 'z'*299, final_link])), True),
+            ('current-paragraph-too-long', owned(current(['x'*321, 'Date', 'KM', final_link])), False),
+            ('current-cjk-too-wide', owned(current(['中'*161, '日期', '模型', final_link])), False),
+            ('current-total-too-long', owned(current(['x'*300, 'y'*300, 'z'*300, final_link])), False),
+            ('current-empty-value', owned(current(['', 'Date', 'KM', final_link])), False),
+            ('current-missing-link', owned(current(['Name', 'Date', 'KM', 'Generated with service.'])), False),
+            ('current-earlier-link', owned(current([final_link, 'Date', 'KM', 'Generated with '+final_link])), False),
+            ('current-two-final-links', owned(current(['Name', 'Date', 'KM', final_link+final_link])), False),
+            ('current-link-class', owned(current_five.replace('<a href=', '<a class="unknown" href=')), False),
+            ('current-rich-value', owned(current_five.replace('Original workspace', '<em>Original workspace</em>')), False),
+            ('current-six-paragraphs', owned(current_five+'<p>Extra.</p>'), False),
+            ('current-nested-value', owned(current_five.replace('<p>Document: Original workspace</p>', '<div><p>Document: Original workspace</p></div>')), False),
+            ('current-owned-aside', owned('<aside class="document-provenance">'+current_five+'</aside>'), True),
+            ('current-unknown-aside', owned('<aside class="unknown">'+current_five+'</aside>'), False),
+            ('current-aside-attribute', owned('<aside class="document-provenance" data-extra="x">'+current_five+'</aside>'), False),
+            ('current-unowned-div', owned('<div>'+current_five+'</div>'), False),
+            ('old-short-pair', owned(short_pair), True),
             ('chinese', owned('<aside><p>問卷知識模型：沿岸觀測。</p><p>由 <a href="https://example.org/">資料服務</a> 產生。</p></aside>'), True),
             ('limit', owned('<p>'+'x'*239+'</p><p>y</p>'), True),
             ('over-limit', owned('<p>'+'x'*240+'</p><p>y</p>'), False),
             ('unicode-over-limit', owned('<p>'+'中'*240+'</p><p>文</p>'), False),
-            ('aside-only', provenance, False),
-            ('wrong-id', owned(provenance, 'id="other" class="document-provenance"'), False),
-            ('wrong-class', owned(provenance, 'id="dmp-provenance" class="other"'), False),
-            ('extra-class', owned(provenance, 'id="dmp-provenance" class="document-provenance other"'), False),
-            ('extra-attribute', owned(provenance, 'id="dmp-provenance" class="document-provenance" data-extra="x"'), False),
-            ('three-paragraphs', owned(provenance+'<p>Original third paragraph.</p>'), False),
+            ('aside-only', short_pair, False),
+            ('wrong-id', owned(short_pair, 'id="other" class="document-provenance"'), False),
+            ('wrong-class', owned(short_pair, 'id="dmp-provenance" class="other"'), False),
+            ('extra-class', owned(short_pair, 'id="dmp-provenance" class="document-provenance other"'), False),
+            ('extra-attribute', owned(short_pair, 'id="dmp-provenance" class="document-provenance" data-extra="x"'), False),
+            ('three-paragraphs', owned(short_pair+'<p>Original third paragraph.</p>'), False),
             ('nested-paragraph', owned('<div><p>Original first.</p></div><p>Original second.</p>'), False),
             ('image', owned('<p><img src="unfetched.png"></p><p>Original source.</p>'), False),
             ('styled-text', owned('<p><em>Original first.</em></p><p>Original source.</p>'), False),
@@ -59,9 +243,9 @@ with tempfile.TemporaryDirectory() as tmp:
 print(json.dumps(results))
 '''
         raw = subprocess.check_output(['docker','run','--rm','--network','none','-i',
-            '--entrypoint','python',IMAGE,'-c',runner], input=json.dumps(dict(
+            '--entrypoint','python',image,'-c',runner], input=json.dumps(dict(
                 variants=[lua.replace(anchor, 'if false and div.identifier == "dmp-provenance"', 1), lua],
-                html=''.join('<div id="case-'+str(i)+'">'+body+'</div>' for i, (_, body, _) in enumerate(cases)))).encode(), timeout=180)
+                html=''.join('<div id="case-'+str(i)+'"><p>Ordinary before.</p>'+body+'<p>Ordinary after.</p></div>' for i, (_, body, _) in enumerate(cases)))).encode(), timeout=180)
         before, after = json.loads(raw)
         self.assertEqual(before['meta'], after['meta'])
         self.assertEqual(len(before['blocks']), len(cases))
@@ -72,14 +256,67 @@ print(json.dumps(results))
                     self.assertEqual(old, new)
                     continue
                 self.assertEqual(old['c'][0], new['c'][0])
-                old_div, new_div = old['c'][1][0], new['c'][1][0]
+                self.assertEqual(old['c'][1][0], new['c'][1][0])
+                self.assertEqual(old['c'][1][-1], new['c'][1][-1])
+                old_div, new_div = old['c'][1][1], new['c'][1][1]
                 self.assertEqual(old_div['c'][0], ['dmp-provenance', ['document-provenance'], []])
                 self.assertEqual(new_div['c'][0], ['dmp-provenance', ['document-provenance'], [['custom-style', 'Pilot Provenance']]])
-                first, second = old_div['c'][1]
-                self.assertEqual([first['t'], second['t']], ['Para', 'Para'])
-                self.assertEqual(new_div['c'][1], [{'t':'Para', 'c':first['c']+[{'t':'LineBreak'}]+second['c']}])
-                self.assertEqual(len(old['c'][1]), 1)
-                self.assertEqual(len(new['c'][1]), 1)
+                old_target, new_target = old_div, new_div
+                if len(old_div['c'][1]) == 1 and old_div['c'][1][0]['t'] == 'Div':
+                    old_target, new_target = old_div['c'][1][0], new_div['c'][1][0]
+                    self.assertEqual(old_target['c'][0], new_target['c'][0])
+                joined = []
+                for index, paragraph in enumerate(old_target['c'][1]):
+                    self.assertEqual(paragraph['t'], 'Para')
+                    if index:
+                        joined.append({'t':'LineBreak'})
+                    joined.extend(paragraph['c'])
+                self.assertEqual(new_target['c'][1], [{'t':'Para', 'c':joined}])
+                self.assertEqual(len(old['c'][1]), 3)
+                self.assertEqual(len(new['c'][1]), 3)
+
+    def test_pdf_review_provenance_is_one_block_but_oversized_values_flow(self):
+        image = 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'
+        css = (ROOT/'src/layout.css').read_text()
+        rule = 'html body aside.document-provenance { break-inside: avoid; }'
+        self.assertEqual(css.count(rule), 1)
+        def block(values, tag='aside', attrs='class="document-provenance"'):
+            return '<'+tag+' '+attrs+'>'+''.join('<p>'+v+'</p>' for v in values)+'</'+tag+'>'
+        values = ['Document: Original workspace', 'Created on 2026-09-22', 'Project phase: Planning',
+                  'Knowledge model: Coastal KM', 'Generated with <a href="https://example.org/">DMP service</a>.']
+        cases = [('five', block(values), True), ('four', block(values[:2]+values[3:]), True),
+                 ('chinese', block(['文件名稱：原始名稱', '文件建立日期：2026-09-22', '計畫階段：規劃',
+                    '問卷知識模型：沿岸觀測', '本文件由資料服務產生。']), True),
+                 ('wrong-class', block(values, attrs='class="ordinary"'), False),
+                 ('wrong-element', block(values, tag='div'), False),
+                 ('oversized', block(['Long metadata '*500]+values[1:]), None)]
+        runner = '''import json,sys
+from weasyprint import HTML
+p=json.load(sys.stdin)
+def inspect(body,css):
+ doc=HTML(string='<html><head><style>'+css+'</style></head><body><div style="height:230mm"></div>'+body+'</body></html>').render()
+ rows=[]
+ for page_index,page in enumerate(doc.pages):
+  for box in page._page_box.descendants():
+   if type(box).__name__=='TextBox':
+    left=page._page_box.content_box_x(); right=left+page._page_box.width
+    assert box.position_x>=left-1 and box.position_x+box.width<=right+1,('overflow',box.text)
+    rows.append((page_index,box.text,box.position_x,box.position_y,box.width,box.height))
+ return rows
+for name,body,kept in p['cases']:
+ before=inspect(body,p['css'].replace(p['rule'],'')); after=inspect(body,p['css'])
+ assert ''.join(x[1] for x in before)==''.join(x[1] for x in after),(name,'text changed')
+ pages=set(x[0] for x in after)
+ if kept is True:
+  assert len(pages)==1,(name,'split metadata',pages)
+  assert len(set(x[0] for x in before))>1,(name,'control did not split')
+ elif kept is False: assert before==after,(name,'ordinary layout changed')
+ else: assert len(pages)>1,(name,'oversized metadata did not flow')
+print(json.dumps({'passed':True,'cases':len(p['cases'])}))
+'''
+        raw = subprocess.check_output(['docker','run','--rm','--network','none','-i',
+            '--entrypoint','python',image,'-c',runner], input=json.dumps(dict(css=css, rule=rule, cases=cases)).encode(), timeout=180)
+        self.assertEqual(json.loads(raw), dict(passed=True, cases=6))
 
     def test_fixed_list_leads_keep_only_the_intro_without_changing_list_xml(self):
         import base64
@@ -195,35 +432,38 @@ print(json.dumps(results))
         reason = path(parent, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
         auth = path(reason, 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid')
         who = path(auth, 'legalReasonsAuthenticatedYesAUuid', 'legalReasonsAuthorizeQUuid')
-        template = environment(ROOT).from_string(PREFIX + "{% include 'src/questions/10-share-restrictions.html.j2' %}")
         cases = []
-        for kind in ['Other', 'OldCommittee']:
-            for value in ['', '  ', '<p>Access office.</p>', '<p>Original.</p>' * 50,
-                    '<ul><li>Original A.</li><li>Original B.</li></ul>',
-                    '<table><tr><td>Original.</td><td>Keep.</td></tr></table>']:
-                replies = {parent: IDS['openImmediatelyNoAUuid'], reason: IDS['notOpenLegalReasonsYesAUuid'],
-                    auth: IDS['legalReasonsAuthenticatedYesAUuid'], who: IDS['legalReasonsAuthorize'+kind+'AUuid'],
-                    path(who, 'legalReasonsAuthorize'+kind+'AUuid', 'legalReasonsAuthorize'+kind+'QUuid'): value}
-                html = template.render(repliesMap=replies, output_profile='submission')
-                cases.append([html, int(bool(value.strip()))])
+        for question in ['08-copyright-ipr', '10-share-restrictions']:
+            template = environment(ROOT).from_string(PREFIX + "{% include 'src/questions/"+question+".html.j2' %}")
+            for kind, lead in [('Other', 'We will use the following authorization arrangements:'),
+                    ('OldCommittee', 'We will make use of an existing data committee:')]:
+                for value in ['', '  ', '<p>Access office.</p>', '<p>Original.</p>' * 50,
+                        '<ul><li>Original A.</li><li>Original B.</li></ul>',
+                        '<table><tr><td>Original.</td><td>Keep.</td></tr></table>']:
+                    replies = {parent: IDS['openImmediatelyNoAUuid'], reason: IDS['notOpenLegalReasonsYesAUuid'],
+                        auth: IDS['legalReasonsAuthenticatedYesAUuid'], who: IDS['legalReasonsAuthorize'+kind+'AUuid'],
+                        path(who, 'legalReasonsAuthorize'+kind+'AUuid', 'legalReasonsAuthorize'+kind+'QUuid'): value}
+                    for profile in ['review', 'submission']:
+                        html = template.render(repliesMap=replies, output_profile=profile)
+                        cases.append([html, int(bool(value.strip())), lead if question.startswith('08-') else 'We will permit authenticated access to the data.'])
         runner = '''import json,sys,subprocess,tempfile,zipfile
 from pathlib import Path
 p=json.load(sys.stdin);results=[]
 with tempfile.TemporaryDirectory() as tmp:
  f=Path(tmp)/'pilot.lua';f.write_text(p['lua']);out=Path(tmp)/'test.docx'
- for html,count in p['cases']:
+ for html,count,lead in p['cases']:
   pair=[]
   for text in [html.replace('class="answer-lead"','class="authorization-control"'),html]:
    subprocess.run(['pandoc','--from=html','--to=docx','--lua-filter='+str(f),'-o',str(out)],input=text.encode(),check=True)
    with zipfile.ZipFile(out) as z:pair.append(z.read('word/document.xml').decode())
-  results.append([count,pair])
+  results.append([count,lead,pair])
 print(json.dumps(results))
 '''
         raw = subprocess.check_output(['docker','run','--rm','--network','none','-i',
             '--entrypoint','python',IMAGE,'-c',runner],
             input=json.dumps(dict(cases=cases,lua=(ROOT/'src/word/pilot.lua').read_text())).encode(),timeout=180)
         ns = {'w':'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
-        for count, pair in json.loads(raw):
+        for count, lead, pair in json.loads(raw):
             before, after = [E.fromstring(value.encode()) for value in pair]
             oldps, newps = [tree.findall('.//w:p',ns) for tree in [before,after]]
             self.assertEqual(len(oldps),len(newps)); changed = 0
@@ -235,7 +475,7 @@ print(json.dumps(results))
                 old_style = oldp.find('w:pPr/w:pStyle',ns)
                 if old_style is not None:
                     self.assertEqual(old_style.get('{'+ns['w']+'}val'),'FirstParagraph')
-                self.assertIn('We will permit authenticated access to the data.', ''.join(newp.itertext()))
+                self.assertIn(lead, ''.join(newp.itertext()))
                 prop = style.getparent()
                 if old_style is None: prop.remove(style)
                 else: style.set('{'+ns['w']+'}val','FirstParagraph')
@@ -407,10 +647,12 @@ print(json.dumps(results))
                 ('missing-description', 1, '核對 A', '', '沿岸觀測'),
                 ('many', 24, 'Review A', 'Checked the data.', 'Coastal KM'),
                 ('long', 1, 'VERSION' + 'ABCDEFGHIJ' * 18, 'CHANGES' + '0123456789' * 45, 'MODEL' + 'ABCDEFGHIJ' * 18)]:
-            dc = dict(project=dict(versions=[dict(name=title, description=description, created_at='')] * count),
+            dc = dict(project=dict(name='Workspace label', versions=[dict(name=title, description=description, created_at='')] * count),
+                      document=dict(created_at=''),
                       pkg=dict(name=model, version='2.7.0', organization_id='dsw', km_id='root'),
                       config=dict(service_name='DMP service', service_url='https://example.org/'))
-            cases.append(dict(name=name, html=template.render(dc=dc), text=[title, description, model]))
+            cases.append(dict(name=name, html=template.render(dc=dc, ctx=dict(phaseUuid=None),
+                output_profile='review'), text=[title, description, model]))
         runner = '''import json,sys,re
 from weasyprint import HTML
 p=json.load(sys.stdin)
@@ -487,6 +729,10 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                     self.assertTrue(document.styles[name].paragraph_format.keep_together)
                     self.assertEqual('Compact', document.styles[name].base_style.name)
                 self.assertFalse(document.styles["Heading 4"].font.italic)
+                question = document.styles["Heading 3"]
+                self.assertEqual(11.5, question.font.size.pt)
+                self.assertTrue(question.font.bold)
+                self.assertEqual('000000', str(question.font.color.rgb))
                 self.assertEqual(0, document.styles["Body Text"].paragraph_format.space_before)
                 for style_name in ("Normal", "Body Text", "First Paragraph", "Compact"):
                     item = document.styles[style_name]

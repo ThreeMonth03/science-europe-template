@@ -1,21 +1,25 @@
 {
   "baseline_commit": "bff774569148d925aa08fd0d5bea85acae24a73d",
   "baseline_version": "0.3.51",
-  "candidate_version": "0.3.67",
+  "candidate_version": "0.3.78",
   "release_approved": false,
   "baseline_tree_sha256": "61b52f8350c2bd36dfe3f033a1d3a832d57036f807c2b99eaade72144f99fc78",
-  "candidate_tree_sha256": "fa533e2aa669fd7051298e490547d71e0ef4def5003c78f7ee20e450c353f522",
+  "candidate_tree_sha256": "49bf00ba7269a0533dff524e1faaa0f9f059c7be3be7400186efb5a881c51156",
   "changed": [
     "src/budget-reading.html.j2",
     "src/contributors.html.j2",
+    "src/document-provenance.html.j2",
     "src/frontmatter.html.j2",
+    "src/index.html.j2",
     "src/layout.css",
     "src/macros.html.j2",
     "src/pdf/index.html.j2",
     "src/pdf/short-resource-rows.html.j2",
     "src/pdf/short-resources.html.j2",
     "src/post-project-archive.html.j2",
+    "src/preservation-dataset.html.j2",
     "src/preservation-publication-reason.html.j2",
+    "src/project-file-naming.html.j2",
     "src/projects.html.j2",
     "src/quality-control.html.j2",
     "src/questions/01-how-data.html.j2",
@@ -33,6 +37,9 @@
     "src/questions/13-persistent-identifier.html.j2",
     "src/questions/14-dm-responsible.html.j2",
     "src/questions/15-required-resources.html.j2",
+    "src/reference-maintenance-plan.html.j2",
+    "src/reference-publication-plan.html.j2",
+    "src/reuse-summary.html.j2",
     "src/uuids.j2",
     "src/word/index.html.j2",
     "src/word/pilot.lua",
@@ -43,6 +50,9 @@
   ],
   "added": [
     "src/active-answer.j2",
+    "src/answer-markdown-inputs.html.j2",
+    "src/answer-markdown.html.j2",
+    "src/answer-markdown.lua",
     "src/ethics-data-summary.html.j2",
     "src/identifier-repository.html.j2",
     "src/nonreuse.html.j2",
@@ -56,7 +66,7 @@
   "support": {
     "scripts/prepare_layout.py": {
       "before_sha256": "a47b9631e638d8f693adb99186c280754be9f7bde7105f4d40467099dc96de5a",
-      "after_sha256": "169ed4163f90e654214abc617eaa7b7eb3d1174cbf35bd75cb4dac212cc4a16e"
+      "after_sha256": "cf08227ad8bb9d3e32090b8e665d280acf6ff120e05ce1a0944c5eb3ae07b99a"
     },
     "PACKAGE_README.md": {
       "before_sha256": "47fee033565ab06a3527a46b3f133083bed109a513235730d717bc2a738d65ae",
@@ -68,7 +78,7 @@
     },
     "template.json": {
       "before_sha256": "04346ff2c6f7be9ccc9c05b629ebdce3e66d42dedb16d372453d0794554ee84a",
-      "after_sha256": "5b8521aac0683ce8fa4e64cde5e1533487d1c133f83a8d5c0735dda9c21afff4"
+      "after_sha256": "293ed9d1a87a40aef160af8c5ac42bba72b7df98be55347505835a64f7d81548"
     }
   }
 }

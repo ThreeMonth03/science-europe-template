@@ -106,6 +106,7 @@
 {%- set refDataFormatConvertAUuid = "9de86d7b-9c60-47d6-8cb1-bfca13d6f619" -%}
 {%- set refDataVersionedQUuid = "10b6548c-21cd-44c8-a8de-47415e7b012e" -%}
 {%- set refDataVersionedYesAUuid = "842007ce-0951-4655-8acc-b0f582e82ea1" -%}
+{%- set refDataVersionedNoAUuid = "32c9e457-8289-4825-9334-83ff87adeb3f" -%}
 {%- set refDataVersionedWhichQUuid = "f00a28fb-ac77-4110-b285-c73c8bc62630" -%}
 {%- set refDataVersionedChangeQUuid = "481d0157-6d89-4f68-9f3b-cf1b05f8f15d" -%}
 {%- set refDataVersionedChangeStayAUuid = "a4f6a1da-536b-43fa-9637-71e33327fa08" -%}
@@ -366,6 +367,23 @@
         {%- set cpersGdprPurposeQUuid = "c7496ece-4535-4f5d-bcf7-7845989906e9" -%}
         {%- set cpersGdprNeedDpiaQUuid = "8915bd25-db22-4ed6-bcc8-b1bbdc52989e" -%}
         {%- set cpersGdprNeedDpiaYesAUuid = "c3914e43-cca1-4180-8960-228b7022bae6" -%}
+        {%- set cpersGdprNeedDpiaNoAUuid = "d0741ff3-370b-44e7-860d-00b1f01e6254" -%}
+          {%- set cpersGdprPerformedDpiaQUuid = "6cc96576-2535-46b3-8c9b-a12703ee96cc" -%}
+            {%- set cpersGdprPerformedDpiaNoAUuid = "feb5bdea-9317-4fdd-8781-c26ce6e55fbf" -%}
+            {%- set cpersGdprPerformedDpiaYesAUuid = "af053acd-fc24-4830-8000-bcff8912435b" -%}
+              {%- set cpersGdprDpiaListQUuid = "8cc50031-87d5-4b0e-8c3c-c7ded35fd263" -%}
+                {%- set cpersGdprDpiaDatasetQUuid = "fa72bb87-0403-4953-9536-4ac836843763" -%}
+                {%- set cpersGdprDpiaDescriptionQUuid = "432c867e-8f29-47e6-9078-05bdf3d3fcb0" -%}
+              {%- set cpersGdprDpiaReasonsQUuid = "3d09f311-07dd-49a0-8445-5eab8f9548fc" -%}
+                {%- set cpersGdprDpiaVulnerableChoiceUuid = "7dd41e34-b8fb-4d4a-9dde-eb0954d9718f" -%}
+                {%- set cpersGdprDpiaSensitiveChoiceUuid = "1b4fef4e-73ba-4f59-8234-92879a6f09d9" -%}
+                {%- set cpersGdprDpiaLargeScaleChoiceUuid = "63285783-9635-4c55-a781-33f81eff6e9d" -%}
+                {%- set cpersGdprDpiaAutomatedChoiceUuid = "cee31df6-624a-4569-ae32-fad3d74dc169" -%}
+                {%- set cpersGdprDpiaEvaluationChoiceUuid = "5c331845-fc91-40a0-b8b0-4d55a0664b7b" -%}
+                {%- set cpersGdprDpiaMonitoringChoiceUuid = "41d2caa6-14b5-4536-86d6-63f54999e604" -%}
+                {%- set cpersGdprDpiaMatchingChoiceUuid = "fcf05e2f-b25b-45a3-a2fe-460618e3ee7f" -%}
+                {%- set cpersGdprDpiaInnovativeChoiceUuid = "f2919725-27cf-4c43-a04b-69a47eb1f852" -%}
+                {%- set cpersGdprDpiaRightsChoiceUuid = "9e3d02c8-3a93-4e95-b724-36ed315efb69" -%}
         {%- set cpersGdprSafeguardsQUuid = "a30f5047-33c1-45a7-8b3f-b1b90c364fc9" -%}
          {%- set cpersGdprSafeguardsAUuid = "22e612e0-c72d-42fa-9a37-a55232e72c72" -%}
          {%- set cpersGdprSafeguardsIdentifQUuid = "7cc7b00c-6f1e-4ad9-9742-f02df552dbee" -%}
@@ -388,6 +406,9 @@
     {%- set ethLegHumanQUuid = "b464593d-fb92-4ad9-88e1-764306bb3051" -%}
       {%- set ethLegHumanNoAUuid = "58b49591-a1f7-4733-bc92-a87cb786b128" -%}
       {%- set ethLegHumanYesAUuid = "761d20f2-d2ce-496b-8a91-a52ff0513e7b" -%}
+        {%- set ethLegInformedCollectedQUuid = "a2b1fa38-792a-4628-9765-93476a38cffb" -%}
+          {%- set ethLegInformedCollectedNoAUuid = "7a2be944-f443-48e8-abaa-2c0bfb4ced35" -%}
+          {%- set ethLegInformedCollectedYesAUuid = "3d50ae01-2bd7-4495-b556-1d513d0a89ce" -%}
 
 {%- set ownershipQUuid = "cb7d17a8-30c0-489d-a43c-702b27d97611" -%}
 {%- set ownershipNoOwnerAUuid = "f310952b-e946-4315-bb32-bf127d1bf96a" -%}
@@ -515,6 +536,7 @@
 {%- set risksPseudonymizationQUuid = "59748a7b-f729-404d-babe-3147e2c6b247" -%}
 {%- set risksPseudonymizationInsideAUuid = "72c0a64f-a3ec-4d9e-bf37-ee0b25c2a084" -%}
 {%- set risksPseudonymizationPartyAUuid = "1653a04e-20e2-4929-9fd5-8c35402ac359" -%}
+{%- set risksPseudonymizationPartyQUuid = "5d51a103-ec07-4c20-b269-f2f59f26d2cd" -%}
 {%- set risksPseudonymizationAnotherAUuid = "c5bdfb9d-33a7-4d0b-82cf-cde1911ad5bc" -%}
 {%- set risksPseudonymizationAnotherQUuid = "eb876df3-5fb5-4885-9ab6-7dbfa6ba7427" -%}
 {# Chapter 6 - Preserving data #}
@@ -578,6 +600,7 @@
 {%- set dataIdentifierTypeDoiAUuid = "48062bc9-0ffb-4509-bec6-e90641a30569" -%}
 {%- set dataIdentifierTypeArkAUuid = "c353f027-823b-4242-9149-37dca26cf4bc" -%}
 {%- set dataIdentifierTypeUrlAUuid = "7a1d3b28-5f85-48b8-b052-2448c276d9fc" -%}
+{%- set dataIdentifierTypeNoPidAUuid = "640d232f-69bc-4d4e-89ef-2d94db27f65f" -%}
 {%- set dataIdentifierTypeOtherAUuid = "97236701-7b62-40f8-99a0-3b18d3fe3658" -%}
 {%- set dataIdentifierTypeOtherTypeQUuid = "636d2958-b8ef-47bb-ae11-10a890569ca2" -%}
 {%- set dataIdentifierIdentifierQUuid = "9e13b2d3-5f00-4e19-8a52-5c33c5b1cb07" -%}
@@ -606,6 +629,9 @@
 {%- set specialRepoLongTermSupportQUuid = "f83a9afd-c6de-452b-be9f-bd76e5eb6b54" -%}
 {%- set specialRepoLongTermSupportYesAUuid = "714e0a22-c059-4f80-9780-6f7f2e2ce53b" -%}
 {%- set specialRepoLongTermSupportNoAUuid = "dc921fac-cf77-4d3d-bb9c-907d37f838ef" -%}
+{%- set specialRepoMaintenanceQUuid = "f691ad73-1284-4c7d-999d-34bb0612dd42" -%}
+{%- set specialRepoMaintenanceYesAUuid = "d2c01a84-fc1d-4108-95c4-9e9e9198f93e" -%}
+{%- set specialRepoMaintenanceNotYetAUuid = "4dd69e44-097b-42fc-98a4-4ce379453d46" -%}
 {%- set specialRepoServiceLevelQUuid = "cbbfb0da-caf1-4c04-b72f-de39c4a8fb33" -%}
 {%- set specialRepoServiceLevelDownloadAUuid = "dc1082fd-1c90-492c-833c-3e0909c643bb" -%}
 {%- set specialRepoServiceLevelSimpleAUuid = "da6725a2-62bb-4fe7-a76f-a4e396646b19" -%}
@@ -690,6 +716,9 @@
 {%- set repoChargesHowPayInstituteAUuid = "aeafeb04-59e1-4e56-8c89-07d773474695" -%}
 {%- set repoChargesHowPayOtherAUuid = "6fb69263-d2cb-4d90-babe-523136c29bc4" -%}
 {%- set repoChargesHowPayOtherQUuid = "6e0704a2-cea3-4ae7-8ab5-5eb6db163639" -%}
+{%- set otherRecurringFeesQUuid = "4baf405e-262e-4f1a-bfdc-fe72fc628650" -%}
+{%- set otherRecurringFeesYesAUuid = "5951120f-af93-4f15-b15a-b2be9a89efff" -%}
+{%- set otherRecurringFeesNoAUuid = "ccbe8121-ac77-4619-a49d-5a755c01d5a2" -%}
 {%- set budgetTimeEffortQUuid = "13a7eeae-09f5-42bf-8e62-b2c1fe1b86f7" -%}
 {%- set budgetTimeEffortYesAUuid = "db44d6ca-efc2-413e-8abc-d92f92ed1d1d" -%}
 {%- set budgetTimeEffortAmountQUuid = "2a0cf686-63ed-44b6-ae74-38ddd39ac741" -%}
@@ -717,6 +746,7 @@
 {%- set accessCUuid = "6be88f7c-f868-460f-bba7-91e1c659adfd" -%}
 {%- set asOpenAsPossibleQUuid = "6516eae1-98b2-48f2-9862-b5fb140cfad7" -%}
 {%- set asOpenAsPossibleYesAUuid = "67a8f6e1-50db-4b04-b1fa-d52941f4e535" -%}
+{%- set asOpenAsPossibleNoAUuid = "ca5c002d-fb3f-4873-bede-a8f304a3934f" -%}
 {%- set openImmediatelyQUuid = "a549d10b-aa46-4c0c-863f-30219ac5ecce" -%}
 {%- set openImmediatelyYesAUuid = "8c33553c-9603-4156-82d7-85ab3d7de090" -%}
 {%- set openImmediatelyNoAUuid = "b3739ebd-2d8e-42d3-9425-a7d6d1b26c79" -%}

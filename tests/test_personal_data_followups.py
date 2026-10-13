@@ -1,6 +1,7 @@
 """Missing, negative and unreachable replies must remain distinguishable."""
 import sys
 import unittest
+from copy import deepcopy
 from bs4 import BeautifulSoup
 from test_science_europe_contract import ROOT, render_question
 from test_personal_data_gaps import UUIDS, case, QUESTION
@@ -221,3 +222,147 @@ class PersonalDataFollowupTests(unittest.TestCase):
     def test_blank_additional_safeguards_is_not_a_completed_empty_block(self):
         values = replies('personal-transfer-complete'); values[PATHS['additional']] = ' \n\t '
         self.assertEqual({'personal-data-additional-safeguards'}, self.facts(values))
+
+    def test_q9_dpia_and_ethical_consent_keep_only_reachable_typed_facts(self):
+        from check_sentence_layout import partial_fixture
+        from check_answer_mapping import question
+        from current_support import PREFIX, environment
+        chain = ('creatingCUuid collectPersonalQUuid collectPersonalYesAUuid '
+                 'cpersGdprQUuid cpersGdprExploreAUuid cpersGdprNeedDpiaQUuid '
+                 'cpersGdprNeedDpiaYesAUuid cpersGdprPerformedDpiaQUuid')
+        km, base, performed = partial_fixture(chain)
+        need = path('creatingCUuid', 'collectPersonalQUuid', 'collectPersonalYesAUuid',
+                    'cpersGdprQUuid', 'cpersGdprExploreAUuid', 'cpersGdprNeedDpiaQUuid')
+        need_no = UUIDS['cpersGdprNeedDpiaNoAUuid']
+        km['entities']['questions'][UUIDS['cpersGdprNeedDpiaQUuid']]['answerUuids'].append(need_no)
+        km['entities']['answers'][need_no] = {'followUpUuids': []}
+        py, pn = [UUIDS['cpersGdprPerformedDpia'+state+'AUuid'] for state in ('Yes', 'No')]
+        pq = km['entities']['questions'][UUIDS['cpersGdprPerformedDpiaQUuid']]
+        pq.update(questionType='OptionsQuestion', answerUuids=[py, pn])
+        km['entities']['answers'].update({py: {'followUpUuids': []}, pn: {'followUpUuids': []}})
+        children = km['entities']['answers'][py]['followUpUuids']
+        listing = path(performed, 'cpersGdprPerformedDpiaYesAUuid', 'cpersGdprDpiaListQUuid')
+        listed = question(km, children, UUIDS['cpersGdprDpiaListQUuid'], 'ListQuestion')
+        for field in ('Dataset', 'Description'):
+            question(km, listed['itemTemplateQuestionUuids'], UUIDS['cpersGdprDpia'+field+'QUuid'],
+                     'ValueQuestion')['valueType'] = 'TextQuestionValueType'
+        reasons = path(performed, 'cpersGdprPerformedDpiaYesAUuid', 'cpersGdprDpiaReasonsQUuid')
+        choices = [UUIDS['cpersGdprDpia'+name+'ChoiceUuid'] for name in
+                   ('Vulnerable', 'Sensitive', 'LargeScale', 'Automated', 'Evaluation',
+                    'Monitoring', 'Matching', 'Innovative', 'Rights')]
+        question(km, children, UUIDS['cpersGdprDpiaReasonsQUuid'], 'MultiChoiceQuestion')['choiceUuids'] = choices
+        km['entities']['choices'] = {choice: {'label': 'KM-EN-LABEL-MUST-NOT-LEAK'} for choice in choices}
+        chapter = km['entities']['chapters'][UUIDS['creatingCUuid']]['questionUuids']
+        ey, en = [UUIDS['ethLeg'+state+'AUuid'] for state in ('Yes', 'No')]
+        hy, hn = [UUIDS['ethLegHuman'+state+'AUuid'] for state in ('Yes', 'No')]
+        iy, ino = [UUIDS['ethLegInformedCollected'+state+'AUuid'] for state in ('Yes', 'No')]
+        question(km, chapter, UUIDS['ethLegQUuid'], 'OptionsQuestion', [ey, en])
+        question(km, km['entities']['answers'][ey]['followUpUuids'], UUIDS['ethLegHumanQUuid'], 'OptionsQuestion', [hy, hn])
+        question(km, km['entities']['answers'][hy]['followUpUuids'], UUIDS['ethLegInformedCollectedQUuid'], 'OptionsQuestion', [iy, ino])
+        ethical = path('creatingCUuid', 'ethLegQUuid')
+        human = path(ethical, 'ethLegYesAUuid', 'ethLegHumanQUuid')
+        informed = path(human, 'ethLegHumanYesAUuid', 'ethLegInformedCollectedQUuid')
+        base.update({ethical: ey, human: hy})
+        env = environment(ROOT)
+        old_str, old_items = env.filters['reply_str_value'], env.filters['reply_items']
+        env.filters['reply_str_value'] = lambda r: str(r['value'].get('value', '')) if isinstance(r, dict) and isinstance(r.get('value'), dict) else old_str(r)
+        env.filters['reply_items'] = lambda r: r['value'].get('value', []) if isinstance(r, dict) and isinstance(r.get('value'), dict) and isinstance(r['value'].get('value'), list) else old_items(r)
+        template = env.from_string(PREFIX + "{% include 'src/questions/09-ethical-issues.html.j2' %}")
+        source = (ROOT/Q9).read_text()
+        prior_boundary = source.replace("{%- set dpiaDatasetLabel %}Dataset{% endset -%}\n{%- set dpiaDatasetKind = 'dpia' -%}\n", '').replace(
+            '{{ dpiaDatasetLabel }} {{ macros.datasetLabel(dpiaDatasetKind, record.index) }}',
+            "Dataset {{ macros.datasetLabel('dpia', record.index) }}")
+        prior_template = env.from_string(PREFIX + prior_boundary)
+        # The noun is translator-owned; its surrounding strong/ordinal shell is
+        # not. Keep EN units independent of the optional external Tool package.
+        noun_capture = '{%- set dpiaDatasetLabel %}Dataset{% endset -%}'
+        self.assertEqual(1, source.count(noun_capture))
+        self.assertIn('<strong>{{ dpiaDatasetLabel }} {{ macros.datasetLabel(dpiaDatasetKind, record.index) }}</strong>', source)
+        translated_source = source.replace(noun_capture, noun_capture.replace('Dataset{% endset', '資料集{% endset'), 1)
+        translated = env.from_string(PREFIX + translated_source)
+        render = lambda values, profile, schema: BeautifulSoup(template.render(repliesMap=values,
+            output_profile=profile, **schema), 'html.parser')
+        typed = lambda value, kind='AnswerReply': {'value': {'type': kind, 'value': value}}
+        expected = [('dpia-performed', performed, py, pn,
+                     'Data protection impact assessments (DPIAs) have been performed for the personal data.',
+                     'Data protection impact assessments (DPIAs) have not been performed for the personal data.'),
+                    ('ethical-informed-consent-collected', informed, iy, ino,
+                     'Informed consent has been collected from the research subjects.',
+                     'Informed consent has not been collected from the research subjects.')]
+        for profile in ('review', 'submission'):
+            for schema in ({}, {'km': km}):
+                for fact, leaf, yes, no, positive, negative in expected:
+                    for selected in (yes, no, None, '', 'unknown'):
+                        values = dict(base)
+                        if selected is not None: values[leaf] = selected
+                        soup = render(values, profile, schema)
+                        nodes = soup.select('[data-fact-id="'+fact+'"]')
+                        self.assertEqual(int(selected in (yes, no)), len(nodes), (profile, fact, selected))
+                        if nodes:
+                            self.assertEqual('complete' if selected == yes else 'explicit-no', nodes[0]['data-status'])
+                            self.assertEqual(positive if selected == yes else negative, nodes[0].get_text(' ', strip=True))
+                        if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+            values = {key: typed(value) for key, value in {**base, performed: py, informed: ino}.items()}
+            values.update({listing: typed(['empty', 'no-name', 'name-only'], 'ItemListReply'),
+                path(listing, 'no-name', 'cpersGdprDpiaDescriptionQUuid'): typed('<p>0</p><table><tr><td>DPIA-ORIGINAL</td></tr></table>', 'StringReply'),
+                path(listing, 'name-only', 'cpersGdprDpiaDatasetQUuid'): typed('<p>NAME-ONLY &amp; original</p>', 'StringReply'),
+                reasons: typed(choices + ['unknown'], 'MultiChoiceReply')})
+            soup = render(values, profile, {'km': km})
+            self.assertEqual(prior_template.render(repliesMap=values, output_profile=profile, km=km),
+                             template.render(repliesMap=values, output_profile=profile, km=km))
+            self.assertIn('According to the questionnaire, a data protection impact assessment (DPIA) is required.', soup.get_text())
+            records = soup.select('.dpia-record')
+            self.assertEqual(['no-name', 'name-only'], [n['data-item-id'] for n in records])
+            self.assertEqual(['2', '3'], [n.select_one('.dataset-label')['data-list-index'] for n in records])
+            self.assertIn('0', records[0].get_text()); self.assertEqual('DPIA-ORIGINAL', records[0].table.get_text())
+            self.assertIsNone(records[1].select_one('[data-fact-id="dpia-description"]'))
+            self.assertEqual(choices, [n['data-choice-id'] for n in soup.select('.dpia-reasons li')])
+            self.assertNotIn('KM-EN-LABEL-MUST-NOT-LEAK', str(soup))
+            self.assertFalse(soup.select('p p,p div,p ul,p table'))
+            localized = BeautifulSoup(translated.render(repliesMap=values, output_profile=profile, km=km), 'html.parser')
+            leads = localized.select('.dpia-record > .answer-lead > p > strong')
+            self.assertEqual(2, len(leads))
+            self.assertTrue(all(lead.get_text(strip=True).startswith('資料集') for lead in leads))
+            self.assertEqual(['2', '3'], [lead.span['data-list-index'] for lead in leads])
+            for parent, inactive in ((need, need_no), (performed, pn),
+                    (path('creatingCUuid', 'collectPersonalQUuid'), UUIDS['collectPersonalNoAUuid']),
+                    (path('creatingCUuid', 'collectPersonalQUuid', 'collectPersonalYesAUuid', 'cpersGdprQUuid'), '')):
+                altered = deepcopy(values); altered[parent] = typed(inactive)
+                hidden = render(altered, profile, {'km': km})
+                self.assertFalse(hidden.select('.dpia-record,.dpia-reasons'))
+                self.assertNotIn('DPIA-ORIGINAL', hidden.get_text())
+            for parent, inactive in ((ethical, en), (human, hn), (ethical, ''), (human, 'unknown')):
+                altered = deepcopy(values); altered[parent] = typed(inactive)
+                self.assertFalse(render(altered, profile, {'km': km}).select('[data-fact-id="ethical-informed-consent-collected"]'))
+            for fact, leaf, yes, no, _, _ in expected:
+                for mutation in ('wrong-reply', 'wrong-ancestor-reply', 'missing-ancestor', 'removed-question',
+                                 'wrong-question-type', 'removed-answer', 'dangling-answer'):
+                    altered, schema = deepcopy(values), deepcopy(km)
+                    qid = leaf.rsplit('.', 1)[-1]
+                    if mutation == 'wrong-reply': altered[leaf] = typed(no, 'StringReply')
+                    elif mutation == 'wrong-ancestor-reply': altered[need if leaf == performed else human]['value']['type'] = 'StringReply'
+                    elif mutation == 'missing-ancestor': altered.pop(need if leaf == performed else human)
+                    elif mutation == 'removed-question': del schema['entities']['questions'][qid]
+                    elif mutation == 'wrong-question-type': schema['entities']['questions'][qid]['questionType'] = 'ValueQuestion'
+                    elif mutation == 'removed-answer': schema['entities']['questions'][qid]['answerUuids'] = []
+                    else: del schema['entities']['answers'][yes if leaf == performed else no]
+                    self.assertFalse(render(altered, profile, {'km': schema}).select('[data-fact-id="'+fact+'"]'), (fact, mutation))
+            for mutation in ('removed-item', 'wrong-list-reply', 'wrong-text-reply', 'wrong-text-value', 'removed-field', 'wrong-field-type'):
+                altered, schema = deepcopy(values), deepcopy(km)
+                detail = path(listing, 'no-name', 'cpersGdprDpiaDescriptionQUuid')
+                qid = UUIDS['cpersGdprDpiaDescriptionQUuid']
+                if mutation == 'removed-item': altered[listing]['value']['value'] = ['name-only']
+                elif mutation == 'wrong-list-reply': altered[listing]['value']['type'] = 'MultiChoiceReply'
+                elif mutation == 'wrong-text-reply': altered[detail]['value']['type'] = 'AnswerReply'
+                elif mutation == 'wrong-text-value': altered[detail]['value']['value'] = ['INVALID-TEXT']
+                elif mutation == 'removed-field': del schema['entities']['questions'][qid]
+                else: schema['entities']['questions'][qid]['valueType'] = 'IntegerQuestionValueType'
+                self.assertNotIn('DPIA-ORIGINAL', render(altered, profile, {'km': schema}).get_text(), mutation)
+            for mutation in ('wrong-reply', 'removed-choice', 'dangling-choice', 'wrong-question-type'):
+                altered, schema = deepcopy(values), deepcopy(km)
+                if mutation == 'wrong-reply': altered[reasons]['value']['type'] = 'ItemListReply'
+                elif mutation == 'removed-choice': schema['entities']['questions'][UUIDS['cpersGdprDpiaReasonsQUuid']]['choiceUuids'] = choices[1:]
+                elif mutation == 'dangling-choice': del schema['entities']['choices'][choices[0]]
+                else: schema['entities']['questions'][UUIDS['cpersGdprDpiaReasonsQUuid']]['questionType'] = 'ListQuestion'
+                actual = [n['data-choice-id'] for n in render(altered, profile, {'km': schema}).select('.dpia-reasons li')]
+                self.assertEqual([] if mutation in ('wrong-reply', 'wrong-question-type') else choices[1:], actual, mutation)

@@ -1,8 +1,8 @@
 {
   "organizationId": "threemonth03",
   "templateId": "science-europe-enhanced",
-  "version": "0.3.67",
-  "name": "Science Europe DMP — Output Profiles Pilot",
+  "version": "0.3.78",
+  "name": "Science Europe DMP \u2014 Output Profiles Pilot",
   "description": "Experimental derivative of dsw:science-europe:1.30.1 with completeness handling and shared PDF/Word reading structure",
   "license": "Apache-2.0",
   "metamodelVersion": "18.0",
@@ -23,9 +23,25 @@
   "formats": [
     {
       "uuid": "a9293d08-59a4-4e6b-ae62-7a6a570b031c",
-      "name": "HTML — Internal review",
+      "name": "HTML \u2014 Internal review",
       "icon": "far fa-file-code",
       "steps": [
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
         {
           "name": "jinja",
           "options": {
@@ -38,9 +54,25 @@
     },
     {
       "uuid": "68c26e34-5e77-4e15-9bf7-06ff92582257",
-      "name": "PDF — Internal review",
+      "name": "PDF \u2014 Internal review",
       "icon": "far fa-file-pdf",
       "steps": [
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
         {
           "name": "jinja",
           "options": {
@@ -63,6 +95,22 @@
         {
           "name": "jinja",
           "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
+        {
+          "name": "jinja",
+          "options": {
             "template": "src/index.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -79,9 +127,25 @@
     },
     {
       "uuid": "f4bd941a-dfbe-4226-a1fc-200fb5269311",
-      "name": "Word — Internal review",
+      "name": "Word \u2014 Internal review",
       "icon": "far fa-file-word",
       "steps": [
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
         {
           "name": "jinja",
           "options": {
@@ -108,9 +172,25 @@
     },
     {
       "uuid": "499d9300-0183-5157-b6f4-38e6c2b91600",
-      "name": "HTML — Submission preview (pilot)",
+      "name": "HTML \u2014 Submission preview (pilot)",
       "icon": "far fa-file-code",
       "steps": [
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
         {
           "name": "jinja",
           "options": {
@@ -123,9 +203,25 @@
     },
     {
       "uuid": "9fd0a115-4b8b-5013-a084-eaf2890ec940",
-      "name": "PDF — Submission preview (pilot)",
+      "name": "PDF \u2014 Submission preview (pilot)",
       "icon": "far fa-file-pdf",
       "steps": [
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
         {
           "name": "jinja",
           "options": {
@@ -142,9 +238,25 @@
     },
     {
       "uuid": "98081811-41ff-5438-b98a-0472607527c6",
-      "name": "Word — Submission preview (pilot)",
+      "name": "Word \u2014 Submission preview (pilot)",
       "icon": "far fa-file-word",
       "steps": [
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
         {
           "name": "jinja",
           "options": {
@@ -174,6 +286,22 @@
       "name": "OpenDocument Text",
       "icon": "far fa-file-alt",
       "steps": [
+        {
+          "name": "jinja",
+          "options": {
+            "template": "src/answer-markdown-inputs.html.j2",
+            "content-type": "text/html",
+            "extension": "html"
+          }
+        },
+        {
+          "name": "pandoc",
+          "options": {
+            "from": "html",
+            "to": "html",
+            "args": "--lua-filter=src/answer-markdown.lua --wrap=none"
+          }
+        },
         {
           "name": "jinja",
           "options": {

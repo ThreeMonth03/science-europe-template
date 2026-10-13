@@ -1,8 +1,90 @@
 # Maintaining the current bilingual repairs
 
-The `fix/answer-mapping` repairs are packaged as experimental candidate 0.3.54,
+The `fix/answer-mapping` repairs currently include local preview 0.3.78,
 not a deployed release. English Jinja remains the shared source; Chinese
 is produced by the existing translation pipeline, not a second Jinja fork.
+
+0.3.75 preserves explicit negative answers for Q1 harmonization and
+machine-readable preparation, and Q10's choice not to assign persistent
+identifiers even when the identifier value is blank. Missing or inactive
+choices are not treated as negative; supplied identifier values are retained.
+
+0.3.76 retains the special repository's server-administration and hardware
+maintenance arrangement (Yes or Not yet), and other recurring availability
+fees (Yes or No) once in Q15. These are distinct from long-term support and
+repository service charges; missing or inactive replies imply neither state.
+
+## Template-owned Markdown boundary
+
+The current local repairs route Q2's non-standard-format reason and five Q3
+folder/file/object naming details through the existing answer parser. Their
+conditions and fixed prose are unchanged. Q3's three fixed folder statements
+use paragraph-bearing lead wrappers only when their own details are nonblank;
+the existing PDF/Word guards join each statement to its first answer block,
+without keeping a whole answer or list. All 858 Chinese sentence/translation
+pairs retain their bytes; Q3 metadata paths and source identities move with the
+new wrappers. Three existing translations require explicit carry-forward.
+The Q3 layout repair is replayed with the pinned stock 4.35 worker; native
+Word XML and bundled LibreOffice previews are checked, not Microsoft Word.
+The Chinese build selects PDF typography by the final WeasyPrint step, covering review and
+submission while excluding HTML/Word. The stock worker is not modified and
+there is no PO migration. Uncommitted packages remain previews.
+
+0.3.68 adds a shared Jinja → stock Pandoc → original Jinja prefix to all eight
+formats. 0.3.69 also routes the six confirmed free-text consumers through its
+sanitized fragments: Q1 reuse purpose, Q2 non-equipment description, Q3 metadata
+access explanation, shared Q1/Q4 quality details, and Q15 resource purpose and
+funding details. Q1 provenance and Q2 other data-entry arrangements remain on
+the same path. 0.3.70 adds the nine confirmed Q1 version/reuse-condition,
+Q6 pseudonymization, Q8 custom-reason/reuse-condition and Q9 consent/purpose
+fields, preserving repeated Q1/Q8 ownership and single/multiple-reason branches.
+Fixed Q6/Q8 leads are separate from authored blocks; Q8 restriction leads use
+the existing bounded PDF keep without binding the whole answer. Other Markdown
+calls, including integration-identity fallbacks, remain unchanged. Original
+entries, CSS, fonts, Word filters and conversion engines are preserved. The tested
+runtime is the existing pinned official 4.30 worker (Pandoc 3.8.3), not a worker fork
+or a replacement Pandoc binary. Other runtime versions require a compatibility check.
+
+`tests/test_answer_markdown.py` tests exact string transport, rejection/fallbacks,
+all format chains and a single batched stock-parser regression. Existing body tests
+use an explicit test-only Markdown adapter; they cannot certify the new parser.
+Raw HTML stays literal, unsafe links retain their labels/targets without active
+links, and images retain labels/targets without fetching image data at these
+entry points. No original reply or indentation is rewritten. The prefix processes
+strings only, never the full document with embedded font CSS.
+
+Uncommitted bilingual builds must remain `--preview`. Before promotion, commit
+the reviewed English source and pin that exact commit in the Chinese pipeline;
+do not use a floating branch or claim that the current preview is deployable.
+This bounded integration is not whole-template or Microsoft Word acceptance.
+
+0.3.71 lets Q8 custom-reason lists flow, including long plain answers; fixed
+short reasons retain their original keep. Q1 version answers use a labelled
+flow container rather than an outer information table. Recheck the observed
+PDF whitespace and Word body-right overflow against the same native inputs.
+The local paired replay resolves the English rich-reason whitespace and both
+version-table overflows; Chinese Q8 is an unchanged pagination control. The
+existing reason test also checks selector matching in the pinned worker, not
+only the test HTML parser. These finite previews are not release acceptance.
+Q8 permission paragraphs have no actual Word keepNext; the inspected previews
+show no orphan, which is not an all-boundaries guarantee.
+
+0.3.72 reuses the exact Q15 bounded two-cell row contract for Q8 reuse-condition
+tables. Only direct authored tables in the owned dataset list qualify; short
+simple body rows may not split, while long or complex cells, headers, other
+questions and adjacent prose retain their original pagination. No whole-table
+keep, worker change, or translation change is introduced.
+
+0.3.73 overrides the inherited Word label `keepNext` only in already bounded
+Q15 budget rows. Their `cantSplit` protection and repeated table headers remain;
+history rows, unmarked or unbounded rows, and the shared label style are unchanged.
+The local control isolated the label keep rather than the row-split rule as the
+cause of the observed English review-budget whitespace in bundled LibreOffice.
+This is not a Microsoft Word or arbitrary-input guarantee.
+
+0.3.74 also maps Q9's explicit DPIA No answer. It reports the questionnaire
+response, not an independent legal assessment; missing or unreachable replies
+do not become negative claims. Both languages retain the original Yes sentence.
 
 ## One current-behaviour entry point
 

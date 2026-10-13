@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-data-preservation" class="question">
   <h3>11. How will data for preservation be selected, and where will data be preserved long-term (for example a data repository or archive)?</h3>
 
@@ -125,8 +126,12 @@
                       <div class="repository-contact" id="repository-contact-{{ repositoryDatasetIndex }}-{{ loop.index }}">
                         {% if domainSpecificRepoContactBeforeOther|trim %}
                           <div class="answer-lead"><p>Other repository contact arrangements:</p></div>
-                          <div class="answer-detail" data-fact-id="repository-contact-arrangements" data-status="complete">{{ domainSpecificRepoContactBeforeOther|markdown }}</div>
+                          <div class="answer-detail" data-fact-id="repository-contact-arrangements" data-status="complete">{{ answerMarkdown.markdown(domainSpecificRepoContactBeforeOther) }}</div>
                         {% else %}
+                          {%- set activeContactPath = activeAnswer.path(domainSpecificRepoContactBeforePath.split('.'), 'OptionsQuestion') if km is defined else domainSpecificRepoContactBeforePath -%}
+                          {%- if activeContactPath and (km is not defined or (domainSpecificRepoContactBeforeAUuid in km.entities.questions[uuids.domainSpecificRepoContactBeforeQUuid].answerUuids and domainSpecificRepoContactBeforeAUuid in km.entities.answers)) and (repliesMap[domainSpecificRepoContactBeforePath].value is not defined or repliesMap[domainSpecificRepoContactBeforePath].value.type is not defined or repliesMap[domainSpecificRepoContactBeforePath].value.type == 'AnswerReply') -%}
+                            <p data-fact-id="repository-contact-arrangements" data-status="complete">Other arrangements have been made for contacting the repository.</p>
+                          {%- endif -%}
                           {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="repository-contact-arrangements" data-status="missing">The other repository contact arrangements have not been described.</p>{% endif %}
                         {% endif %}
                       </div>
@@ -260,7 +265,7 @@
         {%- set repoChargesHowPayOther = repliesMap[repoChargesHowPayOtherPath]|reply_str_value if repoChargesHowPayOtherPath else '' -%}
         {%- if repoChargesHowPayOther|trim -%}
           <div class="answer-lead"><p>Other arrangements for paying repository costs:</p></div>
-          <div class="answer-detail">{{ repoChargesHowPayOther|markdown }}</div>
+          <div class="answer-detail">{{ answerMarkdown.markdown(repoChargesHowPayOther) }}</div>
         {%- else -%}
           <p>Other arrangements are planned for paying repository service fees.</p>
         {%- endif -%}

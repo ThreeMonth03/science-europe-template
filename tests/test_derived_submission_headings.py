@@ -70,7 +70,7 @@ class DerivedSubmissionHeadingsTests(unittest.TestCase):
                 with self.subTest(name=name, escape=escape):
                     km, replies = fixture(None, name)
                     soup = self.render(source, replies, km=km, escape=escape)
-                    self.assertEqual('Named project' if name == 'Named project' else 'Document name',
+                    self.assertEqual('Named project' if name == 'Named project' else 'Data Management Plan',
                         soup.h1.get_text())
                     self.assertIsNone(soup.select_one('#dmp-projects'))
                     review = self.render(source, replies, 'review', km, escape)

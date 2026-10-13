@@ -9,7 +9,7 @@
 {% import "src/globals.j2" as globals with context %}
 <html lang="en">
   <head>
-    <title>{{ ctx.project.name }}</title>
+    <title>Data Management Plan</title>
     <meta charset="utf-8">
     <style>
       {% include "src/style.css" %}
@@ -22,10 +22,12 @@
       {% if dc.project.versions|length > 0 %}{% include "src/word/versions.html.j2" with context %}{% endif %}
       {% include "src/projects.html.j2" with context %}
       {% include "src/contributors.html.j2" with context %}
+      {% include "src/content.html.j2" with context %}
+      {% if output_profile|default('review') != 'submission' %}
       <div id="dmp-provenance" class="document-provenance">
         {% include "src/document-provenance.html.j2" with context %}
       </div>
-      {% include "src/content.html.j2" with context %}
+      {% endif %}
     </article>
   </body>
 </html>

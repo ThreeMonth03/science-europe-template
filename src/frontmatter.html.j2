@@ -1,16 +1,15 @@
 <header class="document-heading">
-  <p class="document-kind">Data Management Plan</p>
   {%- import 'src/active-answer.j2' as active with context -%}
   {%- set overviewParts = [uuids.adminDetailsCUuid, uuids.projectsQUuid] -%}
   {%- set overviewPath = active.path(overviewParts, 'ListQuestion') -%}
   {%- set overviewItems = repliesMap[overviewPath]|reply_items if overviewPath else [] -%}
   {%- set overviewNamePath = active.path(overviewParts + [overviewItems[0], uuids.projectNameQUuid], 'ValueQuestion') if overviewItems|length == 1 else '' -%}
   {%- set overviewName = repliesMap[overviewNamePath]|reply_str_value if overviewNamePath else '' -%}
-  <h1>{{ (overviewName if overviewName|trim else dc.project.name)|e }}</h1>
-  {% if overviewName|trim and overviewName != dc.project.name %}<p class="document-meta">Document: {{ dc.project.name|e }}</p>{% endif %}
-  <p class="document-meta">Generated on {{ dc.document.created_at|datetime_format("%Y-%m-%d") }}</p>
-  {% if ctx.phaseUuid and ctx.phaseUuid in km.entities.phases %}
-  <p class="document-meta">Project phase: {{ km.entities.phases[ctx.phaseUuid].title|e }}</p>
+  {% if overviewName|trim %}
+  <p class="document-kind">Data Management Plan</p>
+  <h1>{{ overviewName|e }}</h1>
+  {% else %}
+  <h1>Data Management Plan</h1>
   {% endif %}
   {% for version in dc.project.versions if version.uuid == ctx.project.versionUuid %}
   <p class="document-meta">Version: {{ version.name|e }} ({{ version.created_at|datetime_format("%Y-%m-%d") }})</p>

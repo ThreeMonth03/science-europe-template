@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-required-resources" class="question" data-requirement-id="SE-6b">
   <h3>15. What resources (for example financial and time) will be dedicated to data management and ensuring that data will be FAIR (Findable, Accessible, Interoperable, Re-usable)?</h3>
 
@@ -15,7 +16,7 @@
       <div class="answer-lead"><p data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="{{ 'complete' if expertiseTrainText|trim else 'partial' }}">Additional specialist expertise is required. Existing staff will receive training.</p></div>
       {% if expertiseTrainText|trim %}
         <div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete">
-          {{ expertiseTrainText|markdown }}
+          {{ answerMarkdown.markdown(expertiseTrainText) }}
         </div>
       {% endif %}
       {%- if not expertiseTrainText|trim -%}
@@ -37,7 +38,7 @@
     {%- else -%}
       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="specialist-expertise" data-status="missing"><strong>Information not provided:</strong> whether additional specialist expertise is required.</p>{% endif %}
     {%- endif -%}
-    {%- set resourceOverview = namespace(original='', explicitPair=false) -%}
+    {%- set resourceOverview = namespace(original='', explicitPair=false, joinGaps=false) -%}
     {%- set resourceOverview.original -%}
     {# additional hw/sw #}
     {%- set additionalHWSWPath = [uuids.adminDetailsCUuid, uuids.additionalHWSWQUuid]|reply_path -%}
@@ -50,7 +51,7 @@
       {%- if additionalHWSWWhat|trim -%}
         <div class="answer-detail" data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="complete">
           <p><strong>Additional hardware or software required</strong></p>
-          {{ additionalHWSWWhat|markdown }}
+          {{ answerMarkdown.markdown(additionalHWSWWhat) }}
         </div>
       {%- else -%}
         <p data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="partial">We require hardware or software in addition to what is usually available in the institute.</p>
@@ -60,6 +61,9 @@
       {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="hardware-software" data-status="missing"><strong>Information not provided:</strong> whether additional hardware or software is required.</p>{% endif %}
     {%- endif -%}
     {# charges #}
+    {# Word may join the two fixed terminal prompts after a real authored answer.
+       Keep the original paragraphs and fact markers in HTML; never mark free text. #}
+    {%- set resourceOverview.joinGaps = word_budget_reading|default(false) and (expertiseTrainText|default('')|trim or expertiseHireText|default('')|trim or additionalHWSWWhat|default('')|trim) -%}
     {%- set repoChargesPath = [uuids.preservingCUuid, uuids.repoChargesQUuid]|reply_path -%}
     {%- set repoCharges = repliesMap[repoChargesPath]|reply_str_value -%}
     {%- if repoCharges == uuids.repoChargesNoAUuid %}
@@ -67,14 +71,26 @@
     {%- elif repoCharges == uuids.repoChargesYesAUuid %}
       <p>The selected repositories charge for their services.</p>
     {%- else %}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="repository-charges" data-status="missing"><strong>Information not provided:</strong> whether repository service charges will be incurred.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}{% if resourceOverview.joinGaps %}<div class="q15-terminal-gap" data-fact-id="repository-charges" data-status="missing">{% endif %}<p class="data-gap" data-fact-id="repository-charges" data-status="missing"><strong>Information not provided:</strong> whether repository service charges will be incurred.</p>{% if resourceOverview.joinGaps %}</div>{% endif %}{% endif %}
     {%- endif %}
     {% set resourceOverview.explicitPair = additionalHWSWAUuid == uuids.additionalHWSWNoAUuid and repoCharges in [uuids.repoChargesNoAUuid, uuids.repoChargesYesAUuid] -%}
     {%- endset -%}
     {%- import 'src/resource-prose.html.j2' as resourceProse -%}
     {{- resourceProse.render(resourceOverview.original, resourceOverview.explicitPair) -}}
-    {# costs #}
     {%- import 'src/active-answer.j2' as active with context -%}
+    {# Other recurring fees are independent of repository charges and datasets. #}
+    {%- set otherRecurringFeesParts = [uuids.preservingCUuid, uuids.otherRecurringFeesQUuid] -%}
+    {%- set otherRecurringFeesPath = active.path(otherRecurringFeesParts, 'OptionsQuestion') if km is defined else otherRecurringFeesParts|reply_path -%}
+    {%- set otherRecurringFeesAUuid = repliesMap[otherRecurringFeesPath]|reply_str_value if otherRecurringFeesPath else '' -%}
+    {%- if km is defined and otherRecurringFeesPath and (otherRecurringFeesAUuid not in km.entities.questions[uuids.otherRecurringFeesQUuid].answerUuids or otherRecurringFeesAUuid not in km.entities.answers) -%}
+      {%- set otherRecurringFeesAUuid = '' -%}
+    {%- endif -%}
+    {%- if otherRecurringFeesAUuid == uuids.otherRecurringFeesYesAUuid -%}
+      <p data-requirement-id="SE-6b" data-fact-id="other-recurring-fees" data-status="complete">There are other recurring fees for keeping data or documents available.</p>
+    {%- elif otherRecurringFeesAUuid == uuids.otherRecurringFeesNoAUuid -%}
+      <p data-requirement-id="SE-6b" data-fact-id="other-recurring-fees" data-status="explicit-no">There are no other recurring fees for keeping data or documents available.</p>
+    {%- endif -%}
+    {# costs #}
     {%- set budgetProjectParts = [uuids.adminDetailsCUuid, uuids.projectsQUuid] -%}
     {%- set projectPath = active.path(budgetProjectParts, 'ListQuestion') -%}
     {%- set projectItems = repliesMap[projectPath]|reply_items if projectPath else [] -%}
@@ -114,7 +130,7 @@
                         {%- set projectCostItemDescriptionReply = repliesMap[projectCostItemDescriptionQUuid]|reply_str_value  -%}
                         
                         {%- if projectCostItemDescriptionReply|trim -%}
-                          <div class="answer-detail" data-fact-id="resource-justification" data-status="complete">{{ projectCostItemDescriptionReply|markdown }}</div>
+                          <div class="answer-detail" data-fact-id="resource-justification" data-status="complete">{{ answerMarkdown.markdown(projectCostItemDescriptionReply) }}</div>
                         {%- else -%}
                           {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-justification" data-status="missing"><strong>Information not provided:</strong> why this resource is needed to deliver FAIR data.</p>{% endif %}
                         {%- endif -%}
@@ -200,7 +216,7 @@
                           {%- set costCoverOtherHowQUuid = active.path(projectCostItemCoverParts + [uuids.costCoverOtherAUuid, uuids.costCoverOtherHowQUuid], 'ValueQuestion') -%}
                           {%- set costCoverOtherHowReply = repliesMap[costCoverOtherHowQUuid]|reply_str_value if costCoverOtherHowQUuid else '' -%}
                           {%- if costCoverOtherHowReply|trim -%}
-                            <div class="answer-detail">{{costCoverOtherHowReply|markdown}}</div>
+                            <div class="answer-detail">{{ answerMarkdown.markdown(costCoverOtherHowReply) }}</div>
                           {%- else -%}
                             <p>Other funding arrangements are planned.</p>
                             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="cost-coverage" data-status="missing"><strong>Information not provided:</strong> how this cost will be covered.</p>{% endif %}
@@ -232,7 +248,7 @@
 
         {%- endfor -%}
     {%- else -%}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> the financial and time resources budgeted for data management and FAIR data.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}{% if resourceOverview.joinGaps %}<div class="q15-terminal-gap" data-fact-id="resources-costing" data-status="missing">{% endif %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resources-costing" data-status="missing"><strong>Information not provided:</strong> the financial and time resources budgeted for data management and FAIR data.</p>{% if resourceOverview.joinGaps %}</div>{% endif %}{% endif %}
     {%- endif -%}
   </div>
 </div>

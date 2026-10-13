@@ -1,4 +1,11 @@
+{% if output_profile|default('review') != 'submission' %}
 <aside class="document-provenance">
+  <p>Document: {{ dc.project.name|e }}</p>
+  <p>Created on {{ dc.document.created_at|datetime_format("%Y-%m-%d") }}</p>
+  {% if ctx.phaseUuid and ctx.phaseUuid in km.entities.phases %}
+  <p>Project phase: {{ km.entities.phases[ctx.phaseUuid].title|e }}</p>
+  {% endif %}
   <p>Knowledge model: {{ dc.pkg.name }}, {{ dc.pkg.version }} ({{ dc.pkg.organization_id }}:{{ dc.pkg.km_id }}:{{ dc.pkg.version }})</p>
   <p>Generated with <a href="{{ dc.config.service_url }}">{{ dc.config.service_name }}</a>.</p>
 </aside>
+{% endif %}

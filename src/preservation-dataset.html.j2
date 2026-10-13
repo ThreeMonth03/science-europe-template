@@ -1,8 +1,9 @@
 {# Included inside Q11's dataset-policy. Only direct owned paragraphs may join.
    Description and stage are context, not evidence of preservation decisions. #}
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context %}
 {% set producedDescription = repliesMap[[pathPrefix, uuids.producedDataDescriptionQUuid]|reply_path]|reply_str_value %}
 {% if producedDescription|trim %}
-  <div class="answer-detail" data-fact-id="preservation-dataset-description" data-status="complete">{{ producedDescription|markdown }}</div>
+  <div class="answer-detail" data-fact-id="preservation-dataset-description" data-status="complete">{{ answerMarkdown.markdown(producedDescription) }}</div>
 {% endif %}
 {% set stagePath = [pathPrefix, uuids.producedDataStageQUuid]|reply_path %}
 {% set stage = repliesMap[stagePath]|reply_str_value %}

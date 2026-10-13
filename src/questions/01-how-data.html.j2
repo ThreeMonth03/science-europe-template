@@ -1,3 +1,4 @@
+{% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 <div id="q-how-data" class="question" data-requirement-id="SE-1a">
   <h3>1. How will new data be collected or produced and/or how will existing data be re-used?</h3>
 
@@ -132,24 +133,35 @@
             {%- set refDataUsageReply = repliesMap[refDataUsageQ]|reply_str_value -%}
             {% if refDataUsageReply|trim %}
               <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
-                {{ refDataUsageReply|markdown }}
+                {{ answerMarkdown.markdown(refDataUsageReply) }}
               </div>
             {% else %}
               {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
             {% endif %}
 
             {# version #}
-            {%- set refDataVersionedPath = [refDataUsedPrefix, uuids.refDataVersionedQUuid]|reply_path -%}
-            {%- set refDataVersionedAUuid = repliesMap[refDataVersionedPath]|reply_str_value -%}
+            {%- set refDataVersionedParts = refDataUsedPrefix.split('.') + [uuids.refDataVersionedQUuid] -%}
+            {%- set refDataVersionedPath = activeAnswer.path(refDataVersionedParts, 'OptionsQuestion') if km is defined else refDataVersionedParts|reply_path -%}
+            {%- set refDataVersionedAUuid = repliesMap[refDataVersionedPath]|reply_str_value if refDataVersionedPath else '' -%}
+            {%- if refDataVersionedPath in repliesMap and repliesMap[refDataVersionedPath].value is defined and repliesMap[refDataVersionedPath].value.type is defined and repliesMap[refDataVersionedPath].value.type != 'AnswerReply' -%}
+              {%- set refDataVersionedAUuid = '' -%}
+            {%- endif -%}
+            {%- if km is defined and refDataVersionedPath and (refDataVersionedAUuid not in km.entities.questions[uuids.refDataVersionedQUuid].answerUuids or refDataVersionedAUuid not in km.entities.answers) -%}
+              {%- set refDataVersionedAUuid = '' -%}
+            {%- endif -%}
             {%- if refDataVersionedAUuid == uuids.refDataVersionedYesAUuid -%}
               {%- set refDataVersionedWhichPath = [refDataVersionedPath, uuids.refDataVersionedYesAUuid, uuids.refDataVersionedWhichQUuid]|reply_path -%}
               {%- set refDataVersionedWhich = repliesMap[refDataVersionedWhichPath]|reply_str_value -%}
               {%- set refDataVersionedChangePath = [refDataVersionedPath, uuids.refDataVersionedYesAUuid, uuids.refDataVersionedChangeQUuid]|reply_path -%}
               {%- set refDataVersionedChangeAUuid = repliesMap[refDataVersionedChangePath]|reply_str_value -%}
+              {% if not refDataVersionedWhich|trim and refDataVersionedChangeAUuid not in [uuids.refDataVersionedChangeStayAUuid, uuids.refDataVersionedChangeNewAUuid, uuids.refDataVersionedChangeAllAUuid] %}
+                <p data-fact-id="dataset-versioning" data-status="complete">This reference dataset is versioned.</p>
+              {% endif %}
               {% if refDataVersionedWhich|trim %}
-                <table class="dataset-version" data-fact-id="dataset-version" data-status="complete">
-                  <tbody><tr><th scope="row">Version</th><td>{{ refDataVersionedWhich|markdown }}</td></tr></tbody>
-                </table>
+                <div class="dataset-version answer-detail" data-fact-id="dataset-version" data-status="complete">
+                  <div class="answer-lead"><p><strong>Version</strong></p></div>
+                  {{ answerMarkdown.markdown(refDataVersionedWhich) }}
+                </div>
               {% else %}
                 {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-version" data-status="missing"><strong>Information not provided:</strong> which version of this dataset will be used.</p>{% endif %}
               {% endif %}
@@ -162,6 +174,8 @@
               {% else %}
                 {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="dataset-version-policy" data-status="missing"><strong>Information not provided:</strong> how new dataset versions will be handled.</p>{% endif %}
               {% endif %}
+            {%- elif refDataVersionedAUuid == uuids.refDataVersionedNoAUuid -%}
+              <p data-fact-id="dataset-versioning" data-status="explicit-no">This reference dataset is not versioned.</p>
             {%- endif -%}
 
             {% set referencePolicy %}
@@ -191,7 +205,7 @@
                 <p>{% if sharedReferencePolicy %}These datasets are freely available with an obligation to cite their sources.{% else %}This dataset is freely available with an obligation to cite the source.{% endif %}</p>
               {%- elif refDataConditionsReply == uuids.refDataConditionsOtherAUuid -%}
                   {%- if refDataConditionsOtherReply|trim -%}
-                    <div class="answer-detail"><p><strong>Conditions of use</strong></p>{{refDataConditionsOtherReply|markdown}}</div>
+                    <div class="answer-detail"><p><strong>Conditions of use</strong></p>{{ answerMarkdown.markdown(refDataConditionsOtherReply) }}</div>
                   {%- else -%}
                     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing-output">Restrictions apply, but the conditions of use are not yet described.</p>{% else %}<p data-fact-id="reuse-restrictions" data-status="partial">Restrictions apply to this dataset.</p>{% endif %}
                   {%- endif -%}
@@ -277,7 +291,7 @@
           {% if nrefDataUsageReply|trim %}
             <div class="answer-detail" data-fact-id="reuse-purpose" data-status="complete">
               <p><strong>Purpose of re-use</strong></p>
-              {{ nrefDataUsageReply|markdown }}
+              {{ answerMarkdown.markdown(nrefDataUsageReply) }}
             </div>
           {% else %}
             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="reuse-purpose" data-status="missing"><strong>Information not provided:</strong> the purpose for which this dataset will be re-used.</p>{% endif %}
@@ -287,8 +301,15 @@
           {% include 'src/reuse-summary.html.j2' with context %}
 
           {# Personal Data #}
-          {%- set nrefDataPersonal = [nrefDataUsedPrefix, uuids.nrefDataPersonalQUuid]|reply_path -%}
-          {%- set nrefDataPersonalReply = repliesMap[nrefDataPersonal]|reply_str_value -%}
+          {%- set nrefDataPersonalParts = nrefDataUsedPrefix.split('.') + [uuids.nrefDataPersonalQUuid] -%}
+          {%- set nrefDataPersonal = activeAnswer.path(nrefDataPersonalParts, 'OptionsQuestion') if km is defined else nrefDataPersonalParts|reply_path -%}
+          {%- set nrefDataPersonalReply = repliesMap[nrefDataPersonal]|reply_str_value if nrefDataPersonal else '' -%}
+          {%- if nrefDataPersonal in repliesMap and repliesMap[nrefDataPersonal].value is defined and repliesMap[nrefDataPersonal].value.type is defined and repliesMap[nrefDataPersonal].value.type != 'AnswerReply' -%}
+            {%- set nrefDataPersonalReply = '' -%}
+          {%- endif -%}
+          {%- if km is defined and nrefDataPersonal and (nrefDataPersonalReply not in km.entities.questions[uuids.nrefDataPersonalQUuid].answerUuids or nrefDataPersonalReply not in km.entities.answers) -%}
+            {%- set nrefDataPersonalReply = '' -%}
+          {%- endif -%}
           {%- if nrefDataPersonalReply == uuids.nrefDataPersonalYesAUuid %}
           {%- set nrefDataPersonalLegalBasis = [nrefDataPersonal, uuids.nrefDataPersonalYesAUuid, uuids.nrefDataPersonalLegalBasisQUuid]|reply_path -%}
           {%- set nrefDataPersonalLegalBasisReply = repliesMap[nrefDataPersonalLegalBasis]|reply_str_value -%}
@@ -319,6 +340,8 @@
               {% endif %}
             {% endif %}
           </p>
+          {%- elif nrefDataPersonalReply == uuids.nrefDataPersonalNoAUuid -%}
+            <p data-fact-id="reuse-personal-data" data-status="explicit-no">This dataset does not contain personal data.</p>
           {%- endif -%}
 
           {# Ethical Approval for Reuse #}
@@ -354,8 +377,12 @@
     {%- endif -%}
 
     {# Constrains - Data Harmonization #}
-    {%- set dataHarmo = [preexistingPath, uuids.preexistingYesAUuid, uuids.dataHarmoQUuid]|reply_path -%}
-    {%- set dataHarmoReply = repliesMap [dataHarmo]|reply_str_value -%}
+    {%- set dataHarmoParts = [uuids.reusingCUuid, uuids.preexistingQUuid, uuids.preexistingYesAUuid, uuids.dataHarmoQUuid] -%}
+    {%- set dataHarmo = activeAnswer.path(dataHarmoParts, 'OptionsQuestion') if km is defined else dataHarmoParts|reply_path -%}
+    {%- set dataHarmoReply = repliesMap[dataHarmo]|reply_str_value if dataHarmo else '' -%}
+    {%- if km is defined and dataHarmo and (dataHarmoReply not in km.entities.questions[uuids.dataHarmoQUuid].answerUuids or dataHarmoReply not in km.entities.answers) -%}
+      {%- set dataHarmoReply = '' -%}
+    {%- endif -%}
     {%- if dataHarmoReply == uuids.dataHarmoYesAUuid -%}
       <p>Before reuse, we need to harmonize existing data from different sources
       {%- set dataHarmonAvailable = [dataHarmo, uuids.dataHarmoYesAUuid, uuids.dataHarmoOthersQUuid]|reply_path  -%}
@@ -366,11 +393,17 @@
         {{+" "}}but will not make the results available to others
       {%- endif -%}
       .</p>
+    {%- elif dataHarmoReply == uuids.dataHarmoNoAUuid -%}
+      <p>We do not need to harmonize existing data from different sources before reuse.</p>
     {%- endif -%}
 
     {# Constrains - (Re)made data computer readable #}
-    {%- set dataCompRead = [preexistingPath, uuids.preexistingYesAUuid, uuids.dataCompReadQUuid]|reply_path -%}
-    {%- set dataCompReadReply = repliesMap[dataCompRead]|reply_str_value -%}
+    {%- set dataCompReadParts = [uuids.reusingCUuid, uuids.preexistingQUuid, uuids.preexistingYesAUuid, uuids.dataCompReadQUuid] -%}
+    {%- set dataCompRead = activeAnswer.path(dataCompReadParts, 'OptionsQuestion') if km is defined else dataCompReadParts|reply_path -%}
+    {%- set dataCompReadReply = repliesMap[dataCompRead]|reply_str_value if dataCompRead else '' -%}
+    {%- if km is defined and dataCompRead and (dataCompReadReply not in km.entities.questions[uuids.dataCompReadQUuid].answerUuids or dataCompReadReply not in km.entities.answers) -%}
+      {%- set dataCompReadReply = '' -%}
+    {%- endif -%}
     {%- if dataCompReadReply == uuids.dataCompReadYesAUuid -%}
       {%- set dataCompReadItself = [dataCompRead, uuids.dataCompReadYesAUuid, uuids.dataCompReadItselfQUuid]|reply_path -%}
       {%- set dataCompReadItselfReply = repliesMap[dataCompReadItself]|reply_str_value -%}
@@ -410,6 +443,8 @@
         {{+" "}}We will not provide others with standardized, machine-readable metadata.
       {%- endif -%}
       </p>
+    {%- elif dataCompReadReply == uuids.dataCompReadNoAUuid -%}
+      <p>We will not use existing data that needs to be converted into a machine-readable form before reuse.</p>
     {%- endif -%}
   {%- elif preexistingAUuid == uuids.preexistingNoAUuid -%}
     <p data-requirement-id="SE-1a" data-fact-id="reuse-sources" data-status="explicit-no">No existing datasets will be re-used.</p>
@@ -439,6 +474,10 @@
               {{ macros.provenanceReading(provenanceOther) }}
             </div>
           {%- else -%}
+            {%- set activeProvenancePath = activeAnswer.path([uuids.creatingCUuid, uuids.metadataQUuid, uuids.metadataExploreAUuid, uuids.provenanceQUuid], 'OptionsQuestion') if km is defined else provenancePath -%}
+            {%- if activeProvenancePath and (km is not defined or (provenanceAUuid in km.entities.questions[uuids.provenanceQUuid].answerUuids and provenanceAUuid in km.entities.answers)) and (repliesMap[provenancePath].value is not defined or repliesMap[provenancePath].value.type is not defined or repliesMap[provenancePath].value.type == 'AnswerReply') -%}
+              <p data-requirement-id="SE-1a" data-fact-id="provenance" data-status="complete">We use other arrangements to document data provenance.</p>
+            {%- endif -%}
             {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance-detail" data-status="missing"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>{% endif %}
           {%- endif -%}
         {%- endif -%}

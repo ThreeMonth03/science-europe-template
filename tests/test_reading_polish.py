@@ -12,6 +12,95 @@ from check_project_acronym import fixture as project_fixture
 
 
 class ReadingPolishTests(unittest.TestCase):
+    def test_known_other_arrangements_survive_only_missing_active_details(self):
+        from check_sentence_layout import partial_fixture
+        cases = [
+            ('01-how-data', 'creatingCUuid metadataQUuid metadataExploreAUuid provenanceQUuid '
+             'provenanceOtherAUuid provenanceOtherQUuid', 'provenance', 'provenance-detail',
+             'We use other arrangements to document data provenance.'),
+            ('02-what-data', 'creatingCUuid measuredQUuid measuredYesAUuid measuredDataQUuid ITEM '
+             'measuredDataWhoQUuid measuredDataWhoExternalAUuid mdExternalOwnershipQUuid '
+             'mdExternalOwnershipOtherAUuid mdExternalOwnershipOtherQUuid', 'external-ownership', 'external-ownership',
+             'Other arrangements have been made for ownership of this dataset.'),
+            ('11-data-preservation', 'preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid '
+             'isPublishedDataYesAUuid publishedDistrosQUuid ITEM publishedDataRepositoryKindQUuid '
+             'publishedDataRepositoryDomainSpecificAUuid domainSpecificRepoContactBeforeQUuid '
+             'domainSpecificRepoContactBeforeOtherAUuid domainSpecificRepoContactBeforeOtherQUuid',
+             'repository-contact-arrangements', 'repository-contact-arrangements',
+             'Other arrangements have been made for contacting the repository.'),
+        ]
+        authored = '<p>Original arrangement <strong>remains</strong>.</p><ul><li>Keep the owner-specific detail.</li></ul>'
+        for name, chain, fact, gap, sentence in cases:
+            km, base, detail = partial_fixture(chain)
+            leaf = detail.rsplit('.', 2)[0]
+            qid, choice = leaf.split('.')[-1], base[leaf]
+            template = 'src/questions/' + name + '.html.j2'
+            for context, profile, value in itertools.product(({}, {'km': km}), ('review', 'submission'),
+                    (None, '', ' \t\n\u3000', authored)):
+                values = dict(base)
+                if value is not None: values[detail] = value
+                output = render_question(template, values, output_profile=profile, **context)
+                soup = BeautifulSoup(output, 'html.parser')
+                blank = not (value or '').strip()
+                with self.subTest(name=name, profile=profile, value=value, schema=bool(context)):
+                    self.assertEqual(int(blank), output.count(sentence))
+                    self.assertEqual(not blank, authored in output)
+                    self.assertEqual(blank and profile == 'review', bool(soup.select(
+                        '.data-gap[data-fact-id="' + gap + '"]')))
+                    if blank:
+                        self.assertEqual(sentence, soup.select_one(
+                            '[data-fact-id="' + fact + '"][data-status="complete"]').get_text())
+                    if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review'))
+                    if name == '01-how-data': self.assertIn('Provenance', [h.get_text() for h in soup.select('h4')])
+                    if name == '11-data-preservation': self.assertIsNotNone(soup.select_one('#repository-contact-1-1'))
+            for profile, control in itertools.product(('review', 'submission'),
+                    ('missing', 'unknown', 'removed-question', 'wrong-type', 'removed-choice', 'dangling-choice')):
+                altered, values = deepcopy(km), {**base, detail: authored}
+                if control == 'missing': del values[leaf]
+                elif control == 'unknown': values[leaf] = 'unknown-option'
+                elif control == 'removed-question': del altered['entities']['questions'][qid]
+                elif control == 'wrong-type': altered['entities']['questions'][qid]['questionType'] = 'ValueQuestion'
+                elif control == 'removed-choice': altered['entities']['questions'][qid]['answerUuids'] = []
+                else: del altered['entities']['answers'][choice]
+                # Only the new fallback is guarded here; existing filled branches
+                # are deliberately outside this repair's source-change scope.
+                values.pop(detail) if control not in ('missing', 'unknown') else None
+                output = render_question(template, values, km=altered, output_profile=profile)
+                self.assertNotIn(sentence, output, (name, control))
+                if control in ('missing', 'unknown'): self.assertNotIn(authored, output)
+            for ancestor in base.keys() - {leaf}:
+                inactive = {**base, detail: authored}
+                inactive.pop(ancestor)
+                output = render_question(template, inactive, km=km, output_profile='submission')
+                self.assertNotIn(sentence, output, (name, ancestor))
+                self.assertNotIn(authored, output, (name, ancestor))
+            typed_env = environment(ROOT)
+            fallback = typed_env.filters['reply_str_value']
+            typed_env.filters['reply_str_value'] = lambda reply: str(reply['value']['value']) if isinstance(reply, dict) else fallback(reply)
+            typed_render = typed_env.from_string(PREFIX + "{% include '" + template + "' %}").render
+            for reply_type in ('AnswerReply', 'StringReply', 'ItemListReply'):
+                values = {**base, leaf: {'value': {'type': reply_type, 'value': choice}}}
+                self.assertEqual(reply_type == 'AnswerReply', sentence in typed_render(
+                    repliesMap=values, km=km, output_profile='submission'), (name, reply_type))
+            if name != '01-how-data':
+                listing = next(key for key, value in base.items() if isinstance(value, list))
+                multiple = {**base, listing: ['ITEM', 'ITEM2']}
+                for key, value in base.items():
+                    if key.startswith(listing + '.ITEM.'):
+                        multiple[key.replace(listing + '.ITEM.', listing + '.ITEM2.', 1)] = value
+                multiple[detail.replace(listing + '.ITEM.', listing + '.ITEM2.', 1)] = authored
+                soup = BeautifulSoup(render_question(template, multiple, km=km, output_profile='submission'), 'html.parser')
+                selector = '.collection-dataset' if name == '02-what-data' else '.dataset-section'
+                owners = soup.select(selector)
+                self.assertEqual(['ITEM', 'ITEM2'], [node['data-item-id'] for node in owners])
+                self.assertIn(sentence, owners[0].get_text())
+                self.assertNotIn('owner-specific detail', owners[0].get_text())
+                self.assertNotIn(sentence, owners[1].get_text())
+                self.assertIn(authored, str(owners[1]))
+                if name == '11-data-preservation':
+                    self.assertIsNotNone(owners[0].select_one('#repository-contact-1-1'))
+                    self.assertIsNotNone(owners[1].select_one('#repository-contact-2-1'))
+
     def test_metadata_standard_sentences_keep_selected_names_and_parent_guards(self):
         parent = path('creatingCUuid', 'metadataQUuid')
         standards = path(parent, 'metadataExploreAUuid', 'metadataStandardsQUuid')

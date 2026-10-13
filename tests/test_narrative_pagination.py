@@ -8,6 +8,241 @@ from test_structure_bindings import BlockProbe
 
 
 class NarrativePaginationTests(unittest.TestCase):
+    def test_restricted_custom_process_keeps_only_its_fixed_nonempty_lead(self):
+        datasets = path('preservingCUuid', 'producedDataQUuid')
+        published = path(datasets, 'd1', 'isPublishedDataQUuid')
+        distributions = path(published, 'isPublishedDataYesAUuid', 'publishedDistrosQUuid')
+        licences = path(distributions, 'r1', 'publishedDataLicensesQUuid')
+        licence = path(licences, 'l1', 'publishedDataLicenseQUuid')
+        restricted = path(licence, 'publishedDataLicenseRestrictAUuid')
+        access = path(restricted, 'licenseRestrictAccessQUuid')
+        detail = path(access, 'licenseRestrictAccessAnotherAUuid', 'licenseRestrictAccessAnotherQUuid')
+        base = {datasets: ['d1'], published: IDS['isPublishedDataYesAUuid'],
+                distributions: ['r1'], licences: ['l1'], licence: IDS['publishedDataLicenseRestrictAUuid'],
+                access: IDS['licenseRestrictAccessAnotherAUuid'],
+                path(restricted, 'licenseRestrictMetadataQUuid'): IDS['licenseRestrictMetadataYesAUuid']}
+        rich = '<p>Original opening.</p><table><tr><td>Original cell.</td></tr></table><p>Original ending.</p>'
+        for profile in ('review', 'submission'):
+            for value in (rich, '0', 'false', None, '', ' \t\n\u3000'):
+                with self.subTest(profile=profile, value=value):
+                    replies = dict(base)
+                    if value is not None: replies[detail] = value
+                    output = render_question('src/questions/10-share-restrictions.html.j2', replies,
+                                             output_profile=profile)
+                    soup = BeautifulSoup(output, 'html.parser')
+                    process = soup.select_one('.restriction-process')
+                    lead = process.find('div', recursive=False)
+                    self.assertEqual('Access requests will follow a specialized process.', lead.p.get_text())
+                    filled = value is not None and bool(value.strip())
+                    self.assertEqual(['answer-lead'] if filled else None, lead.get('class'))
+                    self.assertEqual([lead.p], lead.find_all(recursive=False))
+                    authored = process.select_one('[data-fact-id="restriction-custom-process"][data-status="complete"]')
+                    if filled:
+                        self.assertEqual(authored, lead.find_next_sibling())
+                        self.assertEqual(value, authored.decode_contents())
+                        self.assertFalse(authored.select('.answer-lead'))
+                    else:
+                        self.assertIsNone(authored)
+                        self.assertEqual(profile == 'review', bool(process.select_one('.data-gap')))
+                    self.assertFalse({'answer-lead', 'short-reading-unit'} & set(process.get('class', [])))
+                    self.assertEqual('The conditions will be published as part of open metadata.',
+                                     process.find_all('p', recursive=False)[-1].get_text())
+                    probe = BlockProbe(); probe.feed(output)
+                    self.assertEqual([], probe.errors)
+
+    def test_folder_item_leads_attach_only_to_their_own_nonempty_details(self):
+        storage = path('processingCUuid', 'storageConvQUuid')
+        filesystem = path(storage, 'storageConvExploreAUuid', 'storageConvFSysQUuid')
+        prefix = path(filesystem, 'storageConvFSysYesAUuid')
+        owners = [('Subj', 'folder for each sample/subject'),
+                  ('Analysis', '(sub)folder for each (repeated) analysis'),
+                  ('WorkflowStep', '(sub)folder for each step in the analysis workflow')]
+        base = {storage: IDS['storageConvExploreAUuid'], filesystem: IDS['storageConvFSysYesAUuid']}
+        for name, _ in owners:
+            base[path(prefix, 'scFSys' + name + 'FoldersQUuid')] = IDS['scFSys' + name + 'FoldersYesAUuid']
+        for profile in ('submission', 'review'):
+            for value in ('rich', None, '', ' \t\n\u3000', '0', 'false', 'only-Subj', 'only-Analysis', 'only-WorkflowStep'):
+                with self.subTest(profile=profile, value=value):
+                    values, bodies = dict(base), []
+                    for name, _ in owners:
+                        body = ('<p>' + name + ' opening.</p><ul><li>' + name + ' original item.</li></ul>'
+                                if value in ('rich', 'only-' + name) else None if str(value).startswith('only-') else value)
+                        bodies.append(body)
+                        if body is not None:
+                            values[path(prefix, 'scFSys' + name + 'FoldersQUuid',
+                                        'scFSys' + name + 'FoldersYesAUuid',
+                                        'scFSys' + name + 'FoldersConvsQUuid')] = body
+                    output = render_question('src/questions/03-docs-metadata.html.j2', values, output_profile=profile)
+                    soup = BeautifulSoup(output, 'html.parser')
+                    policy = soup.select_one('.storage-conventions-policy')
+                    listing = policy.find('ul', recursive=False)
+                    self.assertEqual(3, len(listing.find_all('li', recursive=False)))
+                    for node in (soup.select_one('.answer'), policy, listing):
+                        self.assertFalse({'answer-lead', 'short-reading-unit'} & set(node.get('class', [])))
+                    for item, (_, phrase), body in zip(listing.find_all('li', recursive=False), owners, bodies):
+                        label = item.find('div', recursive=False)
+                        self.assertEqual('There will be a ' + phrase + '.', ' '.join(label.get_text().split()))
+                        self.assertEqual(phrase, label.strong.get_text())
+                        self.assertEqual('margin:0', label.p.get('style'))
+                        self.assertFalse(label.select('ul, ol, table, pre, div'))
+                        filled = body is not None and bool(body.strip())
+                        self.assertEqual(['answer-lead'] if filled else None, label.get('class'))
+                        detail = label.find_next_sibling()
+                        if filled:
+                            self.assertEqual(['answer-detail'], detail.get('class'))
+                            lead = detail.find('div', recursive=False)
+                            self.assertEqual(['answer-lead'], lead.get('class'))
+                            self.assertEqual('Each of those will use the following conventions:', lead.p.get_text())
+                            self.assertEqual(1, detail.decode_contents().count(body))
+                        else:
+                            self.assertIsNone(detail)
+                    probe = BlockProbe(); probe.feed(output)
+                    self.assertEqual([], probe.errors)
+
+    def test_custom_pseudonymization_keeps_fixed_lead_outside_authored_blocks(self):
+        # These body tests supply HTML through the registered test adapter;
+        # they do not exercise the Markdown parser or native Word layout.
+        risks = path('processingCUuid', 'risksQUuid')
+        personal = path(risks, 'risksExploreAUuid', 'risksPersonalDataQUuid')
+        method = path(personal, 'risksPersonalDataPseudoAUuid', 'risksPseudonymizationQUuid')
+        detail = path(method, 'risksPseudonymizationAnotherAUuid', 'risksPseudonymizationAnotherQUuid')
+        authored = '<p>Custodian opening.</p><ul><li>Original key-handling item.</li></ul>'
+        base = {risks: IDS['risksExploreAUuid'], personal: IDS['risksPersonalDataPseudoAUuid'],
+                method: IDS['risksPseudonymizationAnotherAUuid']}
+        for profile in ('submission', 'review'):
+            for value in (authored, None, '', ' \t\n\u3000'):
+                with self.subTest(profile=profile, value=value):
+                    values = dict(base)
+                    if value is not None: values[detail] = value
+                    output = render_question('src/questions/06-access-security.html.j2', values,
+                                             output_profile=profile)
+                    soup = BeautifulSoup(output, 'html.parser')
+                    block = soup.select_one('#q-access-security > .answer > .answer-detail')
+                    self.assertIsNotNone(block)
+                    lead = block.find('div', recursive=False)
+                    self.assertIn('All personal data will be processed in pseudonymized form only.', lead.get_text())
+                    self.assertIn('form only. We use', ' '.join(lead.get_text().split()))
+                    if value == authored:
+                        self.assertEqual(['answer-lead'], lead.get('class'))
+                        self.assertTrue(lead.get_text().strip().endswith('We use a specific pseudonymization method:'))
+                        self.assertEqual('Custodian opening.', lead.find_next_sibling().get_text())
+                        self.assertEqual('Original key-handling item.', lead.find_next_sibling().find_next_sibling().li.get_text())
+                        self.assertEqual(1, output.count(authored))
+                    else:
+                        self.assertFalse(block.select('.answer-lead, ul, table, pre'))
+                        self.assertTrue(lead.get_text().strip().endswith('We use a specific pseudonymization method.'))
+                        self.assertNotIn(':', lead.get_text())
+                    probe = BlockProbe(); probe.feed(output)
+                    self.assertEqual([], probe.errors)
+            for state in ('missing-risk-parent', 'not-personal', 'different-method'):
+                with self.subTest(profile=profile, stale=state):
+                    values = {**base, detail: authored}
+                    if state == 'missing-risk-parent': del values[risks]
+                    elif state == 'not-personal': values[personal] = IDS['risksPersonalDataNotUsingAUuid']
+                    else: values[method] = IDS['risksPseudonymizationInsideAUuid']
+                    output = render_question('src/questions/06-access-security.html.j2', values,
+                                             output_profile=profile)
+                    self.assertNotIn('Custodian opening.', output)
+                    self.assertNotIn('Original key-handling item.', output)
+                    self.assertNotIn('We use a specific pseudonymization method', output)
+
+    def test_custom_opening_reasons_keep_single_and_multiple_bodies_owned(self):
+        opened = path('accessCUuid', 'openImmediatelyQUuid')
+        closed = path(opened, 'openImmediatelyNoAUuid')
+        legal = path(closed, 'notOpenLegalReasonsQUuid')
+        reasons = [('Business', 'commercial considerations unrelated to patents'),
+                   ('Other', 'reasons other than publishing a paper')]
+        bodies = {name: '<p>' + name + ' opening.</p><ul><li>' + name + ' original item.</li></ul>'
+                  for name, _ in reasons}
+        for selected in (('Business',), ('Other',), ('Business', 'Other')):
+            for profile in ('submission', 'review'):
+                for filled in (True, False):
+                    with self.subTest(selected=selected, profile=profile, filled=filled):
+                        values = {opened: IDS['openImmediatelyNoAUuid'], legal: IDS['notOpenLegalReasonsNoAUuid']}
+                        for name in selected:
+                            choice = path(closed, 'notOpen' + name + 'ReasonsQUuid')
+                            values[choice] = IDS['notOpen' + name + 'ReasonsOtherAUuid']
+                            values[path(choice, 'notOpen' + name + 'ReasonsOtherAUuid',
+                                        'notOpen' + name + 'ReasonsOtherQUuid')] = bodies[name] if filled else ' \t\n\u3000'
+                        output = render_question('src/questions/08-copyright-ipr.html.j2', values,
+                                                 output_profile=profile)
+                        soup = BeautifulSoup(output, 'html.parser')
+                        root = soup.select_one('#q-copyright-ipr > .answer > .answer-detail')
+                        self.assertIsNotNone(root)
+                        records = root.find('ul', recursive=False).find_all('li', recursive=False) if len(selected) > 1 else [root]
+                        self.assertEqual(len(selected), len(records))
+                        for name, record in zip(selected, records):
+                            phrase = dict(reasons)[name]
+                            lead = record.find('div', recursive=False)
+                            self.assertIsNotNone(lead)
+                            self.assertIn(phrase, lead.p.get_text())
+                            if filled:
+                                self.assertEqual(['answer-lead'], lead.get('class'))
+                                self.assertTrue(lead.p.get_text().endswith(':'))
+                                self.assertEqual(name + ' opening.', lead.find_next_sibling().get_text())
+                                self.assertEqual(name + ' original item.', lead.find_next_sibling().find_next_sibling().li.get_text())
+                                self.assertEqual(1, output.count(bodies[name]))
+                            else:
+                                self.assertIsNone(lead.get('class'))
+                                self.assertNotIn(':', lead.p.get_text())
+                                if len(selected) == 1:
+                                    self.assertEqual('The data cannot be made fully open because of ' + phrase + '.', lead.p.get_text())
+                                self.assertNotIn(name + ' opening.', output)
+                        probe = BlockProbe(); probe.feed(output)
+                        self.assertEqual([], probe.errors)
+
+    def test_reuse_permission_lead_and_detail_follow_their_own_dataset_label(self):
+        parent = path('reusingCUuid', 'preexistingQUuid')
+        permission = 'It is available under specific restrictions, which we will follow in our project'
+        for profile in ('submission', 'review'):
+            for named in (True, False):
+                for value in ('rich', None, ' \t\n\u3000'):
+                    with self.subTest(profile=profile, named=named, value=value):
+                        values = {parent: IDS['preexistingYesAUuid']}
+                        for kind in ('ref', 'nref'):
+                            listing = path(parent, 'preexistingYesAUuid', kind + 'DataQUuid')
+                            values[listing] = ['unused', 'record']
+                            values[path(listing, 'unused', kind + 'DataUseQUuid')] = IDS[kind + 'DataUseNoAUuid']
+                            used = path(listing, 'record', kind + 'DataUseQUuid')
+                            values[used] = IDS[kind + 'DataUseYesAUuid']
+                            choice = path(used, kind + 'DataUseYesAUuid', kind + 'DataConditionsQUuid')
+                            values[choice] = IDS[kind + 'DataConditionsOtherAUuid']
+                            if named: values[path(listing, 'record', kind + 'DataNameQUuid')] = kind + ' original name'
+                            if value is not None:
+                                values[path(choice, kind + 'DataConditionsOtherAUuid', kind + 'DataConditionsOtherQUuid')] = (
+                                    '<p>' + kind + ' terms.</p><ul><li>' + kind + ' original condition.</li></ul>' if value == 'rich' else value)
+                        output = render_question('src/questions/08-copyright-ipr.html.j2', values,
+                                                 output_profile=profile)
+                        soup = BeautifulSoup(output, 'html.parser')
+                        lead = next(node for node in soup.select('div.answer-lead')
+                                    if node.get_text() == 'The following conditions apply to the reference and non-reference datasets that we reuse:')
+                        records = lead.find_next_sibling().find_all('li', recursive=False)
+                        self.assertEqual(2, len(records))
+                        for kind, record in zip(('ref', 'nref'), records):
+                            label = record.find('div', recursive=False)
+                            if named: self.assertEqual(kind + ' original name', label.get_text())
+                            elif profile == 'submission':
+                                neutral = label.select_one('.dataset-label')
+                                self.assertEqual('reference' if kind == 'ref' else 'non-reference', neutral['data-list-kind'])
+                                self.assertEqual('2', neutral['data-list-index'])
+                            else: self.assertEqual('(no name given)', label.get_text())
+                            fixed = label.find_next_sibling()
+                            self.assertEqual('p', fixed.name)
+                            self.assertEqual(permission + (':' if value == 'rich' else '.'), fixed.get_text())
+                            detail = fixed.find_next_sibling()
+                            if value == 'rich':
+                                self.assertEqual(['answer-lead'], fixed.get('class'))
+                                self.assertEqual(['answer-detail'], detail.get('class'))
+                                self.assertEqual(kind + ' terms.', detail.p.get_text())
+                                self.assertEqual(kind + ' original condition.', detail.li.get_text())
+                                self.assertNotIn(('nref' if kind == 'ref' else 'ref') + ' terms.',
+                                                 [node.get_text() for node in detail.find_all('p', recursive=False)])
+                            else:
+                                self.assertIsNone(fixed.get('class'))
+                                self.assertIsNone(detail)
+                        probe = BlockProbe(); probe.feed(output)
+                        self.assertEqual([], probe.errors)
+
     def test_each_consent_detail_has_its_own_fixed_lead_without_flattening_answers(self):
         parent = path('creatingCUuid', 'collectPersonalQUuid')
         gdpr = path(parent, 'collectPersonalYesAUuid', 'cpersGdprQUuid')
@@ -148,11 +383,11 @@ class NarrativePaginationTests(unittest.TestCase):
         replies[path(root, 'person', 'contributorNameQUuid')] = 'Very long institutional group name ' * 30
         output = render_question('src/questions/14-dm-responsible.html.j2', replies)
         self.assertNotIn('short-reading-unit', output)
-        # A contributor label is emitted once; the length still prevents a
-        # keep-together class without duplicating the user's authored name.
-        self.assertEqual(1, output.count('Very long institutional group name ' * 30))
-        self.assertIn('Data stewardship:', output)
-        self.assertIn('DMP implementation:', output)
+        # Each complete responsibility sentence names its actor. The full
+        # text, including repeated long names, determines keep-together.
+        self.assertEqual(2, output.count('Very long institutional group name ' * 30))
+        self.assertIn('is responsible for managing data', output)
+        self.assertIn('is responsible for implementing the data management plan', output)
 
     def test_short_distribution_is_bounded_but_free_terms_are_not_kept_whole(self):
         from generate_storage_fixtures import storage_cases

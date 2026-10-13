@@ -17,22 +17,22 @@ ROLE_LABELS = {
 }
 SENTENCES = {
     'en': [
-        'Data curation: reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.',
-        'Data collection: finding, gathering and collecting data.',
-        'Data management: maintaining the completed resource.',
-        'Data stewardship: managing data and supporting its effective use, including data processing, policies, guidelines and availability.',
-        'Distribution: producing and disseminating electronic or print copies of the resource.',
-        'Data protection: addressing personal-data protection and data-protection policies.',
-        'DMP implementation: implementing the data management plan and ensuring that it is reviewed and revised.',
+        '{actor} is responsible for reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.',
+        '{actor} is responsible for finding, gathering and collecting data.',
+        '{actor} is responsible for maintaining the completed resource.',
+        '{actor} is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability.',
+        '{actor} is responsible for producing and disseminating electronic or print copies of the resource.',
+        '{actor} is responsible for addressing personal-data protection and data-protection policies.',
+        '{actor} is responsible for implementing the data management plan and ensuring that it is reviewed and revised.',
     ],
     'zh-Hant': [
-        '資料整理：審查、補充、清理或標準化提交至資料中心或儲存庫的後設資料及相關資料，以供儲存、使用與維護。',
-        '資料蒐集：尋找、彙整與蒐集資料。',
-        '資料管理：維護已完成的資源。',
-        '資料託管：管理資料並支援其有效運用，涵蓋資料處理、政策、指引與可用性。',
-        '資源發布：以電子或紙本形式製作並發布資源副本。',
-        '資料保護：處理個人資料保護及資料保護政策相關事項。',
-        '資料管理方案執行：落實資料管理方案，並確保進行審查與修訂。',
+        '{actor}負責審查、補充、清理或標準化提交至資料中心或儲存庫的後設資料及相關資料，以供儲存、使用與維護。',
+        '{actor}負責尋找、彙整與蒐集資料。',
+        '{actor}負責維護已完成的資源。',
+        '{actor}負責管理資料並支援其有效運用，涵蓋資料處理、資料政策、指引與可用性。',
+        '{actor}負責以電子或紙本形式製作並發布資源副本。',
+        '{actor}負責個人資料保護及資料保護政策相關工作。',
+        '{actor}負責執行資料管理方案，並確保該方案經過審查與修訂。',
     ],
 }
 LISTING = path('adminDetailsCUuid', 'contributorsQUuid')
@@ -74,13 +74,13 @@ def check(root, language):
                 selected = [r for r in ROLES if r in roles]
                 assert node['data-contributor-id'] == item
                 assert node['data-contributor-index'] == str(index)
-                heading = node.select_one('.responsible-person')
-                assert heading.get_text(strip=True) == (name.strip() if name and name.strip() else f'{label} {index}')
+                actor = name if name and name.strip() else f'{label} {index}'
+                assert not node.select('.responsible-person')
                 paragraphs = node.select('.responsibility-summary')
                 assert len(paragraphs) == 1
                 assert paragraphs[0]['data-role-uuids'].split() == selected
                 assert paragraphs[0].get_text(strip=True) == separator.join(
-                    sentence for role, sentence in zip(ROLES, SENTENCES[language]) if role in roles)
+                    sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES[language]) if role in roles).strip()
                 gaps = node.select('.data-gap')
                 assert len(gaps) == int(profile == 'review' and not (name and name.strip()))
                 if gaps: assert gaps[0].get_text(strip=True) == name_gap
