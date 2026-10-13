@@ -2,30 +2,30 @@
    space between complete sentences, while Traditional Chinese joins at 。.
    Append to the caller's fresh lists; include assignments would be local. #}
 {% if uuids.contributorRoleDataCuratorAUuid in roles %}
-  {%- do responsibilitySentences.append(responsibilityActor ~ " is responsible for reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.") -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataCuratorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataCollectorAUuid in roles %}
-  {%- do responsibilitySentences.append(responsibilityActor ~ " is responsible for finding, gathering and collecting data.") -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for finding, gathering and collecting data.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataCollectorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataManagerAUuid in roles %}
-  {%- do responsibilitySentences.append(responsibilityActor ~ " is responsible for maintaining the completed resource.") -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for maintaining the completed resource.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataManagerAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataStewardAUuid in roles %}
-  {%- do responsibilitySentences.append(responsibilityActor ~ " is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability.") -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataStewardAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDistributorAUuid in roles %}
-  {%- do responsibilitySentences.append(responsibilityActor ~ " is responsible for producing and disseminating electronic or print copies of the resource.") -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for producing and disseminating electronic or print copies of the resource.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleDistributorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataProtectorAUuid in roles %}
-  {%- do responsibilitySentences.append(responsibilityActor ~ " is responsible for addressing personal-data protection and data-protection policies.") -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for addressing personal-data protection and data-protection policies.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataProtectorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleCreatorOfDMPAUuid in roles %}
-  {%- do responsibilitySentences.append(responsibilityActor ~ " is responsible for implementing the data management plan and ensuring that it is reviewed and revised.") -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for implementing the data management plan and ensuring that it is reviewed and revised.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleCreatorOfDMPAUuid) %}
 {% endif %}

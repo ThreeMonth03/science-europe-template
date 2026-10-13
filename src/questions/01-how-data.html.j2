@@ -25,7 +25,7 @@
           <li data-item-id="{{ pathPrefix }}">
             {%- set measuredDataNamePath = [pathPrefix, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataName = repliesMap[measuredDataNamePath]|reply_str_value -%}
-            <h5>{% if output_profile|default('review') == 'submission' and not measuredDataName|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}{% else %}{{ measuredDataName if measuredDataName|trim else "(no name given)" }}{% endif %}</h5>
+            <h5>{% if output_profile|default('review') == 'submission' and not measuredDataName|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, measuredDataItems.index(datasetItem) + 1) }}{% else %}{{ measuredDataName if measuredDataName|trim else pgettext("questions/01-how-data", "(no name given)") }}{% endif %}</h5>
             {# Instruments #}
             {%- set measuredDataInstrPath = [pathPrefix, uuids.measuredDataInstrQUuid]|reply_path -%}
             {%- set measuredDataInstrItems = repliesMap[measuredDataInstrPath]|reply_items -%}
@@ -384,15 +384,17 @@
       {%- set dataHarmoReply = '' -%}
     {%- endif -%}
     {%- if dataHarmoReply == uuids.dataHarmoYesAUuid -%}
-      <p>Before reuse, we need to harmonize existing data from different sources
       {%- set dataHarmonAvailable = [dataHarmo, uuids.dataHarmoYesAUuid, uuids.dataHarmoOthersQUuid]|reply_path  -%}
       {%- set dataHarmonAvailableReply = repliesMap[dataHarmonAvailable]|reply_str_value -%}
+      <p>
       {%- if dataHarmonAvailableReply == uuids.dataHarmoOthersYesAUuid -%}
-        {{+" "}}and will make the results available to others
+        {{ pgettext("questions/01-how-data", "Before reuse, we need to harmonize existing data from different sources and will make the results available to others.") }}
       {%- elif dataHarmonAvailableReply == uuids.dataHarmoOthersNoAUuid -%}
-        {{+" "}}but will not make the results available to others
+        {{ pgettext("questions/01-how-data", "Before reuse, we need to harmonize existing data from different sources but will not make the results available to others.") }}
+      {%- else -%}
+        {{ pgettext("questions/01-how-data", "Before reuse, we need to harmonize existing data from different sources.") }}
       {%- endif -%}
-      .</p>
+      </p>
     {%- elif dataHarmoReply == uuids.dataHarmoNoAUuid -%}
       <p>{{ pgettext("questions/01-how-data", "We do not need to harmonize existing data from different sources before reuse.") }}</p>
     {%- endif -%}
@@ -435,12 +437,12 @@
             {%- if standardName|striptags|trim -%}{%- do namedMetadataStandards.append(standardName) -%}{%- endif -%}
         {%- endfor -%}
         {%- if namedMetadataStandards -%}
-          {{+" "}}We will provide others with standardized, machine-readable metadata and we will use the following metadata standards:{{+" "}}{{ namedMetadataStandards|join(", ") }}.
+          {{ pgettext("questions/01-how-data", " We will provide others with standardized, machine-readable metadata and we will use the following metadata standards: %(standards)s.", standards=namedMetadataStandards|join(pgettext("questions/01-how-data", ", "))) }}
         {%- else -%}
-          {{+" "}}We will provide others with standardized, machine-readable metadata.
+          {{ pgettext("questions/01-how-data", " We will provide others with standardized, machine-readable metadata.") }}
         {%- endif -%}
       {%- elif dataCompReadOthersReply == uuids.dataCompReadOthersNoAUuid -%}
-        {{+" "}}We will not provide others with standardized, machine-readable metadata.
+        {{ pgettext("questions/01-how-data", " We will not provide others with standardized, machine-readable metadata.") }}
       {%- endif -%}
       </p>
     {%- elif dataCompReadReply == uuids.dataCompReadNoAUuid -%}
@@ -487,10 +489,10 @@
           {{ provenanceContent }}
         {% endif %}
       {%- else -%}
-        {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>{% endif %}
+        {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance\" data-status=\"missing\"><strong>Information not provided:</strong> how data provenance will be documented.</p>") }}{% endif %}
       {%- endif -%}
     {%- else -%}
-      {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1a" data-fact-id="provenance" data-status="missing"><strong>Information not provided:</strong> how data provenance will be documented.</p>{% endif %}
+      {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance\" data-status=\"missing\"><strong>Information not provided:</strong> how data provenance will be documented.</p>") }}{% endif %}
     {%- endif -%}
   </div>
 </div>

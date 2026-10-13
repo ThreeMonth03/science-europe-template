@@ -22,7 +22,7 @@
                     {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-legal-basis\" data-status=\"missing\"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>") }}{% endif %}
                 {%- else -%}
                     <h4>{{ pgettext("questions/07-personal-data", "Legal basis for collecting and processing personal data") }}</h4>
-                    <p> We are collecting and processing personal data{{+" "}}
+                    <p> {{ pgettext("questions/07-personal-data", "We are collecting and processing personal data ") }}
                     {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisPublicAUuid -%}
                         {{ pgettext("questions/07-personal-data", "because the processing is necessary to perform a task carried out in the public interest.") }}
                     {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisAskAUuid -%}

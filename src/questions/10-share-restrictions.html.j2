@@ -45,12 +45,12 @@
                             {%- set identifierLabel = repliesMap[[identifierTypePath, uuids.dataIdentifierTypeOtherAUuid, uuids.dataIdentifierTypeOtherTypeQUuid]|reply_path]|reply_str_value|trim -%}
                             {%- if not identifierLabel -%}{%- set identifierLabel -%}{{ pgettext("questions/10-share-restrictions", "Other identifier") }}{%- endset -%}{%- endif -%}
                         {%- elif identifierValue -%}
-                            {%- set identifierLabel -%}Identifier{%- endset -%}
+                            {%- set identifierLabel -%}{{ pgettext("questions/10-share-restrictions", "Identifier") }}{%- endset -%}
                         {%- endif -%}
                         {%- if noPersistentIdentifier -%}
                             <li>{{ pgettext("questions/10-share-restrictions", "<p>We do not assign persistent identifiers to this dataset.</p>") }}{% if identifierValue %}{{ pgettext("questions/10-share-restrictions", "<p>Recorded identifier: <strong>%(identifierValue)s</strong></p>", identifierValue=identifierValue|e) }}{% endif %}</li>
                         {%- elif identifierLabel -%}
-                            <li>{{ identifierLabel|e }}{% if identifierValue %}: <strong>{% if identifierTypeAUuid == uuids.dataIdentifierTypeDoiAUuid %}<a href="https://doi.org/{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% elif identifierTypeAUuid == uuids.dataIdentifierTypeUrlAUuid %}<a href="{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% else %}{{ identifierValue|e }}{% endif %}</strong>{% endif %}</li>
+                            <li>{{ identifierLabel|e }}{% if identifierValue %}{{ pgettext("questions/10-share-restrictions", ": ") }}<strong>{% if identifierTypeAUuid == uuids.dataIdentifierTypeDoiAUuid %}<a href="https://doi.org/{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% elif identifierTypeAUuid == uuids.dataIdentifierTypeUrlAUuid %}<a href="{{ identifierValue|e }}" target="_blank">{{ identifierValue|e }}</a>{% else %}{{ identifierValue|e }}{% endif %}</strong>{% endif %}</li>
                         {%- endif -%}
                     {%- endfor -%}
                 {%- endset -%}
@@ -80,13 +80,14 @@
                                 <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-access" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The access arrangement for this distribution has not been provided.") }}</p>{% endif %}</div>
                             {%- endif %}
                             <div class="repository-arrangement{{ ' joined-policy' if distroRepositoryKindAUuid in [uuids.publishedDataRepositoryNationalAUuid, uuids.publishedDataRepositoryInstitutionalAUuid, uuids.publishedDataRepositorySpecialAUuid] else '' }}">
+                            {%- if document_language|default('en') != 'zh-Hant' %}{{ " " }}{% endif -%}
                             {% if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}
                                 {%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
                                 {%- set domainSpecificRepoNameReply = repliesMap[domainSpecificRepoNamePath] -%}
                                 {%- set domainSpecificRepoContactBeforePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoContactBeforeQUuid]|reply_path -%}
                                 {%- set domainSpecificRepoContactBeforeAUuid = repliesMap[domainSpecificRepoContactBeforePath]|reply_str_value -%}
                                 {%- set repositorySentences = [] -%}
-                                {%- set repositoryDestinationSentence -%}{{ pgettext("questions/10-share-restrictions", "Domain-specific repository") }}{%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim %}: {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.{%- else %}.{%- endif -%}{%- endset -%}
+                                {%- set repositoryDestinationSentence -%}{{ pgettext("questions/10-share-restrictions", "Domain-specific repository") }}{%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim %}{{ pgettext("questions/10-share-restrictions", ": ") }}{{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}{{ pgettext("questions/10-share-restrictions", ".") }}{%- else %}{{ pgettext("questions/10-share-restrictions", ".") }}{%- endif -%}{%- endset -%}
                                 {%- do repositorySentences.append(repositoryDestinationSentence) -%}
                                 {# Contact the repository #}
                                 {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid %}
@@ -102,12 +103,12 @@
                                   {%- set repositoryContactSentence -%}<span class="repository-contact-reference"><a href="#repository-contact-{{ repositoryDatasetIndex }}-{{ loop.index }}">{% if distrosItems|length > 1 %}{{ pgettext("questions/10-share-restrictions", "For repository contact arrangements, see Question 11, distribution %(loop_index)s of this dataset.", loop_index=loop.index) }}{% else %}{{ pgettext("questions/10-share-restrictions", "For repository contact arrangements, see Question 11 under this dataset.") }}{% endif %}</a></span>{%- endset -%}
                                   {%- do repositorySentences.append(repositoryContactSentence) -%}
                                 {%- endif -%}
-                                {{- repositorySentences|join(" ") -}}
+                                {{- repositorySentences|join("" if document_language|default("en") == "zh-Hant" else " ") -}}
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}{{ pgettext("questions/10-share-restrictions", "General-purpose repository") }}{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                                 {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
                                 {%- if macros.integrationFairSharing(generalPurposeRepoNameReply)|striptags|trim -%}
-                                    : {{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}.
-                                {%- else -%}.
+                                    {{ pgettext("questions/10-share-restrictions", ": ") }}{{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}{{ pgettext("questions/10-share-restrictions", ".") }}
+                                {%- else -%}{{ pgettext("questions/10-share-restrictions", ".") }}
                                 {%- endif -%}
                             {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid %}
                                 <p>{{ pgettext("questions/10-share-restrictions", "This distribution will be deposited in a national repository.") }}</p>
@@ -193,12 +194,12 @@
                                     {% endif %}
                                     </div>
                                 {% else %}
-                                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>{% endif %}
+                                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-licence" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The licence or conditions of use have not been provided.") }}</p>{% endif %}
                                 {%- endif -%}
                                 </div>
                             {%- endfor -%}
                         {% else %}
-                            <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-licence" data-status="missing">The licence or conditions of use have not been provided.</p>{% endif %}</div>
+                            <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="distribution-licence" data-status="missing">{{ pgettext("questions/10-share-restrictions", "The licence or conditions of use have not been provided.") }}</p>{% endif %}</div>
                         {%- endif -%}
                         {% endset %}
                         {% if output_profile|default('review') != 'submission' or distributionContent|striptags|trim %}
@@ -260,7 +261,7 @@
             {% endset %}
             {% if output_profile|default('review') != 'submission' or publicationDatasetContent|striptags|trim or '<img' in publicationDatasetContent or '<table' in publicationDatasetContent %}
             <div class="dataset-section" data-item-id="{{ i }}">
-            <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</h5>
+            <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else pgettext("questions/10-share-restrictions", "(no name given)") }}{% endif %}</h5>
             {{ publicationDatasetContent }}
             </div>
             {% endif %}
@@ -282,7 +283,7 @@
         <p>
           {{ pgettext("questions/10-share-restrictions", "Data not subject to legal restrictions will be released openly after a fixed time period.") }}
           {%- if embargoPeriod|trim %}
-            The embargo period will be {{ embargoPeriod|dot }}
+            {{ pgettext("questions/10-share-restrictions", "The embargo period will be %(period)s", period=(embargoPeriod|trim if document_language|default("en") == "zh-Hant" else embargoPeriod|dot)) }}
           {%- endif %}
         </p>
       {%- endif -%}

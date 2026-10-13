@@ -28,7 +28,7 @@
             {%- set showIdentifierDataset = output_profile|default('review') != 'submission' or isPublishedDataAUuid == uuids.isPublishedDataNoAUuid or identifierDistroItems|length > 0 -%}
             {% if showIdentifierDataset %}
             <div class="dataset-section" data-item-id="{{ i }}">
-                <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</h5>
+                <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else pgettext("questions/13-persistent-identifier", "(no name given)") }}{% endif %}</h5>
             {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
                 {# Where the data will be distributed #}
                     {%- if publishedDistrosItems|length > 0  -%}
@@ -117,8 +117,8 @@
                             {% endif %}
                             {% if identifierMissing or identifierReview %}
                               <div class="identifier-followups reading-gap">
-                                {% if identifierMissing %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d">Information still needed: {{ identifierMissing|join(", ") }}.</p>{% endif %}{% endif %}
-                                {% if identifierReview %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d">This template cannot interpret the selected answers for: {{ identifierReview|join(", ") }}.</p>{% endif %}{% endif %}
+                                {% if identifierMissing %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d">{{ pgettext("questions/13-persistent-identifier", "Information still needed: %(fields)s.", fields=identifierMissing|join(gettext(", "))) }}</p>{% endif %}{% endif %}
+                                {% if identifierReview %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-5d">{{ pgettext("questions/13-persistent-identifier", "This template cannot interpret the selected answers for: %(fields)s.", fields=identifierReview|join(gettext(", "))) }}</p>{% endif %}{% endif %}
                               </div>
                             {% endif %}
                             </div>
@@ -175,7 +175,7 @@
                 {# Keep a short summary with its use label, not an entire authored answer. #}
                 {% set keepReuseLead = reuseHow|trim and measuredDataNameReply|length <= 80 %}
                 {% if keepReuseLead %}<div class="answer-lead">{% endif %}
-                <p class="reuse-summary"><strong>{% if output_profile|default('review') == 'submission' and not measuredDataNameReply|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply|e if measuredDataNameReply|trim else "(no name given)" }}{% endif %}</strong>{% if reuseSummary %} — <span data-fact-id="measured-data-reuse" data-status="complete">{{ reuseSummary }}</span>{% endif %}</p>
+                <p class="reuse-summary"><strong>{% if output_profile|default('review') == 'submission' and not measuredDataNameReply|trim %}{{ macros.datasetLabel(macros.DATASET_INSTRUMENT, dataMeasuredItems.index(k) + 1) }}{% else %}{{ measuredDataNameReply|e if measuredDataNameReply|trim else pgettext("questions/13-persistent-identifier", "(no name given)") }}{% endif %}</strong>{% if reuseSummary %} — <span data-fact-id="measured-data-reuse" data-status="complete">{{ reuseSummary }}</span>{% endif %}</p>
                 {% if keepReuseLead %}</div>{% endif %}
                 {% if reuseHow|trim %}
                   <div class="answer-lead"><p>{{ pgettext("questions/13-persistent-identifier", "Potential uses in other fields:") }}</p></div>

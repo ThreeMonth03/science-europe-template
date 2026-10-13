@@ -43,11 +43,11 @@
           {%- do metadataStandards.append(pgettext("questions/03-docs-metadata", "DDI (Data Documentation Initiative)")) -%}
         {%- endif -%}
         {%- if metadataStandards|length == 1 -%}
-          {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ " metadata standard.") -%}
+          {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will document the data using the %(first_standard)s metadata standard.", first_standard=metadataStandards[0])) -%}
         {%- elif metadataStandards|length == 2 -%}
-          {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ " and " ~ metadataStandards[1] ~ " metadata standards.") -%}
+          {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will document the data using the %(first_standard)s and %(second_standard)s metadata standards.", first_standard=metadataStandards[0], second_standard=metadataStandards[1])) -%}
         {%- elif metadataStandards|length == 3 -%}
-          {%- do metadataSentences.append("We will document the data using the " ~ metadataStandards[0] ~ ", " ~ metadataStandards[1] ~ ", and " ~ metadataStandards[2] ~ " metadata standards.") -%}
+          {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will document the data using the %(first_standard)s, %(second_standard)s, and %(third_standard)s metadata standards.", first_standard=metadataStandards[0], second_standard=metadataStandards[1], third_standard=metadataStandards[2])) -%}
         {%- endif -%}
         {%- if metadataStandardsKeywordsAUuid == uuids.metadataStandardsKeywordsYesAUuid -%}
           {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will include keywords or relevant ontology references to optimize the possibility for discovery and potential reuse.")) -%}
@@ -61,7 +61,7 @@
       {%- endif -%}
 
       {%- if metadataSentences|length > 0 -%}
-        <p>{{ metadataSentences|join(" ") }}</p>
+        <p>{{ metadataSentences|join("" if document_language|default('en') == 'zh-Hant' else " ") }}</p>
       {%- endif -%}
       {# This answer is independent of standards and metadata publication. #}
       {%- set dictionary = repliesMap[[metadataPath, uuids.metadataExploreAUuid, uuids.metadataDictionaryQUuid]|reply_path]|reply_str_value -%}
@@ -115,8 +115,8 @@
       {%- if (not instructionKnown or not formKnown) and output_profile|default('review') != 'submission' -%}
       <div class="reading-gap">
         {%- if not metadataOpenInstrAUuid|trim and not metadataOpenFormAUuid|trim -%}
-          {%- set metadataInstructionsGap -%}<span data-fact-id="metadata-access-instructions" data-status="missing">whether the metadata will include instructions for accessing the data</span>{%- endset -%}
-          {%- set metadataHarvestGap -%}<span data-fact-id="metadata-harvestable" data-status="missing">whether the metadata will be available in a form that can be harvested and indexed</span>{%- endset -%}
+          {%- set metadataInstructionsGap -%}<span data-fact-id="metadata-access-instructions" data-status="missing">{{ pgettext("questions/03-docs-metadata", "whether the metadata will include instructions for accessing the data") }}</span>{%- endset -%}
+          {%- set metadataHarvestGap -%}<span data-fact-id="metadata-harvestable" data-status="missing">{{ pgettext("questions/03-docs-metadata", "whether the metadata will be available in a form that can be harvested and indexed") }}</span>{%- endset -%}
           {% if output_profile|default('review') != 'submission' %}<p class="data-gap metadata-publication-gap">{{ pgettext("questions/03-docs-metadata", "Information not provided: %(metadataInstructionsGap)s; %(metadataHarvestGap)s.", metadataInstructionsGap=metadataInstructionsGap, metadataHarvestGap=metadataHarvestGap) }}</p>{% endif %}
         {%- else -%}
         {%- if not instructionKnown -%}
@@ -257,12 +257,12 @@
         {{ pgettext("questions/03-docs-metadata", "We will use a database system to store project data.") }}
         {%- set scRelDbHandleChangesPath = [storageConvRelDbPath, uuids.storageConvRelDbYesAUuid, uuids.scRelDbHandleChangesQUuid]|reply_path -%}
         {%- set scRelDbHandleChangesAUuid = repliesMap[scRelDbHandleChangesPath]|reply_str_value -%}
-        {%- if scRelDbHandleChangesAUuid == uuids.scRelDbReadOnlyAnswerUuid %}
-          {{ pgettext("questions/03-docs-metadata", "Data in the database will be read-only.") }}
-        {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbCrudAnswerUuid %}
-          {{ pgettext("questions/03-docs-metadata", "We will be allowing Create, Update and Delete operations for data in the database.") }}
-        {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbExpireAnswerUuid %}
-          {{ pgettext("questions/03-docs-metadata", "Modifications will be made by <em>Expiring</em> the existing data and <em>Adding</em> updated data.") }}
+        {%- if scRelDbHandleChangesAUuid == uuids.scRelDbReadOnlyAnswerUuid -%}
+          {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "Data in the database will be read-only.") }}
+        {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbCrudAnswerUuid -%}
+          {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "We will be allowing Create, Update and Delete operations for data in the database.") }}
+        {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbExpireAnswerUuid -%}
+          {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "Modifications will be made by <em>Expiring</em> the existing data and <em>Adding</em> updated data.") }}
         {%- endif -%}
         </p>
       {%- endif -%}

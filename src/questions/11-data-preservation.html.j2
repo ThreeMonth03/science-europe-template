@@ -108,17 +108,18 @@
                   {%- if distroRepositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid %}{{ pgettext("questions/11-data-preservation", "Domain-specific repository") }}{%- set domainSpecificRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.domainSpecificRepoNameQUuid]|reply_path -%}
                     {%- set domainSpecificRepoNameReply = repliesMap[domainSpecificRepoNamePath] -%}
                     {%- if macros.integrationFairSharing(domainSpecificRepoNameReply)|striptags|trim -%}
-                      : {{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}.
-                    {%- else -%}.
+                              {{ pgettext("questions/11-data-preservation", ": ") }}{{ macros.integrationFairSharing(domainSpecificRepoNameReply) }}{{ pgettext("questions/11-data-preservation", ".") }}
+                            {%- else -%}{{ pgettext("questions/11-data-preservation", ".") }}
                     {% endif -%}
                     {% if repositoryOtherContact %}</p></div>{% endif %}
-                    {# Contact the repository #}
-                    {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid %}
-                      {{ pgettext("questions/11-data-preservation", "We do not need to contact the repository in advance because depositing data there is routine for us.") }}
-                    {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesAlreadyAUuid %}
-                      {{ pgettext("questions/11-data-preservation", "We have already contacted the repository.") }}
-                    {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesWillAUuid %}
-                      {{ pgettext("questions/11-data-preservation", "We are going to contact the repository.") }}
+                    {#- Contact the repository #}
+                    {%- set repositorySentenceSeparator = "" if document_language|default('en') == 'zh-Hant' else " " -%}
+                    {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid -%}
+                      {{ repositorySentenceSeparator }}{{ pgettext("questions/11-data-preservation", "We do not need to contact the repository in advance because depositing data there is routine for us.") }}
+                    {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesAlreadyAUuid -%}
+                      {{ repositorySentenceSeparator }}{{ pgettext("questions/11-data-preservation", "We have already contacted the repository.") }}
+                    {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesWillAUuid -%}
+                      {{ repositorySentenceSeparator }}{{ pgettext("questions/11-data-preservation", "We are going to contact the repository.") }}
                     {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeOtherAUuid %}
                       {%- set repositoryReading.simple = false -%}
                       {%- set domainSpecificRepoContactBeforeOtherPath = [domainSpecificRepoContactBeforePath, uuids.domainSpecificRepoContactBeforeOtherAUuid, uuids.domainSpecificRepoContactBeforeOtherQUuid]|reply_path -%}
@@ -139,8 +140,8 @@
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid %}{{ pgettext("questions/11-data-preservation", "<em>General-purpose repository</em>") }}{%- set generalPurposeRepoNamePath = [distroRepositoryKindPath, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.generalPurposeRepoNameQUuid]|reply_path -%}
                     {%- set generalPurposeRepoNameReply = repliesMap[generalPurposeRepoNamePath] -%}
                     {%- if macros.integrationFairSharing(generalPurposeRepoNameReply)|striptags|trim -%}
-                      : {{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}.
-                    {%- else -%}.
+                              {{ pgettext("questions/11-data-preservation", ": ") }}{{ macros.integrationFairSharing(generalPurposeRepoNameReply) }}{{ pgettext("questions/11-data-preservation", ".") }}
+                            {%- else -%}{{ pgettext("questions/11-data-preservation", ". ") -}}
                     {% endif -%}
                   {%- elif distroRepositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid %}
                     {{ pgettext("questions/11-data-preservation", "Our national repository.") }}
@@ -211,11 +212,11 @@
         {% set recordContent = record.context ~ record.policy ~ record.tail %}
         {% if output_profile|default('review') != 'submission' or recordContent|striptags|trim or '<img' in recordContent or '<table' in recordContent %}
         <div class="dataset-section" data-item-id="{{ record.id }}">
-          <h5>{% if sharedPolicies.count %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% if record.name|trim %}: {{ record.name|e }}{% elif output_profile|default('review') != 'submission' %}: {{ "(no name given)" }}{% endif %}{% elif output_profile|default('review') == 'submission' and not record.name|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% else %}{{ record.name|e if record.name|trim else "(no name given)" }}{% endif %}</h5>
+          <h5>{% if sharedPolicies.count %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% if record.name|trim %}{{ pgettext("questions/11-data-preservation", ": ") }}{{ record.name|e }}{% elif output_profile|default('review') != 'submission' %}{{ pgettext("questions/11-data-preservation", ": (no name given)") }}{% endif %}{% elif output_profile|default('review') == 'submission' and not record.name|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% else %}{{ record.name|e if record.name|trim else pgettext("questions/11-data-preservation", "(no name given)") }}{% endif %}</h5>
           <div class="preservation-summary dataset-policy">
             {{ record.context }}
             {% if group and group.number %}
-              {% set policyReference %}<a href="#preservation-policy-{{ group.number }}">Shared preservation policy {{ group.number }}</a>{% endset %}
+              {% set policyReference %}<a href="#preservation-policy-{{ group.number }}">{{ pgettext("questions/11-data-preservation", "Shared preservation policy %(group_number)s", group_number=group.number) }}</a>{% endset %}
               <p class="preservation-policy-reference">{{ pgettext("questions/11-data-preservation", "Preservation policy: see %(policyReference)s.", policyReference=policyReference) }}</p>
             {% else %}{{ record.policy }}{% endif %}
           </div>

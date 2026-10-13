@@ -30,7 +30,7 @@
   {%- endif -%}
   {%- if state.valid -%}{{- resolved -}}{%- endif -%}
 {%- endmacro -%}
-{%- set dpiaDatasetLabel %}Dataset{% endset -%}
+{%- set dpiaDatasetLabel %}{{ pgettext("questions/09-ethical-issues", "Dataset") }}{% endset -%}
 {%- set dpiaDatasetKind = 'dpia' -%}
 <div id="q-ethical-issues" class="question">
   <h3>{{ pgettext("questions/09-ethical-issues", "9. What ethical issues and codes of conduct are there, and how will they be taken into account?") }}</h3>
@@ -67,7 +67,7 @@
       <ul>
       {%- for project in projects -%}
         <li class="ethical-project" data-item-id="{{ project.item_id|e }}">
-          <p class="ethical-project-summary"><strong>{% if output_profile|default('review') == 'submission' and not project.name|trim %}{{ macros.projectLabel(project.index) }}{% else %}{{ project.name|e if project.name|trim else "(no name given)" }}{% endif %}</strong> — {% if project.approval == uuids.projEthicalApprovalNoAUuid %}{{ pgettext("questions/09-ethical-issues", "According to the questionnaire, this project does not require ethical approval.") }}{% else %}{{ pgettext("questions/09-ethical-issues", "This project requires ethical approval.") }}{% endif %}</p>
+          <p class="ethical-project-summary"><strong>{% if output_profile|default('review') == 'submission' and not project.name|trim %}{{ macros.projectLabel(project.index) }}{% else %}{{ project.name|e if project.name|trim else pgettext("questions/09-ethical-issues", "(no name given)") }}{% endif %}</strong> — {% if project.approval == uuids.projEthicalApprovalNoAUuid %}{{ pgettext("questions/09-ethical-issues", "According to the questionnaire, this project does not require ethical approval.") }}{% else %}{{ pgettext("questions/09-ethical-issues", "This project requires ethical approval.") }}{% endif %}</p>
           {% if project.approval == uuids.projEthicalApprovalYesAUuid %}
           {% if project.authorities|length > 0 %}
           {% set approvalRecords %}
@@ -129,7 +129,7 @@
         <li class="ethical-dataset" data-item-id="{{ i|e }}">
           {# A submission label with no facts is not a Word heading that must
              keep the following dataset/section with it. Mark its inline role. #}
-          <p class="ethical-data-summary">{% if output_profile|default('review') == 'submission' %}<span class="ethical-dataset-name">{% endif %}<strong>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else "(no name given)" }}{% endif %}</strong>{% if output_profile|default('review') == 'submission' %}</span>{% endif %}{% if containPersonal in [uuids.containPersonalYesAUuid, uuids.containPersonalNoAUuid] or containSensitive in [uuids.containSensitiveYesAUuid, uuids.containSensitiveNoAUuid] %} — {% endif %}{% include 'src/ethics-data-summary.html.j2' %}</p>
+          <p class="ethical-data-summary">{% if output_profile|default('review') == 'submission' %}<span class="ethical-dataset-name">{% endif %}<strong>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else pgettext("questions/09-ethical-issues", "(no name given)") }}{% endif %}</strong>{% if output_profile|default('review') == 'submission' %}</span>{% endif %}{% if containPersonal in [uuids.containPersonalYesAUuid, uuids.containPersonalNoAUuid] or containSensitive in [uuids.containSensitiveYesAUuid, uuids.containSensitiveNoAUuid] %} — {% endif %}{% include 'src/ethics-data-summary.html.j2' %}</p>
           {% if not containPersonal and not containSensitive and output_profile|default('review') != 'submission' %}<p class="data-gap" data-status="missing">{{ pgettext("questions/09-ethical-issues", "Whether this dataset contains personal or sensitive data has not been specified.") }}</p>{% endif %}
         </li>
       {%- endfor -%}

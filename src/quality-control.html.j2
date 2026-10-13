@@ -1,6 +1,6 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
 {# Shared by Q1/Q4. Only selected fixed methods form a sentence; free Markdown
-   remains an independent block. The existing translator localizes join(", ").
+   remains an independent block. The PO locale supplies the list separator.
    Do not join user-provided paragraphs or append punctuation to list entries. #}
 {% set measuredDataQualityPath = [pathPrefix, uuids.measuredDataQualityQUuid]|reply_path %}
 {% set qualityAnswer = repliesMap[measuredDataQualityPath]|reply_str_value %}
@@ -38,8 +38,8 @@
   {% set otherPath = [mdqPrefix, uuids.mdQualityOtherQUuid]|reply_path %}
   {% set otherAnswer = repliesMap[otherPath]|reply_str_value %}
   {% set otherText = repliesMap[[otherPath, uuids.mdQualityOtherYesAUuid, uuids.mdQualityOtherWhatQUuid]|reply_path]|reply_str_value if otherAnswer == uuids.mdQualityOtherYesAUuid else '' %}
-{% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText|trim %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}Quality control measures planned for <strong>{{ qualityName }}</strong>: <span data-fact-id="quality-methods" data-status="complete">{{ qualityMethods|join(", ") }}</span> and other quality control methods.{% else %}{{ pgettext("quality-control", "Other quality control methods are planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}{% endif %}</p>{% else %}  {% if qualityMethods %}
-    <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">Quality control measures for <strong>{{ qualityName }}</strong>: {{ qualityMethods|join(", ") }}.</p>
+{% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText|trim %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}{{ pgettext("quality-control", "Quality control measures planned for <strong>%(qualityName)s</strong>: <span data-fact-id=\"quality-methods\" data-status=\"complete\">%(qualityMethods)s</span> and other quality control methods.", qualityName=qualityName, qualityMethods=qualityMethods|join(pgettext("quality-control", ", "))) }}{% else %}{{ pgettext("quality-control", "Other quality control methods are planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}{% endif %}</p>{% else %}  {% if qualityMethods %}
+    <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">{{ pgettext("quality-control", "Quality control measures for <strong>%(qualityName)s</strong>: %(qualityMethods)s.", qualityName=qualityName, qualityMethods=qualityMethods|join(pgettext("quality-control", ", "))) }}</p>
   {% elif not otherText|trim %}
     {% if output_profile|default('review') == 'submission' %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="partial">{{ pgettext("quality-control", "Quality control is planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>

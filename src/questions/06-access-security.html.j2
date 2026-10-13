@@ -63,11 +63,12 @@
     {%- set storeLab = risksStoreLabAUuid == uuids.risksStoreLabNoAUuid -%}
 
     {%- if risksStoreLabAUuid in [uuids.risksStoreLabNoAUuid, uuids.risksStoreLabYesAUuid] or (risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid]) or (risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid]) or (risksHttpsAUuid in [uuids.risksHttpsYesAUuid, uuids.risksHttpsNoAUuid]) or (risksInstructedAUuid in [uuids.risksInstructedYesAUuid, uuids.risksInstructedNoAUuid]) %}
-      <p>
+      {# Only template-owned fixed statements are captured; no authored answer enters this block.
+         Chinese joins complete clauses without source indentation; English keeps it unchanged. #}{% set basicRiskParagraph %}<p>
         {%- if storeLab %}
-          Project members do not store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
+          {{ pgettext("questions/06-access-security", "Project members do not store data or software on computers in the lab or external hard drives connected to those computers.") }}{{ "" if document_language|default('en') == 'zh-Hant' else " " }}
         {%- elif risksStoreLabAUuid == uuids.risksStoreLabYesAUuid %}
-          Project members store data or software on computers in the lab or external hard drives connected to those computers.{{" "}}
+          {{ pgettext("questions/06-access-security", "Project members store data or software on computers in the lab or external hard drives connected to those computers.") }}{{ "" if document_language|default('en') == 'zh-Hant' else " " }}
         {%- endif -%}
         {%- if risksCarryHomeAUuid == uuids.risksCarryHomeNoAUuid %}
           {{ pgettext("questions/06-access-security", "Project members do not carry data with them (e.g. on laptops, USB sticks, or other external media).") }}
@@ -99,7 +100,7 @@
         {%- elif risksInstructedAUuid == uuids.risksInstructedNoAUuid %}
           {{ pgettext("questions/06-access-security", "Project members have not received instruction covering both generic and project-specific risks.") }}
         {%- endif -%}
-      </p>
+      </p>{% endset %}{{ basicRiskParagraph.splitlines()|map('trim')|join('') if document_language|default('en') == 'zh-Hant' else basicRiskParagraph }}
     {%- endif -%}
     {# Information loss, leak, and vandalism #}
     {%- set riskAnswers = {} -%}
@@ -129,9 +130,9 @@
     } -%}
 
     {# Captured labels remain translatable before they are joined into prose. #}
-    {%- set riskLoss %}data loss{% endset -%}
-    {%- set riskDisclosure %}data disclosure{% endset -%}
-    {%- set riskTampering %}data tampering{% endset -%}
+    {%- set riskLoss %}{{ pgettext("questions/06-access-security", "data loss") }}{% endset -%}
+    {%- set riskDisclosure %}{{ pgettext("questions/06-access-security", "data disclosure") }}{% endset -%}
+    {%- set riskTampering %}{{ pgettext("questions/06-access-security", "data tampering") }}{% endset -%}
 
     {# Use complete translatable combinations so localized output never leaks
        the English conjunction from a dynamically joined list. #}
@@ -178,22 +179,22 @@
     {%- set fragments = [] -%}
     {%- if small|length > 0 -%}
       {%- set risks = risk_list(small)|trim -%}
-      {%- set _ = fragments.append("The potential impact of " ~ risks ~ " is small") -%}
+      {%- set _ = fragments.append(pgettext("questions/06-access-security", "The potential impact of %(risks)s is small", risks=risks)) -%}
     {%- endif -%}
     {%- if low|length > 0 -%}
       {%- set risks = risk_list(low)|trim -%}
-      {%- set _ = fragments.append("The risk of " ~ risks ~ " is acceptably low") -%}
+      {%- set _ = fragments.append(pgettext("questions/06-access-security", "The risk of %(risks)s is acceptably low", risks=risks)) -%}
     {%- endif -%}
     {%- if will|length > 0 -%}
       {%- set risks = risk_list(will)|trim -%}
-      {%- set _ = fragments.append("We will mitigate the risk of " ~ risks) -%}
+      {%- set _ = fragments.append(pgettext("questions/06-access-security", "We will mitigate the risk of %(risks)s", risks=risks)) -%}
     {%- endif -%}
     {%- if notConsidered|length > 0 -%}
       {%- set risks = risk_list(notConsidered)|trim -%}
-      {%- set _ = fragments.append("We have not considered the possible impact on the project or organization of " ~ risks) -%}
+      {%- set _ = fragments.append(pgettext("questions/06-access-security", "We have not considered the possible impact on the project or organization of %(risks)s", risks=risks)) -%}
     {%- endif -%}
     {%- if fragments|length > 0 -%}
-      <p>{{ fragments | join('. ') }}.</p>
+      <p>{{ fragments | join('。' if document_language|default('en') == 'zh-Hant' else '. ') }}{{ '。' if document_language|default('en') == 'zh-Hant' else '.' }}</p>
     {%- endif -%}
     {# Personal data #}
     {%- set risksPersonalDataPath = [risksPathPrefix, uuids.risksPersonalDataQUuid]|reply_path -%}
@@ -231,7 +232,7 @@
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationPartyAUuid %}
           {{ pgettext("questions/06-access-security", "Pseudonymization is performed by an independent party to enable data linkage.") }}
         {%- elif risksPseudonymizationAUuid == uuids.risksPseudonymizationAnotherAUuid %}
-          We use a specific pseudonymization method{{ ":" if hasPseudonymizationDetail else "." }}
+          {{ pgettext("questions/06-access-security", "We use a specific pseudonymization method:") if hasPseudonymizationDetail else pgettext("questions/06-access-security", "We use a specific pseudonymization method.") }}
         {%- endif -%}
       </p></div>
       {% if hasPseudonymizationDetail %}{{ answerMarkdown.markdown(risksPseudonymizationAnother) }}{% endif %}

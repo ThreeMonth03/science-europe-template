@@ -1,82 +1,91 @@
 {
-  "status": "local-expanded-PO-prototype-not-for-release",
+  "status": "bounded-local-locale-verified-not-released",
   "branch": "codex/official-po",
   "baseline_snapshot_commit": "895741e",
   "source_language": "en",
   "locale_language": "zh-Hant",
-  "marked_messages": 764,
+  "marked_messages": 855,
   "migrated_scope": [
-    "Previous Q2/Q11/Q15 clusters (47 uncontexted messages)",
-    "729 approved translation-tree units in 43 source files (717 new contexted messages)"
+    "47 original uncontexted messages and 808 contexted messages",
+    "Existing approved Chinese, including whole clauses, responsibility subjects, locale joins, display punctuation, fallbacks and project metadata",
+    "Reviewed current template scope; catalog key coverage is not proof of every possible input or human-readable literal"
   ],
   "unchanged": [
     "Authored answers",
     "Questionnaire/KM paths and branching",
-    "Shared layout",
-    "Existing delivery artifacts",
+    "Shared layout and prepared reference assets",
+    "Existing delivery artifacts and original repository checkouts",
     "Stock Worker"
   ],
   "verified_runtime": "DSW document-worker 4.35.0",
   "verified_worker_image": "datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3",
-  "preparation_requirement": "The native prototype overlays changes on the frozen prepared English package, retaining its prepared reference.docx and layout.css. The raw source reference is not release-ready; existing preparation must run exactly once before packaging. Never prepare the frozen prepared reference again.",
+  "preparation_requirement": "Tests overlay source on the frozen prepared English package, retaining its prepared reference.docx and layout.css. Raw source still needs the existing preparation exactly once before packaging. Never prepare the frozen prepared reference again.",
   "local_checks": {
-    "catalog_messages": 764,
-    "contexted_messages": 717,
+    "catalog_messages": 855,
+    "contexted_messages": 808,
     "uncontexted_messages": 47,
     "parsed_template_files": 63,
-    "catalog_context_gate_fixture_cases": 21,
-    "html_outputs": 80,
-    "english_html_pairs": 20,
-    "english_strict_equal_pairs": 8,
-    "english_paragraph_edge_ASCII_whitespace_only_pairs": 12,
-    "english_text_structure_style_and_protected_content_equal": true,
-    "chinese_html_pairs": 20,
-    "chinese_equal_pairs": 4,
-    "current_migration_native_documents_generated": 0
+    "main_html_outputs": 80,
+    "main_english_html_equivalent_pairs": 20,
+    "main_chinese_html_equivalent_pairs": 20,
+    "main_strict_equal_pairs_per_language": 8,
+    "main_direct_block_edge_ASCII_whitespace_only_pairs_per_language": 12,
+    "extra_repository_html_outputs": 64,
+    "extra_repository_html_equivalent_pairs": 32,
+    "extra_repository_punctuation_and_escaping_checks": 64,
+    "native_documents_generated": {
+      "PDF": 8,
+      "Word": 8
+    },
+    "native_candidate_documents": 12,
+    "native_all_missing_control_documents": 4,
+    "native_page_pairs": 56,
+    "native_page_pairs_pixel_identical": true,
+    "docx_non_core_parts_byte_identical": true,
+    "docx_core_properties_equal_except_created_modified_timestamps": true,
+    "authored_answers_unchanged": true
   },
   "comparison_boundaries": {
-    "english": "Strict DOM equality or ONLY p direct-edge ASCII whitespace differences in normal-whitespace paragraphs; no source text edits.",
-    "chinese": "Full frozen Chinese delivery vs expanded PO prototype: 4/20 selected HTML pairs equal, 16/20 still differ. No complete Chinese acceptance claim."
+    "html": "Strict full DOM equality or ONLY direct p/td/th-edge ASCII whitespace under normal whitespace. Preserve full CSS/fonts, attributes, inline spacing, NBSP and preformatted content. Both languages pass all 72 pairs.",
+    "native": "Filled submission and partial review compare against frozen delivery; all-missing submission compares against newly rendered frozen-source controls. Stock generation, bundled Poppler and bundled LibreOffice previews only.",
+    "cases": "Whole HTML: complete, partial, all-missing, multi-gap/zero, long authored content and four legal repository type/name variants. Native: complete submission, partial review, all-missing submission."
   },
-  "locale_assets": "HTML/CSS chooses by document locale/language; stock enrich-docx adjusts Chinese styles after Pandoc, preserving added/custom styles. English styles pass through unchanged.",
   "visual_review": {
-    "current_expanded_catalog_pages_reviewed": 0,
-    "required_before_acceptance": "Complete Chinese HTML regression, then stock Worker PDF/Word generation and page review; include authored Markdown and Latin-term wrapping."
+    "candidate_pages_reviewed_at_original_size": {
+      "en": 29,
+      "zh-Hant": 27
+    },
+    "new_all_missing_control_pages_reviewed_at_original_size": 9,
+    "new_clipping_overlap_missing_glyphs_table_overflow_or_clear_grammar_regressions_found": false,
+    "missing_input_submission": "All 15 questions retained without gap hints or invented answers; neutral numbered labels retained when applicable.",
+    "preserved_presentation_choices": [
+      "All-missing documents retain the existing title-only cover page.",
+      "Partial English review PDF retains its sparse document-traceability tail page.",
+      "Chinese filled Word keeps the final budget table intact on the following page."
+    ]
   },
-  "upgrade_cost": "The Word rewrite guards the current prepared-reference style IDs and Pandoc XML serialization. A runtime/reference upgrade needs native regression and may need this small adapter updated. PO does not resolve upstream Jinja or KM mapping conflicts.",
-  "authority_during_prototype": "Existing Chinese repository/workflow remains authoritative for delivery. This experimental PO is not a second editable production translation source.",
+  "locale_assets": "HTML/CSS chooses by document locale/language; stock enrich-docx applies Chinese styles after Pandoc, preserving added/custom styles. English styles pass through unchanged.",
+  "upgrade_cost": "The Word adapter guards current prepared-reference style IDs and Pandoc XML serialization. Runtime/reference upgrades require native regression and may need this adapter updated. Official PO does not eliminate upstream Jinja/KM mapping conflicts or supply locale-specific prose/layout automatically.",
+  "authority_until_integration": "The existing Chinese repository/workflow remains the delivery authority. This isolated PO branch is not a second editable production translation source.",
+  "previous_local_prototype_commits": [
+    "de96940",
+    "5f607d0"
+  ],
+  "validation_correction": "The early private html-mechanical/report.json is invalid: default lxml truncated large inline-font CSS before body. Current reports use huge_tree, strict parsing, all 15 ordered questions/body checks, and negative body/inline-space/NBSP/preformatted-content tests. Old failed reports remain as history, not acceptance evidence.",
+  "local_evidence_root": "/home/trc/.local/share/dsw-po-full435.C4XZLyTx",
+  "current_evidence": [
+    "html-final3/report-final.json",
+    "repository-probe-final3/report.json",
+    "native-acceptance/comparison.json",
+    "acceptance-summary.json"
+  ],
   "not_verified": [
-    "Complete Chinese catalog and language hooks",
-    "Current expanded catalog native PDF/Word layout",
+    "Production packaging/preparation path for this PO branch",
     "Existing general CI under updated 4.35 dependencies",
     "Wizard locale upload/UI/cache/S3",
-    "Native Microsoft Word"
+    "Native Microsoft Word",
+    "Arbitrary questionnaire inputs"
   ],
-  "next_step": "Resolve unmatched/ambiguous spans, whole clauses and remaining locale joins/punctuation/globals using existing approved Chinese. Preserve source==target machine literals. Require whole Chinese HTML comparison before native PDF/Word acceptance or production workflow adoption.",
-  "remote_operations": false,
-  "previous_partial_prototype_verification": {
-    "commit": "de96940",
-    "local_checks": {
-      "selected_cluster_state_cases": 284,
-      "catalog_gate_positive_cases": 2,
-      "catalog_gate_negative_cases": 12,
-      "complete_html_entrypoint_pairs": 40,
-      "native_documents_generated": {
-        "PDF": 6,
-        "Word": 6
-      },
-      "native_page_pairs": 47,
-      "native_page_pairs_pixel_identical": true,
-      "docx_content_and_style_parts_identical": true,
-      "docx_differences": "Generation timestamp in docProps/core.xml only"
-    },
-    "visual_review": {
-      "candidate_pages_reviewed": 47,
-      "clipping_overlap_missing_glyphs_or_table_overflow": false,
-      "observation": "Remaining unmarked English text in the partial Chinese Word prototype can wrap inside Latin words. The literal-Chinese/static-assets experimental control has the same behavior; this is not evidence that the frozen complete Chinese delivery has these exact cases. Recheck remaining Latin terms/user answers after complete locale migration before acceptance."
-    },
-    "current_expanded_catalog_native_acceptance": false
-  },
-  "validation_correction": "Private initial report.json is invalid because default lxml limits truncated a large inline-font style before body. Final report uses huge_tree, strict parsing, all 15 ordered question/body checks, negative body/space/NBSP/protected-content tests, and separately reports strict vs paragraph-edge ASCII whitespace equality.",
-  "local_evidence_root": "/home/trc/.local/share/dsw-po-full435.C4XZLyTx"
+  "next_step": "Choose one authoritative PO source and pin source/catalog revisions; verify the production preparation/packaging path locally with 4.35 exactly once before replacing the current translation workflow. Do not mix this migration with further prose/layout changes.",
+  "remote_operations": false
 }

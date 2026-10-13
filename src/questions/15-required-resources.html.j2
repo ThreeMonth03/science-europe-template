@@ -104,7 +104,7 @@
             {%- set projectItemNumberQUuid = active.path(budgetProjectParts + [i, uuids.projectNumberQUuid], 'ValueQuestion') -%}
             {%- set projectItemNumberReply = repliesMap[projectItemNumberQUuid]|reply_str_value if projectItemNumberQUuid else '' -%}
             {% if output_profile|default('review') != 'submission' or repliesMap[[projectItem, uuids.costQUuid]|reply_path]|reply_items %}<div class="project-resources" data-item-id="{{ projectItem }}">
-                {% if projectItems|length > 1 %}{% if output_profile|default('review') == 'submission' and not projectItemNameReply|trim %}<p>{{ pgettext("questions/15-required-resources", "<strong>Project %(i)s%(projectItemNumberReply)s </strong>", i=projectItems.index(i) + 1, projectItemNumberReply=(" - " + projectItemNumberReply)|e if projectItemNumberReply|trim) }}</p>{% else %}<p><strong>{{ projectItemNameReply|e if projectItemNameReply|trim else "(no name given)" }}{{ (" - " + projectItemNumberReply)|e if projectItemNumberReply|trim}} </strong></p>{% endif %}{% endif %}
+                {% if projectItems|length > 1 %}{% if output_profile|default('review') == 'submission' and not projectItemNameReply|trim %}<p>{{ pgettext("questions/15-required-resources", "<strong>Project %(i)s%(projectItemNumberReply)s </strong>", i=projectItems.index(i) + 1, projectItemNumberReply=(" - " + projectItemNumberReply)|e if projectItemNumberReply|trim) }}</p>{% else %}<p><strong>{{ projectItemNameReply|e if projectItemNameReply|trim else pgettext("questions/15-required-resources", "(no name given)") }}{{ (" - " + projectItemNumberReply)|e if projectItemNumberReply|trim}} </strong></p>{% endif %}{% endif %}
 
                 {%- set projectCostPath = [projectItem, uuids.costQUuid]|reply_path -%}
                 {%- set projectCostItems = repliesMap[projectCostPath]|reply_items -%}
@@ -123,7 +123,7 @@
                         {%- set budgetRow = namespace(id=projectCostItem, title='', purpose='', budget='', funding='', original='') -%}
                         {%- set budgetRow.original -%}
                         <tr data-item-id="{{ projectCostItem }}"><td>
-                        {% set budgetRow.title %}<p><strong>{% if output_profile|default('review') == 'submission' and not projectCostItemTitleReply|trim %}{{ macros.resourceLabel(projectCostItems.index(j) + 1) }}{% else %}{{ projectCostItemTitleReply if projectCostItemTitleReply|trim else "(no resource name given)" }}{% endif %}</strong></p>{% endset %}{{ budgetRow.title }}
+                        {% set budgetRow.title %}<p><strong>{% if output_profile|default('review') == 'submission' and not projectCostItemTitleReply|trim %}{{ macros.resourceLabel(projectCostItems.index(j) + 1) }}{% else %}{{ projectCostItemTitleReply if projectCostItemTitleReply|trim else pgettext("questions/15-required-resources", "(no resource name given)") }}{% endif %}</strong></p>{% endset %}{{ budgetRow.title }}
                         {%- set budgetRow.purpose -%}
                         
                         {%- set projectCostItemDescriptionQUuid = [projectCostItem, uuids.costDescriptionQUuid]|reply_path -%}
@@ -151,9 +151,9 @@
                               <p data-fact-id="resource-amount-value" data-status="complete">{{ projectCostItemAmountReply }}</p>
                             {% endif %}
                             {% if hasCurrency %}
-                              <p data-fact-id="resource-currency" data-status="complete">Currency: {{ macros.integrationCurrency(projectCostItemCurrencyReply) }}.</p>
+                              <p data-fact-id="resource-currency" data-status="complete">{{ pgettext("questions/15-required-resources", "Currency: %(currency)s.", currency=macros.integrationCurrency(projectCostItemCurrencyReply)) }}</p>
                             {% endif %}
-                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing"><strong>Information not provided:</strong> {% if projectCostItemAmountReply|trim %}currency.{% elif hasCurrency %}budgeted amount.{% else %}budgeted amount and currency.{% endif %}</p>{% endif %}
+                            {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-6b" data-fact-id="resource-amount" data-status="missing">{% if projectCostItemAmountReply|trim %}{{ pgettext("questions/15-required-resources", "<strong>Information not provided:</strong> currency.") }}{% elif hasCurrency %}{{ pgettext("questions/15-required-resources", "<strong>Information not provided:</strong> budgeted amount.") }}{% else %}{{ pgettext("questions/15-required-resources", "<strong>Information not provided:</strong> budgeted amount and currency.") }}{% endif %}</p>{% endif %}
                         {%- endif -%}
                         {%- endset -%}
 

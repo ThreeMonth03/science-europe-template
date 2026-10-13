@@ -58,7 +58,7 @@
           {%- do visibleSoftwareItems.append(swItem) -%}
         {%- endif -%}
       {%- endfor -%}
-      {% set accessLabel %}{% if producedDataName|trim %}{{ producedDataName|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, loop.index) }}{% else %}(no name given){% endif %}{% endset %}
+      {% set accessLabel %}{% if producedDataName|trim %}{{ producedDataName|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, loop.index) }}{% else %}{{ pgettext("questions/12-access-data", "(no name given)") }}{% endif %}{% endset %}
       {# A run-in label and one owned sentence, not a heading for every short
          answer. Never combine different dataset records, even equal names. #}
       {% set accessSummary %}

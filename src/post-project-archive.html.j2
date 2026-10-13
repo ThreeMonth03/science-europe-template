@@ -86,7 +86,7 @@
       {% do basisItems.append(basisItem) %}
     {% endif %}
     {% if basisItems %}
-      <div class="archive-extension-basis-summary"><p>Basis for extending the archival period: {{ basisItems|join(", ") }}.</p></div>
+      <div class="archive-extension-basis-summary"><p>{{ pgettext("post-project-archive", "Basis for extending the archival period: %(basis)s.", basis=basisItems|join(gettext(", "))) }}</p></div>
     {% endif %}
     {% if not basis %}
       <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="archive-extension-basis" data-status="missing">{{ pgettext("post-project-archive", "The basis for deciding on an extension has not been specified.") }}</p>{% endif %}</div>

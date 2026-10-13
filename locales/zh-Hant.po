@@ -4547,3 +4547,575 @@ msgstr "變更"
 msgctxt "word/versions"
 msgid "<p><em>There are no named versions.</em></p>"
 msgstr "<p><em>沒有命名版本。</em></p>"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/05-store-backup.html.j2
+msgctxt "questions/05-store-backup"
+msgid "<strong>Information not provided:</strong> how storage capacity needs will change during the project."
+msgstr "尚待補充：計畫期間儲存容量需求的變化。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/05-store-backup.html.j2
+msgctxt "questions/05-store-backup"
+msgid "<strong>Information not provided:</strong> how a total loss of data will be prevented."
+msgstr "尚待補充：如何防止資料全部遺失。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/05-store-backup.html.j2
+msgctxt "questions/05-store-backup"
+msgid "<strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up."
+msgstr "尚待補充：共享工作空間內外資料的備份方式。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/07-personal-data.html.j2
+msgctxt "questions/07-personal-data"
+msgid "We are collecting and processing personal data "
+msgstr "本計畫蒐集及處理個人資料，"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of commercial considerations unrelated to patents:"
+msgstr "資料因與專利無關的商業考量而無法完全開放:"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of commercial considerations unrelated to patents."
+msgstr "資料因與專利無關的商業考量而無法完全開放。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of reasons other than publishing a paper:"
+msgstr "資料因論文發表以外的其他考量而無法完全開放:"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of reasons other than publishing a paper."
+msgstr "資料因論文發表以外的其他考量而無法完全開放。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "It is available under specific restrictions, which we will follow in our project:"
+msgstr "其可在特定限制下取得，我們將在專案中遵循這些限制:"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "It is available under specific restrictions, which we will follow in our project."
+msgstr "其可在特定限制下取得，我們將在專案中遵循這些限制。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "commercial considerations unrelated to patents:"
+msgstr "與專利無關的商業考量:"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "commercial considerations unrelated to patents"
+msgstr "與專利無關的商業考量"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "reasons other than publishing a paper:"
+msgstr "論文發表以外的其他考量:"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/08-copyright-ipr.html.j2
+msgctxt "questions/08-copyright-ipr"
+msgid "reasons other than publishing a paper"
+msgstr "論文發表以外的其他考量"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/09-ethical-issues.html.j2
+msgctxt "questions/09-ethical-issues"
+msgid "(no name given)"
+msgstr "（名稱尚未提供）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/10-share-restrictions.html.j2
+msgctxt "questions/10-share-restrictions"
+msgid "(no name given)"
+msgstr "（名稱尚未提供）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/11-data-preservation.html.j2
+msgctxt "questions/11-data-preservation"
+msgid "(no name given)"
+msgstr "（名稱尚未提供）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/13-persistent-identifier.html.j2
+msgctxt "questions/13-persistent-identifier"
+msgid "(no name given)"
+msgstr "（名稱尚未提供）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/09-ethical-issues.html.j2
+msgctxt "questions/09-ethical-issues"
+msgid "Dataset"
+msgstr "資料集"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/10-share-restrictions.html.j2
+msgctxt "questions/10-share-restrictions"
+msgid "Identifier"
+msgstr "識別碼"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/10-share-restrictions.html.j2
+msgctxt "questions/10-share-restrictions"
+msgid "The licence or conditions of use have not been provided."
+msgstr "尚待補充：授權或使用條件。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/10-share-restrictions.html.j2
+#, python-format
+msgctxt "questions/10-share-restrictions"
+msgid "The embargo period will be %(period)s"
+msgstr "延後開放期限為 %(period)s。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/10-share-restrictions.html.j2
+msgctxt "questions/10-share-restrictions"
+msgid ": "
+msgstr "："
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/10-share-restrictions.html.j2
+msgctxt "questions/10-share-restrictions"
+msgid "."
+msgstr "。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/11-data-preservation.html.j2
+msgctxt "questions/11-data-preservation"
+msgid ": "
+msgstr "："
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/11-data-preservation.html.j2
+msgctxt "questions/11-data-preservation"
+msgid ": (no name given)"
+msgstr "：（名稱尚未提供）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/13-persistent-identifier.html.j2
+#, python-format
+msgctxt "questions/13-persistent-identifier"
+msgid "Information still needed: %(fields)s."
+msgstr "尚待補充：%(fields)s。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/13-persistent-identifier.html.j2
+#, python-format
+msgctxt "questions/13-persistent-identifier"
+msgid "This template cannot interpret the selected answers for: %(fields)s."
+msgstr "本模板無法判讀下列欄位的選項，請核對：%(fields)s。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/15-required-resources.html.j2
+msgctxt "questions/15-required-resources"
+msgid "(no name given)"
+msgstr "（計畫名稱尚未提供）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/15-required-resources.html.j2
+msgctxt "questions/15-required-resources"
+msgid "(no resource name given)"
+msgstr "（尚未填寫資源名稱）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/15-required-resources.html.j2
+#, python-format
+msgctxt "questions/15-required-resources"
+msgid "Currency: %(currency)s."
+msgstr "幣別：%(currency)s"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/15-required-resources.html.j2
+msgctxt "questions/15-required-resources"
+msgid "<strong>Information not provided:</strong> currency."
+msgstr "幣別尚未提供。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/15-required-resources.html.j2
+msgctxt "questions/15-required-resources"
+msgid "<strong>Information not provided:</strong> budgeted amount."
+msgstr "預算金額尚未提供。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/15-required-resources.html.j2
+msgctxt "questions/15-required-resources"
+msgid "<strong>Information not provided:</strong> budgeted amount and currency."
+msgstr "預算金額與幣別尚未提供。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/post-project-archive.html.j2
+#, python-format
+msgctxt "post-project-archive"
+msgid "Basis for extending the archival period: %(basis)s."
+msgstr "延長保存期限的考量因素：%(basis)s。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/03-docs-metadata.html.j2
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "We will document the data using the %(first_standard)s metadata standard."
+msgstr "本計畫將以 %(first_standard)s 後設資料標準描述資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/03-docs-metadata.html.j2
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "We will document the data using the %(first_standard)s and %(second_standard)s metadata standards."
+msgstr "本計畫將以 %(first_standard)s 與 %(second_standard)s 後設資料標準描述資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/03-docs-metadata.html.j2
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "We will document the data using the %(first_standard)s, %(second_standard)s, and %(third_standard)s metadata standards."
+msgstr "本計畫將以 %(first_standard)s、%(second_standard)s 與 %(third_standard)s 後設資料標準描述資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "The potential impact of %(risks)s is small"
+msgstr "%(risks)s可能造成的影響很小"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "The risk of %(risks)s is acceptably low"
+msgstr "%(risks)s的風險已降至可接受程度"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "We will mitigate the risk of %(risks)s"
+msgstr "我們將降低%(risks)s的風險"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "We have not considered the possible impact on the project or organization of %(risks)s"
+msgstr "我們尚未考量%(risks)s對計畫或機構的可能影響"
+
+#. Approved existing Chinese; no retranslation.
+#: src/responsibility-sentences.j2
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance."
+msgstr "%(responsibility_actor)s負責審查、補充、清理或標準化提交至資料中心或儲存庫的後設資料及相關資料，以供儲存、使用與維護。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/responsibility-sentences.j2
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for finding, gathering and collecting data."
+msgstr "%(responsibility_actor)s負責尋找、彙整與蒐集資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/responsibility-sentences.j2
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for maintaining the completed resource."
+msgstr "%(responsibility_actor)s負責維護已完成的資源。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/responsibility-sentences.j2
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability."
+msgstr "%(responsibility_actor)s負責管理資料並支援其有效運用，涵蓋資料處理、資料政策、指引與可用性。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/responsibility-sentences.j2
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for producing and disseminating electronic or print copies of the resource."
+msgstr "%(responsibility_actor)s負責以電子或紙本形式製作並發布資源副本。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/responsibility-sentences.j2
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for addressing personal-data protection and data-protection policies."
+msgstr "%(responsibility_actor)s負責個人資料保護及資料保護政策相關工作。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/responsibility-sentences.j2
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for implementing the data management plan and ensuring that it is reviewed and revised."
+msgstr "%(responsibility_actor)s負責執行資料管理方案，並確保該方案經過審查與修訂。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/03-docs-metadata.html.j2
+msgctxt "questions/03-docs-metadata"
+msgid "whether the metadata will include instructions for accessing the data"
+msgstr "後設資料是否會包含取用資料的說明"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/03-docs-metadata.html.j2
+msgctxt "questions/03-docs-metadata"
+msgid "whether the metadata will be available in a form that can be harvested and indexed"
+msgstr "後設資料是否可供自動擷取並建立索引"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+msgctxt "questions/06-access-security"
+msgid "Project members do not store data or software on computers in the lab or external hard drives connected to those computers."
+msgstr "專案成員不使用實驗室電腦或連接於這些電腦的外接硬碟儲存資料或軟體。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+msgctxt "questions/06-access-security"
+msgid "Project members store data or software on computers in the lab or external hard drives connected to those computers."
+msgstr "專案成員使用實驗室電腦或連接於這些電腦的外接硬碟儲存資料或軟體。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+msgctxt "questions/06-access-security"
+msgid "data loss"
+msgstr "資訊遺失"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+msgctxt "questions/06-access-security"
+msgid "data disclosure"
+msgstr "資訊外洩"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+msgctxt "questions/06-access-security"
+msgid "data tampering"
+msgstr "資訊遭竄改"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+msgctxt "questions/06-access-security"
+msgid "We use a specific pseudonymization method:"
+msgstr "我們採用特定的擬匿名化方法:"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/06-access-security.html.j2
+msgctxt "questions/06-access-security"
+msgid "We use a specific pseudonymization method."
+msgstr "我們採用特定的擬匿名化方法。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid "(no name given)"
+msgstr "（名稱尚未提供）"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we need to harmonize existing data from different sources and will make the results available to others."
+msgstr "再利用前，我們需要先對不同來源的既有資料進行一致化處理，並會將處理結果提供給他人使用。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we need to harmonize existing data from different sources but will not make the results available to others."
+msgstr "再利用前，我們需要先對不同來源的既有資料進行一致化處理，但不會將處理結果提供給他人使用。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we need to harmonize existing data from different sources."
+msgstr "再利用前，我們需要先對不同來源的既有資料進行一致化處理。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+#, python-format
+msgctxt "questions/01-how-data"
+msgid " We will provide others with standardized, machine-readable metadata and we will use the following metadata standards: %(standards)s."
+msgstr "我們將提供標準化且機器可讀的後設資料，並採用以下後設資料標準：%(standards)s。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid " We will provide others with standardized, machine-readable metadata."
+msgstr "我們會提供機器可讀的標準化後設資料，供他人使用。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid " We will not provide others with standardized, machine-readable metadata."
+msgstr "我們不會向他人提供標準化、機器可讀的後設資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid ", "
+msgstr "、"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/01-how-data.html.j2
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance\" data-status=\"missing\"><strong>Information not provided:</strong> how data provenance will be documented.</p>"
+msgstr "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance\" data-status=\"missing\">尚待補充：資料來源與處理歷程的記錄方式。</p>"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/02-what-data.html.j2
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "Data collection for <strong>%(collectionName)s</strong>: %(collectionSentences)s"
+msgstr "<strong>%(collectionName)s</strong>的蒐集方式：%(collectionSentences)s"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/02-what-data.html.j2
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "We collect data from %(first_type)s."
+msgstr "我們將從%(first_type)s蒐集資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/02-what-data.html.j2
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "We collect data from %(first_type)s and %(second_type)s."
+msgstr "我們將從%(first_type)s與%(second_type)s蒐集資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/questions/02-what-data.html.j2
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "We collect data from %(first_type)s, %(second_type)s, and %(third_type)s."
+msgstr "我們將從%(first_type)s、%(second_type)s與%(third_type)s蒐集資料。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/quality-control.html.j2
+#, python-format
+msgctxt "quality-control"
+msgid "Quality control measures planned for <strong>%(qualityName)s</strong>: <span data-fact-id=\"quality-methods\" data-status=\"complete\">%(qualityMethods)s</span> and other quality control methods."
+msgstr "<strong>%(qualityName)s</strong>的品質管控措施包括<span data-fact-id=\"quality-methods\" data-status=\"complete\">%(qualityMethods)s</span>及其他品質管控方法。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/quality-control.html.j2
+#, python-format
+msgctxt "quality-control"
+msgid "Quality control measures for <strong>%(qualityName)s</strong>: %(qualityMethods)s."
+msgstr "<strong>%(qualityName)s</strong>：品質管控措施包括%(qualityMethods)s。"
+
+#. Approved existing Chinese; no retranslation.
+#: src/quality-control.html.j2
+msgctxt "quality-control"
+msgid ", "
+msgstr "、"
+
+#. Approved existing Chinese; no retranslation.
+#: src/header.html.j2
+msgctxt "header"
+msgid "Contact people"
+msgstr "聯絡人"
+
+#. Approved existing Chinese; no retranslation.
+#: src/header.html.j2
+msgctxt "header"
+msgid "Contact person"
+msgstr "聯絡人"
+
+#. Approved existing Chinese; no retranslation.
+#: src/contributors.html.j2
+msgctxt "contributors"
+msgid "Role"
+msgstr "角色"
+
+#. Approved existing Chinese; no retranslation.
+#: src/contributors.html.j2
+msgctxt "contributors"
+msgid "Roles"
+msgstr "角色"
+
+#. Approved existing Chinese; no retranslation.
+#: src/contributors.html.j2
+msgctxt "contributors"
+msgid ": "
+msgstr "："
+
+#. Approved existing Chinese; no retranslation.
+#: src/contributors.html.j2
+msgctxt "contributors"
+msgid ", "
+msgstr "、"
+
+#. Approved existing Chinese; no retranslation.
+#: src/contributors.html.j2
+msgctxt "contributors"
+msgid "Affiliation:"
+msgstr "所屬機構："
+
+#. Approved existing Chinese; no retranslation.
+#: src/projects.html.j2
+msgctxt "projects"
+msgid ": "
+msgstr "："
+
+#. Approved existing Chinese; no retranslation.
+#: src/projects.html.j2
+msgctxt "projects"
+msgid "grant number not yet given"
+msgstr "尚未提供補助編號"
+
+#. Approved existing Chinese; no retranslation.
+#: src/projects.html.j2
+msgctxt "projects"
+msgid "N/A"
+msgstr "尚未提供"
+
+#. Approved existing Chinese; no retranslation.
+#: src/macros.html.j2
+msgctxt "macros"
+msgid "ORCID:"
+msgstr "ORCID："
+
+#. Approved existing Chinese; no retranslation.
+#: src/globals.j2
+msgctxt "globals"
+msgid "projects"
+msgstr "專案"
+
+#. Approved existing Chinese; no retranslation.
+#: src/globals.j2
+msgctxt "globals"
+msgid "project"
+msgstr "專案"
+
+#. Approved existing Chinese; no retranslation.
+#: src/globals.j2
+msgctxt "globals"
+msgid "are"
+msgstr "為"
+
+#. Approved existing Chinese; no retranslation.
+#: src/globals.j2
+msgctxt "globals"
+msgid "is"
+msgstr "為"
+
+#. Approved existing Chinese repository sentence punctuation.
+#: src/questions/11-data-preservation.html.j2
+msgctxt "questions/11-data-preservation"
+msgid "."
+msgstr "。"
+
+#. Preserve the English empty-repository trailing space; Chinese has none.
+#: src/questions/11-data-preservation.html.j2
+msgctxt "questions/11-data-preservation"
+msgid ". "
+msgstr "。"

@@ -21,7 +21,7 @@
           {%- endif -%}
         {%- endfor -%}
         {%- set nContacts = contacts|length -%}
-        <dt>Contact {{ "people" if (nContacts > 1) else "person" }}</dt>
+        <dt>{{ pgettext("header", "Contact people") if (nContacts > 1) else pgettext("header", "Contact person") }}</dt>
         <dd>
           {%- if nContacts > 0 -%}
             <ul>

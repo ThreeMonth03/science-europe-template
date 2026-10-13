@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: science-europe-enhanced 0.3.78\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-13 03:19+0000\n"
+"POT-Creation-Date: 2026-10-13 04:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -14,6 +14,64 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
+
+#: src/questions/01-how-data.html.j2:445
+msgctxt "questions/01-how-data"
+msgid " We will not provide others with standardized, machine-readable metadata."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:440
+#, python-format
+msgctxt "questions/01-how-data"
+msgid " We will provide others with standardized, machine-readable metadata and we will use the following metadata standards: %(standards)s."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:442
+msgctxt "questions/01-how-data"
+msgid " We will provide others with standardized, machine-readable metadata."
+msgstr ""
+
+#: src/responsibility-sentences.j2:25
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for addressing personal-data protection and data-protection policies."
+msgstr ""
+
+#: src/responsibility-sentences.j2:9
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for finding, gathering and collecting data."
+msgstr ""
+
+#: src/responsibility-sentences.j2:29
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for implementing the data management plan and ensuring that it is reviewed and revised."
+msgstr ""
+
+#: src/responsibility-sentences.j2:13
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for maintaining the completed resource."
+msgstr ""
+
+#: src/responsibility-sentences.j2:17
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability."
+msgstr ""
+
+#: src/responsibility-sentences.j2:21
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for producing and disseminating electronic or print copies of the resource."
+msgstr ""
+
+#: src/responsibility-sentences.j2:5
+#, python-format
+msgctxt "responsibility-sentences"
+msgid "%(responsibility_actor)s is responsible for reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance."
+msgstr ""
 
 #: src/projects.html.j2:31
 msgctxt "projects"
@@ -35,7 +93,12 @@ msgctxt "quality-control"
 msgid "(no name given)"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:204
+#: src/questions/01-how-data.html.j2:28
+msgctxt "questions/01-how-data"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:24 src/questions/02-what-data.html.j2:203
 msgctxt "questions/02-what-data"
 msgid "(no name given)"
 msgstr ""
@@ -46,9 +109,42 @@ msgctxt "questions/08-copyright-ipr"
 msgid "(no name given)"
 msgstr ""
 
+#: src/questions/09-ethical-issues.html.j2:70
+#: src/questions/09-ethical-issues.html.j2:132
+msgctxt "questions/09-ethical-issues"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:264
+msgctxt "questions/10-share-restrictions"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:215
+msgctxt "questions/11-data-preservation"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/12-access-data.html.j2:61
 #: src/questions/12-access-data.html.j2:92
 msgctxt "questions/12-access-data"
 msgid "(no name given)"
+msgstr ""
+
+#: src/questions/13-persistent-identifier.html.j2:31
+#: src/questions/13-persistent-identifier.html.j2:178
+msgctxt "questions/13-persistent-identifier"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:107
+msgctxt "questions/15-required-resources"
+msgid "(no name given)"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:126
+msgctxt "questions/15-required-resources"
+msgid "(no resource name given)"
 msgstr ""
 
 #: src/projects.html.j2:31
@@ -66,9 +162,45 @@ msgctxt "projects"
 msgid "(rejected)"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:341
+#: src/post-project-archive.html.j2:89 src/questions/02-what-data.html.j2:340
+#: src/questions/13-persistent-identifier.html.j2:120
+#: src/questions/13-persistent-identifier.html.j2:121
 #: src/questions/15-required-resources.html.j2:184
 msgid ", "
+msgstr ""
+
+#: src/contributors.html.j2:48
+msgctxt "contributors"
+msgid ", "
+msgstr ""
+
+#: src/quality-control.html.j2:41 src/quality-control.html.j2:42
+msgctxt "quality-control"
+msgid ", "
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:440
+msgctxt "questions/01-how-data"
+msgid ", "
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:90
+#: src/questions/10-share-restrictions.html.j2:110
+#: src/questions/10-share-restrictions.html.j2:111
+msgctxt "questions/10-share-restrictions"
+msgid "."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:111
+#: src/questions/11-data-preservation.html.j2:112
+#: src/questions/11-data-preservation.html.j2:143
+msgctxt "questions/11-data-preservation"
+msgid "."
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:144
+msgctxt "questions/11-data-preservation"
+msgid ". "
 msgstr ""
 
 #: src/questions/01-how-data.html.j2:3
@@ -146,7 +278,36 @@ msgctxt "questions/09-ethical-issues"
 msgid "9. What ethical issues and codes of conduct are there, and how will they be taken into account?"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:139
+#: src/contributors.html.j2:48
+msgctxt "contributors"
+msgid ": "
+msgstr ""
+
+#: src/projects.html.j2:33
+msgctxt "projects"
+msgid ": "
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:53
+#: src/questions/10-share-restrictions.html.j2:90
+#: src/questions/10-share-restrictions.html.j2:110
+msgctxt "questions/10-share-restrictions"
+msgid ": "
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:111
+#: src/questions/11-data-preservation.html.j2:143
+#: src/questions/11-data-preservation.html.j2:215
+msgctxt "questions/11-data-preservation"
+msgid ": "
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:215
+msgctxt "questions/11-data-preservation"
+msgid ": (no name given)"
+msgstr ""
+
+#: src/questions/11-data-preservation.html.j2:140
 msgctxt "questions/11-data-preservation"
 msgid "<em>General-purpose repository</em>"
 msgstr ""
@@ -156,7 +317,7 @@ msgctxt "questions/01-how-data"
 msgid "<p class=\"answer-lead\"><strong>Shared arrangements</strong></p>"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:312
+#: src/questions/06-access-security.html.j2:313
 msgctxt "questions/06-access-security"
 msgid "<p class=\"answer-reference\"><a href=\"#q-store-backup\">See question 5 for archival and backup arrangements.</a></p>"
 msgstr ""
@@ -197,7 +358,7 @@ msgctxt "questions/15-required-resources"
 msgid "<p class=\"data-gap\" data-fact-id=\"repository-charges\" data-status=\"missing\"><strong>Information not provided:</strong> whether repository service charges will be incurred.</p>"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:135
+#: src/questions/11-data-preservation.html.j2:136
 msgctxt "questions/11-data-preservation"
 msgid "<p class=\"data-gap\" data-fact-id=\"repository-contact-arrangements\" data-status=\"missing\">The other repository contact arrangements have not been described.</p>"
 msgstr ""
@@ -222,7 +383,12 @@ msgctxt "questions/01-how-data"
 msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"new-data\" data-status=\"missing\"><strong>Information not provided:</strong> whether the project will collect or produce new instrument data.</p>"
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:481
+#: src/questions/01-how-data.html.j2:492 src/questions/01-how-data.html.j2:495
+msgctxt "questions/01-how-data"
+msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance\" data-status=\"missing\"><strong>Information not provided:</strong> how data provenance will be documented.</p>"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:483
 msgctxt "questions/01-how-data"
 msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"provenance-detail\" data-status=\"missing\"><strong>Information not provided:</strong> the other arrangement that will document data provenance.</p>"
 msgstr ""
@@ -232,7 +398,7 @@ msgctxt "questions/01-how-data"
 msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"reuse-sources\" data-status=\"missing\"><strong>Information not provided:</strong> the existing datasets considered for re-use, including any sources that were considered but discarded.</p>"
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:452
+#: src/questions/01-how-data.html.j2:454
 msgctxt "questions/01-how-data"
 msgid "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"reuse-sources\" data-status=\"missing\"><strong>Information not provided:</strong> whether existing data will be re-used, including constraints or reasons for discarding candidate sources.</p>"
 msgstr ""
@@ -402,7 +568,7 @@ msgctxt "questions/13-persistent-identifier"
 msgid "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">The repository will assign the persistent identifier.</span></p>"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:133
+#: src/questions/11-data-preservation.html.j2:134
 msgctxt "questions/11-data-preservation"
 msgid "<p data-fact-id=\"repository-contact-arrangements\" data-status=\"complete\">Other arrangements have been made for contacting the repository.</p>"
 msgstr ""
@@ -530,7 +696,7 @@ msgctxt "questions/15-required-resources"
 msgid "<p>Other funding arrangements are planned.</p>"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:128
+#: src/questions/11-data-preservation.html.j2:129
 msgctxt "questions/11-data-preservation"
 msgid "<p>Other repository contact arrangements:</p>"
 msgstr ""
@@ -598,12 +764,12 @@ msgctxt "questions/09-ethical-issues"
 msgid "<span data-fact-id=\"ethical-informed-consent-collected\" data-status=\"explicit-no\">Informed consent has not been collected from the research subjects.</span>"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:154
+#: src/questions/11-data-preservation.html.j2:155
 msgctxt "questions/11-data-preservation"
 msgid "<span data-requirement-id=\"SE-5b\" data-fact-id=\"repository-destination\" data-status=\"missing\">The repository for this distribution has not been specified.</span>"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:152
+#: src/questions/11-data-preservation.html.j2:153
 msgctxt "questions/11-data-preservation"
 msgid "<span data-requirement-id=\"SE-5b\" data-fact-id=\"repository-destination\" data-status=\"needs-review\">The selected repository type cannot be described by this template.</span>"
 msgstr ""
@@ -613,7 +779,7 @@ msgctxt "questions/01-how-data"
 msgid "<strong class=\"item-label\">(no name given)</strong>"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:206
+#: src/questions/10-share-restrictions.html.j2:207
 #, python-format
 msgctxt "questions/10-share-restrictions"
 msgid "<strong>Distribution %(loop_index)s</strong>"
@@ -633,6 +799,39 @@ msgstr ""
 #: src/questions/13-persistent-identifier.html.j2:53
 msgctxt "questions/13-persistent-identifier"
 msgid "<strong>General-purpose repository</strong>"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:156
+msgctxt "questions/15-required-resources"
+msgid "<strong>Information not provided:</strong> budgeted amount and currency."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:156
+msgctxt "questions/15-required-resources"
+msgid "<strong>Information not provided:</strong> budgeted amount."
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:156
+msgctxt "questions/15-required-resources"
+msgid "<strong>Information not provided:</strong> currency."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:60
+#: src/questions/05-store-backup.html.j2:74
+msgctxt "questions/05-store-backup"
+msgid "<strong>Information not provided:</strong> how a total loss of data will be prevented."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:71
+#: src/questions/05-store-backup.html.j2:75
+msgctxt "questions/05-store-backup"
+msgid "<strong>Information not provided:</strong> how data in and outside the shared workspace will be backed up."
+msgstr ""
+
+#: src/questions/05-store-backup.html.j2:43
+#: src/questions/05-store-backup.html.j2:46
+msgctxt "questions/05-store-backup"
+msgid "<strong>Information not provided:</strong> how storage capacity needs will change during the project."
 msgstr ""
 
 #: src/questions/15-required-resources.html.j2:192
@@ -665,17 +864,17 @@ msgctxt "questions/08-copyright-ipr"
 msgid "A fixed embargo period cannot be used because some restricted data must remain closed indefinitely."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:183
+#: src/questions/02-what-data.html.j2:182
 msgctxt "questions/02-what-data"
 msgid "A member of the project team will perform the data entry."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:259
+#: src/questions/11-data-preservation.html.j2:260
 msgctxt "questions/11-data-preservation"
 msgid "A participating department will cover the repository service fees."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:261
+#: src/questions/11-data-preservation.html.j2:262
 msgctxt "questions/11-data-preservation"
 msgid "A participating institute will cover the repository service fees."
 msgstr ""
@@ -685,7 +884,7 @@ msgctxt "post-project-archive"
 msgid "A principal investigator involved in the project will decide on an extension."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:181
+#: src/questions/02-what-data.html.j2:180
 msgctxt "questions/02-what-data"
 msgid "A specialized team will perform the data entry."
 msgstr ""
@@ -695,17 +894,17 @@ msgctxt "questions/07-personal-data"
 msgid "Access procedure to personal data"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:174
+#: src/questions/10-share-restrictions.html.j2:175
 msgctxt "questions/10-share-restrictions"
 msgid "Access requests will follow a specialized process."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:262
+#: src/questions/06-access-security.html.j2:263
 msgctxt "questions/06-access-security"
 msgid "Access to data during research"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:143
+#: src/questions/10-share-restrictions.html.j2:144
 msgctxt "questions/10-share-restrictions"
 msgid "Access to this distribution is subject to restrictions."
 msgstr ""
@@ -740,7 +939,7 @@ msgctxt "questions/09-ethical-issues"
 msgid "According to the questionnaire, this project does not require ethical approval."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:83
+#: src/questions/06-access-security.html.j2:84
 msgctxt "questions/06-access-security"
 msgid "Accounts on laptops are password-protected."
 msgstr ""
@@ -761,23 +960,28 @@ msgctxt "questions/15-required-resources"
 msgid "Additional specialist expertise is required. New staff will be recruited."
 msgstr ""
 
+#: src/contributors.html.j2:51
+msgctxt "contributors"
+msgid "Affiliation:"
+msgstr ""
+
 #: src/contributors.html.j2:62
 #, python-format
 msgctxt "contributors"
 msgid "Affiliation: <span class=\"affiliation\">%(dc_project_created_by_affiliation)s</span>"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:78
+#: src/questions/06-access-security.html.j2:79
 msgctxt "questions/06-access-security"
 msgid "All data carriers are encrypted."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:88
+#: src/questions/06-access-security.html.j2:89
 msgctxt "questions/06-access-security"
 msgid "All data centres that store project data hold appropriate certifications."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:177
+#: src/questions/02-what-data.html.j2:176
 msgctxt "questions/02-what-data"
 msgid "All data in this dataset will be captured immediately in digital form."
 msgstr ""
@@ -797,17 +1001,17 @@ msgctxt "questions/05-store-backup"
 msgid "All essential data will also be stored elsewhere to prevent a total loss of data."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:248
+#: src/questions/06-access-security.html.j2:249
 msgctxt "questions/06-access-security"
 msgid "All personal data will be anonymized as early as possible."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:246
+#: src/questions/06-access-security.html.j2:247
 msgctxt "questions/06-access-security"
 msgid "All personal data will be collected anonymously."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:228
+#: src/questions/06-access-security.html.j2:229
 msgctxt "questions/06-access-security"
 msgid "All personal data will be processed in pseudonymized form only."
 msgstr ""
@@ -822,12 +1026,12 @@ msgctxt "questions/05-store-backup"
 msgid "All project data stored outside the workspace will be adequately backed up."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:264
+#: src/questions/06-access-security.html.j2:265
 msgctxt "questions/06-access-security"
 msgid "All project members, and no one else, have read and write access to the data."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:93
+#: src/questions/06-access-security.html.j2:94
 msgctxt "questions/06-access-security"
 msgid "All project web services are accessible through HTTPS."
 msgstr ""
@@ -918,22 +1122,43 @@ msgctxt "header"
 msgid "Based on"
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:418
+#: src/post-project-archive.html.j2:89
+#, python-format
+msgctxt "post-project-archive"
+msgid "Basis for extending the archival period: %(basis)s."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:391
 msgctxt "questions/01-how-data"
-msgid "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others through a standard repository."
+msgid "Before reuse, we need to harmonize existing data from different sources and will make the results available to others."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:393
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we need to harmonize existing data from different sources but will not make the results available to others."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:395
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we need to harmonize existing data from different sources."
 msgstr ""
 
 #: src/questions/01-how-data.html.j2:420
 msgctxt "questions/01-how-data"
-msgid "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others."
+msgid "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others through a standard repository."
 msgstr ""
 
 #: src/questions/01-how-data.html.j2:422
 msgctxt "questions/01-how-data"
-msgid "Before reuse, we will need to convert the data into a machine-readable form but will not make this version available to others."
+msgid "Before reuse, we will need to convert the data into a machine-readable form and will make this version available to others."
 msgstr ""
 
 #: src/questions/01-how-data.html.j2:424
+msgctxt "questions/01-how-data"
+msgid "Before reuse, we will need to convert the data into a machine-readable form but will not make this version available to others."
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:426
 msgctxt "questions/01-how-data"
 msgid "Before reuse, we will need to convert the data into a machine-readable form."
 msgstr ""
@@ -943,7 +1168,7 @@ msgctxt "questions/15-required-resources"
 msgid "Budget"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:287
+#: src/questions/11-data-preservation.html.j2:288
 msgctxt "questions/11-data-preservation"
 msgid "Budget for making data or other research outputs FAIR:"
 msgstr ""
@@ -961,6 +1186,16 @@ msgstr ""
 #: src/questions/05-store-backup.html.j2:114
 msgctxt "questions/05-store-backup"
 msgid "Changes to archived data will require re-archival."
+msgstr ""
+
+#: src/header.html.j2:24
+msgctxt "header"
+msgid "Contact people"
+msgstr ""
+
+#: src/header.html.j2:24
+msgctxt "header"
+msgid "Contact person"
 msgstr ""
 
 #: src/macros.html.j2:154
@@ -984,6 +1219,12 @@ msgstr ""
 #, python-format
 msgctxt "document-provenance"
 msgid "Created on %(dc_document_created_at)s"
+msgstr ""
+
+#: src/questions/15-required-resources.html.j2:154
+#, python-format
+msgctxt "questions/15-required-resources"
+msgid "Currency: %(currency)s."
 msgstr ""
 
 #: src/questions/03-docs-metadata.html.j2:43
@@ -1028,22 +1269,28 @@ msgctxt "questions/02-what-data"
 msgid "Data collection for <strong>%(collectionName)s</strong> has not yet been described."
 msgstr ""
 
+#: src/questions/02-what-data.html.j2:57
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "Data collection for <strong>%(collectionName)s</strong>: %(collectionSentences)s"
+msgstr ""
+
 #: src/questions/09-ethical-issues.html.j2:260
 msgctxt "questions/09-ethical-issues"
 msgid "Data concerning vulnerable data subjects, including minors, employees, elderly people, mentally incapacitated people, and patients receiving care."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:267
+#: src/questions/02-what-data.html.j2:266
 #, python-format
 msgid "Data format %(loop_index)s."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:265
+#: src/questions/02-what-data.html.j2:264
 #, python-format
 msgid "Data format: <strong>%(formatName)s</strong>."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:239
+#: src/questions/02-what-data.html.j2:238
 msgid "Data formats and types"
 msgstr ""
 
@@ -1052,12 +1299,12 @@ msgctxt "questions/03-docs-metadata"
 msgid "Data in the database will be read-only."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:179
+#: src/questions/02-what-data.html.j2:178
 msgctxt "questions/02-what-data"
 msgid "Data in this dataset will first be captured on paper."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:283
+#: src/questions/10-share-restrictions.html.j2:284
 msgctxt "questions/10-share-restrictions"
 msgid "Data not subject to legal restrictions will be released openly after a fixed time period."
 msgstr ""
@@ -1143,6 +1390,11 @@ msgctxt "questions/15-required-resources"
 msgid "Data-management budget"
 msgstr ""
 
+#: src/questions/09-ethical-issues.html.j2:33
+msgctxt "questions/09-ethical-issues"
+msgid "Dataset"
+msgstr ""
+
 #: src/questions/05-store-backup.html.j2:25
 msgctxt "questions/05-store-backup"
 msgid "Dedicated specialists will operate the shared workspace."
@@ -1169,7 +1421,7 @@ msgctxt "questions/12-access-data"
 msgid "Documentation for this software will not be included in the metadata."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:89
+#: src/questions/10-share-restrictions.html.j2:90
 msgctxt "questions/10-share-restrictions"
 msgid "Domain-specific repository"
 msgstr ""
@@ -1209,12 +1461,12 @@ msgctxt "questions/09-ethical-issues"
 msgid "Evaluation or scoring concerning work performance, economic situation, health, personal preferences or interests, reliability or behaviour, location, or movements."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:270
+#: src/questions/06-access-security.html.j2:271
 msgctxt "questions/06-access-security"
 msgid "Everyone at the institute can read the data; only project members can request write access."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:266
+#: src/questions/06-access-security.html.j2:267
 msgctxt "questions/06-access-security"
 msgid "Everyone at the institute has read access to the data; all project members have read and write access."
 msgstr ""
@@ -1234,23 +1486,23 @@ msgctxt "questions/03-docs-metadata"
 msgid "File naming conventions:"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:102
+#: src/questions/10-share-restrictions.html.j2:103
 msgctxt "questions/10-share-restrictions"
 msgid "For repository contact arrangements, see Question 11 under this dataset."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:102
+#: src/questions/10-share-restrictions.html.j2:103
 #, python-format
 msgctxt "questions/10-share-restrictions"
 msgid "For repository contact arrangements, see Question 11, distribution %(loop_index)s of this dataset."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:323
+#: src/questions/10-share-restrictions.html.j2:324
 msgctxt "questions/10-share-restrictions"
 msgid "For the authorization of potential users, we will make special arrangements."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:323
+#: src/questions/10-share-restrictions.html.j2:324
 msgctxt "questions/10-share-restrictions"
 msgid "For the authorization of potential users, we will make special arrangements:"
 msgstr ""
@@ -1260,12 +1512,12 @@ msgctxt "questions/01-how-data"
 msgid "For this dataset, we are using the following instruments:"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:139
+#: src/questions/10-share-restrictions.html.j2:140
 msgctxt "questions/10-share-restrictions"
 msgid "Freely available for any use (public domain or CC0)."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:141
+#: src/questions/10-share-restrictions.html.j2:142
 msgctxt "questions/10-share-restrictions"
 msgid "Freely available with an obligation to cite the source (e.g. CC BY)."
 msgstr ""
@@ -1295,7 +1547,7 @@ msgctxt "questions/15-required-resources"
 msgid "Funding source"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:106
+#: src/questions/10-share-restrictions.html.j2:107
 msgctxt "questions/10-share-restrictions"
 msgid "General-purpose repository"
 msgstr ""
@@ -1327,9 +1579,14 @@ msgctxt "word/versions"
 msgid "History of changes"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:181
+#: src/questions/10-share-restrictions.html.j2:182
 msgctxt "questions/10-share-restrictions"
 msgid "How to request restricted access has not been specified."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:48
+msgctxt "questions/10-share-restrictions"
+msgid "Identifier"
 msgstr ""
 
 #: src/questions/10-share-restrictions.html.j2:58
@@ -1337,7 +1594,7 @@ msgctxt "questions/10-share-restrictions"
 msgid "Identifier information for this dataset:"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:240
+#: src/questions/06-access-security.html.j2:241
 msgctxt "questions/06-access-security"
 msgid "Independent party that keeps the pseudonymization keys:"
 msgstr ""
@@ -1418,7 +1675,13 @@ msgctxt "questions/03-docs-metadata"
 msgid "Information not provided: why the metadata will not be openly available."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:341
+#: src/questions/13-persistent-identifier.html.j2:120
+#, python-format
+msgctxt "questions/13-persistent-identifier"
+msgid "Information still needed: %(fields)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:340
 #, python-format
 msgid "Information still needed: %(formatGaps)s."
 msgstr ""
@@ -1470,7 +1733,7 @@ msgctxt "quality-control"
 msgid "It has not been specified whether quality control processes will be used for <strong>%(qualityName)s</strong>."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:188
+#: src/questions/10-share-restrictions.html.j2:189
 msgctxt "questions/10-share-restrictions"
 msgid "It has not been specified whether the access conditions will be included in open metadata."
 msgstr ""
@@ -1485,7 +1748,7 @@ msgctxt "questions/12-access-data"
 msgid "It has not yet been specified whether software is required to use this dataset."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:215
+#: src/questions/10-share-restrictions.html.j2:216
 msgctxt "questions/10-share-restrictions"
 msgid "It has not yet been specified whether this dataset will be published."
 msgstr ""
@@ -1510,12 +1773,24 @@ msgctxt "questions/09-ethical-issues"
 msgid "It involves human subjects."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:271
+#: src/questions/02-what-data.html.j2:270
 msgid "It is a standardized format suitable for long-term archiving."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:273
+#: src/questions/02-what-data.html.j2:272
 msgid "It is a standardized format."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:236
+#: src/questions/08-copyright-ipr.html.j2:264
+msgctxt "questions/08-copyright-ipr"
+msgid "It is available under specific restrictions, which we will follow in our project."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:236
+#: src/questions/08-copyright-ipr.html.j2:264
+msgctxt "questions/08-copyright-ipr"
+msgid "It is available under specific restrictions, which we will follow in our project:"
 msgstr ""
 
 #: src/questions/09-ethical-issues.html.j2:345
@@ -1576,7 +1851,7 @@ msgctxt "post-project-archive"
 msgid "Library or archive staff will decide on an extension."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:136
+#: src/questions/10-share-restrictions.html.j2:137
 #, python-format
 msgctxt "questions/10-share-restrictions"
 msgid "Licence start date: %(licenseDate)s."
@@ -1617,6 +1892,11 @@ msgctxt "questions/03-docs-metadata"
 msgid "Modifications will be made by <em>Expiring</em> the existing data and <em>Adding</em> updated data."
 msgstr ""
 
+#: src/projects.html.j2:39 src/projects.html.j2:40 src/projects.html.j2:41
+msgctxt "projects"
+msgid "N/A"
+msgstr ""
+
 #: src/reuse-rightsholder.html.j2:33
 msgctxt "reuse-rightsholder"
 msgid "No application for data access is required."
@@ -1627,7 +1907,7 @@ msgctxt "questions/08-copyright-ipr"
 msgid "No embargo period is needed because all data will be made openly available."
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:450
+#: src/questions/01-how-data.html.j2:452
 msgctxt "questions/01-how-data"
 msgid "No existing datasets will be re-used."
 msgstr ""
@@ -1673,24 +1953,29 @@ msgctxt "macros"
 msgid "Non-reference dataset"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:80
+#: src/questions/06-access-security.html.j2:81
 msgctxt "questions/06-access-security"
 msgid "Not all data carriers are encrypted."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:90
+#: src/questions/06-access-security.html.j2:91
 msgctxt "questions/06-access-security"
 msgid "Not all data centres that store project data hold appropriate certifications."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:85
+#: src/questions/06-access-security.html.j2:86
 msgctxt "questions/06-access-security"
 msgid "Not all laptop accounts are password-protected."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:95
+#: src/questions/06-access-security.html.j2:96
 msgctxt "questions/06-access-security"
 msgid "Not all project web services are accessible through HTTPS."
+msgstr ""
+
+#: src/macros.html.j2:32 src/macros.html.j2:44
+msgctxt "macros"
+msgid "ORCID:"
 msgstr ""
 
 #: src/macros.html.j2:38
@@ -1729,11 +2014,11 @@ msgctxt "post-project-archive"
 msgid "One or more participating institutes have budgeted for this long-term storage service."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:297
+#: src/questions/02-what-data.html.j2:296
 msgid "Only a small volume of data is expected."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:268
+#: src/questions/06-access-security.html.j2:269
 msgctxt "questions/06-access-security"
 msgid "Only project members have read access; only designated project members can modify the data."
 msgstr ""
@@ -1748,12 +2033,12 @@ msgctxt "questions/10-share-restrictions"
 msgid "Open access: this distribution will be shared with anyone."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:270
+#: src/questions/11-data-preservation.html.j2:271
 msgctxt "questions/11-data-preservation"
 msgid "Other arrangements are planned for paying repository service fees."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:267
+#: src/questions/11-data-preservation.html.j2:268
 msgctxt "questions/11-data-preservation"
 msgid "Other arrangements for paying repository costs:"
 msgstr ""
@@ -1763,7 +2048,7 @@ msgctxt "post-project-archive"
 msgid "Other arrangements for the archive's minimum lifetime:"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:193
+#: src/questions/02-what-data.html.j2:192
 msgctxt "questions/02-what-data"
 msgid "Other arrangements have been made for data entry."
 msgstr ""
@@ -1773,7 +2058,7 @@ msgctxt "questions/02-what-data"
 msgid "Other arrangements have been made for ownership of this dataset."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:209
+#: src/questions/02-what-data.html.j2:208
 msgctxt "questions/02-what-data"
 msgid "Other data-entry arrangements:"
 msgstr ""
@@ -1810,7 +2095,7 @@ msgctxt "questions/07-personal-data"
 msgid "Other technical and procedural safeguards:"
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:468
+#: src/questions/01-how-data.html.j2:470
 msgctxt "questions/01-how-data"
 msgid "Our computing workflow system records provenance information about the data analysis."
 msgstr ""
@@ -1820,12 +2105,12 @@ msgctxt "questions/08-copyright-ipr"
 msgid "Our consortium agreement defines ownership of intellectual property rights."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:148
+#: src/questions/11-data-preservation.html.j2:149
 msgctxt "questions/11-data-preservation"
 msgid "Our institutional repository."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:146
+#: src/questions/11-data-preservation.html.j2:147
 msgctxt "questions/11-data-preservation"
 msgid "Our national repository."
 msgstr ""
@@ -1835,22 +2120,22 @@ msgctxt "contributors"
 msgid "People and responsibilities"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:320
+#: src/questions/10-share-restrictions.html.j2:321
 msgctxt "questions/10-share-restrictions"
 msgid "People can apply to an existing data access committee."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:313
+#: src/questions/10-share-restrictions.html.j2:314
 msgctxt "questions/10-share-restrictions"
 msgid "People can apply to one of the project members."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:315
+#: src/questions/10-share-restrictions.html.j2:316
 msgctxt "questions/10-share-restrictions"
 msgid "People can apply to the data access committee that we will set up."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:318
+#: src/questions/10-share-restrictions.html.j2:319
 msgctxt "questions/10-share-restrictions"
 msgid "People can apply to the following data access committee:"
 msgstr ""
@@ -1878,7 +2163,7 @@ msgstr ""
 msgid "Please specify a time unit for the retention period."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:299
+#: src/questions/06-access-security.html.j2:300
 msgctxt "questions/06-access-security"
 msgid "Policies and Procedures"
 msgstr ""
@@ -1893,18 +2178,18 @@ msgctxt "questions/13-persistent-identifier"
 msgid "Potential uses in other fields:"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:169
+#: src/questions/11-data-preservation.html.j2:170
 msgctxt "questions/11-data-preservation"
 msgid "Preservation destinations by distribution:"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:219
+#: src/questions/11-data-preservation.html.j2:220
 #, python-format
 msgctxt "questions/11-data-preservation"
 msgid "Preservation policy: see %(policyReference)s."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:306
+#: src/questions/11-data-preservation.html.j2:307
 msgctxt "questions/11-data-preservation"
 msgid "Preservation selection still requires review: publication decisions and archive renewal criteria do not by themselves explain which datasets and versions must be retained or destroyed."
 msgstr ""
@@ -1940,24 +2225,34 @@ msgctxt "projects"
 msgid "Project acronym"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:75
+#: src/questions/06-access-security.html.j2:76
 msgctxt "questions/06-access-security"
 msgid "Project members carry data with them (e.g. on laptops, USB sticks, or other external media)."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:73
+#: src/questions/06-access-security.html.j2:74
 msgctxt "questions/06-access-security"
 msgid "Project members do not carry data with them (e.g. on laptops, USB sticks, or other external media)."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:98
+#: src/questions/06-access-security.html.j2:69
+msgctxt "questions/06-access-security"
+msgid "Project members do not store data or software on computers in the lab or external hard drives connected to those computers."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:99
 msgctxt "questions/06-access-security"
 msgid "Project members have been instructed about both generic and specific risks to the project."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:100
+#: src/questions/06-access-security.html.j2:101
 msgctxt "questions/06-access-security"
 msgid "Project members have not received instruction covering both generic and project-specific risks."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:71
+msgctxt "questions/06-access-security"
+msgid "Project members store data or software on computers in the lab or external hard drives connected to those computers."
 msgstr ""
 
 #: src/questions/05-store-backup.html.j2:63
@@ -1981,17 +2276,17 @@ msgctxt "post-project-archive"
 msgid "Project-wide cold storage after the project"
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:486
+#: src/questions/01-how-data.html.j2:488
 msgctxt "questions/01-how-data"
 msgid "Provenance"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:232
+#: src/questions/06-access-security.html.j2:233
 msgctxt "questions/06-access-security"
 msgid "Pseudonymization is performed by an independent party to enable data linkage."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:230
+#: src/questions/06-access-security.html.j2:231
 msgctxt "questions/06-access-security"
 msgid "Pseudonymization is performed within the project, and only a limited number of people can access the re-identification keys."
 msgstr ""
@@ -2023,22 +2318,34 @@ msgctxt "quality-control"
 msgid "Quality control is planned for <strong>%(qualityName)s</strong>."
 msgstr ""
 
+#: src/quality-control.html.j2:42
+#, python-format
+msgctxt "quality-control"
+msgid "Quality control measures for <strong>%(qualityName)s</strong>: %(qualityMethods)s."
+msgstr ""
+
+#: src/quality-control.html.j2:41
+#, python-format
+msgctxt "quality-control"
+msgid "Quality control measures planned for <strong>%(qualityName)s</strong>: <span data-fact-id=\"quality-methods\" data-status=\"complete\">%(qualityMethods)s</span> and other quality control methods."
+msgstr ""
+
 #: src/questions/01-how-data.html.j2:99
 msgctxt "questions/01-how-data"
 msgid "Re-used datasets"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:170
+#: src/questions/10-share-restrictions.html.j2:171
 msgctxt "questions/10-share-restrictions"
 msgid "Re-users can request access through the project's Data Access Committee."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:168
+#: src/questions/10-share-restrictions.html.j2:169
 msgctxt "questions/10-share-restrictions"
 msgid "Re-users will be able to get access by request to the contact person."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:315
+#: src/questions/02-what-data.html.j2:314
 msgid "Reason for using a non-standard format:"
 msgstr ""
 
@@ -2052,7 +2359,7 @@ msgctxt "macros"
 msgid "Reference dataset"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:244
+#: src/questions/10-share-restrictions.html.j2:245
 msgctxt "questions/10-share-restrictions"
 msgid "References to other datasets:"
 msgstr ""
@@ -2072,7 +2379,7 @@ msgctxt "research-quality"
 msgid "Repeating jobs across computing infrastructures"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:297
+#: src/questions/11-data-preservation.html.j2:298
 msgctxt "questions/11-data-preservation"
 msgid "Repository costs and publication preparation"
 msgstr ""
@@ -2098,7 +2405,7 @@ msgctxt "questions/15-required-resources"
 msgid "Resource and purpose"
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:192
+#: src/questions/10-share-restrictions.html.j2:193
 #, python-format
 msgctxt "questions/10-share-restrictions"
 msgid "Restriction details: %(restrictionLink)s."
@@ -2112,6 +2419,16 @@ msgstr ""
 #: src/questions/08-copyright-ipr.html.j2:182
 msgctxt "questions/08-copyright-ipr"
 msgid "Rights to the collected data are arranged in another way."
+msgstr ""
+
+#: src/contributors.html.j2:48
+msgctxt "contributors"
+msgid "Role"
+msgstr ""
+
+#: src/contributors.html.j2:48
+msgctxt "contributors"
+msgid "Roles"
 msgstr ""
 
 #: src/content.html.j2:3
@@ -2149,7 +2466,8 @@ msgctxt "questions/09-ethical-issues"
 msgid "Sensitive data or data of a highly personal nature, including racial or ethnic origin, political opinions, religious or philosophical beliefs, trade union membership, genetic data, health data, biometric data, or sexual orientation."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:230
+#: src/questions/11-data-preservation.html.j2:219
+#: src/questions/11-data-preservation.html.j2:231
 #, python-format
 msgctxt "questions/11-data-preservation"
 msgid "Shared preservation policy %(group_number)s"
@@ -2314,17 +2632,17 @@ msgctxt "post-project-archive"
 msgid "The basis for deciding on an extension has not been specified."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:164
+#: src/questions/10-share-restrictions.html.j2:165
 msgctxt "questions/10-share-restrictions"
 msgid "The conditions of restricted access have not been provided."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:184
+#: src/questions/10-share-restrictions.html.j2:185
 msgctxt "questions/10-share-restrictions"
 msgid "The conditions will be published as part of open metadata."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:186
+#: src/questions/10-share-restrictions.html.j2:187
 msgctxt "questions/10-share-restrictions"
 msgid "The conditions will not be published as part of open metadata."
 msgstr ""
@@ -2359,6 +2677,16 @@ msgctxt "questions/01-how-data"
 msgid "The data can be used directly without format conversion."
 msgstr ""
 
+#: src/questions/08-copyright-ipr.html.j2:61
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of commercial considerations unrelated to patents."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:61
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of commercial considerations unrelated to patents:"
+msgstr ""
+
 #: src/questions/08-copyright-ipr.html.j2:57
 msgctxt "questions/08-copyright-ipr"
 msgid "The data cannot be made fully open because of legal restrictions."
@@ -2367,6 +2695,16 @@ msgstr ""
 #: src/questions/08-copyright-ipr.html.j2:59
 msgctxt "questions/08-copyright-ipr"
 msgid "The data cannot be made fully open because of patent-related commercial considerations."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:66
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of reasons other than publishing a paper."
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:66
+msgctxt "questions/08-copyright-ipr"
+msgid "The data cannot be made fully open because of reasons other than publishing a paper:"
 msgstr ""
 
 #: src/questions/08-copyright-ipr.html.j2:64
@@ -2454,6 +2792,12 @@ msgctxt "publication-summary"
 msgid "The dataset will be published when the project is completed."
 msgstr ""
 
+#: src/questions/10-share-restrictions.html.j2:286
+#, python-format
+msgctxt "questions/10-share-restrictions"
+msgid "The embargo period will be %(period)s"
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:54
 msgctxt "questions/02-what-data"
 msgid "The equipment is less well described or not completely standard, so we will need to take extra care documenting the process."
@@ -2464,12 +2808,12 @@ msgctxt "questions/02-what-data"
 msgid "The equipment is very well described and known."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:309
+#: src/questions/02-what-data.html.j2:308
 #, python-format
 msgid "The estimated average file size is %(formatAverageQuantity)s."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:300
+#: src/questions/02-what-data.html.j2:299
 #, python-format
 msgid "The estimated data volume is %(formatTotalQuantity)s."
 msgstr ""
@@ -2499,6 +2843,12 @@ msgctxt "post-project-archive"
 msgid "The grant will pay for this long-term storage."
 msgstr ""
 
+#: src/questions/10-share-restrictions.html.j2:197
+#: src/questions/10-share-restrictions.html.j2:202
+msgctxt "questions/10-share-restrictions"
+msgid "The licence or conditions of use have not been provided."
+msgstr ""
+
 #: src/questions/11-data-preservation.html.j2:68
 msgctxt "questions/11-data-preservation"
 msgid "The metadata will be available even when the data no longer exists."
@@ -2509,7 +2859,7 @@ msgctxt "questions/11-data-preservation"
 msgid "The metadata will not remain available once the data no longer exists."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:140
+#: src/questions/02-what-data.html.j2:139
 msgctxt "questions/02-what-data"
 msgid "The non-equipment datasets are:"
 msgstr ""
@@ -2544,12 +2894,18 @@ msgctxt "post-project-archive"
 msgid "The person or team responsible for deciding on an extension has not been specified."
 msgstr ""
 
+#: src/questions/06-access-security.html.j2:182
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "The potential impact of %(risks)s is small"
+msgstr ""
+
 #: src/questions/09-ethical-issues.html.j2:197
 msgctxt "questions/09-ethical-issues"
 msgid "The procedure for obtaining consent from data subjects is as follows:"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:257
+#: src/questions/11-data-preservation.html.j2:258
 msgctxt "questions/11-data-preservation"
 msgid "The project budget includes the repository service fees."
 msgstr ""
@@ -2559,7 +2915,7 @@ msgctxt "questions/08-copyright-ipr"
 msgid "The project data are not protected by copyright and therefore have no copyright owner."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:216
+#: src/questions/02-what-data.html.j2:215
 msgctxt "questions/02-what-data"
 msgid "The project includes data capture that does not use measurement equipment."
 msgstr ""
@@ -2619,7 +2975,7 @@ msgctxt "questions/01-how-data"
 msgid "The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:212
+#: src/questions/10-share-restrictions.html.j2:213
 msgctxt "questions/10-share-restrictions"
 msgid "The publication locations have not been listed."
 msgstr ""
@@ -2644,12 +3000,12 @@ msgctxt "post-project-archive"
 msgid "The reason the archival period cannot be extended has not been specified."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:248
+#: src/questions/11-data-preservation.html.j2:249
 msgctxt "questions/11-data-preservation"
 msgid "The repositories we use do not charge for their services."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:119
+#: src/questions/10-share-restrictions.html.j2:120
 msgctxt "questions/10-share-restrictions"
 msgid "The repository for this distribution has not been provided."
 msgstr ""
@@ -2703,6 +3059,12 @@ msgctxt "reuse-rightsholder"
 msgid "The rights holder will not collaborate with us on this research."
 msgstr ""
 
+#: src/questions/06-access-security.html.j2:186
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "The risk of %(risks)s is acceptably low"
+msgstr ""
+
 #: src/questions/03-docs-metadata.html.j2:75
 msgctxt "questions/03-docs-metadata"
 msgid "The selected data-dictionary option cannot be represented by this template; please review it."
@@ -2733,7 +3095,7 @@ msgctxt "questions/05-store-backup"
 msgid "The shared workspace will not be operated by dedicated specialists."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:178
+#: src/questions/10-share-restrictions.html.j2:179
 msgctxt "questions/10-share-restrictions"
 msgid "The specialized access process has not been described."
 msgstr ""
@@ -2946,12 +3308,12 @@ msgctxt "ethics-data-summary"
 msgid "This dataset does not contain sensitive data."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:258
+#: src/questions/10-share-restrictions.html.j2:259
 msgctxt "questions/10-share-restrictions"
 msgid "This dataset has no qualified references to other datasets."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:256
+#: src/questions/10-share-restrictions.html.j2:257
 msgctxt "questions/10-share-restrictions"
 msgid "This dataset has qualified references to other datasets."
 msgstr ""
@@ -3021,27 +3383,27 @@ msgctxt "questions/10-share-restrictions"
 msgid "This distribution is not intended for sharing."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:113
+#: src/questions/10-share-restrictions.html.j2:114
 msgctxt "questions/10-share-restrictions"
 msgid "This distribution will be deposited in a national repository."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:117
+#: src/questions/10-share-restrictions.html.j2:118
 msgctxt "questions/10-share-restrictions"
 msgid "This distribution will be deposited in a special-purpose repository for the project."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:115
+#: src/questions/10-share-restrictions.html.j2:116
 msgctxt "questions/10-share-restrictions"
 msgid "This distribution will be deposited in an institutional repository."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:308
+#: src/questions/06-access-security.html.j2:309
 msgctxt "questions/06-access-security"
 msgid "This document does not yet contain an answer about data security and protection of sensitive data."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:309
+#: src/questions/11-data-preservation.html.j2:310
 msgctxt "questions/11-data-preservation"
 msgid "This document does not yet contain an answer about data selection and long-term preservation."
 msgstr ""
@@ -3071,7 +3433,7 @@ msgctxt "questions/04-quality-control"
 msgid "This document does not yet describe data quality checks. Re-used data also need appropriate quality control."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:357
+#: src/questions/10-share-restrictions.html.j2:358
 msgctxt "questions/10-share-restrictions"
 msgid "This document does not yet describe how and when data will be shared, or any restrictions."
 msgstr ""
@@ -3091,48 +3453,48 @@ msgctxt "questions/12-access-data"
 msgid "This document does not yet identify the datasets to be shared or the tools needed to use them."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:236
+#: src/questions/02-what-data.html.j2:235
 msgid "This document does not yet list the data types, formats and estimated volumes."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:290
+#: src/questions/02-what-data.html.j2:289
 msgid "This format is not suitable for long-term archiving, and we do not plan to convert it to a suitable format."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:292
+#: src/questions/02-what-data.html.j2:291
 msgid "This format is not suitable for long-term archiving."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:285
+#: src/questions/02-what-data.html.j2:284
 msgid "This is a suitable format for long-term archiving."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:288
+#: src/questions/02-what-data.html.j2:287
 msgid "This is not a suitable format for long-term archiving; however, we plan to convert it to a suitable format before the end of the project."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:231
+#: src/questions/11-data-preservation.html.j2:232
 #, python-format
 msgctxt "questions/11-data-preservation"
 msgid "This policy applies separately to produced datasets %(policyMemberIndices)s."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:341
+#: src/questions/10-share-restrictions.html.j2:342
 msgctxt "questions/10-share-restrictions"
 msgid "This project does not involve collaboration between different groups or institutions. Therefore, no collaboration agreement for data access is needed."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:350
+#: src/questions/10-share-restrictions.html.j2:351
 msgctxt "questions/10-share-restrictions"
 msgid "This project involves collaboration between different groups and institutions."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:348
+#: src/questions/10-share-restrictions.html.j2:349
 msgctxt "questions/10-share-restrictions"
 msgid "This project involves collaboration between different groups and institutions. A collaboration agreement is in place to specify who can access which project data."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:346
+#: src/questions/10-share-restrictions.html.j2:347
 msgctxt "questions/10-share-restrictions"
 msgid "This project involves collaboration between different groups and institutions. However, no collaboration agreement is in place to specify who can access which project data."
 msgstr ""
@@ -3167,6 +3529,12 @@ msgctxt "questions/12-access-data"
 msgid "This software will not be included."
 msgstr ""
 
+#: src/questions/13-persistent-identifier.html.j2:121
+#, python-format
+msgctxt "questions/13-persistent-identifier"
+msgid "This template cannot interpret the selected answers for: %(fields)s."
+msgstr ""
+
 #: src/questions/15-required-resources.html.j2:12
 msgctxt "questions/15-required-resources"
 msgid "To execute the DMP, additional specialist expertise is required and we have such trained support staff available."
@@ -3177,7 +3545,7 @@ msgctxt "questions/15-required-resources"
 msgid "To execute the DMP, no additional specialist expertise is required."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:267
+#: src/questions/02-what-data.html.j2:266
 #, python-format
 msgid "Unnamed data format %(loop_index)s."
 msgstr ""
@@ -3213,29 +3581,34 @@ msgctxt "reuse-rightsholder"
 msgid "We already have a copy of this dataset."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:99
+#: src/questions/07-personal-data.html.j2:25
+msgctxt "questions/07-personal-data"
+msgid "We are collecting and processing personal data "
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:100
 msgctxt "questions/10-share-restrictions"
 msgid "We are going to contact the repository."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:121
+#: src/questions/11-data-preservation.html.j2:122
 msgctxt "questions/11-data-preservation"
 msgid "We are going to contact the repository."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:276
+#: src/questions/02-what-data.html.j2:275
 msgid "We are not using a standardized format because there is no standardized format for this data type."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:278
+#: src/questions/02-what-data.html.j2:277
 msgid "We are not using a standardized format but it is optimized for processing speed and/or volume."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:280
+#: src/questions/02-what-data.html.j2:279
 msgid "We are not using a standardized format."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:202
+#: src/questions/06-access-security.html.j2:203
 msgctxt "questions/06-access-security"
 msgid "We are not using any personal information."
 msgstr ""
@@ -3250,17 +3623,35 @@ msgctxt "questions/09-ethical-issues"
 msgid "We ask the data subjects for their consent."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:93
+#: src/questions/02-what-data.html.j2:131
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "We collect data from %(first_type)s and %(second_type)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:133
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "We collect data from %(first_type)s, %(second_type)s, and %(third_type)s."
+msgstr ""
+
+#: src/questions/02-what-data.html.j2:129
+#, python-format
+msgctxt "questions/02-what-data"
+msgid "We collect data from %(first_type)s."
+msgstr ""
+
+#: src/questions/10-share-restrictions.html.j2:94
 msgctxt "questions/10-share-restrictions"
 msgid "We do not need to contact the repository in advance because depositing data there is routine for us."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:117
+#: src/questions/11-data-preservation.html.j2:118
 msgctxt "questions/11-data-preservation"
 msgid "We do not need to contact the repository in advance because depositing data there is routine for us."
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:397
+#: src/questions/01-how-data.html.j2:399
 msgctxt "questions/01-how-data"
 msgid "We do not need to harmonize existing data from different sources before reuse."
 msgstr ""
@@ -3286,32 +3677,32 @@ msgctxt "questions/03-docs-metadata"
 msgid "We estimate the storage space that the project will require for all data and software (including temporary storage) to be %(size)s gigabytes."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:305
+#: src/questions/02-what-data.html.j2:304
 #, python-format
 msgid "We expect %(formatsVolumeFiles)s files, with an estimated average size of %(formatAverageQuantity)s."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:307
+#: src/questions/02-what-data.html.j2:306
 #, python-format
 msgid "We expect %(formatsVolumeFiles)s files."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:282
+#: src/questions/11-data-preservation.html.j2:283
 msgctxt "questions/11-data-preservation"
 msgid "We have allocated funds for the time and effort needed to prepare the data for publication."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:96
+#: src/questions/10-share-restrictions.html.j2:97
 msgctxt "questions/10-share-restrictions"
 msgid "We have already contacted the repository."
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:119
+#: src/questions/11-data-preservation.html.j2:120
 msgctxt "questions/11-data-preservation"
 msgid "We have already contacted the repository."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:197
+#: src/questions/02-what-data.html.j2:196
 msgctxt "questions/02-what-data"
 msgid "We have arranged for someone to make this dataset available in digital form."
 msgstr ""
@@ -3326,9 +3717,15 @@ msgctxt "questions/08-copyright-ipr"
 msgid "We have made the following arrangements regarding data ownership:"
 msgstr ""
 
-#: src/questions/11-data-preservation.html.j2:291
+#: src/questions/11-data-preservation.html.j2:292
 msgctxt "questions/11-data-preservation"
 msgid "We have not budgeted for the time and effort needed to prepare the data for publication."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:194
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "We have not considered the possible impact on the project or organization of %(risks)s"
 msgstr ""
 
 #: src/questions/03-docs-metadata.html.j2:232
@@ -3336,7 +3733,7 @@ msgctxt "questions/03-docs-metadata"
 msgid "We have not documented how we manage file versioning for files and folders."
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:199
+#: src/questions/02-what-data.html.j2:198
 msgctxt "questions/02-what-data"
 msgid "We have not yet arranged for someone to make this dataset available in digital form."
 msgstr ""
@@ -3366,7 +3763,17 @@ msgctxt "questions/15-required-resources"
 msgid "We require hardware or software in addition to what is usually available in the institute."
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:479
+#: src/questions/06-access-security.html.j2:235
+msgctxt "questions/06-access-security"
+msgid "We use a specific pseudonymization method."
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:235
+msgctxt "questions/06-access-security"
+msgid "We use a specific pseudonymization method:"
+msgstr ""
+
+#: src/questions/01-how-data.html.j2:481
 msgctxt "questions/01-how-data"
 msgid "We use other arrangements to document data provenance."
 msgstr ""
@@ -3416,6 +3823,24 @@ msgctxt "research-quality"
 msgid "We will cross-check key steps using independently developed tools or workflows to reduce human error."
 msgstr ""
 
+#: src/questions/03-docs-metadata.html.j2:48
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "We will document the data using the %(first_standard)s and %(second_standard)s metadata standards."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:46
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "We will document the data using the %(first_standard)s metadata standard."
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:50
+#, python-format
+msgctxt "questions/03-docs-metadata"
+msgid "We will document the data using the %(first_standard)s, %(second_standard)s, and %(third_standard)s metadata standards."
+msgstr ""
+
 #: src/reuse-rightsholder.html.j2:44
 msgctxt "reuse-rightsholder"
 msgid "We will download or obtain a copy of this dataset."
@@ -3444,6 +3869,12 @@ msgstr ""
 #: src/questions/08-copyright-ipr.html.j2:113
 msgctxt "questions/08-copyright-ipr"
 msgid "We will make use of an existing data committee:"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:190
+#, python-format
+msgctxt "questions/06-access-security"
+msgid "We will mitigate the risk of %(risks)s"
 msgstr ""
 
 #: src/questions/11-data-preservation.html.j2:79
@@ -3491,7 +3922,7 @@ msgctxt "questions/08-copyright-ipr"
 msgid "We will not manage our data according to the principle of being as open as possible."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:334
+#: src/questions/10-share-restrictions.html.j2:335
 msgctxt "questions/10-share-restrictions"
 msgid "We will not permit authenticated access to the data."
 msgstr ""
@@ -3521,7 +3952,7 @@ msgctxt "research-quality"
 msgid "We will not use automated tools to integrate the analysis tools into pipelines and workflows."
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:447
+#: src/questions/01-how-data.html.j2:449
 msgctxt "questions/01-how-data"
 msgid "We will not use existing data that needs to be converted into a machine-readable form before reuse."
 msgstr ""
@@ -3546,7 +3977,7 @@ msgctxt "questions/09-ethical-issues"
 msgid "We will obtain consent to anonymize the data. We will anonymize the data before any further processing."
 msgstr ""
 
-#: src/questions/10-share-restrictions.html.j2:311
+#: src/questions/10-share-restrictions.html.j2:312
 msgctxt "questions/10-share-restrictions"
 msgid "We will permit authenticated access to the data."
 msgstr ""
@@ -3591,7 +4022,7 @@ msgctxt "questions/03-docs-metadata"
 msgid "We will use a filesystem with files and folders."
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:466
+#: src/questions/01-how-data.html.j2:468
 msgctxt "questions/01-how-data"
 msgid "We will use an electronic lab notebook to document the provenance of the data analysis."
 msgstr ""
@@ -3601,7 +4032,7 @@ msgctxt "research-quality"
 msgid "We will use automated tools to integrate the analysis tools into pipelines and workflows."
 msgstr ""
 
-#: src/questions/01-how-data.html.j2:464
+#: src/questions/01-how-data.html.j2:466
 msgctxt "questions/01-how-data"
 msgid "We will use lab notebooks to document the provenance of the data analysis."
 msgstr ""
@@ -3611,7 +4042,7 @@ msgctxt "questions/08-copyright-ipr"
 msgid "We will use the following authorization arrangements:"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:300
+#: src/questions/06-access-security.html.j2:301
 msgctxt "questions/06-access-security"
 msgid "We will use the following policies and procedures:"
 msgstr ""
@@ -3643,6 +4074,11 @@ msgstr ""
 #: src/post-project-archive.html.j2:77
 msgctxt "post-project-archive"
 msgid "actual use of the archived data"
+msgstr ""
+
+#: src/globals.j2:5
+msgctxt "globals"
+msgid "are"
 msgstr ""
 
 #: src/post-project-archive.html.j2:85
@@ -3680,12 +4116,27 @@ msgctxt "questions/02-what-data"
 msgid "case report forms"
 msgstr ""
 
+#: src/questions/08-copyright-ipr.html.j2:78
+msgctxt "questions/08-copyright-ipr"
+msgid "commercial considerations unrelated to patents"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:78
+msgctxt "questions/08-copyright-ipr"
+msgid "commercial considerations unrelated to patents:"
+msgstr ""
+
 #: src/questions/09-ethical-issues.html.j2:216
 msgctxt "questions/09-ethical-issues"
 msgid "compliance with a legal obligation."
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:148
+#: src/questions/06-access-security.html.j2:134
+msgctxt "questions/06-access-security"
+msgid "data disclosure"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:149
 msgctxt "questions/06-access-security"
 msgid "data disclosure and data tampering"
 msgstr ""
@@ -3695,21 +4146,26 @@ msgctxt "quality-control"
 msgid "data entry validation"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:321
+#: src/questions/02-what-data.html.j2:320
 msgid "data format name"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:144
+#: src/questions/06-access-security.html.j2:133
+msgctxt "questions/06-access-security"
+msgid "data loss"
+msgstr ""
+
+#: src/questions/06-access-security.html.j2:145
 msgctxt "questions/06-access-security"
 msgid "data loss and data disclosure"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:146
+#: src/questions/06-access-security.html.j2:147
 msgctxt "questions/06-access-security"
 msgid "data loss and data tampering"
 msgstr ""
 
-#: src/questions/06-access-security.html.j2:142
+#: src/questions/06-access-security.html.j2:143
 msgctxt "questions/06-access-security"
 msgid "data loss, data disclosure, and data tampering"
 msgstr ""
@@ -3719,24 +4175,29 @@ msgctxt "quality-control"
 msgid "data peer review"
 msgstr ""
 
+#: src/questions/06-access-security.html.j2:135
+msgctxt "questions/06-access-security"
+msgid "data tampering"
+msgstr ""
+
 #: src/questions/02-what-data.html.j2:124
 msgctxt "questions/02-what-data"
 msgid "electronic patient records"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:337
+#: src/questions/02-what-data.html.j2:336
 msgid "estimated average file size (GB)"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:339
+#: src/questions/02-what-data.html.j2:338
 msgid "estimated data volume"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:336
+#: src/questions/02-what-data.html.j2:335
 msgid "estimated number of files"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:334
+#: src/questions/02-what-data.html.j2:333
 msgid "estimated total volume (GB)"
 msgstr ""
 
@@ -3744,8 +4205,18 @@ msgstr ""
 msgid "findability"
 msgstr ""
 
+#: src/projects.html.j2:33
+msgctxt "projects"
+msgid "grant number not yet given"
+msgstr ""
+
 #: src/questions/15-required-resources.html.j2:172
 msgid "interoperability"
+msgstr ""
+
+#: src/globals.j2:5
+msgctxt "globals"
+msgid "is"
 msgstr ""
 
 #: src/questions/08-copyright-ipr.html.j2:73
@@ -3792,6 +4263,16 @@ msgctxt "post-project-archive"
 msgid "predicted use of the archived data"
 msgstr ""
 
+#: src/globals.j2:4
+msgctxt "globals"
+msgid "project"
+msgstr ""
+
+#: src/globals.j2:4
+msgctxt "globals"
+msgid "projects"
+msgstr ""
+
 #: src/questions/09-ethical-issues.html.j2:214
 msgctxt "questions/09-ethical-issues"
 msgid "protection of vital interests."
@@ -3802,8 +4283,18 @@ msgctxt "questions/02-what-data"
 msgid "questionnaires"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:326
+#: src/questions/02-what-data.html.j2:325
 msgid "reason for using a non-standard format"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:84
+msgctxt "questions/08-copyright-ipr"
+msgid "reasons other than publishing a paper"
+msgstr ""
+
+#: src/questions/08-copyright-ipr.html.j2:84
+msgctxt "questions/08-copyright-ipr"
+msgid "reasons other than publishing a paper:"
 msgstr ""
 
 #: src/quality-control.html.j2:21
@@ -3820,7 +4311,7 @@ msgctxt "quality-control"
 msgid "standardized data capture or recording"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:329
+#: src/questions/02-what-data.html.j2:328
 msgid "suitability for long-term archiving"
 msgstr ""
 
@@ -3829,12 +4320,22 @@ msgctxt "quality-control"
 msgid "use of controlled vocabularies"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:331
+#: src/questions/02-what-data.html.j2:330
 msgid "whether the data will be converted to a suitable archival format"
 msgstr ""
 
-#: src/questions/02-what-data.html.j2:324
+#: src/questions/02-what-data.html.j2:323
 msgid "whether the format is standardized"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:119
+msgctxt "questions/03-docs-metadata"
+msgid "whether the metadata will be available in a form that can be harvested and indexed"
+msgstr ""
+
+#: src/questions/03-docs-metadata.html.j2:118
+msgctxt "questions/03-docs-metadata"
+msgid "whether the metadata will include instructions for accessing the data"
 msgstr ""
 
 #: src/questions/13-persistent-identifier.html.j2:115

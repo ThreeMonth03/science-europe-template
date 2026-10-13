@@ -58,12 +58,12 @@
           {%- elif businessReasonsPatents %}
             {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of patent-related commercial considerations.") }}
           {%- elif businessReasonsOther %}
-            <div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>The data cannot be made fully open because of commercial considerations unrelated to patents{{ ":" if notOpenBusinessReasonsOther else "." }}</p></div>
+            <div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of commercial considerations unrelated to patents:") if notOpenBusinessReasonsOther else pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of commercial considerations unrelated to patents.") }}</p></div>
             {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}
           {%- elif otherReasonsPapers %}
             {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because papers need to be submitted first.") }}
           {%- elif otherReasonsOther %}
-            <div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>The data cannot be made fully open because of reasons other than publishing a paper{{ ":" if notOpenOtherReasonsOther else "." }}</p></div>
+            <div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of reasons other than publishing a paper:") if notOpenOtherReasonsOther else pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of reasons other than publishing a paper.") }}</p></div>
             {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}
           {%- endif -%}
         {%- else %}
@@ -75,13 +75,13 @@
             {%- if businessReasonsPatents %}
               <li>{{ pgettext("questions/08-copyright-ipr", "patent-related commercial considerations") }}</li>
             {%- elif businessReasonsOther %}
-              <li><div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>commercial considerations unrelated to patents{{ ":" if notOpenBusinessReasonsOther else "" }}</p></div>
+              <li><div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "commercial considerations unrelated to patents:") if notOpenBusinessReasonsOther else pgettext("questions/08-copyright-ipr", "commercial considerations unrelated to patents") }}</p></div>
                 {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}</li>
             {%- endif -%}
             {%- if otherReasonsPapers %}
               <li>{{ pgettext("questions/08-copyright-ipr", "papers need to be submitted first") }}</li>
             {%- elif otherReasonsOther -%}
-              <li><div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>reasons other than publishing a paper{{ ":" if notOpenOtherReasonsOther else "" }}</p></div>
+              <li><div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "reasons other than publishing a paper:") if notOpenOtherReasonsOther else pgettext("questions/08-copyright-ipr", "reasons other than publishing a paper") }}</p></div>
                 {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}</li>
             {%- endif -%}
           </ul>
@@ -233,7 +233,7 @@
                   {%- set refDataConditionsOtherPath = [refDataConditionsPath, uuids.refDataConditionsOtherAUuid, uuids.refDataConditionsOtherQUuid]|reply_path -%}
                   {%- set refDataConditionsOther = repliesMap[refDataConditionsOtherPath]|reply_str_value -%}
                   {%- set refDataConditionsOther = refDataConditionsOther if refDataConditionsOther|trim else '' -%}
-                  <p{% if refDataConditionsOther %} class="answer-lead"{% endif %}>It is available under specific restrictions, which we will follow in our project{{ ":" if refDataConditionsOther else "." }}</p>
+                  <p{% if refDataConditionsOther %} class="answer-lead"{% endif %}>{{ pgettext("questions/08-copyright-ipr", "It is available under specific restrictions, which we will follow in our project:") if refDataConditionsOther else pgettext("questions/08-copyright-ipr", "It is available under specific restrictions, which we will follow in our project.") }}</p>
                   {% if refDataConditionsOther %}<div class="answer-detail">{{ answerMarkdown.markdown(refDataConditionsOther) }}</div>{% endif %}
                 {%- endif -%}
               </li>
@@ -261,7 +261,7 @@
                   {%- set nrefDataConditionsOtherPath = [nrefDataConditionsPath, uuids.nrefDataConditionsOtherAUuid, uuids.nrefDataConditionsOtherQUuid]|reply_path -%}
                   {%- set nrefDataConditionsOther = repliesMap[nrefDataConditionsOtherPath]|reply_str_value -%}
                   {%- set nrefDataConditionsOther = nrefDataConditionsOther if nrefDataConditionsOther|trim else '' -%}
-                  <p{% if nrefDataConditionsOther %} class="answer-lead"{% endif %}>It is available under specific restrictions, which we will follow in our project{{ ":" if nrefDataConditionsOther else "." }}</p>
+                  <p{% if nrefDataConditionsOther %} class="answer-lead"{% endif %}>{{ pgettext("questions/08-copyright-ipr", "It is available under specific restrictions, which we will follow in our project:") if nrefDataConditionsOther else pgettext("questions/08-copyright-ipr", "It is available under specific restrictions, which we will follow in our project.") }}</p>
                   {% if nrefDataConditionsOther %}<div class="answer-detail">{{ answerMarkdown.markdown(nrefDataConditionsOther) }}</div>{% endif %}
                 {%- endif -%}
               </li>
