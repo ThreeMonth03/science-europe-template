@@ -1,5 +1,26 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context %}
 {# Formatting macros #}
+{%- macro projectPhase(context, knowledgeModel) -%}
+  {# A present project field is authoritative, including null or empty values.
+     Only older contexts without that field may use the legacy top-level value. #}
+  {%- set phaseUuid = context.project.phaseUuid if context.project is defined and context.project.phaseUuid is defined else context.phaseUuid|default(none) -%}
+  {%- if phaseUuid and phaseUuid in knowledgeModel.entities.phases -%}
+    {%- set title = knowledgeModel.entities.phases[phaseUuid].title|default('', true) -%}
+    {# Translate only unchanged official labels; retain custom/translated KM text. #}
+    {%- if phaseUuid == 'b101f2d0-2476-452d-aa8d-95a41a02b52c' and title == 'Before Submitting the Proposal' -%}
+      {{- pgettext("project-phase", "Before Submitting the Proposal") -}}
+    {%- elif phaseUuid == '1796fa3c-9f53-475f-89ff-c66a0453c42e' and title == 'Before Submitting the DMP' -%}
+      {{- pgettext("project-phase", "Before Submitting the DMP") -}}
+    {%- elif phaseUuid == 'adc9133d-afcd-4616-9aea-db5f475898a2' and title == 'Before Finishing the Project' -%}
+      {{- pgettext("project-phase", "Before Finishing the Project") -}}
+    {%- elif phaseUuid == '1ace0fc6-a949-495f-a32e-e948f3f6bed1' and title == 'After Finishing the Project' -%}
+      {{- pgettext("project-phase", "After Finishing the Project") -}}
+    {%- else -%}
+      {{- title|e -}}
+    {%- endif -%}
+  {%- endif -%}
+{%- endmacro -%}
+
 {%- macro provenanceReading(value) -%}
   {# Conservative keep hint, never a Markdown rewrite. Unknown/complex HTML
      remains breakable. Bounds include the lead, header and every data cell. #}

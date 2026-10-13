@@ -59,9 +59,10 @@
       <dt>{{ pgettext("header", "Based on") }}</dt>
       <dd>{{ dc.pkg.name }}, {{ dc.pkg.version }} (<span class="package-id"><span class="organization-id">{{ dc.pkg.organization_id }}</span>:<span class="km-id">{{ dc.pkg.km_id }}</span>:<span class="version">{{ dc.pkg.version }}</span></span>)</dd>
 
-      {%- if ctx.phaseUuid -%}
+      {%- set projectPhaseTitle = macros.projectPhase(ctx, km) -%}
+      {%- if projectPhaseTitle -%}
       <dt>{{ pgettext("header", "Project phase") }}</dt>
-      <dd>{{ km.entities.phases[ctx.phaseUuid].title }}</dd>
+      <dd>{{ projectPhaseTitle }}</dd>
       {%- endif -%}
 
       {%- set nCreators = creators|length -%}

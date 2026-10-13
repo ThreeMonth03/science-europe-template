@@ -1,9 +1,10 @@
 {% if output_profile|default('review') != 'submission' %}
 <aside class="document-provenance">
-  <p>{{ pgettext("document-provenance", "Document: %(dc_project_name)s", dc_project_name=dc.project.name|e) }}</p>
+  <p>{{ pgettext("document-provenance", "Project: %(dc_project_name)s", dc_project_name=dc.project.name|e) }}</p>
   <p>{{ pgettext("document-provenance", "Created on %(dc_document_created_at)s", dc_document_created_at=dc.document.created_at|datetime_format("%Y-%m-%d")) }}</p>
-  {% if ctx.phaseUuid and ctx.phaseUuid in km.entities.phases %}
-  <p>{{ pgettext("document-provenance", "Project phase: %(phases_phaseUuid_title)s", phases_phaseUuid_title=km.entities.phases[ctx.phaseUuid].title|e) }}</p>
+  {% set projectPhaseTitle = macros.projectPhase(ctx, km) %}
+  {% if projectPhaseTitle %}
+  <p>{{ pgettext("document-provenance", "Project phase: %(phases_phaseUuid_title)s", phases_phaseUuid_title=projectPhaseTitle) }}</p>
   {% endif %}
   <p>{{ pgettext("document-provenance", "Knowledge model: %(dc_pkg_name)s, %(dc_pkg_version)s (%(dc_pkg_organization_id)s:%(dc_pkg_km_id)s:%(dc_pkg_version)s)", dc_pkg_name=dc.pkg.name, dc_pkg_version=dc.pkg.version, dc_pkg_organization_id=dc.pkg.organization_id, dc_pkg_km_id=dc.pkg.km_id) }}</p>
   <p>{{ pgettext("document-provenance", "Generated with <a href=\"%(dc_config_service_url)s\">%(dc_config_service_name)s</a>.", dc_config_service_url=dc.config.service_url, dc_config_service_name=dc.config.service_name) }}</p>

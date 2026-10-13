@@ -257,12 +257,12 @@ msgctxt "contributors"
 msgid "There are no contributors described for this DMP."
 msgstr "本資料管理方案尚未描述貢獻者。"
 
-#. Approved existing Chinese; no retranslation.
+#. Project identity, distinct from document.name.
 #: src/document-provenance.html.j2
 #, python-format
 msgctxt "document-provenance"
-msgid "Document: %(dc_project_name)s"
-msgstr "文件名稱：%(dc_project_name)s"
+msgid "Project: %(dc_project_name)s"
+msgstr "專案名稱：%(dc_project_name)s"
 
 #. Approved existing Chinese; no retranslation.
 #: src/document-provenance.html.j2
@@ -277,6 +277,27 @@ msgstr "文件建立日期：%(dc_document_created_at)s"
 msgctxt "document-provenance"
 msgid "Project phase: %(phases_phaseUuid_title)s"
 msgstr "計畫階段：%(phases_phaseUuid_title)s"
+
+#. Existing approved phase labels; only canonical UUID/title pairs use these.
+#: src/macros.html.j2
+msgctxt "project-phase"
+msgid "Before Submitting the Proposal"
+msgstr "提交計畫申請書前"
+
+#: src/macros.html.j2
+msgctxt "project-phase"
+msgid "Before Submitting the DMP"
+msgstr "提交資料管理計畫前"
+
+#: src/macros.html.j2
+msgctxt "project-phase"
+msgid "Before Finishing the Project"
+msgstr "計畫結束前"
+
+#: src/macros.html.j2
+msgctxt "project-phase"
+msgid "After Finishing the Project"
+msgstr "計畫結束後"
 
 #. Approved existing Chinese; no retranslation.
 #: src/document-provenance.html.j2
