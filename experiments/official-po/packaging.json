@@ -1,0 +1,55 @@
+{
+  "status": "local-rehearsal-only-not-a-production-release-lock",
+  "source_input_commit": "4c9cf7642009862544f84ef54f049118bfc5f36a",
+  "catalog_at_source_input_commit": "locales/zh-Hant.po",
+  "catalog_sha256": "fe8c1cda076b45aec55de42c6f87c1391b50041eb7d0aa775ecd926a372f3d1b",
+  "tdk": "4.35.0",
+  "worker_image": "datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3",
+  "template_zip_sha256": "3dd5189df5ad57c1c9d09527eda8dddc614c5007785bc3b740233d845ad266e7",
+  "mo_sha256": "0906094f5b6615cdc806fb2205ab293c776c45fc3c8954ce14bfd8f4fe842695",
+  "preparation": "Export clean pinned source; use the committed font and existing prepare_layout.py exactly once with language=en. One shared prepared reference; Chinese styles are selected at render time, not by preparing it again.",
+  "package": "Official TDK verify -> package -> existing deterministic ZIP canonicalization -> official unpackage -> verify. PO is a separate translation input, not automatically loaded from the template ZIP.",
+  "metadata_compatibility_fix": "Restore root-zh-hant >=2.7.0 eligibility already supported by the frozen Chinese DT. Original root/lifesciences eligibility and all format UUIDs/steps remain unchanged.",
+  "native_evidence_reuse": "All 77 packaged src files, including layout, fonts and prepared reference.docx, are byte-identical to the previously native-verified PO package. Reuse its 56 page-pair comparison/visual evidence only with this exact Worker and catalog. No new PDF/DOCX documents generated in this packaging check.",
+  "local_worker_checks": {
+    "stock_loader_catalog_messages_per_state": 855,
+    "loader_states": ["Cold MO load", "Same updatedAt cache hit without download", "New updatedAt MO refresh"],
+    "true_stock_prepare_locale_used": true,
+    "whole_html_byte_equal_pairs": 40,
+    "authored_replies_unchanged": true,
+    "s3": "Local stub implementing the download contract only; real S3/database/network not exercised.",
+    "output_storage": "Hashes only for matching HTML; no duplicated large HTML or new native output documents."
+  },
+  "publication_guard": "Experimental 0.3.78 coordinates are not authorized for upload or overwriting any existing release. Assign a new immutable release identity and rebind acceptance before publication.",
+  "official_locale_boundary": "Stock Worker reads MO (or compiles PO fallback), selecting by locale UUID and invalidating cache by updatedAt. Its loader does not validate the source template commit/hash. A separate paired release receipt is still required. Server locale DTO/UI/source binding has not been established by this experiment.",
+  "locale_contract_for_server_maintainers_to_verify": {
+    "selected_locale_code": "zh-Hant",
+    "runtime_translation_filename": "translation.mo",
+    "document_context_fields": ["document.language", "document.locale.uuid", "document.locale.name", "document.locale.code", "document.locale.updatedAt"],
+    "translation_update": "A changed catalog must update locale.updatedAt so Worker invalidates its cached MO. Do not reuse an unchanged stamp for new bytes.",
+    "source_pairing": "Bind the installed locale to the approved template/PO/MO pair outside the Worker loader; the local experiment does not establish how the Server API enforces or stores this association.",
+    "user_selection": "Confirm how users select the official locale and how template/format names appear. Do not assume the old separate Chinese DT or current Tool render-project request selects it automatically."
+  },
+  "proposed_authority_after_cutover_not_applied": {
+    "english_repository": "Shared marked Jinja, KM mappings, complete English message units, generated POT and locale-aware layout/Word helpers.",
+    "chinese_repository": "The single human-editable zh-Hant PO, pinned English source commit, translation version and paired acceptance/release manifest.",
+    "generated_only": ["POT", "MO", "prepared source", "template ZIP"],
+    "legacy_translation_tree": "Retain in history/read-only archive after approved cutover; do not maintain Markdown translations and PO as two live editable authorities.",
+    "current_migration_PO": "English experimental branch copy only. Do not begin independently editing another production copy in the Chinese repository during this rehearsal."
+  },
+  "version_and_branch_policy": {
+    "branches": "One maintained default branch per repository; short-lived codex/* changes, not permanent branches per language/version. This experiment remains on codex/official-po.",
+    "versions": "English source and Chinese locale can version independently; version names or matching branch names are not pairing guarantees.",
+    "pairing_fields": ["Full English input commit", "PO commit/hash and MO hash", "Exact official tooling versions", "Stock Worker digest", "Prepared reference/font hashes", "Template/locale coordinates", "Final artifacts and acceptance hashes"],
+    "candidate_rules": "Dirty sources are previews, not candidates. Candidate artifacts are immutable and acceptance must bind to their exact bytes."
+  },
+  "existing_workflow_not_migrated": "Existing repositories remain on their current release/translation workflows. Their old runtime declaration or Tool SHA alone does not prove a fully locked 4.35 dependency set.",
+  "required_before_cutover": [
+    "Verify official locale creation/import/selection and metadata/format labels with the server maintainers; never assume embedding PO in the template ZIP is enough.",
+    "Transfer the approved PO to exactly one authoritative location and replace the legacy translation generation path once, without dual-write synchronization.",
+    "Promote exact tooling/runtime and paired artifact guards into the existing workflow without adding parallel CI pipelines.",
+    "Choose new immutable publication versions, then bind acceptance to the final artifacts."
+  ],
+  "local_evidence_root": "/home/trc/.local/share/dsw-po-package435.gowhGcrM",
+  "remote_operations": false
+}

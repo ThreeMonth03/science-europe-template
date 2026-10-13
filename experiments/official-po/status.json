@@ -19,7 +19,7 @@
   ],
   "verified_runtime": "DSW document-worker 4.35.0",
   "verified_worker_image": "datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3",
-  "preparation_requirement": "Tests overlay source on the frozen prepared English package, retaining its prepared reference.docx and layout.css. Raw source still needs the existing preparation exactly once before packaging. Never prepare the frozen prepared reference again.",
+  "preparation_requirement": "Native comparison uses frozen prepared assets. The follow-up packaging rehearsal independently exports pinned clean source, prepares English once with the committed font, then runs official 4.35 verify/package/unpackage. All 77 src files match the native-accepted package byte-for-byte. Never prepare an already-prepared reference again.",
   "local_checks": {
     "catalog_messages": 855,
     "contexted_messages": 808,
@@ -80,12 +80,13 @@
     "acceptance-summary.json"
   ],
   "not_verified": [
-    "Production packaging/preparation path for this PO branch",
+    "Adoption of the locally rehearsed packaging path into the existing production CI/release workflow",
     "Existing general CI under updated 4.35 dependencies",
     "Wizard locale upload/UI/cache/S3",
     "Native Microsoft Word",
     "Arbitrary questionnaire inputs"
   ],
-  "next_step": "Choose one authoritative PO source and pin source/catalog revisions; verify the production preparation/packaging path locally with 4.35 exactly once before replacing the current translation workflow. Do not mix this migration with further prose/layout changes.",
+  "packaging_rehearsal": "See experiments/official-po/packaging.json. Template metadata additionally restores root-zh-hant eligibility; it does not alter rendering or questionnaire mappings. Native acceptance still refers to the unchanged render inputs.",
+  "next_step": "Resolve the official locale installation/selection contract with server maintainers and approve the single PO authority before replacing the current Chinese workflow. Keep exact source/catalog/toolchain/artifact pairing and use new immutable release versions. Do not mix this migration with further prose/layout changes.",
   "remote_operations": false
 }
