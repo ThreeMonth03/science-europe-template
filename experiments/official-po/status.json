@@ -1,5 +1,5 @@
 {
-  "status": "local-po-review-metadata-fixed-workflow-integration-pending-not-released",
+  "status": "local-po-current-pair-tool-e2e-accepted-workflow-integration-pending-not-released",
   "branch": "codex/official-po",
   "baseline_snapshot_commit": "895741e",
   "source_language": "en",
@@ -91,6 +91,7 @@
   "end_to_end_rehearsal": "See experiments/official-po/e2e.json: real local Server/PO/S3/Worker generation and all 56 page-pair comparisons passed. Original-size reading found two review metadata defects, so this is not overall candidate acceptance or cutover approval.",
   "review_metadata_follow_up": "Both defects are fixed in source 8b480c0 and passed focused tests, updated 859-message catalog checks and four new native review outputs (21 inspected pages). Eight submission entry hashes are unchanged. See metadata.json for the new exact pair and the bounded offline-regression evidence.",
   "tool_language_forwarding": "Implemented in isolated Tool commit 233403b: optional API and regression document language, early unsupported-path rejection, default payload/report preserved. All 418 unit/infra tests, full lint and Sphinx pass. Simulated transport only in this step; see tool-language.json.",
-  "next_step": "Exercise Tool commit 233403b with the current immutable template/PO pair in the isolated stock DSW 4.35 stack, then approve the single PO authority and adapt the existing workflow with immutable pairing. Use a new publication version, never overwrite the legacy meeting 0.3.78 pair; no parallel CI.",
+  "current_tool_e2e": "Tool 233403b and the current render pair passed real local stock Server/Worker generation under a non-conflicting staged test identity: twelve actual PDF/Word outputs, fifty-six exact page pairs and individually inspected pages, two full YAML/service HTML runs, default-null English-base behavior and unknown-locale rejection. Both review metadata fixes confirmed; see tool-e2e.json. No template or CI edits.",
+  "next_step": "Approve the single Chinese PO authority and adapt the existing build/release workflow with immutable template/PO pairing. Use a new publication version, never overwrite the legacy meeting 0.3.78 pair; no parallel CI or duplicate editable translation source.",
   "remote_operations": false
 }

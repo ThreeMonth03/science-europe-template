@@ -34,11 +34,12 @@
     "new_confirmed_layout_or_grammar_defects": false,
     "native_microsoft_word": false
   },
-  "evidence_boundary": "This new pair passed offline stock Worker regression against genuine saved Server contexts. It has not been reinstalled into a Server. The earlier e2e.json API/S3/native evidence remains historical and bound to its old exact source/ZIP/PO; do not silently repoint that receipt.",
+  "evidence_boundary": "This receipt records the offline stock Worker regression against genuine saved Server contexts; at that step the new pair had not been reinstalled into a Server. The subsequent real Tool/Server rehearsal uses a separately hashed staged identity with identical render bytes and is recorded in tool-e2e.json. The earlier e2e.json evidence remains bound to its old exact artifacts; do not silently repoint either receipt.",
   "local_evidence_root": "/home/trc/.local/share/dsw-po-metadata435.MAZkEkVn",
   "acceptance_receipt_sha256": "b13c3c5e88a0e95979c9f117a1dff6f821d1ac3bb63fadc74937ef8b52cf567f",
   "publication_guard": "This local experimental ZIP still has 0.3.78 coordinates. The separately uploaded meeting pair is the legacy delivery, not this PO pair. Never overwrite it; choose a new immutable publication identity and rebind final acceptance before PO rollout.",
   "unchanged": ["Authored answers and KM/question branching", "Submission output entry HTML", "Prepared layout/fonts/Word reference", "Stock Worker/Pandoc", "Original dirty repositories and handoff", "Online DSW and its meeting templates", "CI"],
-  "next_step": "Add explicit language forwarding to the existing Tool with backward-compatible tests. Then approve one authoritative Chinese PO location and fold pinned pairing/gates into the existing workflow, without a second CI or dual editable translation authority.",
+  "subsequent_tool_validation": "Tool 233403b and this pair's unchanged render bytes have now passed actual local 4.35 generation under a unique staged test coordinate. Both metadata fixes confirmed in real outputs. See tool-e2e.json for exact binding and limits.",
+  "next_step": "Approve one authoritative Chinese PO location and fold pinned template/PO pairing into the existing workflow, without a second CI or dual editable translation authority.",
   "remote_operations": false
 }
