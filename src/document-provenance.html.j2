@@ -1,7 +1,6 @@
 {% if output_profile|default('review') != 'submission' %}
 <aside class="document-provenance">
   <p>{{ pgettext("document-provenance", "Project: %(dc_project_name)s", dc_project_name=dc.project.name|e) }}</p>
-  <p>{{ pgettext("document-provenance", "Created on %(dc_document_created_at)s", dc_document_created_at=dc.document.created_at|datetime_format("%Y-%m-%d")) }}</p>
   {% set projectPhaseTitle = macros.projectPhase(ctx, km) %}
   {% if projectPhaseTitle %}
   <p>{{ pgettext("document-provenance", "Project phase: %(phases_phaseUuid_title)s", phases_phaseUuid_title=projectPhaseTitle) }}</p>

@@ -1,4 +1,4 @@
-"""Business titles stay on the cover; system trace fields are review-only."""
+"""Business/version dates stay; export timestamps never enter active outputs."""
 from pathlib import Path
 import re
 import sys
@@ -18,16 +18,20 @@ class DocumentMetadataTests(unittest.TestCase):
     VERSION = 'Approved <v2> & checked'
     PHASE = 'Before final project end'
 
-    def render(self, entry, name=PROJECT, escape=False, phase='phase-end', profile=None):
+    def render(self, entry, name=PROJECT, escape=False, phase='phase-end', profile=None,
+               versions=None, document_created_at='1999-12-31T23:59:00Z'):
         km, replies = fixture(None, name)
         km['entities']['phases'] = {'phase-end': {'title': self.PHASE}}
-        dc = dict(project=dict(name=self.WORKSPACE, versions=[dict(uuid='selected',
-            name=self.VERSION, description='Checked revision.', created_at='2001-02-03T00:00:00Z')]),
-            document=dict(created_at='1999-12-31T23:59:00Z'),
+        if versions is None:
+            versions = [dict(uuid='selected', name=self.VERSION,
+                description='Checked revision.', created_at='2001-02-03T00:00:00Z')]
+        dc = dict(project=dict(name=self.WORKSPACE, versions=versions),
+            document=dict(created_at=document_created_at),
             pkg=dict(name='MODEL-TRACE', version='2.7.0', organization_id='dsw', km_id='root'),
             config=dict(service_name='SERVICE-TRACE', service_url='https://example.org/tool'))
+        # Mirror the worker timestamp and its to_context_obj view above.
         ctx = dict(knowledgeModel=km, project=dict(name=self.WORKSPACE, replies=replies,
-            versionUuid='selected'), report={}, phaseUuid=phase)
+            versionUuid='selected'), document=dict(createdAt=document_created_at), report={}, phaseUuid=phase)
         env = environment(ROOT, escape, {'src/style.css': '', 'src/layout.css': ''})
         env.filters['to_context_obj'] = lambda value: dc
         env.filters['datetime_format'] = lambda value, fmt: value.split('T')[0]
@@ -67,15 +71,59 @@ class DocumentMetadataTests(unittest.TestCase):
                         self.assertIs(tracking.find_previous('div', class_='question'),
                                       soup.select('.question')[-1])
                         text = tracking.get_text()
-                        for trace in (self.WORKSPACE, 'Created on 1999-12-31',
-                                      'MODEL-TRACE', 'SERVICE-TRACE'):
+                        for trace in (self.WORKSPACE, 'MODEL-TRACE', 'SERVICE-TRACE'):
                             self.assertIn(trace, text)
+                        for export_trace in ('1999-12-31', 'Generated on', 'Created on'):
+                            self.assertNotIn(export_trace, soup.get_text())
                         self.assertEqual(phase == 'phase-end', self.PHASE in text)
                         self.assertNotIn(self.WORKSPACE, soup.header.get_text())
                         self.assertNotIn('1999-12-31', soup.header.get_text())
                         self.assertNotIn(self.PHASE, soup.header.get_text())
                         self.assertEqual('Data Management Plan', soup.title.get_text())
                         self.assertFalse(tracking.select('label, script, img'))
+
+    def test_named_version_dates_and_real_change_history_survive_both_profiles(self):
+        versions = [
+            dict(uuid='previous', name='Draft v1', created_at='2000-01-02T00:00:00Z',
+                 description='Initial data plan.'),
+            dict(uuid='selected', name='Approved v2', created_at='2001-02-03T00:00:00Z',
+                 description='Approved retention changes.'),
+        ]
+        expected = [['Approved v2', '2001-02-03', 'Approved retention changes.'],
+                    ['Draft v1', '2000-01-02', 'Initial data plan.']]
+        for entry in ('src/index.html.j2', 'src/pdf/index.html.j2', 'src/word/index.html.j2'):
+            for profile in ('review', 'submission'):
+                for escape in (False, True):
+                    with self.subTest(entry=entry, profile=profile, escape=escape):
+                        soup = self.render(entry, profile=profile, escape=escape, versions=versions)
+                        self.assertEqual('Version: Approved v2 (2001-02-03)',
+                                         soup.header.select_one('.document-meta').get_text())
+                        history = soup.select_one('table.version-history' if 'word' in entry
+                                                  else '#dmp-versions > table')
+                        self.assertIsNotNone(history)
+                        self.assertEqual(expected, [[cell.get_text(strip=True) for cell in row.select('td')]
+                                                    for row in history.select('tbody > tr')])
+
+    def test_export_timestamp_never_changes_active_outputs_or_supplies_a_version_date(self):
+        entries = ('src/index.html.j2', 'src/pdf/index.html.j2', 'src/word/index.html.j2',
+                   'src/submission/index.html.j2', 'src/submission/pdf.html.j2',
+                   'src/submission/word.html.j2')
+        timestamps = ('1999-12-31T23:59:00Z', '2042-06-07T08:09:10Z')
+        for entry in entries:
+            profile = 'submission' if '/submission/' in entry else 'review'
+            for escape in (False, True):
+                for versions in (None, []):
+                    with self.subTest(entry=entry, profile=profile, escape=escape,
+                                      named_version=versions is None):
+                        documents = [self.render(entry, profile=profile, escape=escape,
+                            versions=versions, document_created_at=stamp) for stamp in timestamps]
+                        self.assertEqual(str(documents[0]), str(documents[1]))
+                        for soup in documents:
+                            for export_trace in ('1999-12-31', '2042-06-07', 'Generated on', 'Created on'):
+                                self.assertNotIn(export_trace, soup.get_text())
+                            if versions == []:
+                                self.assertFalse(soup.select('.document-meta, #dmp-versions, table.version-history'))
+                                self.assertNotIn('History of changes', soup.get_text())
 
     def test_missing_project_title_uses_generic_cover_not_workspace_fallback(self):
         for entry in ('src/pdf/index.html.j2', 'src/word/index.html.j2',

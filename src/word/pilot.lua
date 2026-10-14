@@ -923,11 +923,12 @@ local function provenance_text(inlines)
   return true
 end
 
--- The current review footer has four scalar paragraphs, or five with phase.
+-- The current review footer has three scalar paragraphs, or four with phase.
+-- Retain the prior five-paragraph bounded shape for older prepared inputs.
 -- Keep only that small generated shape; arbitrary long/complex values flow.
 local function short_review_provenance(blocks)
   local count, total, links = #blocks, 0, 0
-  if count ~= 4 and count ~= 5 then return false end
+  if count < 3 or count > 5 then return false end
   for index, block in ipairs(blocks) do
     if block.t ~= "Para" or not provenance_text(block.content) or
        not pandoc.utils.stringify(block):match("%S") then return false end

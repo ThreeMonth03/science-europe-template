@@ -173,14 +173,16 @@ class LayoutTests(unittest.TestCase):
     def test_word_provenance_keeps_only_owned_bounded_metadata_and_all_inlines(self):
         import sys
         sys.path.insert(0, str(ROOT / 'scripts'))
+        from current_support import environment
         image = 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'
-        env = Environment(loader=FileSystemLoader(ROOT), autoescape=True)
+        env = environment(ROOT, True)
         env.filters['datetime_format'] = lambda value, fmt: '2026-09-22'
-        provenance = env.get_template('src/document-provenance.html.j2').render(dc=dict(
+        provenance = env.from_string("{% import 'src/macros.html.j2' as macros with context %}"
+            "{% include 'src/document-provenance.html.j2' %}").render(dc=dict(
             project=dict(name='Workspace label'), document=dict(created_at=''),
             pkg=dict(name='Coastal KM', version='2.7.0', organization_id='dsw', km_id='root'),
             config=dict(service_name='DMP service', service_url='https://example.org/?a=1&b=2')),
-            ctx=dict(phaseUuid=None), output_profile='review')
+            ctx=dict(project={}, phaseUuid=None), km={}, output_profile='review')
         short_pair = ('<aside><p>Knowledge model: Coastal KM, 2.7.0 (dsw:root:2.7.0)</p>'
                       '<p>Generated with <a href="https://example.org/?a=1&amp;b=2">DMP service</a>.</p></aside>')
         def owned(body, attrs='id="dmp-provenance" class="document-provenance"'):
@@ -191,7 +193,9 @@ class LayoutTests(unittest.TestCase):
         current_five = current(['Document: Original workspace', 'Created on 2026-09-22',
             'Project phase: Planning', 'Knowledge model: Coastal KM', 'Generated with '+final_link+'.'])
         cases = [
-            ('real-include-four', owned(provenance), True),
+            ('real-include-three', owned(provenance), True),
+            ('current-three', owned(current(['Project: Original workspace',
+                'Knowledge model: Coastal KM', 'Generated with '+final_link+'.'])), True),
             ('current-five', owned(current_five), True),
             ('current-chinese', owned(current(['文件名稱：原始名稱', '文件建立日期：2026-09-22',
                 '計畫階段：規劃', '問卷知識模型：沿岸觀測', '本文件由 '+final_link+' 產生。'])), True),
@@ -201,7 +205,8 @@ class LayoutTests(unittest.TestCase):
             ('current-paragraph-too-long', owned(current(['x'*321, 'Date', 'KM', final_link])), False),
             ('current-cjk-too-wide', owned(current(['中'*161, '日期', '模型', final_link])), False),
             ('current-total-too-long', owned(current(['x'*300, 'y'*300, 'z'*300, final_link])), False),
-            ('current-empty-value', owned(current(['', 'Date', 'KM', final_link])), False),
+            # Pandoc drops the empty HTML paragraph before this Lua guard.
+            ('current-empty-html-paragraph-dropped', owned(current(['', 'Date', 'KM', final_link])), True),
             ('current-missing-link', owned(current(['Name', 'Date', 'KM', 'Generated with service.'])), False),
             ('current-earlier-link', owned(current([final_link, 'Date', 'KM', 'Generated with '+final_link])), False),
             ('current-two-final-links', owned(current(['Name', 'Date', 'KM', final_link+final_link])), False),
@@ -265,6 +270,9 @@ print(json.dumps(results))
                 if len(old_div['c'][1]) == 1 and old_div['c'][1][0]['t'] == 'Div':
                     old_target, new_target = old_div['c'][1][0], new_div['c'][1][0]
                     self.assertEqual(old_target['c'][0], new_target['c'][0])
+                if name == 'current-empty-html-paragraph-dropped':
+                    self.assertEqual(3, len(old_target['c'][1]))
+                    self.assertTrue(all(p['t'] == 'Para' and p['c'] for p in old_target['c'][1]))
                 joined = []
                 for index, paragraph in enumerate(old_target['c'][1]):
                     self.assertEqual(paragraph['t'], 'Para')

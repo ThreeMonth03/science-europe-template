@@ -1215,12 +1215,6 @@ msgctxt "word/frontpage"
 msgid "Created in <a href=\"%(dc_config_service_url)s\">%(dc_config_service_name)s</a>."
 msgstr ""
 
-#: src/document-provenance.html.j2:4
-#, python-format
-msgctxt "document-provenance"
-msgid "Created on %(dc_document_created_at)s"
-msgstr ""
-
 #: src/questions/15-required-resources.html.j2:154
 #, python-format
 msgctxt "questions/15-required-resources"
@@ -4357,4 +4351,3 @@ msgstr ""
 msgctxt "post-project-archive"
 msgid "years"
 msgstr ""
-
