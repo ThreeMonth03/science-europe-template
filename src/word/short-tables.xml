@@ -10,6 +10,8 @@
 {%- set content = content.replace('<!--DSW:SE:authored-reuse-row:v1-->', '<!--DSW:SE:authored-resource-row:v1-->') -%}
 {#- Q10 authorization rows share the same independent bounded two-cell contract. -#}
 {%- set content = content.replace('<!--DSW:SE:authored-authorization-row:v1-->', '<!--DSW:SE:authored-resource-row:v1-->') -%}
+{#- Q2 non-standard-format reasons use the same bounded body-row contract. -#}
+{%- set content = content.replace('<!--DSW:SE:authored-format-row:v1-->', '<!--DSW:SE:authored-resource-row:v1-->') -%}
 {%- set authored_marker = '<!--DSW:SE:authored-resource-row:v1-->' -%}
 {%- if authored_marker in content -%}
   {%- set authored_rows = content.split('<w:tr>') -%}

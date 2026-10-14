@@ -6,11 +6,11 @@ English Jinja and one PO; do not edit the generated Chinese ZIP. See the
 [compatibility build instructions](docs/testing.md#po-translation-and-dsw-434-compatibility).
 The 4.35 native-PO path stays separate. Neither path automatically deploys.
 
-The local cutover uses English `0.3.79` and generated Chinese compatibility
-`0.3.81`. Edit the PO only in the companion Chinese repository; this repository's
+The local polish candidate uses English `0.3.80` and generated Chinese compatibility
+`0.3.82`, compared with the preserved `0.3.79`/`0.3.81` pair. Edit the PO only in the companion Chinese repository; this repository's
 old catalog is now a read-only historical fixture. The existing Chinese builder
-produces both runtime deliveries with one prepared reference. CI cutover and
-new-package native acceptance remain pending; older version notes below are history.
+produces both runtime deliveries with one prepared reference. Native before/after
+verification and CI cutover are separate gates; older version notes below are history.
 
 For the current candidate repairs, see the [shared testing guide](docs/testing.md).
 It replaces eight per-round development notes; the release history below is unchanged.

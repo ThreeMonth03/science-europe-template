@@ -1,4 +1,4 @@
--- Word-only scoped Q8/Q9/Q10/Q15 authored tables and bounded version-history rows.
+-- Word-only scoped Q2/Q8/Q9/Q10/Q15 authored tables and bounded version-history rows.
 -- The matching enrich-docx step consumes these exact generated XML comments.
 local begin_marker = "<!--DSW:SE:short-table:v1:begin-->"
 local end_marker = "<!--DSW:SE:short-table:v1:end-->"
@@ -66,6 +66,46 @@ local function short_authored_row(row)
     end
   end
   return true
+end
+
+-- Q2 non-standard-format reasons may contain long authored tables. Keep only
+-- their individually bounded two-cell body rows, not the table or surrounding
+-- prose; long/complex rows must remain free to split across pages.
+local function keep_authored_format_rows(div)
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.identifier == "" and #answer.classes == 1 and
+       answer.classes:includes("answer") and #answer.attributes == 0 then
+      for _, formats in ipairs(answer.content) do
+        if formats.t == "Div" and formats.identifier == "" and #formats.classes == 1 and
+           formats.classes:includes("data-formats") and #formats.attributes == 0 then
+          for _, record in ipairs(formats.content) do
+            if record.t == "Div" and record.identifier == "" and #record.classes == 1 and
+               record.classes:includes("format-description") and #record.attributes == 1 and
+               record.attributes["item-id"] and record.attributes["item-id"] ~= "" then
+              for _, detail in ipairs(record.content) do
+                if detail.t == "Div" and detail.identifier == "" and #detail.classes == 1 and
+                   detail.classes:includes("answer-detail") and #detail.attributes == 2 and
+                   detail.attributes["fact-id"] == "nonstandard-reason" and detail.attributes["status"] == "complete" then
+                  for _, tbl in ipairs(detail.content) do
+                    if tbl.t == "Table" and empty_attr(tbl) and #tbl.colspecs == 2 and #tbl.head.rows <= 1 and
+                       #tbl.foot.rows == 0 and #tbl.bodies == 1 and #tbl.bodies[1].head == 0 and
+                       tbl.bodies[1].row_head_columns == 0 and #tbl.caption.long == 0 and tbl.caption.short == nil then
+                      for _, row in ipairs(tbl.bodies[1].body) do
+                        if short_authored_row(row) then
+                          row.cells[1].contents:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:authored-format-row:v1-->"))
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  return div
 end
 
 -- Q8/Q10 authorization tables may continue, but bounded body rows must not
@@ -225,6 +265,7 @@ local function question(div)
   if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end
   if div.classes:includes("answer") or div.classes:includes("answer-detail") or
      div.classes:includes("abstract") then return div, false end
+  if div.identifier == "q-what-data" then return keep_authored_format_rows(div), false end
   if div.identifier == "q-required-resources" then return keep_authored_resource_rows(div), false end
   if div.identifier == "q-copyright-ipr" then
     return keep_authored_reuse_rows(keep_authored_authorization_rows(div)), false

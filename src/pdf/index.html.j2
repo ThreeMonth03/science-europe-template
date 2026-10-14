@@ -1,6 +1,31 @@
 {# PDF-only presentation, shared facts and translated fragments stay in Q15. #}
 {%- set pdf_budget_reading = true -%}
 {%- set pdfDocument -%}{%- include 'src/index.html.j2' -%}{%- endset -%}
+{# Only the PDF entry may release an otherwise empty document's cover break.
+   Trust the shared exact-empty classifier, but also require the complete owned
+   inventory. Missing, extra, unmarked or unfamiliar questions keep normal flow. #}
+{%- set emptyInventory = namespace(ok=output_profile|default('review') == 'submission'
+    and pdfDocument.count('class="question compact-empty-question"') == 15
+    and pdfDocument.count('class="question') == 15
+    and pdfDocument.count('<section id=') == 6) -%}
+{%- for identifier in ['sec-data-collection', 'sec-docs-metadata', 'sec-storage-backup',
+    'sec-ethics-legal', 'sec-sharing-preservation', 'sec-responsibilities-resources'] -%}
+  {%- if pdfDocument.count('<section id="' + identifier + '" class="dmp-section">') != 1 -%}
+    {%- set emptyInventory.ok = false -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- for identifier in ['q-how-data', 'q-what-data', 'q-docs-metadata', 'q-quality-control',
+    'q-store-backup', 'q-access-security', 'q-personal-data', 'q-copyright-ipr',
+    'q-ethical-issues', 'q-share-restrictions', 'q-data-preservation', 'q-access-data',
+    'q-persistent-identifier', 'q-dm-responsible', 'q-required-resources'] -%}
+  {%- if pdfDocument.count('<div id="' + identifier + '" class="question compact-empty-question"') != 1 -%}
+    {%- set emptyInventory.ok = false -%}
+  {%- endif -%}
+{%- endfor -%}
+{%- if pdfDocument.count('<article class="dmp">') == 1 -%}
+  {%- set pdfArticle = '<article class="dmp pdf-flow-layout' + (' pdf-all-empty-submission' if emptyInventory.ok else '') + '">' -%}
+  {%- set pdfDocument = pdfDocument|replace('<article class="dmp">', pdfArticle|safe, 1) -%}
+{%- endif -%}
 {%- import 'src/pdf/short-resources.html.j2' as shortResources -%}
 {%- set budgetDocument = shortResources.document(pdfDocument) -%}
 {{- shortResources.no_budget_document(budgetDocument) -}}

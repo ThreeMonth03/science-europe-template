@@ -114,6 +114,9 @@ class BudgetProbeTests(unittest.TestCase):
         reuse_call = 'keep_authored_reuse_rows(keep_authored_authorization_rows(div))'
         reuse_marker = '<!--DSW:SE:authored-reuse-row:v1-->'
         self.assertEqual(source.count(reuse_call), 1)
+        format_call = 'return keep_authored_format_rows(div), false'
+        format_marker = '<!--DSW:SE:authored-format-row:v1-->'
+        self.assertEqual(source.count(format_call), 1)
         data = ''.join('<tr><td>ROW-%02d</td><td>10</td></tr>' % n for n in range(1, 49))
         def fixture(kind='purpose', rows=data, metadata=2):
             meta = ('<table class="word-rich-funding-metadata" data-item-id="cost-1">' if metadata == 2 else '<table class="resource-table word-rich-budget-metadata">')
@@ -169,17 +172,40 @@ class BudgetProbeTests(unittest.TestCase):
             ('reason-detail', reuse_base.replace('class="answer"', 'class="answer-detail"')),
             ('no-table', reuse(rows='').replace('<table><thead><tr><th>Action</th><th>Evidence</th></tr></thead><tbody></tbody></table>', '')),
         ]]
+        def formats(rows=data, records=1):
+            table = '<table><thead><tr><th>Field</th><th>Treatment</th></tr></thead><tbody>'+rows+'</tbody></table>'
+            record = '<div class="format-description" data-item-id="format-1"><div class="dataset-policy format-summary"><p>Keep format 1.</p></div><div class="answer-detail" data-fact-id="nonstandard-reason" data-status="complete"><p>Original reason.</p>'+table+'<p>Keep original tail.</p></div></div>'
+            return '<div id="q-what-data" class="question"><div class="answer"><div class="data-formats">'+record*records+'</div></div></div>'
+        format_base = formats()
+        cases += [('format-single', format_base, 48), ('format-multiple', formats(records=2), 96),
+                  ('format-mixed', formats(rows=mixed), 2)]
+        cases += [('format-'+name, value, 0) for name,value in [
+            ('other-question', format_base.replace('q-what-data', 'q-other')),
+            ('unowned-answer', format_base.replace('class="answer"', 'class="unowned"')),
+            ('unowned-group', format_base.replace('class="data-formats"', 'class="unowned"')),
+            ('unowned-record', format_base.replace('class="format-description"', 'class="unowned"')),
+            ('empty-id', format_base.replace('data-item-id="format-1"', 'data-item-id=""')),
+            ('no-id', format_base.replace(' data-item-id="format-1"', '')),
+            ('wrong-fact', format_base.replace('nonstandard-reason', 'original-fact')),
+            ('missing-status', format_base.replace('data-status="complete"', 'data-status="missing"')),
+            ('extra-detail-attribute', format_base.replace('data-status="complete"', 'data-status="complete" data-extra="keep"')),
+            ('table-attribute', format_base.replace('<table><thead>', '<table class="original"><thead>')),
+            ('caption', format_base.replace('<table><thead>', '<table><caption>Keep caption.</caption><thead>')),
+            ('nested-table', format_base.replace('<table><thead>', '<div><table><thead>').replace('</table><p>Keep original tail.', '</table></div><p>Keep original tail.')),
+            ('long-row', formats(rows='<tr><td>'+'Long original text. '*80+'</td><td>Keep.</td></tr>')),
+            ('two-paragraphs', formats(rows='<tr><td><p>First.</p><p>Second.</p></td><td>Keep.</td></tr>')),
+        ]]
         # Exercise the real filter order in one offline container; compare the
         # complete AST, allowing only one generated marker per eligible row.
         native = RUNNER.replace('f.write_text(p["lua"])', 'f.write_text(p["lua"]);g=Path(tmp)/"before.lua";g.write_text(p["pilot"])').replace('"--lua-filter="+str(f)', '"--lua-filter="+str(g),"--lua-filter="+str(f)')
         runner = 'import contextlib,io,json,sys\np=json.load(sys.stdin)\nresults=[]\nfor source in p["sources"]:\n sys.stdin=io.StringIO(json.dumps(dict(html=p["html"],lua=source,pilot=p["pilot"])))\n out=io.StringIO()\n with contextlib.redirect_stdout(out): exec('+repr(native)+',{})\n results.append(json.loads(out.getvalue()))\nprint(json.dumps(results))'
-        payload = dict(html=''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases), pilot=(ROOT/'src/word/pilot.lua').read_text(), sources=[source.replace(call, 'return div, false').replace(reuse_call, 'keep_authored_authorization_rows(div)'), source])
+        payload = dict(html=''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases), pilot=(ROOT/'src/word/pilot.lua').read_text(), sources=[source.replace(call, 'return div, false').replace(reuse_call, 'keep_authored_authorization_rows(div)').replace(format_call, 'return div, false'), source])
         raw = subprocess.check_output(['docker','run','--rm','--network','none','--log-driver','none','-i','--entrypoint','python',IMAGE,'-c',runner], input=json.dumps(payload).encode(), timeout=180)
         results = [{b['c'][0][0]:b for b in r['blocks']} for r in json.loads(raw)]
         def remove_markers(node):
             if isinstance(node, dict): return sum(remove_markers(value) for value in node.values())
             if isinstance(node, list):
-                kept = [v for v in node if v not in [{'t':'RawBlock','c':['openxml',m]} for m in (marker,reuse_marker)]]
+                kept = [v for v in node if v not in [{'t':'RawBlock','c':['openxml',m]} for m in (marker,reuse_marker,format_marker)]]
                 count = len(node)-len(kept); node[:] = kept
                 return count+sum(remove_markers(v) for v in node)
             return 0
@@ -202,7 +228,7 @@ class BudgetProbeTests(unittest.TestCase):
         malformed = [before.replace(marker, marker*2), before.replace('</w:tr></w:tbl>', cell('Extra')+'</w:tr></w:tbl>'), before.replace('<w:tcPr />', '<w:tcPr><w:gridSpan w:val="2"/></w:tcPr>'), before.replace('<w:tcPr />', '<w:tcPr><w:vMerge/></w:tcPr>'), before.replace(marker+'<w:p>', marker+'<w:p><w:p/>'), before.replace(marker+'<w:p>', '<w:p>'+marker), before.replace('<w:tr>'+row, '<w:tr><w:trPr/>'+row), before.replace('<w:body>', '<w:body>'+marker)]
         for escape in (False, True):
             template = Environment(loader=FileSystemLoader(root),undefined=StrictUndefined,autoescape=escape).get_template('src/word/short-tables.xml')
-            for current in (marker, '<!--DSW:SE:authored-reuse-row:v1-->'):
+            for current in (marker, '<!--DSW:SE:authored-reuse-row:v1-->', '<!--DSW:SE:authored-format-row:v1-->'):
                 self.assertEqual(template.render(content=before.replace(marker, current)), expected)
                 literal = '&lt;!--DSW:SE:authored-reuse-row:v1--&gt;'
                 self.assertEqual(template.render(content=before.replace(marker,current).replace('ROW-01',literal)), expected.replace('ROW-01',literal))

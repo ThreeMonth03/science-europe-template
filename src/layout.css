@@ -271,3 +271,14 @@ html body #dmp-content > section.dmp-section#sec-sharing-preservation:has(> h2:f
 html body #dmp-content > section.dmp-section#sec-responsibilities-resources:has(> h2:first-child):has(> div.question.compact-empty-question:nth-child(2)):has(> div.question.compact-empty-question:nth-child(3):last-child) > h2 { margin-top: .9em; margin-bottom: .4em; }
 }
 /* END empty section spacing v1 */
+
+/* PDF-only sparse endings. The PDF entry verifies all fifteen trusted-empty
+   questions and all six owned sections before releasing the cover break.
+   Other profiles, mixed answers, Word and screen keep their existing flow.
+   Compact only review metadata itself; never glue the preceding answer/table
+   to it or reduce type size to make a short metadata block fit. */
+@media print {
+html body article.dmp.pdf-flow-layout.pdf-all-empty-submission > #dmp-content { break-before: auto; page-break-before: auto; }
+html body article.dmp.pdf-flow-layout > aside.document-provenance { margin-top: 1em; padding-top: .5em; }
+html body article.dmp.pdf-flow-layout > aside.document-provenance > p { margin-bottom: .1em; }
+}
