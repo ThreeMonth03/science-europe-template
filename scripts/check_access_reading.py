@@ -30,7 +30,7 @@ REUSE = {
     'en': {'Us': 'Only we will be interested in re-using this data.',
            'SameField': 'Other researchers in this field will be interested in re-using this data.',
            'OtherField': 'Researchers working in other fields will be interested in re-using this data.'},
-    'zh-Hant': {'Us': '只有我們有意再次使用這份資料。',
+    'zh-Hant': {'Us': '只有我們會有興趣再次使用這份資料。',
                 'SameField': '本領域的其他研究人員會有興趣再次使用這份資料。',
                 'OtherField': '其他領域的研究人員會有興趣再次使用這份資料。'},
 }
@@ -103,7 +103,7 @@ def check(root, language):
                   identifier_cases=0, reuse_cases=0, inactive_reuse=0, reuse_identity=0,
                   identity_cases=0, full_documents=0)
     for escape in (False, True):
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         access = env.from_string(PREFIX + "{% include '" + Q12 + "' %}")
         identifier = env.from_string(PREFIX + "{% include '" + Q13 + "' %}")
         full = env.from_string(WRAPPER)

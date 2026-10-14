@@ -160,7 +160,7 @@ def check(root, language):
     assert 'html body li > strong:first-child {' not in css
     assert 'html body li > strong.item-label { display: block; break-after: avoid; }' in css
     for escape in [False, True]:
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         for name, count in check_partial_answers(env, language).items(): counts[name] += count
         prefix = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}"
         template = env.from_string(prefix + "{% include 'src/questions/01-how-data.html.j2' %}")

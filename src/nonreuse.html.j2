@@ -18,7 +18,7 @@
     {%- set reasonSentence -%}<span data-fact-id="nonreuse-reason" data-status="complete">{{ pgettext("nonreuse", "Its conditions of use do not permit the intended re-use.") }}</span>{%- endset -%}
     {%- do nonreuseSentences.append(reasonSentence) -%}
   {%- endif -%}
-  <p class="nonreuse-summary" data-fact-id="reuse-decision" data-status="explicit-no">{{ nonreuseSentences|join(" ") }}</p>
+  <p class="nonreuse-summary" data-fact-id="reuse-decision" data-status="explicit-no">{{ nonreuseSentences|join("" if document_language|default('en') == 'zh-Hant' else " ") }}</p>
   {{ location(source) }}
   {% if reason == other and detail|trim %}
     <div class="answer-detail" data-fact-id="nonreuse-reason" data-status="complete">{{ pgettext("nonreuse", "<p><strong>Reason for not re-using this dataset</strong></p>") }}{{ answerMarkdown.markdown(detail) }}</div>

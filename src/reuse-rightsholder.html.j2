@@ -47,6 +47,6 @@
     {%- endif -%}
   {%- endif -%}
   {%- if sentences -%}
-    <p class="dataset-policy" data-fact-id="reuse-access-arrangements" data-status="complete">{{ sentences|join(' ') }}</p>
+    <p class="dataset-policy" data-fact-id="reuse-access-arrangements" data-status="complete">{{ sentences|join("" if document_language|default('en') == 'zh-Hant' else " ") }}</p>
   {%- endif -%}
 {%- endmacro -%}

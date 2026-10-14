@@ -90,7 +90,7 @@ def contact_replies(text, item='dataset-a', distribution='distro-c'):
 def check(root, language):
     counts = dict(repository_cases=0, preservation_cases=0, inactive_preservation=0, identity_cases=0, full_documents=0)
     for escape in [False, True]:
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         template = env.from_string(PREFIX + "{% include '" + Q11 + "' %}")
         full = env.from_string(WRAPPER)
 

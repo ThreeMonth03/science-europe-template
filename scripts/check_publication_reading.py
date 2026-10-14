@@ -20,7 +20,7 @@ TIMING = {
                     Embargo='資料將於延後公開期限屆滿後發布。'),
 }
 YES = {'en': 'This dataset will be published.', 'zh-Hant': '此資料集將發布。'}
-NO = {'en': 'This dataset will not be published.', 'zh-Hant': '此資料集將不公開發布。'}
+NO = {'en': 'This dataset will not be published.', 'zh-Hant': '此資料集不會發布。'}
 CATALOGUE = {'en': 'We will add a reference to the published data in at least one data catalogue.',
              'zh-Hant': '本計畫將在至少一個資料目錄中登錄已發布資料的參照資訊。'}
 
@@ -57,7 +57,7 @@ def expected(publication, timing, catalogue, language):
 def check(root, language):
     counts = dict(summary_cases=0, record_cases=0, identifier_cases=0, full_documents=0)
     for escape in [False, True]:
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         template = env.from_string(PREFIX + "{% include '" + Q10 + "' %}")
         full = env.from_string(WRAPPER)
 

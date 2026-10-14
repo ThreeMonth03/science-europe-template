@@ -50,7 +50,7 @@ def research_fixture(states=('yes',) * 4):
     return km, replies
 
 
-def owner_fixture(kind):
+def owner_fixture(kind, arrangements=False):
     km = schema()
     question(km, chapter(km, IDS['reusingCUuid']), IDS['preexistingQUuid'],
              'OptionsQuestion', [IDS['preexistingYesAUuid']])
@@ -66,13 +66,24 @@ def owner_fixture(kind):
     owner = path(use, kind + 'DataUseYesAUuid', kind + 'DataOwnerQUuid')
     replies = {parent: IDS['preexistingYesAUuid'], listing: ['dataset-1'],
                use: IDS[kind + 'DataUseYesAUuid'], owner: OWNER}
+    if arrangements:
+        assert kind == 'nref'
+        question(km, followups, IDS['nrefDataOwnersQUuid'], 'OptionsQuestion',
+                 [IDS['nrefDataOwnersNoAUuid']])
+        question(km, km['entities']['answers'][IDS['nrefDataOwnersNoAUuid']]['followUpUuids'],
+                 IDS['nrefDataOwnersNoReqQUuid'], 'OptionsQuestion', [IDS['nrefDataOwnersNoReqNoAUuid']])
+        question(km, followups, IDS['nrefDataAccessQUuid'], 'OptionsQuestion', [IDS['nrefDataAccessWillDownloadAUuid']])
+        owners = path(use, 'nrefDataUseYesAUuid', 'nrefDataOwnersQUuid')
+        replies.update({owners: IDS['nrefDataOwnersNoAUuid'],
+                        path(owners, 'nrefDataOwnersNoAUuid', 'nrefDataOwnersNoReqQUuid'): IDS['nrefDataOwnersNoReqNoAUuid'],
+                        path(use, 'nrefDataUseYesAUuid', 'nrefDataAccessQUuid'): IDS['nrefDataAccessWillDownloadAUuid']})
     return km, replies, (parent, listing, use, owner)
 
 
 def check(root, language="en"):
     counts = dict(research_combinations=0, inactive_branches=0, owner_cases=0, full_documents=0, authorization_cases=0)
     for escape in (False, True):
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         wrap = "{% import 'src/macros.html.j2' as macros with context %}{% import 'src/uuids.j2' as uuids with context %}"
         quality = env.from_string(wrap + "{% include 'src/questions/04-quality-control.html.j2' %}")
         reuse = env.from_string(wrap + "{% include 'src/questions/01-how-data.html.j2' %}")
@@ -181,7 +192,7 @@ def check(root, language="en"):
         for kind in ('ref', 'nref'):
             for change in ('none', 'blank-owner', 'parent-unanswered', 'use-no', 'item-deleted', 'owner-filtered'):
                 for profile in ('review', 'submission'):
-                    km, replies, (parent, listing, use, owner) = owner_fixture(kind)
+                    km, replies, (parent, listing, use, owner) = owner_fixture(kind, arrangements=kind == 'nref')
                     if change == 'blank-owner': replies[owner] = '  \n '
                     if change == 'parent-unanswered': replies.pop(parent)
                     if change == 'use-no': replies[use] = IDS[kind + 'DataUseNoAUuid']
@@ -190,6 +201,16 @@ def check(root, language="en"):
                     soup = render(reuse, km, replies, profile)
                     holders = soup.select('[data-fact-id="reuse-rightsholder"]')
                     assert len(holders) == int(change == 'none'), (kind, profile, change)
+                    arrangements = soup.select('[data-fact-id="reuse-access-arrangements"]')
+                    assert len(arrangements) == int(kind == 'nref' and change in ('none', 'blank-owner'))
+                    if arrangements:
+                        expected = ('The rights holder will not collaborate with us on this research. '
+                                    'No application for data access is required. '
+                                    'We will download or obtain a copy of this dataset.' if language == 'en' else
+                                    '資料權利人不會與我們共同進行這項研究。取用此資料集無須提出申請。'
+                                    '我們將下載或取得此資料集的副本。')
+                        assert arrangements[0].get_text() == expected
+                        assert not arrangements[0].select('.data-gap, .data-review, p, div')
                     if holders:
                         assert str(holders[0].select('p')[-1]) == str(BeautifulSoup(OWNER, 'html.parser').p)
                         if profile == 'submission':

@@ -269,17 +269,25 @@ class PersonalDataFollowupTests(unittest.TestCase):
         env.filters['reply_items'] = lambda r: r['value'].get('value', []) if isinstance(r, dict) and isinstance(r.get('value'), dict) and isinstance(r['value'].get('value'), list) else old_items(r)
         template = env.from_string(PREFIX + "{% include 'src/questions/09-ethical-issues.html.j2' %}")
         source = (ROOT/Q9).read_text()
-        prior_boundary = source.replace("{%- set dpiaDatasetLabel %}Dataset{% endset -%}\n{%- set dpiaDatasetKind = 'dpia' -%}\n", '').replace(
+        noun_capture = '{%- set dpiaDatasetLabel %}{{ pgettext("questions/09-ethical-issues", "Dataset") }}{% endset -%}'
+        prior_boundary = source.replace(noun_capture + "\n{%- set dpiaDatasetKind = 'dpia' -%}\n", '').replace(
             '{{ dpiaDatasetLabel }} {{ macros.datasetLabel(dpiaDatasetKind, record.index) }}',
             "Dataset {{ macros.datasetLabel('dpia', record.index) }}")
         prior_template = env.from_string(PREFIX + prior_boundary)
         # The noun is translator-owned; its surrounding strong/ordinal shell is
         # not. Keep EN units independent of the optional external Tool package.
-        noun_capture = '{%- set dpiaDatasetLabel %}Dataset{% endset -%}'
         self.assertEqual(1, source.count(noun_capture))
         self.assertIn('<strong>{{ dpiaDatasetLabel }} {{ macros.datasetLabel(dpiaDatasetKind, record.index) }}</strong>', source)
-        translated_source = source.replace(noun_capture, noun_capture.replace('Dataset{% endset', '資料集{% endset'), 1)
-        translated = env.from_string(PREFIX + translated_source)
+        # An explicit one-key translator exercises the noun boundary without
+        # source rewriting or depending on the downstream authoritative PO.
+        import gettext
+        class NounTranslation(gettext.NullTranslations):
+            def pgettext(self, context, message):
+                return '資料集' if (context, message) == ('questions/09-ethical-issues', 'Dataset') else message
+        translated_env = environment(ROOT)
+        translated_env.filters.update(env.filters)
+        translated_env.install_gettext_translations(NounTranslation(), newstyle=True)
+        translated = translated_env.from_string(PREFIX + source)
         render = lambda values, profile, schema: BeautifulSoup(template.render(repliesMap=values,
             output_profile=profile, **schema), 'html.parser')
         typed = lambda value, kind='AnswerReply': {'value': {'type': kind, 'value': value}}

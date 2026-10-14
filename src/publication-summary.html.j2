@@ -27,5 +27,5 @@
   {%- endif -%}
 {%- endif -%}
 {%- if publicationSentences -%}
-  <p class="publication-summary">{{ publicationSentences|join(' ') }}</p>
+  <p class="publication-summary">{{ publicationSentences|join("" if document_language|default('en') == 'zh-Hant' else " ") }}</p>
 {%- endif -%}

@@ -10,6 +10,67 @@ from current_repairs_contract import project_source, source_tree
 from current_support import environment
 
 
+class CurrentI18nTests(unittest.TestCase):
+    def catalog_root(self, parent, language='zh-Hant'):
+        import polib
+        root = Path(parent)
+        target = root / 'src/i18n/zh-Hant/LC_MESSAGES/dsw.mo'
+        target.parent.mkdir(parents=True)
+        catalog = polib.POFile()
+        catalog.metadata = {'Language': language, 'Content-Type': 'text/plain; charset=UTF-8'}
+        catalog.append(polib.POEntry(msgctxt='example', msgid='Hello world', msgstr='世界，你好'))
+        catalog.append(polib.POEntry(msgctxt='example', msgid='<strong>Hello</strong> %(who)s',
+                                    msgstr='<strong>你好</strong> %(who)s'))
+        target.write_bytes(catalog.to_binary())
+        return root
+
+    def test_default_null_english_is_explicit_and_ignores_embedded_chinese(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as folder:
+            root = self.catalog_root(folder)
+            env = environment(root)
+            self.assertEqual('en', env.globals['document_language'])
+            self.assertEqual(env.from_string("{{ pgettext('example', 'Hello world') }}").render(),
+                             'Hello world')
+            self.assertEqual(env.from_string('{% trans %}Missing English key{% endtrans %}').render(),
+                             'Missing English key')
+
+    def test_embedded_mo_context_trimmed_policy_and_escaping(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as folder:
+            root = self.catalog_root(folder)
+            for escape in (False, True):
+                env = environment(root, escape, language='zh-Hant')
+                self.assertEqual('zh-Hant', env.globals['document_language'])
+                self.assertEqual(env.from_string("{% trans 'example' %}Hello\n  world{% endtrans %}").render(),
+                                 '世界，你好')
+                actual = env.from_string(
+                    "{{ pgettext('example', '<strong>Hello</strong> %(who)s', who=who) }}").render(who='<A&B>')
+                self.assertEqual(actual, '<strong>你好</strong> ' + ('&lt;A&amp;B&gt;' if escape else '<A&B>'))
+                self.assertNotIn('&amp;lt;', actual)
+
+    def test_missing_catalog_or_key_never_falls_back_to_english(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as folder:
+            with self.assertRaises(FileNotFoundError):
+                environment(folder, language='zh-Hant')
+            env = environment(self.catalog_root(folder), language='zh-Hant')
+            for source in ("{{ pgettext('wrong-context', 'Hello world') }}",
+                           "{{ pgettext('example', 'Missing key') }}", "{{ gettext('Hello world') }}"):
+                with self.assertRaises(LookupError):
+                    env.from_string(source).render()
+
+    def test_unknown_language_and_wrong_catalog_language_are_rejected(self):
+        from tempfile import TemporaryDirectory
+        with TemporaryDirectory() as folder:
+            root = self.catalog_root(folder, language='en')
+            with self.assertRaises(ValueError):
+                environment(root, language='zh-Hant')
+            for language in ('', 'zh', 'zh-TW', 'unknown'):
+                with self.assertRaises(ValueError):
+                    environment(root, language=language)
+
+
 class CurrentBudgetLayoutTests(unittest.TestCase):
     def test_funding_tables_are_full_width_owned_and_preserve_exact_fragments(self):
         from lxml import html

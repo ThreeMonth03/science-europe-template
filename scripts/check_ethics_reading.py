@@ -63,7 +63,7 @@ def approval_replies(approval='Yes', status='Granted', case='CASE-2026', name='C
 def check(root, language):
     counts = dict(dataset_cases=0, approval_cases=0, identity_cases=0, full_documents=0)
     for escape in (False, True):
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         ethics = env.from_string(PREFIX + "{% include '" + Q9 + "' %}")
         full = env.from_string(WRAPPER)
 

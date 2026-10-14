@@ -13,7 +13,7 @@ from jinja2 import BytecodeCache, ChoiceLoader, DictLoader, Environment, FileSys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from check_project_acronym import fixture as project_fixture
-from current_support import MARKDOWN_ADAPTER
+from current_support import MARKDOWN_ADAPTER, install_i18n
 CONTRACT = json.loads(
     (ROOT / "requirements" / "science-europe-2021.json").read_text(encoding="utf-8")
 )
@@ -79,6 +79,7 @@ def render_question(path: str, replies: dict[str, object], **context) -> str:
         dot=lambda value: f"{value}." if value and not str(value).endswith(".") else value,
     )
     env.tests["true"] = lambda value: value is True
+    install_i18n(env, ROOT)
     wrapper = env.from_string(
         "{% import 'src/macros.html.j2' as macros with context %}"
         "{% import 'src/uuids.j2' as uuids with context %}"
@@ -211,11 +212,14 @@ class ScienceEuropeContractTests(unittest.TestCase):
         self.assertEqual(6, len({item["section"] for item in requirements}))
 
     def test_template_headings_match_the_recorded_science_europe_questions(self):
+        from bs4 import BeautifulSoup
         for requirement in CONTRACT["requirements"]:
-            source = (ROOT / requirement["template"]).read_text(encoding="utf-8")
-            match = re.search(r"<h3>(.*?)</h3>", source, flags=re.DOTALL)
+            # Compare the actual default-English heading, not the gettext call
+            # in marked source. The independent recorded questions stay exact.
+            document = BeautifulSoup(render_question(requirement["template"], {}), 'html.parser')
+            match = document.select_one('.question > h3')
             self.assertIsNotNone(match, requirement["template"])
-            heading = " ".join(html.unescape(match.group(1)).split())
+            heading = " ".join(match.get_text().split())
             expected = f'{requirement["number"]}. {requirement["question"]}'
             self.assertEqual(expected, heading, requirement["id"])
 

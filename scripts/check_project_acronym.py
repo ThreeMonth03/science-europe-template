@@ -66,7 +66,7 @@ def check(root, language):
                   project_values=0, project_titles=0, project_subsets=0,
                   inactive_overview=0, header_metadata=0, project_identity=0, budget_identity=0)
     for escape in (False, True):
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         env.filters['datetime_format'] = lambda value, fmt: '2026-09-30'
         overview = env.from_string(PREFIX + "{% include 'src/projects.html.j2' %}")
         full = env.from_string(WRAPPER)

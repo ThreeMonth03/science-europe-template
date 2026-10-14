@@ -57,7 +57,7 @@ def check(root, language):
     dc = {'project': {'created_by': None}, 'e': {'choices': {
         role: {'label': label} for role, label in zip([*ROLES, CONTACT], ROLE_LABELS[language])}}}
     for escape in (False, True):
-        env = environment(root, escape)
+        env = environment(root, escape, language=language)
         question = env.from_string(PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
         front = env.from_string(PREFIX + "{% include 'src/contributors.html.j2' %}")
         full = env.from_string(WRAPPER)
