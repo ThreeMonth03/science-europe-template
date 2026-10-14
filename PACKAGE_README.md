@@ -25,6 +25,12 @@ nor successfully generating a document guarantees funder approval or compatibili
 with every PDF/Word renderer. Version history and bounded layout changes are
 documented in the source repository, rather than in this package description.
 
+The generated DSW 4.34 Traditional Chinese compatibility profile uses the labels
+「內部檢核版」 and 「提交版」 for these two modes. It is built from the same
+Chinese PO used by the shared template on DSW 4.35, not a separate Jinja fork.
+Install that compatibility ZIP only on 4.34. On 4.35, use the shared English ZIP
+with the Chinese PO attached and explicitly select the document language.
+
 Build reviewed bilingual packages through the companion Chinese repository.
 The bare upstream packaging command does not prepare the reviewed bilingual fonts
 and Word reference styles. Compatibility and release status must be checked
