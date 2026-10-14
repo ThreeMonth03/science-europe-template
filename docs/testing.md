@@ -19,7 +19,7 @@ python3 -m venv .venv-po
 make test-compat434 PYTHON=.venv-po/bin/python
 make export-compat434 PYTHON=.venv-po/bin/python \
   ENGLISH_ZIP=/path/to/prepared-english-template.zip \
-  PO=locales/zh-Hant.po COMPAT_VERSION=0.3.79 \
+  PO=locales/zh-Hant.po COMPAT_VERSION=0.3.80 \
   COMPAT_OUTPUT=outputs/compat434/template.zip
 ```
 
@@ -68,6 +68,18 @@ all 78 cached files match the package, and preview HTML matches fresh HTML.
 Six unchanged true-context offline controls match all 27 actual PDF/Word-preview
 pages. The actual pages were individually read. This does not certify browser
 interaction, new-PO preview invalidation, production installation or native Word.
+
+The [subsequent translation batch](../experiments/legacy434/editorial.json) changes
+23 Chinese messages and generates a separate immutable `0.3.80` candidate.
+Publication/open-access distinctions, calibration, harmonization, consent,
+resource necessity, low-risk wording and six colons were corrected together.
+All 23 changed keys are called and visible across 17 stock-4.34 HTML outputs;
+four PDF and four Word documents (42 pages) were individually read. English
+Jinja, format chains and the other 77 render assets are unchanged. A review-only
+budget hint has a two-character final line in the stress case, without clipping
+or loss; submission is unaffected. This is offline Worker acceptance, not a new
+Server/preview, native Microsoft Word or 4.35 acceptance. Previous evidence and
+the `0.3.79` ZIP remain preserved rather than relabelled.
 
 When the server eventually upgrades, use the shared English DT plus attached PO
 and explicit document language. The 4.34 package is not a 4.35 fallback: 4.35

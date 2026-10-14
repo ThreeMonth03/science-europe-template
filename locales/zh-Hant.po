@@ -965,7 +965,7 @@ msgstr "研究計畫概要"
 #: src/publication-summary.html.j2
 msgctxt "publication-summary"
 msgid "This dataset will not be published."
-msgstr "此資料集將不公開發布。"
+msgstr "此資料集不會發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/publication-summary.html.j2
@@ -1026,7 +1026,7 @@ msgstr "<strong>%(qualityName)s</strong>：將不採用品質管控流程。"
 #: src/quality-control.html.j2
 msgctxt "quality-control"
 msgid "measurement calibration"
-msgstr "校正量測結果"
+msgstr "量測校正"
 
 #. Approved existing Chinese; no retranslation.
 #: src/quality-control.html.j2
@@ -1456,7 +1456,7 @@ msgstr "<p class=\"data-gap\" data-requirement-id=\"SE-1a\" data-fact-id=\"reuse
 #: src/questions/01-how-data.html.j2
 msgctxt "questions/01-how-data"
 msgid "We do not need to harmonize existing data from different sources before reuse."
-msgstr "我們不需要在再次使用前整合不同來源的既有資料。"
+msgstr "我們不需要在再次使用前對不同來源的既有資料進行一致化處理。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/01-how-data.html.j2
@@ -1891,13 +1891,13 @@ msgstr "<p>各資料夾將採用以下規則：</p>"
 #: src/questions/03-docs-metadata.html.j2
 msgctxt "questions/03-docs-metadata"
 msgid "<p style=\"margin:0\">There will be  a <strong>(sub)folder for each (repeated) analysis</strong>. </p>"
-msgstr "<p style=\"margin:0\">每次分析（包括重新分析）都會使用一個子資料夾。</p>"
+msgstr "<p style=\"margin:0\">每次分析（包括重新分析）都會使用一個資料夾或子資料夾。</p>"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/03-docs-metadata.html.j2
 msgctxt "questions/03-docs-metadata"
 msgid "<p style=\"margin:0\">There will be a <strong>(sub)folder for each step in the analysis workflow</strong>.</p>"
-msgstr "<p style=\"margin:0\">分析工作流程的每個步驟都會使用一個子資料夾。</p>"
+msgstr "<p style=\"margin:0\">分析工作流程的每個步驟都會使用一個資料夾或子資料夾。</p>"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/03-docs-metadata.html.j2
@@ -2914,7 +2914,7 @@ msgstr "本計畫填報的個人資料蒐集及處理法律依據為執行公共
 #: src/questions/09-ethical-issues.html.j2
 msgctxt "questions/09-ethical-issues"
 msgid "We ask the data subjects for their consent."
-msgstr "我們會向資料當事人取得同意。"
+msgstr "我們會徵求資料當事人的同意。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/09-ethical-issues.html.j2
@@ -3387,7 +3387,7 @@ msgstr "資料發布位置尚未列出。"
 #: src/questions/10-share-restrictions.html.j2
 msgctxt "questions/10-share-restrictions"
 msgid "It has not yet been specified whether this dataset will be published."
-msgstr "尚待補充：此資料集是否將公開發布。"
+msgstr "尚待補充：此資料集是否將發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/10-share-restrictions.html.j2
@@ -3501,7 +3501,7 @@ msgstr "11. 如何選擇需要保存的資料？這些資料將在哪裡長期�
 #: src/questions/11-data-preservation.html.j2
 msgctxt "questions/11-data-preservation"
 msgid "This dataset will not be published."
-msgstr "此資料集將不公開發布。"
+msgstr "此資料集不會發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/11-data-preservation.html.j2
@@ -3513,7 +3513,7 @@ msgstr "此資料集將發布。"
 #: src/questions/11-data-preservation.html.j2
 msgctxt "questions/11-data-preservation"
 msgid "It has not yet been specified whether this dataset will be published."
-msgstr "尚待補充：此資料集是否將公開發布。"
+msgstr "尚待補充：此資料集是否將發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/11-data-preservation.html.j2
@@ -3763,7 +3763,7 @@ msgstr "<p><strong>不將軟體說明文件納入後設資料的原因：</stron
 #: src/questions/12-access-data.html.j2
 msgctxt "questions/12-access-data"
 msgid "This dataset will not be published."
-msgstr "此資料集將不公開發布。"
+msgstr "此資料集不會發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/12-access-data.html.j2
@@ -3824,7 +3824,7 @@ msgstr "尚待補充：使用此資料集是否需要特定軟體。"
 #: src/questions/12-access-data.html.j2
 msgctxt "questions/12-access-data"
 msgid "It has not yet been specified whether this dataset will be published."
-msgstr "尚待補充：此資料集是否將公開發布。"
+msgstr "尚待補充：此資料集是否將發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/12-access-data.html.j2
@@ -3945,13 +3945,13 @@ msgstr "資料發布位置尚未列出。"
 #: src/questions/13-persistent-identifier.html.j2
 msgctxt "questions/13-persistent-identifier"
 msgid "This dataset will not be published."
-msgstr "此資料集將不公開發布。"
+msgstr "此資料集不會發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/13-persistent-identifier.html.j2
 msgctxt "questions/13-persistent-identifier"
 msgid "It has not yet been specified whether this dataset will be published."
-msgstr "尚待補充：此資料集是否將公開發布。"
+msgstr "尚待補充：此資料集是否將發布。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/13-persistent-identifier.html.j2
@@ -3963,7 +3963,7 @@ msgstr "本文件尚未說明哪些資料集將取得持續識別碼，以及識
 #: src/questions/13-persistent-identifier.html.j2
 msgctxt "questions/13-persistent-identifier"
 msgid "Only we will be interested in re-using this data."
-msgstr "只有我們有意再次使用這份資料。"
+msgstr "只有我們會有興趣再次使用這份資料。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/13-persistent-identifier.html.j2
@@ -4095,7 +4095,7 @@ msgstr "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"hardw
 #: src/questions/15-required-resources.html.j2
 msgctxt "questions/15-required-resources"
 msgid "No repository service charges are expected."
-msgstr "預計使用的資料儲存庫不收取服務費。"
+msgstr "預計不會產生資料儲存庫服務費。"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/15-required-resources.html.j2
@@ -4156,7 +4156,7 @@ msgstr "經費來源"
 #: src/questions/15-required-resources.html.j2
 msgctxt "questions/15-required-resources"
 msgid "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"resource-justification\" data-status=\"missing\"><strong>Information not provided:</strong> why this resource is needed to deliver FAIR data.</p>"
-msgstr "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"resource-justification\" data-status=\"missing\">尚待補充：這項資源如何協助產出符合 FAIR 原則的資料。</p>"
+msgstr "<p class=\"data-gap\" data-requirement-id=\"SE-6b\" data-fact-id=\"resource-justification\" data-status=\"missing\">尚待補充：為何需要這項資源來產出符合 FAIR 原則的資料。</p>"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/15-required-resources.html.j2
@@ -4597,7 +4597,7 @@ msgstr "本計畫蒐集及處理個人資料，"
 #: src/questions/08-copyright-ipr.html.j2
 msgctxt "questions/08-copyright-ipr"
 msgid "The data cannot be made fully open because of commercial considerations unrelated to patents:"
-msgstr "資料因與專利無關的商業考量而無法完全開放:"
+msgstr "資料因與專利無關的商業考量而無法完全開放："
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/08-copyright-ipr.html.j2
@@ -4609,7 +4609,7 @@ msgstr "資料因與專利無關的商業考量而無法完全開放。"
 #: src/questions/08-copyright-ipr.html.j2
 msgctxt "questions/08-copyright-ipr"
 msgid "The data cannot be made fully open because of reasons other than publishing a paper:"
-msgstr "資料因論文發表以外的其他考量而無法完全開放:"
+msgstr "資料因論文發表以外的其他考量而無法完全開放："
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/08-copyright-ipr.html.j2
@@ -4621,7 +4621,7 @@ msgstr "資料因論文發表以外的其他考量而無法完全開放。"
 #: src/questions/08-copyright-ipr.html.j2
 msgctxt "questions/08-copyright-ipr"
 msgid "It is available under specific restrictions, which we will follow in our project:"
-msgstr "其可在特定限制下取得，我們將在專案中遵循這些限制:"
+msgstr "其可在特定限制下取得，我們將在專案中遵循這些限制："
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/08-copyright-ipr.html.j2
@@ -4633,7 +4633,7 @@ msgstr "其可在特定限制下取得，我們將在專案中遵循這些限制
 #: src/questions/08-copyright-ipr.html.j2
 msgctxt "questions/08-copyright-ipr"
 msgid "commercial considerations unrelated to patents:"
-msgstr "與專利無關的商業考量:"
+msgstr "與專利無關的商業考量："
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/08-copyright-ipr.html.j2
@@ -4645,7 +4645,7 @@ msgstr "與專利無關的商業考量"
 #: src/questions/08-copyright-ipr.html.j2
 msgctxt "questions/08-copyright-ipr"
 msgid "reasons other than publishing a paper:"
-msgstr "論文發表以外的其他考量:"
+msgstr "論文發表以外的其他考量："
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/08-copyright-ipr.html.j2
@@ -4817,7 +4817,7 @@ msgstr "%(risks)s可能造成的影響很小"
 #, python-format
 msgctxt "questions/06-access-security"
 msgid "The risk of %(risks)s is acceptably low"
-msgstr "%(risks)s的風險已降至可接受程度"
+msgstr "%(risks)s的風險處於可接受的低水準"
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/06-access-security.html.j2
@@ -4928,7 +4928,7 @@ msgstr "資訊遭竄改"
 #: src/questions/06-access-security.html.j2
 msgctxt "questions/06-access-security"
 msgid "We use a specific pseudonymization method:"
-msgstr "我們採用特定的擬匿名化方法:"
+msgstr "我們採用特定的擬匿名化方法："
 
 #. Approved existing Chinese; no retranslation.
 #: src/questions/06-access-security.html.j2
