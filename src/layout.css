@@ -191,6 +191,9 @@ html body .repository-label { font-weight: bold; }
 html body .identifier-heading { margin: .25em 0 .35em; break-after: avoid; }
 html body .identifier-heading > p { display: inline; margin: 0; }
 html body .identifier-heading > p::after { content: ' '; }
+/* A complete, single reuse summary ends Q13; do not attach it to Q14.
+   Authored details and multiple datasets retain their ordinary flow. */
+html body article.dmp.pdf-flow-layout #q-persistent-identifier > .answer > .measured-data-reuse > ul > li:only-child > p.reuse-summary:only-child { break-after: auto; }
 html body .reading-gap { margin: .5em 0; }
 html body .reading-gap > p { margin-bottom: 0; }
 html body .answer-reference { font-size: 9.5pt; color: #526169; margin-top: .7em; }

@@ -57,11 +57,13 @@ jobs:
         run: |
           mkdir -p outputs
           python scripts/check_current.py --output outputs/current-behavior.json
-          python -m unittest -v \
+          PYTHONPATH=tests:scripts python -m unittest -v \
             tests.test_current_behavior.CurrentI18nTests \
             tests.test_current_behavior.CurrentBudgetLayoutTests \
             tests.test_derived_submission_headings.DerivedSubmissionHeadingsTests \
             tests.test_document_metadata.DocumentMetadataTests \
+            tests.test_answer_states.AnswerStateTests.test_q5_neutral_mapping_limit_does_not_imply_supplied_answers \
+            tests.test_answer_states.AnswerStateTests.test_stale_archive_children_do_not_establish_storage_details \
             2>&1 | tee outputs/current-unit.log
           python -m unittest discover -s experiments/legacy434 -v \
             2>&1 | tee outputs/current-compat434-unit.log
@@ -74,6 +76,7 @@ jobs:
           docker pull datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3
           python -m unittest -v \
             tests.test_answer_markdown.AnswerMarkdownTests.test_stock_435_parser_preserves_eof_tables_nested_lists_and_literal_sources \
+            tests.test_layout.LayoutTests.test_word_terminal_budget_and_single_person_keeps_are_bounded \
             tests.test_layout.LayoutTests.test_word_provenance_keeps_only_owned_bounded_metadata_and_all_inlines \
             tests.test_layout.LayoutTests.test_pdf_review_provenance_boundary_keeps_tail_and_allows_long_content \
             tests.test_layout.LayoutTests.test_word_styles_and_deterministic_reference \

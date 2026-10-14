@@ -11,7 +11,7 @@ from current_support import support_replies
 
 Q5 = 'src/questions/05-store-backup.html.j2'
 Q11 = 'src/questions/11-data-preservation.html.j2'
-LEAD = 'The fields mapped by this template are insufficient to establish the following operational details:'
+LEAD = 'Please check these details; the answers used in this section do not establish them:'
 SUPPORT = {
     'complete': 'We will be able to support this repository for a sufficiently long time.',
     'explicit-no': 'We will not be able to support this repository for a sufficiently long time.',
@@ -605,11 +605,19 @@ class AnswerStateTests(unittest.TestCase):
 
     def test_q5_neutral_mapping_limit_does_not_imply_supplied_answers(self):
         for replies in storage_matrix():
-            with self.subTest(replies=replies):
-                soup = BeautifulSoup(render_question(Q5, replies), 'html.parser')
-                self.assertEqual(LEAD, soup.select_one('.storage-detail-limits > p').get_text())
-                self.assertEqual(['unmapped', 'unmapped'], [n['data-status'] for n in soup.select('.storage-detail-limits [data-fact-id]')])
-                self.assertNotIn('The mapped answers describe', soup.get_text())
+            for profile in ('review', 'submission'):
+                with self.subTest(replies=replies, profile=profile):
+                    soup = BeautifulSoup(render_question(Q5, replies, output_profile=profile), 'html.parser')
+                    if profile == 'submission':
+                        self.assertFalse(soup.select('.storage-detail-limits'))
+                        self.assertNotIn(LEAD, soup.get_text())
+                        continue
+                    self.assertEqual(LEAD, soup.select_one('.storage-detail-limits > p').get_text())
+                    self.assertEqual(['unmapped', 'unmapped'], [n['data-status'] for n in soup.select('.storage-detail-limits [data-fact-id]')])
+                    self.assertEqual(['Exact working-storage and backup locations.',
+                        'The actual backup schedule. A need for frequent backups does not specify a schedule.'],
+                        [n.get_text() for n in soup.select('.storage-detail-limits li')])
+                    self.assertNotIn('The mapped answers describe', soup.get_text())
 
     def test_stale_archive_children_do_not_establish_storage_details(self):
         replies = {path('preservingCUuid', 'archivedDuringQUuid', 'archivedDuringYesAUuid', 'archiveRemoteQUuid'): IDS['archiveRemoteYesAUuid']}

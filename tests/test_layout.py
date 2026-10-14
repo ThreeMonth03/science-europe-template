@@ -42,6 +42,28 @@ class LayoutTests(unittest.TestCase):
                  ('budget-long-earlier-answer', base.replace('<p>Earlier overview.</p>', '<div class="answer-detail"><p>'+'Keep the earlier authored answer. '*100+'</p></div>'), 'Pilot Lead'),
                  ('budget-ascii-boundary', budget(tail='a '*159+'ab'), 'Pilot Lead'),
                  ('budget-cjk-boundary', budget(tail='中'*160), 'Pilot Lead')]
+        training = ('<div class="answer-detail" data-fact-id="specialist-expertise-detail" data-status="complete">'
+                    '<p>Complete training before publication.</p><ul><li>Metadata checks.</li>'
+                    '<li>Version control and provenance.</li></ul></div>')
+        trained = lambda value=training, source=base: source.replace('<p>Earlier overview.</p>', value)
+        bridges = {'budget-training-en', 'budget-training-zh', 'budget-training-one-item'}
+        cases += [('budget-training-en', trained(), 'Pilot Lead'),
+                  ('budget-training-zh', trained(training.replace('Complete training before publication.', '發布前完成培訓。')
+                      .replace('Metadata checks.', '後設資料品質檢核。').replace('Version control and provenance.', '版本控制與資料溯源。')), 'Pilot Lead'),
+                  ('budget-training-one-item', trained(training.replace('<li>Metadata checks.</li>', '')), 'Pilot Lead')]
+        cases += [('budget-training-'+name, trained(value), 'Pilot Lead') for name, value in [
+            ('long', training.replace('Complete training before publication.', 'x' * 161)),
+            ('long-item', training.replace('Metadata checks.', '中' * 41)),
+            ('three-items', training.replace('</ul>', '<li>Keep this third item.</li></ul>')),
+            ('nested', training.replace('Metadata checks.', '<ul><li>Keep nested training.</li></ul>')),
+            ('linked', training.replace('Metadata checks.', '<a href="https://example.org">Keep link.</a>')),
+            ('unowned', training.replace('specialist-expertise-detail', 'unowned-detail')),
+            ('unknown-attribute', training.replace('data-status="complete"', 'data-status="complete" data-extra="unknown"')),
+        ]]
+        cases += [('budget-training-wide-funding', trained(source=base.replace('Institute.', '中' * 81)), None),
+                  ('budget-training-three-rows', trained(source=budget(rows=3)), 'Pilot Lead'),
+                  ('budget-training-two-projects', trained(source=base.replace('</table></div>',
+                      '</table></div><div class="project-resources"><p>Other project.</p></div>')), None)]
         rejected = {
             'four-rows': budget(rows=4), 'long-cell': budget(purpose='a '*161),
             'long-tail': budget(tail='a '*159+'abc'), 'long-cjk-tail': budget(tail='中'*161),
@@ -91,25 +113,35 @@ class LayoutTests(unittest.TestCase):
                     return 1
                 return sum(restore_row_markers(value) for value in node.values())
             return sum(restore_row_markers(value) for value in node) if isinstance(node, list) else 0
-        def only_wrapper(left, right, style):
+        def only_wrapper(left, right, style, bridge=False):
             if left == right: return 0
             if isinstance(left, dict) and isinstance(right, dict):
                 if left.get('t') == 'Para' and right.get('t') == 'Div':
-                    self.assertEqual(right['c'], [['',[],[['custom-style',style]]],[left]])
+                    self.assertIn(right['c'][0], [['',[],[['custom-style',value]]]
+                        for value in ([style, 'Pilot List Lead'] if bridge else [style])])
+                    self.assertEqual(right['c'][1], [left])
+                    return 1
+                if bridge and left.get('t') == 'Plain' and right.get('t') == 'Div':
+                    self.assertEqual(right['c'], [['',[],[['custom-style','Pilot List Lead']]],[dict(t='Para', c=left['c'])]])
                     return 1
                 self.assertEqual(left.keys(), right.keys())
-                return sum(only_wrapper(left[k], right[k], style) for k in left)
+                return sum(only_wrapper(left[k], right[k], style, bridge) for k in left)
             self.assertIsInstance(left, list); self.assertIsInstance(right, list)
             self.assertEqual(len(left), len(right))
-            return sum(only_wrapper(a,b,style) for a,b in zip(left,right))
+            return sum(only_wrapper(a,b,style,bridge) for a,b in zip(left,right))
         self.assertEqual(len(cases), len(old['blocks'])); self.assertEqual(len(cases), len(new['blocks']))
         for (name, _, style), left, right in zip(cases, old['blocks'], new['blocks']):
             with self.subTest(case=name):
                 right = copy.deepcopy(right)
-                rows = 1 if name == 'budget-one' else 3 if name == 'budget-three' else 2
+                rows = 1 if name == 'budget-one' else 3 if name in ('budget-three', 'budget-training-three-rows') else 2
                 self.assertEqual(restore_row_markers(right), rows - 1 if name.startswith('budget-') and style else 0)
                 if style is None: self.assertEqual(left, right)
-                else: self.assertEqual(only_wrapper(left,right,style), 1)
+                else:
+                    self.assertEqual(only_wrapper(left,right,style,name in bridges), 2 if name in bridges else 1)
+                    if name in bridges:
+                        detail = right['c'][1][0]['c'][1][1]['c'][1][0]
+                        self.assertEqual(detail['c'][0][2], [['fact-id', 'specialist-expertise-detail'], ['status', 'complete']])
+                        self.assertEqual(detail['c'][1][1]['c'][-1][0]['c'][0], ['', [], [['custom-style', 'Pilot List Lead']]])
 
     def test_question_hierarchy_is_scoped_without_smaller_body_text(self):
         css = (ROOT/'src/layout.css').read_text()

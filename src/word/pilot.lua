@@ -433,6 +433,34 @@ local function keep_short_budget_narrative(div)
              count > (column == 1 and 4 or 3) or width(cell.contents) > ({320, 80, 160})[column] then return div end
         end
       end
+      -- Only a bounded owned training list may bridge to this proven budget.
+      -- Preserve its paragraphs/inlines; long or unfamiliar training still flows.
+      local training = answer.content[heading - 2]
+      if #tbl.bodies[1].body <= 2 and width(div) <= 1200 and training and training.t == "Div" and
+         training.identifier == "" and #training.classes == 1 and training.classes:includes("answer-detail") and
+         #training.attributes == 2 and training.attributes["fact-id"] == "specialist-expertise-detail" and
+         training.attributes["status"] == "complete" and #training.content == 2 and width(training) <= 320 then
+        local function plain(block, style, limit)
+          if block.t == "Div" and block.identifier == "" and #block.classes == 0 and #block.attributes == 1 and
+             block.attributes["custom-style"] == style and #block.content == 1 then block = block.content[1] end
+          if (block.t ~= "Para" and block.t ~= "Plain") or width(block) == 0 or width(block) > limit or
+             not inline_ok(block.content, false) then return nil end
+          return block
+        end
+        local list, selected = training.content[2], plain(training.content[1], "Pilot Lead", 160) ~= nil
+        local last
+        if list.t ~= "BulletList" or #list.content < 1 or #list.content > 2 then selected = false
+        else
+          for _, item in ipairs(list.content) do
+            last = #item == 1 and plain(item[1], "Pilot List Lead", 80) or nil
+            if not last then selected = false end
+          end
+        end
+        if selected then
+          list.content[#list.content][1] = pandoc.Div({pandoc.Para(last.content)},
+            pandoc.Attr("", {}, {["custom-style"]="Pilot List Lead"}))
+        end
+      end
       answer.content[heading - 1] = pandoc.Div({lead}, pandoc.Attr("", {}, {["custom-style"]="Pilot Lead"}))
       for index = 1, #tbl.bodies[1].body - 1 do
         tbl.bodies[1].body[index].cells[1].contents:insert(1,

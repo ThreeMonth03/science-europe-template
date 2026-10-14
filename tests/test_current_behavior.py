@@ -174,6 +174,30 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
                 actual = str(helper.document(Markup(marked))).replace('class="resource-table pdf-bounded-budget"', 'class="resource-table"')
                 self.assertEqual(actual, str(helper.document(Markup(original))), name)
 
+    def test_owned_row_hint_keeps_only_the_existing_short_question_grammar(self):
+        import re
+        from markupsafe import Markup
+        from probe_short_resources import cases, fragment
+        from short_resources_contract import OPENING, HINT
+        suffix = ' class="pdf-short-resource-row" style="break-inside: avoid"'
+        marked = lambda value: re.sub(r'(<tr data-item-id="[^"]+")>', r'\1' + suffix + '>', value)
+        rows = [(name, marked(original), selected) for name, original, selected in cases()]
+        base = marked(fragment())
+        rows += [(name, source, False) for name, source in [
+            ('unknown-row-class', base.replace('pdf-short-resource-row', 'unknown-row')),
+            ('unknown-row-style', base.replace('style="break-inside: avoid"', 'style="break-inside: auto"')),
+            ('extra-row-attribute', base.replace(suffix, ' data-extra="unknown"' + suffix)),
+            ('invalid-row-identity', base.replace('data-item-id="aa.0"', 'data-item-id="not-owned"')),
+            ('long-training', base.replace('Training details.', 'x' * 161)),
+            ('wide-funding', base.replace('Funds.', '中' * 41)),
+        ]]
+        for escape in [False, True]:
+            helper = environment(ROOT, escape).get_template('src/pdf/short-resources.html.j2').module
+            for name, source, selected in rows:
+                with self.subTest(autoescape=escape, case=name):
+                    self.assertEqual(str(helper.document(Markup(source))),
+                                     source.replace(OPENING, HINT, 1) if selected else source)
+
     def test_only_bounded_content_gets_whole_table_keep(self):
         from markupsafe import Markup
         original = Markup('<table class="resource-table"><tbody><tr><td>Unchanged</td></tr></tbody></table>')
