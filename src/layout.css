@@ -91,6 +91,12 @@ html body .dataset-version p { margin-bottom: .2em; }
 html body .dataset-policy > p { display: inline; margin: 0; }
 html body .dataset-policy > p::after { content: ' '; }
 html body .dataset-policy { margin: .4em 0 .6em; }
+/* Q3 storage facts belong to their own system, not one joined policy run.
+   Keep labels and fixed leads with their opening, never an authored answer. */
+html body #q-docs-metadata .storage-conventions-policy { margin: .4em 0 .6em; }
+html body #q-docs-metadata .q3-storage-group { margin: .6em 0 .75em; break-inside: auto; }
+html body #q-docs-metadata .q3-storage-group > h5 { margin: .5em 0 .25em; }
+html body #q-docs-metadata .q3-storage-group > .dataset-policy { margin: 0; }
 /* Q11 scalar references may wrap, but their original text/href is never edited. */
 html body .paper-reference { overflow-wrap: anywhere; word-break: break-word; }
 html body .answer-detail ul { margin-top: .2em; }

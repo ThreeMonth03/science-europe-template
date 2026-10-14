@@ -155,8 +155,9 @@
     {# Capacity is an independent answer, not conditional on a storage technology. #}
     {%- if storageSpaceAUuid or storageConvFSysAUuid or storageConvObjStoreAUuid or storageConvRelDbAUuid -%}
       {% set storageContent %}
-      <div class="dataset-policy storage-conventions-policy">
+      <div class="storage-conventions-policy">
       {# Storage space #}
+      {% set capacityContent %}
       {%- if storageSpaceAUuid == uuids.storageSpaceLittleAUuid -%}
         <p>{{ pgettext("questions/03-docs-metadata", "The project will require so little storage space for all data and software (including temporary storage) that it is not a problem.") }}</p>
       {%- elif storageSpaceAUuid == uuids.storageSpaceSpecifyAUuid -%}
@@ -169,7 +170,18 @@
         </div>
         {%- endif -%}
       {%- endif -%}
+      {% endset %}
+      {% if capacityContent|striptags|trim %}
+      <div class="q3-storage-group" data-storage-group="capacity">
+        <h5>{{ pgettext("q3-storage-groups", "Storage capacity") }}</h5>
+        <div class="dataset-policy">{{ capacityContent }}</div>
+      </div>
+      {% endif %}
       {# File System #}
+      {% if storageConvFSysAUuid in [uuids.storageConvFSysNoAUuid, uuids.storageConvFSysYesAUuid] %}
+      <div class="q3-storage-group" data-storage-group="filesystem">
+        <h5>{{ pgettext("q3-storage-groups", "File system and version management") }}</h5>
+        <div class="dataset-policy">
       {%- if storageConvFSysAUuid == uuids.storageConvFSysNoAUuid -%}
         <p>{{ pgettext("questions/03-docs-metadata", "We will not use a filesystem with files and folders.") }}</p>
       {%- elif storageConvFSysAUuid == uuids.storageConvFSysYesAUuid -%}
@@ -238,18 +250,34 @@
           <div class="answer-detail" data-fact-id="file-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "File naming conventions:") }}</p></div>{{ answerMarkdown.markdown(scFSysAppointments) }}</div>
         {%- endif -%}
       {%- endif -%}
+        </div>
+      </div>
+      {% endif %}
       {# Object and Document Store #}
+      {% if storageConvObjStoreAUuid in [uuids.storageConvObjStoreNoAUuid, uuids.storageConvObjStoreYesAUuid] %}
+      <div class="q3-storage-group" data-storage-group="object-store">
+        <h5>{{ pgettext("q3-storage-groups", "Object and document storage") }}</h5>
+        <div class="dataset-policy">
       {%- if storageConvObjStoreAUuid == uuids.storageConvObjStoreNoAUuid -%}
         <p>{{ pgettext("questions/03-docs-metadata", "We will not be storing data in an \"object/document store\" system.") }}</p>
       {%- elif storageConvObjStoreAUuid == uuids.storageConvObjStoreYesAUuid -%}
         {%- set scObjStoreNamingQUuid = [storageConvObjStorePath, uuids.storageConvObjStoreYesAUuid, uuids.scObjStoreNamingQUuid]|reply_path -%}
         {%- set scObjStoreNaming = repliesMap[scObjStoreNamingQUuid]|reply_str_value -%}
+        {% if scObjStoreNaming|trim %}<div class="answer-lead">{% endif %}
         <p>{{ pgettext("questions/03-docs-metadata", "We will be storing data in an \"object/document store\" system.") }}</p>
+        {% if scObjStoreNaming|trim %}</div>{% endif %}
         {%- if scObjStoreNaming|trim -%}
           <div class="answer-detail" data-fact-id="object-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "Object naming conventions:") }}</p></div>{{ answerMarkdown.markdown(scObjStoreNaming) }}</div>
         {%- endif -%}
       {%- endif -%}
+        </div>
+      </div>
+      {% endif %}
       {# Databases #}
+      {% if storageConvRelDbAUuid in [uuids.storageConvRelDbNoAUuid, uuids.storageConvRelDbYesAUuid] %}
+      <div class="q3-storage-group" data-storage-group="database">
+        <h5>{{ pgettext("q3-storage-groups", "Database storage") }}</h5>
+        <div class="dataset-policy">
       {%- if storageConvRelDbAUuid == uuids.storageConvRelDbNoAUuid -%}
         <p>{{ pgettext("questions/03-docs-metadata", "We will not use a database system to store project data.") }}</p>
       {%- elif storageConvRelDbAUuid == uuids.storageConvRelDbYesAUuid -%}
@@ -266,6 +294,9 @@
         {%- endif -%}
         </p>
       {%- endif -%}
+        </div>
+      </div>
+      {% endif %}
       </div>
       {% endset %}
       {% if output_profile|default('review') != 'submission' or storageContent|striptags|trim or '<img' in storageContent or '<table' in storageContent %}

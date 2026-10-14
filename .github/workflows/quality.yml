@@ -60,6 +60,7 @@ jobs:
           PYTHONPATH=tests:scripts python -m unittest -v \
             tests.test_current_behavior.CurrentI18nTests \
             tests.test_current_behavior.CurrentBudgetLayoutTests \
+            tests.test_q3_storage_groups \
             tests.test_derived_submission_headings.DerivedSubmissionHeadingsTests \
             tests.test_document_metadata.DocumentMetadataTests \
             tests.test_answer_states.AnswerStateTests.test_q5_neutral_mapping_limit_does_not_imply_supplied_answers \
