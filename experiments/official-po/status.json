@@ -1,5 +1,5 @@
 {
-  "status": "local-po-current-pair-tool-e2e-accepted-workflow-integration-pending-not-released",
+  "status": "local-po-workflow-integration-pending-not-released",
   "branch": "codex/official-po",
   "baseline_snapshot_commit": "895741e",
   "source_language": "en",
@@ -91,7 +91,54 @@
   "end_to_end_rehearsal": "See experiments/official-po/e2e.json: real local Server/PO/S3/Worker generation and all 56 page-pair comparisons passed. Original-size reading found two review metadata defects, so this is not overall candidate acceptance or cutover approval.",
   "review_metadata_follow_up": "Both defects are fixed in source 8b480c0 and passed focused tests, updated 859-message catalog checks and four new native review outputs (21 inspected pages). Eight submission entry hashes are unchanged. See metadata.json for the new exact pair and the bounded offline-regression evidence.",
   "tool_language_forwarding": "Implemented in isolated Tool commit 233403b: optional API and regression document language, early unsupported-path rejection, default payload/report preserved. All 418 unit/infra tests, full lint and Sphinx pass. Simulated transport only in this step; see tool-language.json.",
-  "current_tool_e2e": "Tool 233403b and the current render pair passed real local stock Server/Worker generation under a non-conflicting staged test identity: twelve actual PDF/Word outputs, fifty-six exact page pairs and individually inspected pages, two full YAML/service HTML runs, default-null English-base behavior and unknown-locale rejection. Both review metadata fixes confirmed; see tool-e2e.json. No template or CI edits.",
-  "next_step": "Approve the single Chinese PO authority and adapt the existing build/release workflow with immutable template/PO pairing. Use a new publication version, never overwrite the legacy meeting 0.3.78 pair; no parallel CI or duplicate editable translation source.",
+  "current_tool_e2e": "Tool 233403b and the render pair recorded in tool-e2e.json (PO before the 23-message editorial revision) passed real local stock Server/Worker generation under a non-conflicting staged test identity: twelve actual PDF/Word outputs, fifty-six exact page pairs and individually inspected pages, two full YAML/service HTML runs, default-null English-base behavior and unknown-locale rejection. Both review metadata fixes confirmed. No template or CI edits.",
+  "latest_po_smoke": {
+    "date": "2026-10-14",
+    "status": "bounded-stock-435-offline-smoke-accepted-not-released",
+    "po_commit": "3a1aa973c62cac8e70bcb0068c9281a7d853008f",
+    "po_sha256": "900545fdaf41a89144914bec926251fe9f655bc69cbac0dbc7c610b3c5f9c42e",
+    "mo_sha256": "89fd51a7ad94e914bfa1bddd2308b70f713e4cbfb42ae8a16da5c82cdd8fca38",
+    "english_zip_sha256": "c2983ad352018098ce7b94d75b9d2bc074091e384e8671ae2c8ca843be8ffcf1",
+    "template_source_commit": "8b480c0774b0fb3bc9c9242a7b6d539e78843f7e",
+    "worker": "datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3",
+    "runtime": {
+      "dsw-document-worker": "4.35.0",
+      "dsw-templating": "4.35.0",
+      "Jinja2": "3.1.6",
+      "WeasyPrint": "70.0",
+      "polib": "1.2.0"
+    },
+    "pandoc": "pandoc 3.10.2",
+    "marked_catalog_keys_checked_with_official_extractor": 859,
+    "fast_outputs": 8,
+    "native_pdf": 1,
+    "native_word": 1,
+    "changed_translation_keys_called_and_visible": 10,
+    "native_pages_individually_read": {
+      "pdf": 7,
+      "word": 8
+    },
+    "english_old_new_po_fast_entries_byte_identical": true,
+    "chinese_submission_fast_entries_have_15_questions_and_no_review_hints": true,
+    "all_77_english_render_files_byte_identical_to_accepted_prepared_zip": true,
+    "authored_answers_unchanged_by_renderer": true,
+    "context_scope": "One declared synthetic stress case ported by reply values to genuine metamodel18.3 Server base contexts. Complete KM and base reply-value equality verified against the accepted 4.34 case; existing 4.35 identity/reply metadata retained. English language/locale and submission format selectors are explicit synthetic controls.",
+    "visual_result": "No new confirmed clipping, overflow, lost content or grammar defects. Existing review-only Q15 two-character final line (料。) persists without worsening; not a submission hint.",
+    "local_evidence_root": "/home/trc/.local/share/dsw-po-smoke435.fMYC3yh9",
+    "evidence_sha256": {
+      "catalog.json": "1519499e207602e9758912779c62cee24690f6ec873abee2d34e0286949f561f",
+      "prepare.json": "b33a839b95c3faa75d6f520e1b01999aeab28873467ee735be5fffa01dd0800f",
+      "lock.json": "a352d7f3e4099b2d29971db31f249d2aaadec4d32fb20520f90aae87077da831",
+      "fast.json": "819b2b3d2e0c570d829b94d4003344aca9444912b49037b377ef5415a6cc6066",
+      "native.json": "042dca2efbbcf5d5471a73d3a6c15e56e7b96cf82a7af992e9a784d1a1e5ff6e",
+      "preview-result.json": "1ffd9df2a8af8c8e06baae7224850493a406b127c8fa2b64b4aa421c1baa9284",
+      "smoke.py": "2a3a6084bf93e052dbd2fc8b26f2cbce0c91675b1a29488a89951d1c74ee4da3",
+      "markers.json": "087b82421d75552b92b5bea45f5fc737b6bca7a5262e3cfe437b5f222710d1b1",
+      "visual-review.json": "8b486ff5c57a5c9f22878c2d07897956fc83bc273dd14fbed0acdd9a8a999c8a"
+    },
+    "limits": "Network-none offline Worker smoke, not a fresh Server import/PO attachment, browser-preview invalidation, general CI or native Microsoft Word acceptance. Other 13 edited keys retain their separate 4.34 branch evidence; do not claim all 23 were native-tested here.",
+    "safety": "Original three checkouts, frozen handoff and existing evidence unchanged. No template edits, Worker/Pandoc fork, new branch/CI, deployment or remote write."
+  },
+  "next_step": "Make the Chinese repo PO the single editable authority and replace its existing translation-tree build segment, preparing shared English assets once. Adapt existing test environments/dependency locks and current-versus-historical CI checks, and bind PO/MO/source pairing in the existing candidate manifest/staging guard. Reuse the existing workflow, no parallel CI or new release system. Use new immutable publication versions; preserve meeting 0.3.78.",
   "remote_operations": false
 }

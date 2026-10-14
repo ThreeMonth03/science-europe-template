@@ -81,10 +81,25 @@ or loss; submission is unaffected. This is offline Worker acceptance, not a new
 Server/preview, native Microsoft Word or 4.35 acceptance. Previous evidence and
 the `0.3.79` ZIP remain preserved rather than relabelled.
 
+The same latest PO also passed a bounded stock-4.35 follow-up; see `latest_po_smoke`
+in the [PO status](../experiments/official-po/status.json). Official extraction checks
+all 859 keys. Eight format-entry controls verify ten reached edits, unchanged
+English under old/new PO and Chinese submission hint suppression. One review
+PDF/Word pair has 15 individually inspected pages, with no new confirmed defects.
+This uses declared synthetic replies in true 4.35 base contexts, not a new Server
+import. The previous Server receipts retain their original PO hashes.
+
 When the server eventually upgrades, use the shared English DT plus attached PO
 and explicit document language. The 4.34 package is not a 4.35 fallback: 4.35
 ignores its removed legacy i18n options. The maintained PO and English source
 remain usable; only the deployment profile changes.
+
+Workflow integration remains pending: the Chinese repo should own the editable
+PO, and its existing build should replace the old translation-tree segment,
+prepare shared English assets once and bind PO/MO/source hashes in candidate
+staging. Existing English test environments still need i18n and updated build
+dependencies; Chinese historical-tree checks must remain separate from current
+PO checks. Reuse the existing workflow, without another CI or release system.
 
 ## Historical translation-tree repair baseline
 
