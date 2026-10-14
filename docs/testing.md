@@ -61,6 +61,14 @@ documents; all 27 PDF/Word-preview pages match the accepted 4.35 output in text
 and pixels and were individually read. This is a local candidate, not a production
 installation or arbitrary-input bug-free guarantee.
 
+The subsequent [stock 4.34 Server acceptance](../experiments/legacy434/server-e2e.json)
+also passed on 2026-10-14 with the same ZIP. Real import, DB/S3 asset fetching,
+nine fresh documents and three old-version preview API requests succeeded;
+all 78 cached files match the package, and preview HTML matches fresh HTML.
+Six unchanged true-context offline controls match all 27 actual PDF/Word-preview
+pages. The actual pages were individually read. This does not certify browser
+interaction, new-PO preview invalidation, production installation or native Word.
+
 When the server eventually upgrades, use the shared English DT plus attached PO
 and explicit document language. The 4.34 package is not a 4.35 fallback: 4.35
 ignores its removed legacy i18n options. The maintained PO and English source
