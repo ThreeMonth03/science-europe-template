@@ -437,7 +437,7 @@ def check(root, language):
             else:
                 assert [n.get_text(' ', strip=True) for n in soup.select('.storage-conventions-policy li')] == [
                     '每個樣本／研究對象都會有一個資料夾。',
-                    '每次分析（包括重新分析）都會使用一個子資料夾。',
-                    '分析工作流程的每個步驟都會使用一個子資料夾。']
+                    '每次分析（包括重新分析）都會使用一個資料夾或子資料夾。',
+                    '分析工作流程的每個步驟都會使用一個資料夾或子資料夾。']
             counts['inline_cases'] += 1
     return counts
