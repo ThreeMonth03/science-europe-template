@@ -19,7 +19,7 @@ class DocumentMetadataTests(unittest.TestCase):
     PHASE = 'Before final project end'
 
     def render(self, entry, name=PROJECT, escape=False, phase='phase-end', profile=None,
-               versions=None, document_created_at='1999-12-31T23:59:00Z'):
+               versions=None, document_created_at='1999-12-31T23:59:00Z', trace_fields=None):
         km, replies = fixture(None, name)
         km['entities']['phases'] = {'phase-end': {'title': self.PHASE}}
         if versions is None:
@@ -29,6 +29,8 @@ class DocumentMetadataTests(unittest.TestCase):
             document=dict(created_at=document_created_at),
             pkg=dict(name='MODEL-TRACE', version='2.7.0', organization_id='dsw', km_id='root'),
             config=dict(service_name='SERVICE-TRACE', service_url='https://example.org/tool'))
+        for section, values in (trace_fields or {}).items():
+            dc[section].update(values)
         # Mirror the worker timestamp and its to_context_obj view above.
         ctx = dict(knowledgeModel=km, project=dict(name=self.WORKSPACE, replies=replies,
             versionUuid='selected'), document=dict(createdAt=document_created_at), report={}, phaseUuid=phase)
@@ -198,12 +200,29 @@ class DocumentMetadataTests(unittest.TestCase):
         for entry in ('src/submission/word.html.j2', 'src/word/index.html.j2'):
             self.assertNotIn('pdf-flow-layout', self.render(entry, profile='submission').article['class'])
 
-    def test_sparse_pdf_print_rules_preserve_type_and_do_not_keep_prior_answers(self):
+    def test_pdf_review_boundary_hint_requires_short_owned_metadata(self):
+        for fields, expected in (({}, True),
+                ({'project': {'name': 'Original ' * 100}}, False),
+                ({'project': {'name': '中' * 300}}, False),
+                ({'pkg': {'name': 'Long model ' * 100}}, False),
+                ({'config': {'service_name': 'Long service ' * 100}}, False)):
+            for entry in ('src/pdf/index.html.j2', 'src/word/index.html.j2', 'src/index.html.j2'):
+                with self.subTest(fields=fields, entry=entry):
+                    document = self.render(entry, profile='review', trace_fields=fields)
+                    self.assertEqual(expected and entry == 'src/pdf/index.html.j2',
+                                     bool(document.select('aside.pdf-short-provenance')))
+                    for values in fields.values():
+                        for value in values.values():
+                            self.assertIn(value, document.select_one('aside.document-provenance').get_text())
+        self.assertFalse(self.render('src/pdf/index.html.j2', profile='submission').select('.pdf-short-provenance'))
+
+    def test_sparse_pdf_print_rules_preserve_type_and_only_keep_the_metadata_boundary(self):
         css = (ROOT / 'src/layout.css').read_text().split('/* PDF-only sparse endings.', 1)[1]
         self.assertIn('@media print {', css)
-        self.assertEqual(3, css.count('html body article.dmp.pdf-flow-layout'))
+        self.assertEqual(4, css.count('html body article.dmp.pdf-flow-layout'))
         self.assertIn('.pdf-all-empty-submission > #dmp-content { break-before: auto; page-break-before: auto; }', css)
         self.assertIn('> aside.document-provenance > p { margin-bottom: .1em; }', css)
+        self.assertIn('> aside.document-provenance.pdf-short-provenance { break-before: avoid; }', css)
         for forbidden in ('font-', 'line-height:', 'display:', 'height:', 'overflow:',
                           'break-after:', 'break-inside:', '+ aside', '~ aside', '> .answer'):
             self.assertNotIn(forbidden, css)

@@ -4,6 +4,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      profile:
+        description: Current PO checks or the immutable pre-PO replay (not current acceptance)
+        type: choice
+        options: [current, historical]
+        default: current
+
+env:
+  CI_PROFILE: ${{ github.event_name == 'workflow_dispatch' && inputs.profile || 'current' }}
 
 permissions:
   contents: read
@@ -24,6 +33,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # The invalid saved 0.3.78 snapshot is not a replay baseline.
+          ref: ${{ inputs.profile == 'historical' && '0b06afd1b2983ae53d21232926a3e3b933c468bf' || github.sha }}
           fetch-depth: 0  # Profile regression compares the exact 0.3.37 commit.
       - uses: actions/setup-python@v5
         with:
@@ -34,73 +45,111 @@ jobs:
         run: python -m pip install -r requirements-dev.txt
       - name: Prepare public Knowledge Model fixtures independently
         run: make knowledge-models
-      - name: Check source seal and template validity before long tests
+      - name: Check template validity
+        run: make verify
+      - name: Check immutable historical source seal
+        if: env.CI_PROFILE == 'historical'
         run: |
           PYTHONPATH=scripts python -c 'from current_repairs_contract import verified_current; verified_current()'
-          make verify
-      - name: Check English unit contracts
-        if: matrix.group == 'unit'
+      - name: Check current English answers and PO-aware unit contracts
+        if: env.CI_PROFILE == 'current' && matrix.group == 'unit'
+        shell: bash
+        run: |
+          mkdir -p outputs
+          python scripts/check_current.py --output outputs/current-behavior.json
+          python -m unittest -v \
+            tests.test_current_behavior.CurrentI18nTests \
+            tests.test_current_behavior.CurrentBudgetLayoutTests \
+            tests.test_derived_submission_headings.DerivedSubmissionHeadingsTests \
+            tests.test_document_metadata.DocumentMetadataTests \
+            2>&1 | tee outputs/current-unit.log
+          python -m unittest discover -s experiments/legacy434 -v \
+            2>&1 | tee outputs/current-compat434-unit.log
+      - name: Check current parser and bounded native layout on stock workers
+        if: env.CI_PROFILE == 'current' && matrix.group == 'native'
+        shell: bash
+        run: |
+          mkdir -p outputs
+          docker pull datastewardshipwizard/document-worker@sha256:06707194979a80981b1308f618716bc3a6640c4ff1039d85e5971690d51606a2
+          docker pull datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3
+          python -m unittest -v \
+            tests.test_answer_markdown.AnswerMarkdownTests.test_stock_435_parser_preserves_eof_tables_nested_lists_and_literal_sources \
+            tests.test_layout.LayoutTests.test_word_provenance_keeps_only_owned_bounded_metadata_and_all_inlines \
+            tests.test_layout.LayoutTests.test_pdf_review_provenance_boundary_keeps_tail_and_allows_long_content \
+            tests.test_layout.LayoutTests.test_word_styles_and_deterministic_reference \
+            tests.test_layout.LayoutTests.test_english_uses_same_spacing_without_changing_body_font_size \
+            2>&1 | tee outputs/current-native-unit.log
+      - name: Replay immutable historical English unit contracts
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'unit'
         run: make test
       - name: Check integrated Q3 prose on actual production sources
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_q3_policy_prose.py --output outputs/q3-policy-prose-scope.json
       - name: Verify current sources and replay frozen Word empty-section scope
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_word_empty_sections.py --output outputs/word-empty-section-engine.json
       - name: Check integrated empty-section print spacing and unchanged screen scope
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_empty_section_spacing.py --output outputs/empty-section-spacing-engine.json
       - name: Check bounded many-budget PDF rows without changing cell text
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_short_resource_rows.py --engine --output outputs/short-resource-rows-engine.json
       - name: Check bounded Q15 PDF entry and unchanged fallbacks
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_short_resources.py --engine --output outputs/short-resources-engine.json
       - name: Check Q11 bounded preservation labels with pinned Pandoc
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_preservation_reading.py --output outputs/preservation-reading-engine.json
       - name: Check bounded Word pagination with pinned worker Pandoc
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_budget_word.py --output outputs/budget-word-probe.json
       - name: Check long-budget Word structure with pinned worker Pandoc
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_long_budget_word.py --output outputs/long-budget-word-probe.json
       - name: Check short-budget Word widths and unchanged fallbacks
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_word_short_budget.py --output outputs/word-short-budget-probe.json
       - name: Check Q8 and Q9 labels in actual DOCX as well as AST
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: |
           python scripts/probe_q8_word.py --output outputs/q8-word-probe.json
           python scripts/probe_q9_word.py --output outputs/q9-word-probe.json
       - name: Check budget CSS with the pinned worker rendering engine
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_budget_pdf.py --output outputs/budget-pdf-probe.json
       - name: Check exact empty-Q15 panel and unchanged fallback cases
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_empty_pdf.py --output outputs/empty-pdf-probe.json
       - name: Check PDF budget reading structure and repeating headers
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_pdf_budget_reading.py --engine --output outputs/pdf-budget-reading-probe.json
       - name: Check Q11 fixed gap pairs in print, screen and near-page-end controls
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_archive_gap_panels.py --output outputs/archive-gap-panels-engine.json
       - name: Check bounded Q5 context in PDF, screen, AST and editable Word
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_storage_context.py --output outputs/storage-context-engine.json
       - name: Check exact Q5 Word join against the preserved 0.3.34 behavior
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_q5_word_join.py --output outputs/q5-word-join-engine.json
       - name: Check Q3 concise missing prose in PDF, screen and editable Word
-        if: matrix.group == 'native'
+        if: env.CI_PROFILE == 'historical' && matrix.group == 'native'
         run: python scripts/probe_metadata_gap_prose.py --output outputs/metadata-gap-prose-engine.json
-      - name: Preserve regression reports even after failure
-        if: always() && matrix.group == 'native'
+      - name: Preserve scoped reports even after failure
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: english-regression-reports
-          path: outputs/*.json
+          name: english-${{ env.CI_PROFILE }}-${{ matrix.group }}-reports
+          path: |
+            outputs/*.json
+            outputs/*.log
           retention-days: 14
+      - name: State tested source and acceptance boundary
+        if: always()
+        shell: bash
+        run: |
+          echo "Profile: $CI_PROFILE; lane: ${{ matrix.group }}; source: $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          echo 'Current checks execute the PO source; historical replay executes the fixed 0.3.67 source with its original seals. Neither establishes universal PDF or Microsoft Word acceptance.' >> "$GITHUB_STEP_SUMMARY"
 
   # Preserve the required-check identity; a skipped/cancelled lane is not green.
   contract-and-template:

@@ -27,5 +27,21 @@
   {%- set pdfDocument = pdfDocument|replace('<article class="dmp">', pdfArticle|safe, 1) -%}
 {%- endif -%}
 {%- import 'src/pdf/short-resources.html.j2' as shortResources -%}
+{# Only a short, owned review footer may carry the preceding content tail.
+   Reuse the existing CJK-aware width measure; long metadata keeps normal flow. #}
+{%- set provenanceParts = pdfDocument.split('<aside class="document-provenance">') -%}
+{%- if provenanceParts|length == 2 and provenanceParts[1].count('</aside>') == 1 -%}
+  {%- set provenance = provenanceParts[1].split('</aside>', 1)[0] -%}
+  {%- set provenanceBound = namespace(ok=provenance|length <= 6000
+      and provenance.count('<p>') in [3, 4]
+      and provenance.count('</p>') == provenance.count('<p>')
+      and provenance.count('<a href="') == 1 and provenance.count('</a>') == 1
+      and provenance.count('<') == 2 * provenance.count('<p>') + 2, width=0) -%}
+  {%- set ignored = shortResources.measure(provenance, provenanceBound, 480) -%}
+  {%- if provenanceBound.ok -%}
+    {%- set pdfDocument = pdfDocument|replace('<aside class="document-provenance">',
+        '<aside class="document-provenance pdf-short-provenance">'|safe, 1) -%}
+  {%- endif -%}
+{%- endif -%}
 {%- set budgetDocument = shortResources.document(pdfDocument) -%}
 {{- shortResources.no_budget_document(budgetDocument) -}}

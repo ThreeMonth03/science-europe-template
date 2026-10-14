@@ -275,10 +275,11 @@ html body #dmp-content > section.dmp-section#sec-responsibilities-resources:has(
 /* PDF-only sparse endings. The PDF entry verifies all fifteen trusted-empty
    questions and all six owned sections before releasing the cover break.
    Other profiles, mixed answers, Word and screen keep their existing flow.
-   Compact only review metadata itself; never glue the preceding answer/table
-   to it or reduce type size to make a short metadata block fit. */
+   Only bounded review metadata may carry the preceding tail. Keep long
+   metadata flowing; do not keep whole answers or reduce type size. */
 @media print {
 html body article.dmp.pdf-flow-layout.pdf-all-empty-submission > #dmp-content { break-before: auto; page-break-before: auto; }
 html body article.dmp.pdf-flow-layout > aside.document-provenance { margin-top: 1em; padding-top: .5em; }
+html body article.dmp.pdf-flow-layout > aside.document-provenance.pdf-short-provenance { break-before: avoid; }
 html body article.dmp.pdf-flow-layout > aside.document-provenance > p { margin-bottom: .1em; }
 }

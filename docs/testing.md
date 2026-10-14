@@ -1,5 +1,39 @@
 # Maintaining the current bilingual repairs
 
+## Current CI versus immutable historical replay
+
+The existing `Template quality` workflow now defaults to `profile=current` on
+push, pull request and manual runs; its required `contract-and-template` identity
+is unchanged. Both current lanes must succeed. The unit lane verifies the actual
+TDK source, runs all eight `check_current.py` English suites, and explicitly runs
+`CurrentI18nTests`, `CurrentBudgetLayoutTests`, `DerivedSubmissionHeadingsTests`,
+`DocumentMetadataTests` and all `experiments/legacy434` exporter tests. The native
+lane runs five existing tests: the stock 4.35 Markdown parser, owned Word
+provenance guard, PDF provenance boundary/long-content flow, deterministic Word
+reference styles and English spacing. PDF flow covers both pinned stock 4.34 and
+4.35 workers; the parser and Word guard use stock 4.35, not a Worker fork. JSON
+suite counts and verbose unittest logs (including `Ran N tests`)
+are uploaded even on failure. This is an explicit current test scope, not a claim
+that every historical test module ran on PO Jinja or that 27,044 cases equal the
+entire repository suite. The companion Chinese workflow additionally builds the
+exact pair, checks the authoritative PO with official 4.35 extraction, and runs
+all sixteen prepared bilingual suites.
+
+Manual `profile=historical` retains the complete previous unit/native commands
+but checks out `0b06afd1b2983ae53d21232926a3e3b933c468bf` (0.3.67) and its
+declared dependencies. The matching Chinese replay uses
+`4a1e1086d878c76e99bab794fffa4f806100baed` and Tool
+`25e339fbdfb1d20796471055790aad6a4226b6ed`. Their original English source seal
+and Chinese Word preflight were rechecked without changing a seal; this does
+not establish that the full hosted replay passed. The saved invalid 0.3.78
+snapshot remains documented separately. Historical replay is not current PO
+acceptance, and its seals are never recalculated from current source.
+
+The default checks do not replace complete same-answer PDF/DOCX visual review,
+stock 4.34 runtime acceptance or Microsoft Word testing. No workflow deploys to
+DSW, publishes a release, or promotes a candidate merely because CI passes.
+The older CI descriptions below record the pre-PO workflow and its evidence.
+
 ## PO translation and DSW 4.34 compatibility
 
 Server 4.35 is not required for ongoing translation work. The companion Chinese
@@ -100,7 +134,7 @@ PO, MO and exporter sidecar plus the complete manifest. English current checks
 now select explicit gettext languages. Three template-owned prose joins remove
 English separator spaces only in Chinese; tested English output remains exact.
 English 0.3.79 and compatibility 0.3.81 are new identities, not meeting overwrites.
-Current-package native acceptance and CI cutover remain separate gates. Preserved
+Current-package native acceptance and the scoped CI checks remain separate gates. Preserved
 historical-tree/source seals do not describe marked PO Jinja and are not reset.
 
 ## Historical translation-tree repair baseline

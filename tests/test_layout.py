@@ -326,6 +326,90 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
             '--entrypoint','python',image,'-c',runner], input=json.dumps(dict(css=css, rule=rule, cases=cases)).encode(), timeout=180)
         self.assertEqual(json.loads(raw), dict(passed=True, cases=6))
 
+    def test_pdf_review_provenance_boundary_keeps_tail_and_allows_long_content(self):
+        import os
+        css = (ROOT / 'src/layout.css').read_text()
+        rule = ('html body article.dmp.pdf-flow-layout > aside.document-provenance.pdf-short-provenance '
+                '{ break-before: avoid; }')
+        self.assertEqual(css.count(rule), 1)
+        images = [
+            ('69.0', 'datastewardshipwizard/document-worker@sha256:06707194979a80981b1308f618716bc3a6640c4ff1039d85e5971690d51606a2'),
+            ('70.0', 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'),
+        ]
+        runner = '''import json,sys,weasyprint
+from weasyprint import HTML
+p=json.load(sys.stdin)
+assert weasyprint.__version__==p['version']
+before=p['css'].replace(p['rule'],'',1)
+facts=['specialist-expertise','hardware-software','repository-charges','resources-costing']
+gaps=''.join('<p class="data-gap" data-fact-id="'+fact+'" data-status="missing">Q15 '+fact+' missing.</p>' for fact in facts)
+metadata='<aside class="document-provenance pdf-short-provenance">'+''.join('<p>Metadata '+value+'.</p>' for value in ['project','phase','model','<a href="https://example.org/">service</a>'])+'</aside>'
+def body(answer=gaps,trace=metadata,marker=' pdf-flow-layout',height=210):
+ return ('<article class="dmp'+marker+'"><div id="dmp-content"><div style="height:'+str(height)+'mm"></div>'
+   '<section class="dmp-section"><div id="q-required-resources" class="question"><h3>15. Tail resources?</h3>'
+   '<div class="answer">'+answer+'</div></div></section></div>'+trace+'</article>')
+def inspect(source,css):
+ doc=HTML(string='<html><head><style>'+css+'</style></head><body>'+source+'</body></html>').render()
+ rows=[]
+ for page_index,page in enumerate(doc.pages):
+  for box in page._page_box.descendants():
+   if type(box).__name__=='TextBox':
+    left=page._page_box.content_box_x(); right=left+page._page_box.width
+    assert box.position_x>=left-1 and box.position_x+box.width<=right+1,('overflow',box.text)
+    rows.append((page_index,box.text,box.position_x,box.position_y,box.width,box.height))
+ return len(doc.pages),rows
+def text(rows): return ''.join(''.join(row[1] for row in rows).split())
+def paired(source,name):
+ old=inspect(source,before); new=inspect(source,p['css'])
+ assert text(old[1])==text(new[1]),(name,'original text changed')
+ assert new[0]<=old[0],(name,'page count increased',old[0],new[0])
+ return old,new
+found=None
+for height in range(200,241):
+ old=inspect(body(height=height),before)
+ last=' '.join(row[1] for row in old[1] if row[0]==old[0]-1)
+ if old[0]>1 and 'Metadata' in last and 'Q15' not in last and 'Tail resources' not in last:
+  found=height; break
+assert found is not None,'no metadata-only control near the page boundary'
+old,new=paired(body(height=found),'short-tail')
+last=' '.join(row[1] for row in new[1] if row[0]==new[0]-1)
+assert 'Metadata' in last and 'Q15' in last,('metadata-only tail persists',last)
+for name,source in [('unmarked',body(marker='',height=found)),('submission',body(trace='',height=found))]:
+ old,new=paired(source,name)
+ assert old==new,(name,'ordinary layout changed')
+paragraphs=''.join('<p>Authored paragraph '+str(i)+' retains the original answer and continues naturally across pages.</p>' for i in range(48))
+table='<table><tbody>'+''.join('<tr><td>Original table row '+str(i)+'</td><td>Original allocation.</td></tr>' for i in range(48))+'</tbody></table>'
+oversized='<aside class="document-provenance">'+''.join('<p>Metadata overflow row '+str(i)+' retains the original value.</p>' for i in range(80))+'</aside>'
+for name,source,token in [
+ ('long-answer',body(answer=paragraphs,height=found),'Authored paragraph'),
+ ('terminal-table',body(answer=table,height=found),'Original table row')]:
+ old,new=paired(source,name)
+ assert len({row[0] for row in new[1] if token in row[1]})>1,(name,'unbounded content was kept whole')
+# True Jinja classifier tests separately prove these long traces never get the marker.
+long_value='<p>'+('Long metadata value '*300)+'</p>'
+for name,trace,token in [('many-paragraphs',oversized,'Metadata overflow row')]+[
+ ('long-'+str(count)+'-paragraphs','<aside class="document-provenance">'+long_value+'<p>Short metadata.</p>'*(count-1)+'</aside>','Long metadata value') for count in (3,4)]:
+ assert 'pdf-short-provenance' not in trace
+ old,new=paired(body(trace=trace,height=found),name)
+ assert old==new,(name,'unmarked long metadata layout changed')
+ assert len({row[0] for row in new[1] if token in row[1]})>1,(name,'long metadata did not flow')
+print(json.dumps({'passed':True,'cases':8,'boundary_spacer_mm':found}))
+'''
+        for version, image in images:
+            with self.subTest(image=image):
+                command = ['docker', 'run', '--rm', '--pull=never', '--network=none', '--read-only',
+                    '--cap-drop=ALL', '--security-opt=no-new-privileges', '--log-driver=none',
+                    '--tmpfs', '/tmp:rw,size=768m', '--user', f'{os.getuid()}:{os.getgid()}',
+                    '-e', 'PYTHONDONTWRITEBYTECODE=1',
+                    '-e', 'PYTHONPATH=/home/user/.local/lib/python3.14/site-packages:/usr/local/lib/python3.14/site-packages',
+                    '-i', '--entrypoint', 'python', image, '-B', '-c', runner]
+                raw = subprocess.check_output(command, input=json.dumps(
+                    dict(css=css, rule=rule, version=version)).encode(), timeout=240)
+                result = json.loads(raw)
+                self.assertTrue(result['passed'])
+                self.assertEqual(8, result['cases'])
+                self.assertIn(result['boundary_spacer_mm'], range(200, 241))
+
     def test_fixed_list_leads_keep_only_the_intro_without_changing_list_xml(self):
         import base64
         import sys

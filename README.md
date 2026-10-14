@@ -6,13 +6,16 @@ English Jinja and one PO; do not edit the generated Chinese ZIP. See the
 [compatibility build instructions](docs/testing.md#po-translation-and-dsw-434-compatibility).
 The 4.35 native-PO path stays separate. Neither path automatically deploys.
 
-The local candidate uses English `0.3.81` and generated Chinese compatibility
-`0.3.83`. PDF, Word and HTML never display the export timestamp in either profile;
+The local candidate uses English `0.3.82` and generated Chinese compatibility
+`0.3.84`. PDF, Word and HTML never display the export timestamp in either profile;
 named DMP versions, their dates and real change history remain. The prior
 `0.3.80`/`0.3.82` polish comparison is preserved. Edit the PO only in the companion Chinese repository; this repository's
 old catalog is now a read-only historical fixture. The existing Chinese builder
 produces both runtime deliveries with one prepared reference. Native before/after
 verification and CI cutover are separate gates; older version notes below are history.
+The PDF review footer now avoids a break immediately before provenance; this is
+a soft boundary, not a whole-answer keep rule. The preceding short tail can move
+with metadata without reducing type size or dropping content. Word is unchanged.
 
 For the current candidate repairs, see the [shared testing guide](docs/testing.md).
 It replaces eight per-round development notes; the release history below is unchanged.
