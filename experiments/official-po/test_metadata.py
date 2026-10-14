@@ -23,7 +23,7 @@ class MetadataTests(unittest.TestCase):
     def render(self, language, current=MISSING, legacy=MISSING, phases=None, profile='review', escape=True, entry='src/document-provenance.html.j2'):
         env = Environment(loader=ChoiceLoader([DictLoader({'src/answer-markdown.html.j2': ''}), FileSystemLoader(ROOT)]),
             extensions=['jinja2.ext.i18n', 'jinja2.ext.do'], autoescape=escape)
-        translations = (gettext.GNUTranslations(io.BytesIO(polib.pofile(str(ROOT/'locales/zh-Hant.po')).to_binary()))
+        translations = (gettext.GNUTranslations(io.BytesIO(polib.pofile(str(ROOT/'experiments/official-po/fixtures/zh-Hant-0.3.80.po')).to_binary()))
                         if language == 'zh-Hant' else gettext.NullTranslations())
         env.install_gettext_translations(translations, newstyle=True)
         env.filters.update(markdown=lambda v: v, dot=lambda v: v, reply_items=lambda v: [], reply_str_value=lambda v: '',

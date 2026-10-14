@@ -3,6 +3,7 @@
 This does not claim that every human-readable template string is marked, or that
 translations are semantically correct. The local prototype is not a release.
 """
+import argparse
 from collections import Counter
 import importlib.metadata
 import json
@@ -58,4 +59,6 @@ def validate(po_path):
 
 
 if __name__ == '__main__':
-    print(json.dumps(validate(ROOT / 'locales/zh-Hant.po'), ensure_ascii=False))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--po', type=Path, required=True, help='Authoritative catalog in the Chinese repository')
+    print(json.dumps(validate(parser.parse_args().po), ensure_ascii=False))

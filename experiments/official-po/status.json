@@ -67,7 +67,7 @@
   },
   "locale_assets": "HTML/CSS chooses by document locale/language; stock enrich-docx applies Chinese styles after Pandoc, preserving added/custom styles. English styles pass through unchanged.",
   "upgrade_cost": "The Word adapter guards current prepared-reference style IDs and Pandoc XML serialization. Runtime/reference upgrades require native regression and may need this adapter updated. Official PO does not eliminate upstream Jinja/KM mapping conflicts or supply locale-specific prose/layout automatically.",
-  "authority_until_integration": "The existing Chinese repository/workflow remains the delivery authority. This isolated PO branch is not a second editable production translation source.",
+  "authority_until_integration": "The local cutover moves the sole editable PO to locales/zh-Hant.po in the Chinese repository. The English experiments/official-po/fixtures/zh-Hant-0.3.80.po is byte-preserved read-only history. Existing meeting deliveries remain fallback; current-package native acceptance and CI cutover are not yet release approval.",
   "previous_local_prototype_commits": [
     "de96940",
     "5f607d0"
@@ -139,6 +139,6 @@
     "limits": "Network-none offline Worker smoke, not a fresh Server import/PO attachment, browser-preview invalidation, general CI or native Microsoft Word acceptance. Other 13 edited keys retain their separate 4.34 branch evidence; do not claim all 23 were native-tested here.",
     "safety": "Original three checkouts, frozen handoff and existing evidence unchanged. No template edits, Worker/Pandoc fork, new branch/CI, deployment or remote write."
   },
-  "next_step": "Make the Chinese repo PO the single editable authority and replace its existing translation-tree build segment, preparing shared English assets once. Adapt existing test environments/dependency locks and current-versus-historical CI checks, and bind PO/MO/source pairing in the existing candidate manifest/staging guard. Reuse the existing workflow, no parallel CI or new release system. Use new immutable publication versions; preserve meeting 0.3.78.",
+  "next_step": "Validate the cutover builder's new immutable packages and exact external PO pairing; run current bilingual checks and new-package native acceptance. Then separate current PO CI from archived historical-tree/source-seal replay in the existing workflow. No parallel CI or new release system; preserve meeting 0.3.78.",
   "remote_operations": false
 }

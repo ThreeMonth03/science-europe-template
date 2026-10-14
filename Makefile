@@ -3,13 +3,14 @@
 
 PYTHON ?= python3
 DSW_TDK ?= dsw-tdk
-PO ?= locales/zh-Hant.po
+PO ?=
 ENGLISH_ZIP ?=
 COMPAT_VERSION ?=
 COMPAT_OUTPUT ?= outputs/compat434/template.zip
 SOURCE_COMMIT ?=
 
 export-compat434:
+	$(if $(strip $(PO)),,$(error Set PO to the authoritative Chinese repository catalog))
 	$(PYTHON) scripts/export_legacy_locale.py --source-zip "$(ENGLISH_ZIP)" --po "$(PO)" --output "$(COMPAT_OUTPUT)" --version "$(COMPAT_VERSION)" $(if $(SOURCE_COMMIT),--source-commit "$(SOURCE_COMMIT)")
 
 test-compat434:

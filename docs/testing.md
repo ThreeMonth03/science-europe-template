@@ -2,14 +2,13 @@
 
 ## PO translation and DSW 4.34 compatibility
 
-Server 4.35 is not required for ongoing translation work. In this local PO
-worktree, `locales/zh-Hant.po` is the single editable catalog for the new PO
-outputs. Keep context keys and named parameters intact, translate whole clauses,
-and review the resulting prose. The old translation-tree delivery and meeting
-packages stay preserved as fallback/history; do not maintain a parallel new
-translation there. The exporter accepts `--po` from another repository, so a
-later move of the authoritative PO to the Chinese repo does not require a new
-conversion algorithm or duplicate catalog.
+Server 4.35 is not required for ongoing translation work. The companion Chinese
+repository owns the only editable `locales/zh-Hant.po`. English owns shared Jinja,
+locale-aware layout and the exporter; pass the Chinese catalog explicitly.
+Keep context keys and named parameters intact, translate whole clauses and review
+the resulting prose. The old translation tree and meeting packages remain history.
+`experiments/official-po/fixtures/zh-Hant-0.3.80.po` is an exact read-only receipt
+fixture, not a second translation source.
 
 Install the optional build dependencies in an isolated environment:
 
@@ -19,7 +18,7 @@ python3 -m venv .venv-po
 make test-compat434 PYTHON=.venv-po/bin/python
 make export-compat434 PYTHON=.venv-po/bin/python \
   ENGLISH_ZIP=/path/to/prepared-english-template.zip \
-  PO=locales/zh-Hant.po COMPAT_VERSION=0.3.80 \
+  PO=/path/to/science-europe-template-zhtw/locales/zh-Hant.po COMPAT_VERSION=0.3.81 \
   COMPAT_OUTPUT=outputs/compat434/template.zip
 ```
 
@@ -94,12 +93,15 @@ and explicit document language. The 4.34 package is not a 4.35 fallback: 4.35
 ignores its removed legacy i18n options. The maintained PO and English source
 remain usable; only the deployment profile changes.
 
-Workflow integration remains pending: the Chinese repo should own the editable
-PO, and its existing build should replace the old translation-tree segment,
-prepare shared English assets once and bind PO/MO/source hashes in candidate
-staging. Existing English test environments still need i18n and updated build
-dependencies; Chinese historical-tree checks must remain separate from current
-PO checks. Reuse the existing workflow, without another CI or release system.
+The local cutover gives the Chinese repo PO authority and replaces its build's
+translation-tree segment with one English preparation and generated runtime
+profiles. Candidate staging binds the English ZIP, Chinese compatibility ZIP,
+PO, MO and exporter sidecar plus the complete manifest. English current checks
+now select explicit gettext languages. Three template-owned prose joins remove
+English separator spaces only in Chinese; tested English output remains exact.
+English 0.3.79 and compatibility 0.3.81 are new identities, not meeting overwrites.
+Current-package native acceptance and CI cutover remain separate gates. Preserved
+historical-tree/source seals do not describe marked PO Jinja and are not reset.
 
 ## Historical translation-tree repair baseline
 
