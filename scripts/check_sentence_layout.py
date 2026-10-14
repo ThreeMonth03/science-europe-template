@@ -427,7 +427,7 @@ def check(root, language):
                 counts['inactive_cases'] += 1
         for profile in ['review', 'submission']:
             soup = render(folder, folder_replies(), profile)
-            emphasis = soup.select('.storage-conventions-policy > ul > li > div:first-child > p > strong')
+            emphasis = soup.select('.storage-conventions-policy > .q3-storage-group[data-storage-group="filesystem"] > .dataset-policy > ul > li > div:first-child > p > strong')
             # Reviewed Chinese sentences already omit this English emphasis.
             assert len(emphasis) == (3 if language == 'en' else 0)
             assert all('item-label' not in n.get('class', []) for n in emphasis)
