@@ -10,6 +10,11 @@ html body h2 { font-size: 15pt; line-height: 1.35; margin: 1.3em 0 .65em; }
 html body h3 { font-size: 11pt; font-weight: normal; line-height: 1.5; margin: .9em 0 .6em; color: #47565c; }
 /* Question prompts outrank dataset labels without enlarging ordinary answers. */
 html body .question > h3 { font-size: 11.5pt; font-weight: bold; color: #000; }
+/* Examples and definitions remain visible without weighing down the prompt. */
+html body .question > h3:has(+ .question-guidance) { margin-bottom: .2em; }
+html body .question > .question-guidance { font-size: 10pt; color: #47565c; margin-bottom: .6em; break-inside: avoid; break-after: avoid; }
+html body .question > .question-guidance > p { margin: 0; }
+html body .compact-empty-question > .question-guidance { break-after: auto; }
 html body h4 { font-size: 11.5pt; margin: .85em 0 .4em; }
 html body h5 { font-size: 10.5pt; margin: .75em 0 .3em; }
 html body h1, html body h2, html body h3, html body h4, html body h5 { break-after: avoid; break-inside: avoid; }
@@ -260,6 +265,7 @@ html body #q-share-restrictions > .answer > .dataset-section > ul > li > strong:
    a preceding answer ends with an authored table. */
 html body #dmp-content > .dmp-section > .question.compact-empty-question { margin-top: .5em; }
 html body #dmp-content > .dmp-section > .question.compact-empty-question > h3 { margin: .4em 0 .15em; break-after: auto; }
+html body #dmp-content > .dmp-section > .question.compact-empty-question > h3:has(+ .question-guidance) { break-after: avoid; }
 
 /* BEGIN empty section spacing v1: all direct questions must carry the trusted empty marker.
    Exact section ids, child counts and heading position reject mixed/unknown

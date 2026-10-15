@@ -213,6 +213,22 @@ class ScienceEuropeContractTests(unittest.TestCase):
 
     def test_template_headings_match_the_recorded_science_europe_questions(self):
         from bs4 import BeautifulSoup
+        # Reviewed display decomposition; the independent official questions
+        # below and in requirements stay unchanged, including every example.
+        split_questions = {
+            13: (
+                'How will the application of a unique and persistent identifier (such as a Digital Object Identifier (DOI)) to each data set be ensured?',
+                '13. How will you ensure that each dataset is assigned a unique and persistent identifier?',
+                'A Digital Object Identifier, or DOI, is one example.'),
+            14: (
+                'Who (for example role, position, and institution) will be responsible for data management (i.e. the data steward)?',
+                '14. Who will be responsible for data management?',
+                'This refers to the data steward. Details may include their role, position, and institution.'),
+            15: (
+                'What resources (for example financial and time) will be dedicated to data management and ensuring that data will be FAIR (Findable, Accessible, Interoperable, Re-usable)?',
+                '15. What resources will be dedicated to data management and ensuring that the data are FAIR?',
+                'Resources may include funding and time. FAIR means Findable, Accessible, Interoperable, and Re-usable.'),
+        }
         for requirement in CONTRACT["requirements"]:
             # Compare the actual default-English heading, not the gettext call
             # in marked source. The independent recorded questions stay exact.
@@ -221,6 +237,17 @@ class ScienceEuropeContractTests(unittest.TestCase):
             self.assertIsNotNone(match, requirement["template"])
             heading = " ".join(match.get_text().split())
             expected = f'{requirement["number"]}. {requirement["question"]}'
+            if requirement['number'] in split_questions:
+                official, expected, explanation = split_questions[requirement['number']]
+                self.assertEqual(official, requirement['question'])
+                guidance = document.select_one('.question > .question-guidance')
+                self.assertIsNotNone(guidance)
+                self.assertEqual([node.name for node in guidance.find_all(recursive=False)], ['p'])
+                self.assertEqual(explanation, guidance.get_text())
+                self.assertEqual(guidance, match.find_next_sibling())
+                self.assertIn('answer', guidance.find_next_sibling()['class'])
+            else:
+                self.assertIsNone(document.select_one('.question-guidance'))
             self.assertEqual(expected, heading, requirement["id"])
 
     def test_experiment_bindings_exist_or_are_explicitly_unmapped(self):

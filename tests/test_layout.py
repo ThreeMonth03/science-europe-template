@@ -18,6 +18,112 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_question_guidance_is_owned_bounded_and_keeps_no_whole_answer(self):
+        from native_support import IMAGE, RUNNER
+        guidance = '<div class="question-guidance"><p>Fixed explanation.</p></div>'
+        def question(qid, guide=guidance, body='<p>Original answer.</p>'):
+            return '<div id="' + qid + '" class="question"><h3>Original heading</h3>' + guide + '<div class="answer">' + body + '</div></div>'
+        cases = [(qid, question(qid), True) for qid in
+                 ('q-persistent-identifier', 'q-dm-responsible', 'q-required-resources')]
+        cases += [('chinese', question('q-persistent-identifier', guidance.replace('Fixed explanation.', '例如數位物件識別碼 DOI。')), True)]
+        cases += [(name, question('q-persistent-identifier', value), False) for name, value in [
+            ('extra-attribute', guidance.replace('question-guidance"', 'question-guidance" data-extra="x"')),
+            ('extra-class', guidance.replace('question-guidance"', 'question-guidance other"')),
+            ('rich', guidance.replace('Fixed explanation.', '<em>Fixed explanation.</em>')),
+            ('nested', '<div>' + guidance + '</div>'),
+            ('two-paragraphs', guidance.replace('</p>', '</p><p>Another.</p>')),
+            ('empty', guidance.replace('Fixed explanation.', '')),
+            ('long', guidance.replace('Fixed explanation.', 'x' * 501)),
+        ]]
+        cases.append(('wrong-question', question('q-how-data'), False))
+        gaps = ('<p>Original answer.</p><div class="q15-terminal-gap" data-fact-id="repository-charges" data-status="missing"><p>First missing fact.</p></div>'
+                '<div class="q15-terminal-gap" data-fact-id="resources-costing" data-status="missing"><p>Second missing fact.</p></div>')
+        cases.append(('q15-review-gaps', question('q-required-resources', body=gaps), True))
+        lua = (ROOT / 'src/word/pilot.lua').read_text()
+        html = ''.join('<div id="case-' + name + '">' + text + '</div>' for name, text, _ in cases)
+        data = json.loads(subprocess.check_output(
+            ['docker', 'run', '--rm', '--pull=never', '--network=none', '--log-driver=none', '-i',
+             '--entrypoint', 'python', IMAGE, '-c', RUNNER],
+            input=json.dumps({'lua': lua, 'html': html}).encode(), timeout=180))
+        def all_divs(value):
+            if isinstance(value, dict):
+                if value.get('t') == 'Div': yield value
+                for child in value.values(): yield from all_divs(child)
+            elif isinstance(value, list):
+                for child in value: yield from all_divs(child)
+        for (name, original, expected), result in zip(cases, data['blocks']):
+            with self.subTest(case=name):
+                styled = [div for div in all_divs(result)
+                    if ['custom-style', 'Pilot Question Guidance'] in div['c'][0][2]]
+                self.assertEqual(int(expected), len(styled))
+                if styled:
+                    self.assertEqual(['question-guidance'], styled[0]['c'][0][1])
+                    self.assertEqual(1, len(styled[0]['c'][1]))
+                    self.assertEqual('Para', styled[0]['c'][1][0]['t'])
+                question_node = result['c'][1][0]
+                self.assertFalse(question_node['c'][0][2], 'Never style or keep the whole question')
+                answer = question_node['c'][1][-1]
+                self.assertEqual(['answer'], answer['c'][0][1])
+                self.assertFalse(answer['c'][0][2], 'Never style or keep the whole answer')
+                self.assertIn("'Original'", str(result)); self.assertIn("'answer.'", str(result))
+                if name == 'q15-review-gaps':
+                    terminal = [div for div in all_divs(result) if 'q15-terminal-gap' in div['c'][0][1]]
+                    self.assertEqual(1, len(terminal))
+                    self.assertIn("'First'", str(terminal)); self.assertIn("'Second'", str(terminal))
+
+    def test_word_empty_guidance_markers_require_the_owned_question_shape(self):
+        from native_support import IMAGE
+        guide = '<div class="question-guidance"><p>A fixed example.</p></div>'
+        def question(qid, guidance=guide, answer=''):
+            return '<div id="' + qid + '" class="question compact-empty-question"><h3>Original heading</h3>' + guidance + '<div class="answer">' + answer + '</div></div>'
+        cases = [(qid, question(qid), True) for qid in ('q-persistent-identifier', 'q-dm-responsible', 'q-required-resources')]
+        cases += [('wrong-question', question('q-how-data'), False),
+            ('extra-attribute', question('q-persistent-identifier', guide.replace('question-guidance"', 'question-guidance" data-extra="x"')), False),
+            ('rich', question('q-persistent-identifier', guide.replace('A fixed example.', '<em>Original emphasis</em>')), False),
+            ('authored-empty-block', question('q-persistent-identifier', answer='<div class="original"></div>'), False),
+            ('authored-answer', question('q-persistent-identifier', answer='<p>Original answer.</p>'), False)]
+        runner = '''import json,sys,tempfile,subprocess
+from pathlib import Path
+p=json.load(sys.stdin)
+with tempfile.TemporaryDirectory() as tmp:
+ args=['pandoc','--from=html','--to=json']
+ for name in ['pilot','spacing']:
+  f=Path(tmp)/(name+'.lua');f.write_text(p[name]);args.append('--lua-filter='+str(f))
+ print(subprocess.check_output(args,input=p['html'].encode()).decode())
+'''
+        payload = {'pilot': (ROOT/'src/word/pilot.lua').read_text(),
+                   'spacing': (ROOT/'src/word/question-spacing.lua').read_text(),
+                   'html': ''.join('<div id="case-' + name + '">' + value + '</div>' for name, value, _ in cases)}
+        result = json.loads(subprocess.check_output(['docker','run','--rm','--pull=never','--network=none','--log-driver=none','-i',
+            '--entrypoint','python',IMAGE,'-c',runner],input=json.dumps(payload).encode(),timeout=180))
+        for (name, original, eligible), block in zip(cases, result['blocks']):
+            with self.subTest(case=name):
+                self.assertEqual(2 if eligible else 0, str(block).count('DSW:SE:empty-question:v1:'))
+                if eligible:
+                    self.assertIn('Pilot Question Guidance', str(block))
+                if name == 'authored-answer': self.assertIn("'answer.'", str(block))
+
+    def test_guided_empty_question_xml_releases_only_its_final_paragraph(self):
+        from jinja2 import DictLoader, ChoiceLoader
+        heading = '<w:p><w:pPr><w:pStyle w:val="Heading3" /></w:pPr><w:r><w:t>Original heading</w:t></w:r></w:p>'
+        guide = '<w:p><w:pPr><w:pStyle w:val="PilotQuestionGuidance" /></w:pPr><w:r><w:t>Original guidance</w:t></w:r></w:p>'
+        begin, end = '<!--DSW:SE:empty-question:v1:begin-->\n    ', '\n    <!--DSW:SE:empty-question:v1:end-->'
+        link_begin, link_end = '<!--DSW:SE:empty-section-link:v1:begin-->\n    ', '\n    <!--DSW:SE:empty-section-link:v1:end-->'
+        for linked in (False, True):
+            source = begin + heading + guide + end
+            if linked: source = link_begin + source + link_end
+            source += '<w:p><w:r><w:t>Original later text</w:t></w:r></w:p>'
+            env = Environment(loader=ChoiceLoader([DictLoader({'src/word/short-tables.xml': source}),
+                FileSystemLoader(ROOT)]), undefined=StrictUndefined)
+            output = env.get_template('src/word/question-spacing.xml').render()
+            self.assertNotIn('DSW:SE:', output)
+            self.assertEqual(2, output.count('<w:keepNext'))
+            self.assertIn('<w:pStyle w:val="Heading3" /><w:keepNext w:val="1"/>', output)
+            self.assertIn('<w:pStyle w:val="PilotQuestionGuidance" /><w:keepNext w:val="' + str(int(linked)) + '"/>', output)
+            self.assertTrue(output.endswith('<w:p><w:r><w:t>Original later text</w:t></w:r></w:p>'))
+            for value in ('Original heading', 'Original guidance', 'Original later text'):
+                self.assertEqual(1, output.count(value))
+
     def test_word_terminal_budget_and_single_person_keeps_are_bounded(self):
         import copy
         import sys
@@ -830,6 +936,10 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 self.assertEqual(2, provenance.paragraph_format.space_after.pt)
                 self.assertTrue(provenance.paragraph_format.keep_together)
                 self.assertFalse(provenance.paragraph_format.keep_with_next)
+                guidance = document.styles['Pilot Question Guidance']
+                self.assertEqual('Pilot Provenance', guidance.base_style.name)
+                self.assertEqual(10, guidance.font.size.pt)
+                self.assertTrue(guidance.paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Label"].paragraph_format.keep_with_next)
                 budget_label = document.styles["Pilot Budget Label"]
                 self.assertEqual('Body Text', budget_label.base_style.name)

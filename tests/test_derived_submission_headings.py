@@ -117,6 +117,52 @@ class DerivedSubmissionHeadingsTests(unittest.TestCase):
         self.assertEqual(6, len(soup.select('.dmp-section')))
         self.assertIsNone(soup.select_one('#dmp-projects'))
         self.assertFalse(soup.select('.data-gap, .data-review, .empty-value'))
+        self.assertEqual(3, len(soup.select('.question > .question-guidance')))
+        for guidance in soup.select('.question > .question-guidance'):
+            self.assertEqual('h3', guidance.find_previous_sibling().name)
+            self.assertIn('answer', guidance.find_next_sibling()['class'])
+            self.assertIsNone(guidance.find_parent(class_='answer'))
+
+    def test_only_bounded_direct_question_guidance_allows_empty_compaction(self):
+        env = environment(ROOT)
+        def render_owned(source, profile='submission'):
+            return BeautifulSoup(env.from_string(PREFIX + source).render(
+                repliesMap={}, output_profile=profile), 'html.parser')
+        for qid in ('q-persistent-identifier', 'q-dm-responsible', 'q-required-resources'):
+            for text in ('A plain fixed example.', '例如數位物件識別碼 DOI。'):
+                guide = '<div class="question-guidance"><p>' + text + '</p></div>'
+                for body in ('', ' \t\n', '<p></p>', '<p>Original answer.</p>',
+                             '<img src="original.png">', '<table><tr><td>Original</td></tr></table>'):
+                    for profile in ('submission', 'review', 'unknown'):
+                        with self.subTest(qid=qid, text=text, body=body, profile=profile):
+                            source = ('{% import "src/question-spacing.html.j2" as spacing with context %}'
+                                '{% call spacing.question("' + qid + '") %}'
+                                '<div id="' + qid + '" class="question"><h3>Original question</h3>' + guide +
+                                '<div class="answer">' + body + '</div></div>{% endcall %}')
+                            soup = render_owned(source, profile)
+                            self.assertEqual(profile == 'submission' and not body.strip(),
+                                'compact-empty-question' in soup.select_one('.question')['class'])
+                            self.assertEqual(text, soup.select_one('.question-guidance').get_text())
+                            self.assertEqual(BeautifulSoup('<div>' + body + '</div>', 'html.parser').div.decode_contents(),
+                                soup.select_one('.answer').decode_contents())
+        guide = '<div class="question-guidance"><p>Fixed example.</p></div>'
+        invalid = [guide.replace('<p>', '<p data-extra="x">'),
+            guide.replace('question-guidance"', 'question-guidance unknown"'),
+            guide.replace('<p>', '<p><strong>').replace('</p>', '</strong></p>'),
+            guide.replace('</p>', '</p><p>Another paragraph.</p>'),
+            guide.replace('Fixed example.', '<img src="original.png">'),
+            guide.replace('Fixed example.', 'x' * 501),
+            guide.replace('Fixed example.', ' \t\n'),
+            '<div>' + guide + '</div>']
+        for qid, value in [('q-persistent-identifier', value) for value in invalid] + [('q-how-data', guide)]:
+            with self.subTest(qid=qid, guide=value):
+                source = ('{% import "src/question-spacing.html.j2" as spacing with context %}'
+                    '{% call spacing.question("' + qid + '") %}'
+                    '<div id="' + qid + '" class="question"><h3>Original question</h3>' + value +
+                    '<div class="answer"></div></div>{% endcall %}')
+                soup = render_owned(source)
+                self.assertNotIn('compact-empty-question', soup.select_one('.question')['class'])
+                self.assertIn(BeautifulSoup(value, 'html.parser').get_text(), soup.get_text())
 
 
 if __name__ == '__main__':

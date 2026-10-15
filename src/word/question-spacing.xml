@@ -1,3 +1,6 @@
+{%- set guided_heading = '<w:pPr><w:pStyle w:val="Heading3" /><w:keepNext w:val="1"/><w:spacing w:before="80" w:after="0"/></w:pPr>'|safe -%}
+{%- set guidance_property = '<w:pPr><w:pStyle w:val="PilotQuestionGuidance" /></w:pPr>' -%}
+{%- set guidance_release = '<w:pPr><w:pStyle w:val="PilotQuestionGuidance" /><w:keepNext w:val="0"/></w:pPr>'|safe -%}
 {%- set section_content -%}
 {# Preserve the existing short-table transformation before touching new markers. #}
 {%- set content -%}{%- include 'src/word/short-tables.xml' -%}{%- endset -%}
@@ -19,9 +22,16 @@
   {%- set parts = piece.split(end) -%}
   {{- require(parts|length == 2) -}}
   {%- set heading = parts[0] -%}
-  {{- require(heading.count('<w:p>') == 1 and heading.count('</w:p>') == 1 and heading.count(property) == 1) -}}
   {{- require('<w:tbl' not in heading and '<w:drawing' not in heading and '<w:keepNext' not in heading) -}}
-  {{- heading.replace(property, replacement, 1)|safe -}}
+  {%- if guidance_property in heading -%}
+    {{- require(heading.count('<w:p>') == 2 and heading.count('</w:p>') == 2 and heading.count(property) == 1 and heading.count(guidance_property) == 1 and heading.find(property) < heading.find(guidance_property)) -}}
+    {# Keep the title with its explanation, but an empty answer must not make
+       the explanation pull the following question onto the same page. #}
+    {{- heading.replace(property, guided_heading, 1).replace(guidance_property, guidance_release, 1)|safe -}}
+  {%- else -%}
+    {{- require(heading.count('<w:p>') == 1 and heading.count('</w:p>') == 1 and heading.count(property) == 1) -}}
+    {{- heading.replace(property, replacement, 1)|safe -}}
+  {%- endif -%}
   {{- parts[1]|safe -}}
 {%- endfor -%}
 
@@ -73,8 +83,13 @@
   {%- set link_parts = link_piece.split(link_end) -%}
   {{- require_link(link_parts|length == 2) -}}
   {%- set link_heading = link_parts[0] -%}
-  {{- require_link(link_heading.count('<w:p>') == 1 and link_heading.count('</w:p>') == 1 and link_heading.count(link_property) == 1) -}}
   {{- require_link('<w:tbl' not in link_heading and '<w:drawing' not in link_heading) -}}
-  {{- link_heading.replace(link_property, link_replacement, 1)|safe -}}
+  {%- if guidance_release in link_heading -%}
+    {{- require_link(link_heading.count('<w:p>') == 2 and link_heading.count('</w:p>') == 2 and link_heading.count(guided_heading) == 1 and link_heading.count(guidance_release) == 1) -}}
+    {{- link_heading.replace(guidance_release, guidance_release.replace('w:val="0"', 'w:val="1"'|safe), 1)|safe -}}
+  {%- else -%}
+    {{- require_link(link_heading.count('<w:p>') == 1 and link_heading.count('</w:p>') == 1 and link_heading.count(link_property) == 1) -}}
+    {{- link_heading.replace(link_property, link_replacement, 1)|safe -}}
+  {%- endif -%}
   {{- link_parts[1]|safe -}}
 {%- endfor -%}

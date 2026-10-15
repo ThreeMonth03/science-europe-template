@@ -153,9 +153,14 @@ class DocumentMetadataTests(unittest.TestCase):
                     '<div class="answer"></div></div>' for qid in questions) + '</section>'
             for sid, questions in sections.items())
         original = '<html><body><article class="dmp"><div id="dmp-content">' + content + '</div></article></body></html>'
+        guided = original
+        for qid in ('q-persistent-identifier', 'q-dm-responsible', 'q-required-resources'):
+            heading = '<div id="' + qid + '" class="question compact-empty-question"><h3>Original question</h3>'
+            guided = guided.replace(heading, heading + '<div class="question-guidance"><p>Fixed example or definition.</p></div>', 1)
         question = '<div id="q-how-data" class="question compact-empty-question">'
         variants = {
             'complete': (original, True),
+            'known-guidance': (guided, True),
             'one-unmarked': (original.replace(question, question.replace(' compact-empty-question', ''), 1), False),
             'unknown-question': (original.replace('id="q-how-data"', 'id="q-unknown"', 1), False),
             'missing-question': (original.replace(question + '<h3>Original question</h3><div class="answer"></div></div>', '', 1), False),

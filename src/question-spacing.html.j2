@@ -7,11 +7,20 @@
   {%- set rendered = caller() -%}
   {%- set pieces = rendered.split('<div class="answer">') -%}
   {%- set state = namespace(empty=false) -%}
+  {# Only the three fixed, direct question explanations may follow the heading.
+     Unknown tags/attributes and authored answer blocks never qualify. #}
+  {%- set guidance = pieces[0].rsplit('</h3>', 1)[-1].split()|join('') -%}
+  {%- set guidanceStart = '<divclass="question-guidance"><p>' -%}
+  {%- set guidanceEnd = '</p></div>' -%}
+  {%- set guidanceText = guidance[guidanceStart|length:-(guidanceEnd|length)] -%}
+  {%- set ownedGuidance = identifier in ['q-persistent-identifier', 'q-dm-responsible', 'q-required-resources']
+      and guidance.startswith(guidanceStart) and guidance.endswith(guidanceEnd)
+      and 0 < guidanceText|length <= 500 and '<' not in guidanceText and '>' not in guidanceText -%}
   {%- if output_profile|default('review') == 'submission'
       and (rendered.lstrip().startswith('<div id="' + identifier + '" class="question">')
         or rendered.lstrip().startswith('<div id="' + identifier + '" class="question" data-requirement-id="'))
       and pieces|length == 2 and pieces[0].count('<h3>') == 1
-      and pieces[0].count('</h3>') == 1 and pieces[0].rstrip().endswith('</h3>') -%}
+      and pieces[0].count('</h3>') == 1 and (pieces[0].rstrip().endswith('</h3>') or ownedGuidance) -%}
     {%- set tail = pieces[1].split()|join('') -%}
     {%- set state.empty = tail == '</div></div>' -%}
     {# Q5's two known empty gap containers are generated even in submission. #}

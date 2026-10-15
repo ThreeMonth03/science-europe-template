@@ -106,6 +106,12 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     provenance.paragraph_format.space_after = Pt(2)
     provenance.paragraph_format.keep_together = True
     provenance.paragraph_format.keep_with_next = False
+    guidance = document.styles.add_style("Pilot Question Guidance", WD_STYLE_TYPE.PARAGRAPH)
+    guidance.base_style = provenance
+    guidance.font.size = Pt(10)
+    guidance.paragraph_format.line_spacing = Pt(14)
+    guidance.paragraph_format.space_after = Pt(4)
+    guidance.paragraph_format.keep_with_next = True
     label = document.styles.add_style("Pilot Label", WD_STYLE_TYPE.PARAGRAPH)
     label.base_style = document.styles["Body Text"]
     label.paragraph_format.keep_with_next = True

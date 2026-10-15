@@ -23,23 +23,40 @@ local function empty_answer(answer, id)
   end
   return true
 end
+local guided_questions = { ["q-persistent-identifier"]=true, ["q-dm-responsible"]=true, ["q-required-resources"]=true }
+local function question_parts(div)
+  if #div.content == 2 then return div.content[1], div.content[2] end
+  if #div.content ~= 3 or not guided_questions[div.identifier] then return nil end
+  local guidance = div.content[2]
+  if guidance.t ~= "Div" or guidance.identifier ~= "" or #guidance.classes ~= 1 or
+     guidance.classes[1] ~= "question-guidance" or
+     not (#guidance.attributes == 0 or (#guidance.attributes == 1 and guidance.attributes["custom-style"] == "Pilot Question Guidance")) or
+     #guidance.content ~= 1 or guidance.content[1].t ~= "Para" then return nil end
+  local text = pandoc.utils.stringify(guidance)
+  if not text:match("%S") or utf8.len(text) > 500 then return nil end
+  for _, inline in ipairs(guidance.content[1].content) do
+    if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return nil end
+  end
+  return div.content[1], div.content[3], guidance
+end
 local function question(div)
   if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end
   if div.classes:includes("answer") or div.classes:includes("answer-detail") or div.classes:includes("abstract") then return div, false end
   if not div.classes:includes("question") then return nil end
   if not requirements[div.identifier] or #div.classes ~= 2 or
       not div.classes:includes("compact-empty-question") or #div.attributes > 1 or
-      (#div.attributes == 1 and div.attributes["requirement-id"] ~= requirements[div.identifier]) or #div.content ~= 2 then return div, false end
-  local heading, answer = div.content[1], div.content[2]
+      (#div.attributes == 1 and div.attributes["requirement-id"] ~= requirements[div.identifier]) then return div, false end
+  local heading, answer, guidance = question_parts(div)
+  if not heading or not answer then return div, false end
   if heading.t ~= "Header" or heading.level ~= 3 or not empty_answer(answer, div.identifier) then return div, false end
   -- The known question headings are plain text; unexpected rich headings fall back.
   for _, inline in ipairs(heading.content) do
     if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return div, false end
   end
-  div.content = {
-    pandoc.RawBlock("openxml", "<!--DSW:SE:empty-question:v1:begin-->"), heading,
-    pandoc.RawBlock("openxml", "<!--DSW:SE:empty-question:v1:end-->"), answer
-  }
+  div.content = pandoc.List({pandoc.RawBlock("openxml", "<!--DSW:SE:empty-question:v1:begin-->"), heading})
+  if guidance then div.content:insert(guidance) end
+  div.content:insert(pandoc.RawBlock("openxml", "<!--DSW:SE:empty-question:v1:end-->"))
+  div.content:insert(answer)
   return div, false
 end
 -- Runs before the existing question marker pass, only at the owned DMP root.
@@ -63,8 +80,9 @@ local function trusted_empty_question(block, id)
   if block.t ~= "Div" or block.identifier ~= id or #block.classes ~= 2 or
       not block.classes:includes("question") or not block.classes:includes("compact-empty-question") or
       #block.attributes > 1 or (#block.attributes == 1 and block.attributes["requirement-id"] ~= requirements[id]) or
-      #block.content ~= 2 then return false end
-  return plain_heading(block.content[1], 3) and empty_answer(block.content[2], id)
+      (#block.content ~= 2 and #block.content ~= 3) then return false end
+  local heading, answer = question_parts(block)
+  return heading and answer and plain_heading(heading, 3) and empty_answer(answer, id)
 end
 local function empty_sections(div)
   if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end

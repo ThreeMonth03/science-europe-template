@@ -259,9 +259,29 @@ end
 
 -- Two adjacent, explicitly owned terminal review prompts may share a paragraph.
 -- Preserve both prefixes and all inlines; reject free/long/complex content.
+local guided_questions = { ["q-persistent-identifier"]=true, ["q-dm-responsible"]=true, ["q-required-resources"]=true }
+local function owned_question_guidance(div)
+  if not guided_questions[div.identifier] or not div.classes:includes("question") or
+     (#div.classes ~= 1 and not (#div.classes == 2 and div.classes:includes("compact-empty-question"))) or
+     #div.content ~= 3 or div.content[1].t ~= "Header" or div.content[1].level ~= 3 then return nil end
+  local guide, answer = div.content[2], div.content[3]
+  if guide.t ~= "Div" or guide.identifier ~= "" or #guide.classes ~= 1 or
+     guide.classes[1] ~= "question-guidance" or
+     not (#guide.attributes == 0 or (#guide.attributes == 1 and guide.attributes["custom-style"] == "Pilot Question Guidance")) or
+     #guide.content ~= 1 or guide.content[1].t ~= "Para" or
+     answer.t ~= "Div" or not answer.classes:includes("answer") then return nil end
+  local text = pandoc.utils.stringify(guide)
+  if not text:match("%S") or utf8.len(text) > 500 then return nil end
+  for _, inline in ipairs(guide.content[1].content) do
+    if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return nil end
+  end
+  return guide
+end
+
 local function join_q15_terminal_gaps(div)
-  if #div.content ~= 2 or div.content[1].t ~= "Header" or div.content[1].level ~= 3 then return div end
-  local answer = div.content[2]
+  if not div.content[1] or div.content[1].t ~= "Header" or div.content[1].level ~= 3 then return div end
+  local answer = div.content[#div.content]
+  if #div.content ~= 2 and not owned_question_guidance(div) then return div end
   if answer.t ~= "Div" or not answer.classes:includes("answer") or #answer.content < 3 then return div end
   local first, last = answer.content[#answer.content-1], answer.content[#answer.content]
   local function paragraph(block, fact)
@@ -299,8 +319,10 @@ end
 -- repeating heading and bounded row guards; linking the overview to that table
 -- can push the whole question to a new page and leave half the previous blank.
 local function keep_short_budget_overview(div)
+  -- The question explanation is not part of the bounded answer keep chain.
+  local content = owned_question_guidance(div) and {div.content[1], div.content[3]} or div.content
   local units = 0
-  for _, code in utf8.codes(pandoc.utils.stringify(div)) do
+  for _, code in utf8.codes(pandoc.utils.stringify(content)) do
     units = units + (code >= 0x2E80 and 2 or 1)
   end
   if units > 1000 then return div end
@@ -334,7 +356,7 @@ local function keep_short_budget_overview(div)
       else simple = false end
     end
   end
-  scan(div.content, nil)
+  scan(content, nil)
   local short_without_budget = projects <= 1 and headers >= 1 and headers <= 2 and paragraphs <= 8
   if not simple or not short_without_budget then return div end
   for _, item in ipairs(leading) do
@@ -1064,6 +1086,8 @@ local function separate_authored_resource_tables(div)
 end
 
 function Div(div)
+  local guidance = owned_question_guidance(div)
+  if guidance then guidance.attributes["custom-style"] = "Pilot Question Guidance" end
   -- Adjacent DOCX tables are joined by readers even when they came from
   -- separate HTML tables. A tiny real paragraph keeps the owned metadata
   -- table separate from a purpose that starts with an authored table.
@@ -1312,4 +1336,5 @@ function Div(div)
     div.content = blocks
     return div
   end
+  if guidance then return div end
 end

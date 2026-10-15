@@ -6,7 +6,7 @@
    inventory. Missing, extra, unmarked or unfamiliar questions keep normal flow. #}
 {%- set emptyInventory = namespace(ok=output_profile|default('review') == 'submission'
     and pdfDocument.count('class="question compact-empty-question"') == 15
-    and pdfDocument.count('class="question') == 15
+    and pdfDocument.count('class="question"') + pdfDocument.count('class="question ') == 15
     and pdfDocument.count('<section id=') == 6) -%}
 {%- for identifier in ['sec-data-collection', 'sec-docs-metadata', 'sec-storage-backup',
     'sec-ethics-legal', 'sec-sharing-preservation', 'sec-responsibilities-resources'] -%}
