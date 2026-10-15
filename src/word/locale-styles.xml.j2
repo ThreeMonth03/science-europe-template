@@ -9,7 +9,7 @@
     {%- if not ok -%}{{ locale_styles_xml_contract_mismatch.raise_error() }}{%- endif -%}
   {%- endmacro -%}
   {# These 74 reference-owned styles differ only in run language, except for
-     the four separately guarded line-spacing changes below. Unknown styles
+     the five separately guarded line-spacing changes below. Unknown styles
      and docDefaults are intentionally not rewritten. #}
   {%- set language_styles = [
     'Normal', 'Heading1', 'Heading2', 'Heading3', 'Heading4', 'Heading5',
@@ -46,14 +46,14 @@
     {%- if identifier in language_styles -%}
       {{- require(style.count(old_language) == 1) -}}
       {%- set style = style.replace(old_language, new_language, 1) -%}
-      {%- if identifier in ['BodyText', 'FirstParagraph', 'Compact'] -%}
+      {%- if identifier in ['Normal', 'BodyText', 'FirstParagraph', 'Compact'] -%}
         {%- set after = '40' if identifier == 'Compact' else '80' -%}
         {%- set old_spacing = '<w:spacing w:after="' ~ after ~ '" w:before="0" w:line="288" w:lineRule="auto" />' -%}
-        {%- set new_spacing = '<w:spacing w:after="' ~ after ~ '" w:before="0" w:line="315" w:lineRule="atLeast" />' -%}
+        {%- set new_spacing = '<w:spacing w:after="' ~ after ~ '" w:before="0" w:line="216" w:lineRule="auto" />' -%}
         {{- require(style.count(old_spacing) == 1) -}}
         {%- set style = style.replace(old_spacing, new_spacing, 1) -%}
       {%- elif identifier == 'Heading1' -%}
-        {%- set old_spacing = '<w:spacing w:after="120" w:before="240" />' -%}
+        {%- set old_spacing = '<w:spacing w:after="120" w:before="240" w:line="288" w:lineRule="auto" />' -%}
         {%- set new_spacing = '<w:spacing w:after="120" w:before="240" w:line="525" w:lineRule="atLeast" />' -%}
         {{- require(style.count(old_spacing) == 1) -}}
         {%- set style = style.replace(old_spacing, new_spacing, 1) -%}

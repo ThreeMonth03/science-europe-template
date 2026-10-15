@@ -49,15 +49,15 @@
                             {% if repositoryKindKnown %}
                             <p class="answer-lead">
                             {%- if repositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid -%}
-                                {{ pgettext("questions/13-persistent-identifier", "<strong>Domain-specific repository</strong>") }}
+                                {{ pgettext("questions/13-persistent-identifier", "Domain-specific repository") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid -%}
-                                {{ pgettext("questions/13-persistent-identifier", "<strong>General-purpose repository</strong>") }}
+                                {{ pgettext("questions/13-persistent-identifier", "General-purpose repository") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid -%}
-                               {{ pgettext("questions/13-persistent-identifier", "<strong>National repository</strong>") }}
+                               {{ pgettext("questions/13-persistent-identifier", "National repository") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryInstitutionalAUuid -%}
-                                {{ pgettext("questions/13-persistent-identifier", "<strong>Institutional repository</strong>") }}
+                                {{ pgettext("questions/13-persistent-identifier", "Institutional repository") }}
                             {%- elif repositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid -%}
-                                {{ pgettext("questions/13-persistent-identifier", "<strong>Special-purpose repository</strong>") }}
+                                {{ pgettext("questions/13-persistent-identifier", "Special-purpose repository") }}
                             {%- endif -%}
                             </p>
                             {% endif %}

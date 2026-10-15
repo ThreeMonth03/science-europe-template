@@ -18,6 +18,41 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_short_naming_answers_keep_only_the_marked_paragraph_chain(self):
+        from native_support import IMAGE, RUNNER
+        body = ('<div class="answer-lead"><p>File naming conventions:</p></div>'
+                '<p>Keep station_YYYYMMDD.csv.</p><p>Keep the separate paragraph.</p>'
+                '<ul><li>Keep the original record.</li><li>Record each correction.</li></ul>')
+        def naming(fact='file-naming', marked=True, value=body):
+            return '<div class="answer-detail' + (' short-naming-answer' if marked else '') + '" data-fact-id="' + fact + '">' + value + '</div>'
+        cases = [('file', naming(), 2), ('object', naming('object-naming'), 2),
+                 ('unmarked', naming(marked=False), 0), ('wrong-owner', naming('other'), 0),
+                 ('long', naming(value=body.replace('Keep station_YYYYMMDD.csv.', '中' * 81)), 0)]
+        lua = (ROOT / 'src/word/pilot.lua').read_text()
+        guard = 'if #div.classes == 2 and div.classes:includes("answer-detail") and'
+        self.assertEqual(1, lua.count(guard))
+        fixture = ''.join('<div id="case-' + name + '">' + value + '</div>' for name, value, _ in cases)
+        results = []
+        for source in (lua.replace(guard, 'if false and #div.classes == 2 and div.classes:includes("answer-detail") and'), lua):
+            results.append(json.loads(subprocess.check_output(
+                ['docker', 'run', '--rm', '--pull=never', '--network=none', '--log-driver=none', '-i',
+                 '--entrypoint', 'python', IMAGE, '-c', RUNNER],
+                input=json.dumps(dict(lua=source, html=fixture)).encode(), timeout=180)))
+        def styles(value):
+            if isinstance(value, dict):
+                return int(value.get('t') == 'Div' and ['custom-style', 'Pilot Lead'] in value['c'][0][2]) + sum(styles(v) for v in value.values())
+            return sum(styles(v) for v in value) if isinstance(value, list) else 0
+        def words(value):
+            if isinstance(value, dict):
+                if value.get('t') == 'Str': return [value['c']]
+                return sum((words(v) for v in value.values()), [])
+            return sum((words(v) for v in value), []) if isinstance(value, list) else []
+        for (name, _, count), before, after in zip(cases, results[0]['blocks'], results[1]['blocks']):
+            with self.subTest(case=name):
+                self.assertEqual(words(before), words(after))
+                self.assertEqual(count, styles(after) - styles(before))
+                self.assertFalse(after['c'][0][2], 'Do not keep the outer owner as a whole')
+
     def test_question_guidance_is_owned_bounded_and_keeps_no_whole_answer(self):
         from native_support import IMAGE, RUNNER
         guidance = '<div class="question-guidance"><p>Fixed explanation.</p></div>'
@@ -961,6 +996,8 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                     self.assertTrue(document.styles[name].paragraph_format.keep_together)
                     self.assertEqual('Compact', document.styles[name].base_style.name)
                 self.assertFalse(document.styles["Heading 4"].font.italic)
+                for name in ("Hyperlink", "FollowedHyperlink"):
+                    self.assertEqual('185778', str(document.styles[name].font.color.rgb))
                 question = document.styles["Heading 3"]
                 self.assertEqual(11.5, question.font.size.pt)
                 self.assertTrue(question.font.bold)
@@ -969,16 +1006,14 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 for style_name in ("Normal", "Body Text", "First Paragraph", "Compact"):
                     item = document.styles[style_name]
                     self.assertEqual(10.5, item.font.size.pt)
-                    if style_name == "Normal":
-                        self.assertEqual(1.2, item.paragraph_format.line_spacing)
-                        self.assertEqual(WD_LINE_SPACING.MULTIPLE, item.paragraph_format.line_spacing_rule)
-                    else:
-                        self.assertEqual(15.75, item.paragraph_format.line_spacing.pt)
-                        self.assertEqual(WD_LINE_SPACING.AT_LEAST, item.paragraph_format.line_spacing_rule)
+                    self.assertEqual(0.9, item.paragraph_format.line_spacing)
+                    self.assertEqual(WD_LINE_SPACING.MULTIPLE, item.paragraph_format.line_spacing_rule)
                     self.assertEqual(2 if style_name == "Compact" else 4, item.paragraph_format.space_after.pt)
                     self.assertTrue(item.paragraph_format.widow_control)
                 for level in range(1, 6):
                     item = document.styles[f"Heading {level}"].paragraph_format
+                    if level > 1:
+                        self.assertEqual(1.2, item.line_spacing)
                     self.assertEqual(8 if level >= 4 else 12, item.space_before.pt)
                     self.assertEqual(3 if level >= 4 else 4 if level == 3 else 6, item.space_after.pt)
                     self.assertTrue(item.keep_with_next)

@@ -1,4 +1,39 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
+{# Only short, plain naming answers may stay together; preserve their HTML. #}
+{%- macro shortNamingClass(rendered) -%}
+  {%- set parts = (rendered|trim).split('</p>') -%}
+  {%- set guard = namespace(ok=parts|length in [2, 3], chunks=[], width=0) -%}
+  {%- for part in parts[:-1] -%}
+    {%- set paragraph = part|trim -%}
+    {%- if not paragraph.startswith('<p>') -%}{%- set guard.ok = false -%}{%- endif -%}
+    {%- do guard.chunks.append((paragraph[3:], 160)) -%}
+  {%- endfor -%}
+  {%- set tail = parts[-1]|trim -%}
+  {%- if tail -%}
+    {%- set opening = '<ul>' if tail.startswith('<ul>') else '<ol>' if tail.startswith('<ol>') else '' -%}
+    {%- set closing = '</ul>' if opening == '<ul>' else '</ol>' -%}
+    {%- if not opening or not tail.endswith(closing) -%}{%- set guard.ok = false -%}{%- endif -%}
+    {%- set items = tail[opening|length:-(closing|length)].split('</li>') -%}
+    {%- if items|length not in [2, 3, 4] or items[-1]|trim -%}{%- set guard.ok = false -%}{%- endif -%}
+    {%- for item in items[:-1] -%}
+      {%- set item = item|trim -%}
+      {%- if not item.startswith('<li>') -%}{%- set guard.ok = false -%}{%- endif -%}
+      {%- do guard.chunks.append((item[4:], 100)) -%}
+    {%- endfor -%}
+  {%- endif -%}
+  {%- for text, limit in guard.chunks -%}
+    {%- set chunk = namespace(width=0, token=0) -%}
+    {%- if not text|trim or '<' in text or '>' in text -%}{%- set guard.ok = false -%}{%- endif -%}
+    {%- for char in text -%}
+      {%- set chunk.width = chunk.width + (2 if char >= '⺀' else 1) -%}
+      {%- set chunk.token = chunk.token + 1 if '!' <= char <= '~' else 0 -%}
+      {%- if chunk.token > 64 -%}{%- set guard.ok = false -%}{%- endif -%}
+    {%- endfor -%}
+    {%- if chunk.width > limit -%}{%- set guard.ok = false -%}{%- endif -%}
+    {%- set guard.width = guard.width + chunk.width -%}
+  {%- endfor -%}
+  {{- ' short-naming-answer' if guard.ok and guard.width <= 320 else '' -}}
+{%- endmacro -%}
 <div id="q-docs-metadata" class="question">
   <h3>{{ pgettext("questions/03-docs-metadata", "3. What metadata and documentation (for example the methodology of data collection and way of organising data) will accompany the data?") }}</h3>
 
@@ -87,7 +122,7 @@
       {%- set explanation = repliesMap[[metadataOpenPath, metadataOpenAUuid, uuids.metadataOpenNoExplainQUuid]|reply_path]|reply_str_value -%}
       <p>{{ pgettext("questions/03-docs-metadata", "Metadata will not be available openly.") }}</p>
       {%- if explanation|trim -%}
-                <div class="answer-detail" data-fact-id="metadata-access-explanation">{{ answerMarkdown.markdown(explanation) }}</div>
+        <div class="answer-detail" data-fact-id="metadata-access-explanation"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "Reason for not making the metadata openly available:") }}</p></div>{{ answerMarkdown.markdown(explanation) }}</div>
       {%- elif output_profile|default('review') != 'submission' -%}
         <div class="reading-gap">{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="metadata-access-explanation" data-status="missing">{{ pgettext("questions/03-docs-metadata", "Information not provided: why the metadata will not be openly available.") }}</p>{% endif %}</div>
       {%- endif -%}
@@ -247,7 +282,8 @@
         {%- set scFSysAppointmentsPath = [scFSysPrefix, uuids.scFSysAppointmentsQUuid]|reply_path -%}
         {%- set scFSysAppointments = repliesMap[scFSysAppointmentsPath]|reply_str_value -%}
         {%- if scFSysAppointments|trim %}
-          <div class="answer-detail" data-fact-id="file-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "File naming conventions:") }}</p></div>{{ answerMarkdown.markdown(scFSysAppointments) }}</div>
+          {%- set fileNamingHtml = answerMarkdown.markdown(scFSysAppointments) -%}
+          <div class="answer-detail{{ shortNamingClass(fileNamingHtml) }}" data-fact-id="file-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "File naming conventions:") }}</p></div>{{ fileNamingHtml }}</div>
         {%- endif -%}
       {%- endif -%}
         </div>
@@ -267,7 +303,8 @@
         <p>{{ pgettext("questions/03-docs-metadata", "We will be storing data in an \"object/document store\" system.") }}</p>
         {% if scObjStoreNaming|trim %}</div>{% endif %}
         {%- if scObjStoreNaming|trim -%}
-          <div class="answer-detail" data-fact-id="object-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "Object naming conventions:") }}</p></div>{{ answerMarkdown.markdown(scObjStoreNaming) }}</div>
+          {%- set objectNamingHtml = answerMarkdown.markdown(scObjStoreNaming) -%}
+          <div class="answer-detail{{ shortNamingClass(objectNamingHtml) }}" data-fact-id="object-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "Object naming conventions:") }}</p></div>{{ objectNamingHtml }}</div>
         {%- endif -%}
       {%- endif -%}
         </div>
@@ -288,9 +325,9 @@
         {%- if scRelDbHandleChangesAUuid == uuids.scRelDbReadOnlyAnswerUuid -%}
           {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "Data in the database will be read-only.") }}
         {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbCrudAnswerUuid -%}
-          {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "We will be allowing Create, Update and Delete operations for data in the database.") }}
+          {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "We will allow data in the database to be created, updated, and deleted.") }}
         {%- elif scRelDbHandleChangesAUuid == uuids.scRelDbExpireAnswerUuid -%}
-          {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "Modifications will be made by <em>Expiring</em> the existing data and <em>Adding</em> updated data.") }}
+          {{ "" if document_language|default('en') == 'zh-Hant' else "\n          " }}{{ pgettext("questions/03-docs-metadata", "To update the data, we will mark the existing data as expired and add the updated data.") }}
         {%- endif -%}
         </p>
       {%- endif -%}

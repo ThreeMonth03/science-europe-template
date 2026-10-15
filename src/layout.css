@@ -5,6 +5,8 @@
   @bottom-center { margin-top: 4mm; padding-top: 2mm; border-top: 1px solid #8c999e; }
 }
 html body { font-size: 10.5pt; line-height: 1.5; color: #222; }
+/* Joined and ordinary Chinese prose share the same body-line rhythm. */
+html[lang="zh-Hant"] body { line-height: 1.45; }
 html body h1 { font-size: 21pt; line-height: 1.25; }
 html body h2 { font-size: 15pt; line-height: 1.35; margin: 1.3em 0 .65em; }
 html body h3 { font-size: 11pt; font-weight: normal; line-height: 1.5; margin: .9em 0 .6em; color: #47565c; }
@@ -27,6 +29,8 @@ html body li > strong.item-label { display: block; break-after: avoid; }
 html body #q-access-security > .answer > ul > li > strong:first-child:has(+ table) { display: block; break-after: avoid; }
 html body ul { padding-left: 1.4em; margin: .4em 0 .8em; }
 html body .answer-detail { margin: .3em 0 .75em; }
+/* Q3 marks only bounded plain naming answers; longer/rich answers still flow. */
+html body #q-docs-metadata .answer-detail.short-naming-answer { break-inside: avoid; }
 html body .answer-detail > p:first-child { break-after: avoid; }
 html body .answer-lead { break-after: avoid; }
 /* A terminal training table and a known hardware fact form one reading tail.

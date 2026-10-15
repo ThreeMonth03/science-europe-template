@@ -1086,6 +1086,40 @@ local function separate_authored_resource_tables(div)
 end
 
 function Div(div)
+  -- Q3's shared classifier marks only a few short plain paragraphs/list items.
+  -- Chain those paragraphs, never the whole question or an unbounded answer.
+  if #div.classes == 2 and div.classes:includes("answer-detail") and
+     div.classes:includes("short-naming-answer") and div.identifier == "" and
+     #div.attributes == 1 and
+     (div.attributes["fact-id"] == "file-naming" or div.attributes["fact-id"] == "object-naming") then
+    local paragraphs, simple = {}, true
+    local function scan(blocks, listed, styled)
+      for index, block in ipairs(blocks) do
+        if block.t == "Para" or block.t == "Plain" then
+          if not short_automatic_lead(block) then simple = false end
+          table.insert(paragraphs, {blocks=blocks, index=index, block=block, listed=listed, styled=styled})
+        elseif block.t == "Div" and #block.classes <= 1 and
+               (#block.classes == 0 or block.classes:includes("answer-lead")) and
+               (block.attributes["custom-style"] == "Pilot Lead" or block.attributes["custom-style"] == "Pilot List Lead") then
+          scan(block.content, listed, true)
+        elseif block.t == "BulletList" or block.t == "OrderedList" then
+          if #block.content > 3 then simple = false end
+          for _, item in ipairs(block.content) do scan(item, true, false) end
+        else simple = false end
+      end
+    end
+    scan(div.content, false, false)
+    if simple and #paragraphs >= 2 and #paragraphs <= 6 and utf8.len(pandoc.utils.stringify(div)) <= 400 then
+      for index = 1, #paragraphs - 1 do
+        local item = paragraphs[index]
+        if not item.styled then
+          item.blocks[item.index] = pandoc.Div({pandoc.Para(item.block.content)},
+            pandoc.Attr("", {}, {["custom-style"]=item.listed and "Pilot List Lead" or "Pilot Lead"}))
+        end
+      end
+    end
+    return div
+  end
   local guidance = owned_question_guidance(div)
   if guidance then guidance.attributes["custom-style"] = "Pilot Question Guidance" end
   -- Adjacent DOCX tables are joined by readers even when they came from
@@ -1133,7 +1167,7 @@ function Div(div)
   if div.identifier == "q-required-resources" then div = keep_short_budget_narrative(div) end
   if div.identifier == "q-required-resources" then return keep_rich_resource_leads(align_budget_cells(keep_short_budget_rows(attach_budget_headings(keep_short_budget_overview(div))))) end
   if div.classes:includes("identifier-heading") then
-    -- Q13 only: combine the existing distribution number and repository type.
+    -- Q13 only: combine the emphasized distribution number and plain type.
     -- Para may already wrap all-Strong labels. Reject unexpected/free blocks;
     -- do not turn this into a generic label/paragraph-flattening operation.
     if #div.content > 2 or utf8.len(pandoc.utils.stringify(div)) > 240 then return div end
@@ -1144,7 +1178,9 @@ function Div(div)
       end
       if block.t ~= "Para" and block.t ~= "Plain" then return div end
       if #block.content > 0 then
-        if #block.content ~= 1 or block.content[1].t ~= "Strong" then return div end
+        for _, inline in ipairs(block.content) do
+          if inline.t ~= "Strong" and inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return div end
+        end
         if #inlines > 0 then inlines:insert(pandoc.Space()) end
         inlines:extend(block.content)
       end

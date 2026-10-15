@@ -89,6 +89,37 @@ def render_question(path: str, replies: dict[str, object], **context) -> str:
 
 
 class ScienceEuropeContractTests(unittest.TestCase):
+    def test_identifier_repository_labels_are_plain_below_dataset_boundaries(self):
+        from bs4 import BeautifulSoup
+        from current_support import identifier_replies
+        repositories = [('DomainSpecific', 'Domain-specific repository'),
+                        ('GeneralPurpose', 'General-purpose repository'),
+                        ('National', 'National repository'),
+                        ('Institutional', 'Institutional repository'),
+                        ('Special', 'Special-purpose repository')]
+        for kind, label in repositories:
+            for count in (1, 2):
+                for profile in ('review', 'submission'):
+                    with self.subTest(repository=kind, count=count, profile=profile):
+                        soup = BeautifulSoup(render_question(
+                            'src/questions/13-persistent-identifier.html.j2',
+                            identifier_replies(repository=kind, count=count),
+                            output_profile=profile), 'html.parser')
+                        dataset = soup.select_one('.dataset-section[data-item-id="dataset-a"]')
+                        self.assertIsNotNone(dataset.select_one('h5'))
+                        distributions = dataset.select('.distribution-section')
+                        self.assertEqual(count, len(distributions))
+                        for index, distribution in enumerate(distributions, 1):
+                            labels = distribution.select('.identifier-heading > p.answer-lead')
+                            self.assertEqual(2 if count > 1 else 1, len(labels))
+                            self.assertEqual(label, labels[-1].get_text(' ', strip=True))
+                            self.assertFalse(labels[-1].select('strong,b,h1,h2,h3,h4,h5,h6'))
+                            if count > 1:
+                                self.assertEqual(f'Distribution {index}', labels[0].strong.get_text(strip=True))
+                            for fact in ('persistent-identifier', 'identifier-assigner', 'identifier-resolution'):
+                                self.assertEqual('complete', distribution.select_one(
+                                    f'[data-fact-id="{fact}"]')['data-status'])
+
     def test_reference_version_flows_without_an_outer_information_table(self):
         from bs4 import BeautifulSoup
         from current_support import IDS, path

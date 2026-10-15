@@ -61,17 +61,20 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         lang.set(qn("w:val"), "zh-TW" if language == "zh-Hant" else "en-GB")
         lang.set(qn("w:eastAsia"), "zh-TW")
         props.append(lang)
+    # Links remain identifiable without colouring headings or ordinary lists.
+    for name in ("Hyperlink", "FollowedHyperlink"):
+        if name in document.styles:
+            document.styles[name].font.color.rgb = RGBColor.from_string("185778")
     for name in ("Normal", "Body Text", "First Paragraph", "Compact"):
         if name in document.styles:
             item = document.styles[name]
             item.font.size = Pt(10.5)
-            # Both rules expand for tall content. Chinese body text needs a
-            # minimum in points: multiplying CJK font metrics adds excess lead.
-            # Normal stays relative so headings, tables and footers are unchanged.
-            item.paragraph_format.line_spacing = 1.2
-            if language == "zh-Hant" and name != "Normal":
-                item.paragraph_format.line_spacing = Pt(15.75)
-                item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
+            # CJK font metrics already include generous lead. Relative 0.9
+            # renders about 17.4 pt at 10.5 pt in the checked LibreOffice route;
+            # unlike exact height it still adapts to taller runs and equations.
+            # Normal shares the body rule so Pandoc's first/table paragraphs
+            # cannot silently use a different baseline from ordinary answers.
+            item.paragraph_format.line_spacing = 0.9 if language == "zh-Hant" else 1.2
             item.paragraph_format.space_before = Pt(0)
             item.paragraph_format.space_after = Pt(2 if name == "Compact" else 4)
             item.paragraph_format.widow_control = True
@@ -80,6 +83,8 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item = document.styles[f"Heading {level}"]
             item.font.size, item.font.bold = Pt(size), True
             item.font.italic = False
+            # Headings retain their own rhythm, independent of body spacing.
+            item.paragraph_format.line_spacing = 1.2
             if language == "zh-Hant" and level == 1:
                 # A wrapped CJK cover title otherwise inherits relative font
                 # metrics from Normal, leaving excessive space between lines.

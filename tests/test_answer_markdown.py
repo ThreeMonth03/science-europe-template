@@ -317,7 +317,7 @@ class AnswerMarkdownTests(unittest.TestCase):
                             document=SimpleNamespace(content=transport.encode(), safe_encoding='utf-8'), json=json,
                             output_profile=profile), create_parent=True)
                     doc = output(data)
-                    owned = doc.xpath('.//div[@class="answer-detail"]')
+                    owned = doc.xpath('.//div[contains(concat(" ", normalize-space(@class), " "), " answer-detail ")]')
                     with self.subTest(value=value, profile=profile, escape=escape):
                         self.assertEqual(len(owned), 5 if value and value.strip() else 0)
                         self.assertFalse(doc.xpath('.//pre[@class="answer-markdown-fallback"]'))
