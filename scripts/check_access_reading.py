@@ -18,6 +18,21 @@ COMPOUND = {
     'zh-Hant': {'Yes': '儲存庫將指派持續識別碼，並確保該識別碼能解析至數位物件。',
                 'No': '儲存庫將指派持續識別碼，但不保證該識別碼能解析至數位物件。'},
 }
+REPOSITORY_SUBJECTS = {
+    'en': {'DomainSpecific': 'The domain-specific repository', 'GeneralPurpose': 'The general-purpose repository',
+           'National': 'The national repository', 'Institutional': 'The institutional repository', 'Special': 'The special-purpose repository'},
+    'zh-Hant': {'DomainSpecific': '特定學科的資料儲存庫', 'GeneralPurpose': '通用型資料儲存庫',
+                'National': '國家級資料儲存庫', 'Institutional': '機構資料儲存庫', 'Special': '專用資料儲存庫'},
+}
+
+
+def repository_policy(language, kind, resolves):
+    subject = REPOSITORY_SUBJECTS[language][kind]
+    if resolves in ('Yes', 'No'):
+        return COMPOUND[language][resolves].replace('The repository' if language == 'en' else '儲存庫', subject, 1)
+    return subject + (' will assign the persistent identifier.' if language == 'en' else '將指派持續識別碼。')
+
+
 SOFTWARE_FACTS = {
     'en': {'documentation': {'Yes': 'Documentation for this software will be included in the metadata.',
                             'No': 'Documentation for this software will not be included in the metadata.'},
@@ -252,6 +267,8 @@ def check(root, language):
             distribution = soup.select_one('.distribution-section[data-item-id="distro-0"]')
             expected_distribution = pub == 'Yes' and (profile == 'review' or parent in ['Yes', 'No'])
             assert bool(distribution) == expected_distribution
+            if distribution:
+                assert bool(distribution.select_one('.identifier-heading')) == (parent != 'Yes' or actor != 'Repository')
             policy = soup.select_one('.identifier-arrangement')
             assert bool(policy) == (pub == parent == 'Yes')
             if policy:
@@ -262,10 +279,12 @@ def check(root, language):
                 if resolution: assert resolution['data-status'] == ('complete' if resolves == 'Yes' else 'explicit-no')
                 if actor == 'Repository' and resolves in ['Yes', 'No']:
                     assert len(policy.find_all('p', recursive=False)) == 1
-                    assert policy.get_text(' ', strip=True) == COMPOUND[language][resolves]
+                    assert policy.get_text(' ', strip=True) == repository_policy(language, 'Institutional', resolves)
                     assert assigner.select_one('[data-fact-id="identifier-resolution"]') is resolution
                 else:
                     assert not any(text in policy.get_text() for text in COMPOUND[language].values())
+                    if actor == 'Repository':
+                        assert policy.get_text(' ', strip=True) == repository_policy(language, 'Institutional', resolves)
                 gaps = soup.select('.identifier-followups .data-gap')
                 assert bool(gaps) == (profile == 'review' and (not assigner or not resolution))
             else:

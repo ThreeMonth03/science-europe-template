@@ -18,6 +18,60 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_q13_single_repository_subject_preserves_other_arrangements_and_authored_uses(self):
+        import itertools
+        import sys
+        from lxml import html
+        sys.path.insert(0, str(ROOT / 'scripts'))
+        from current_support import PREFIX, IDS, environment, identifier_replies
+        from check_access_reading import COMPOUND, REPOSITORY_SUBJECTS, repository_policy, reuse_replies, reuse_schema
+        authored = '<p>Use stationA_YYYYMMDD.csv.</p><ul><li>Keep the original record.</li></ul><p>Keep this paragraph.</p>'
+        for escape, profile in itertools.product((False, True), ('review', 'submission')):
+            template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/13-persistent-identifier.html.j2' %}")
+            def render(replies):
+                return html.fragment_fromstring(template.render(repliesMap=replies, output_profile=profile, km=reuse_schema()), create_parent=True)
+            for kind, resolves in itertools.product(REPOSITORY_SUBJECTS['en'], ('Yes', 'No', '', 'unknown')):
+                with self.subTest(escape=escape, profile=profile, kind=kind, resolves=resolves):
+                    replies = identifier_replies(repository=kind, resolves=resolves, count=1)
+                    reuse, _ = reuse_replies(detail=authored); replies.update(reuse)
+                    document = render(replies)
+                    distribution = document.xpath('.//div[@class="distribution-section"]')[0]
+                    self.assertEqual(distribution.get('data-item-id'), 'distro-0')
+                    self.assertFalse(distribution.xpath('.//div[@class="identifier-heading"]'))
+                    policy = distribution.xpath('.//div[@class="identifier-arrangement dataset-policy"]')[0]
+                    self.assertEqual(' '.join(''.join(policy.itertext()).split()), repository_policy('en', kind, resolves))
+                    status = policy.xpath('.//*[@data-fact-id="identifier-resolution"]/@data-status')
+                    self.assertEqual(status, ['complete' if resolves == 'Yes' else 'explicit-no'] if resolves in ('Yes', 'No') else [])
+                    detail = document.xpath('.//div[@data-fact-id="measured-data-reuse-uses"]')[0]
+                    self.assertEqual([node.tag for node in detail], ['p', 'ul', 'p'])
+                    self.assertEqual(''.join(detail.itertext()), 'Use stationA_YYYYMMDD.csv.Keep the original record.Keep this paragraph.')
+            for actor in ('ProjectDataSteward', 'InstitDataSteward', '', 'unknown'):
+                document = render(identifier_replies(assigns=actor, count=1))
+                self.assertEqual(len(document.xpath('.//div[@class="identifier-heading"]')), 1)
+                self.assertNotIn('The institutional repository will assign', ''.join(document.itertext()))
+            for parent in ('No', '', 'unknown'):
+                document = render(identifier_replies(identifier=parent, count=1))
+                self.assertFalse(document.xpath('.//*[@data-fact-id="identifier-assigner"]'))
+                if parent == 'No': self.assertIn('identifiers will not be applied.', ''.join(document.itertext()))
+            for kind in ('', 'unknown'):
+                document = render(identifier_replies(repository=kind, count=1))
+                self.assertIn(COMPOUND['en']['Yes'], ' '.join(''.join(document.itertext()).split()))
+            replies = identifier_replies(count=2)
+            for key in replies:
+                if 'distro-1' in key and key.endswith(IDS['publishedDataIdentifierResolvableQUuid']):
+                    replies[key] = IDS['publishedDataIdentifierResolvableNoAUuid']
+                elif 'distro-1' in key and key.endswith(IDS['publishedDataRepositoryKindQUuid']):
+                    replies[key] = IDS['publishedDataRepositoryNationalAUuid']
+            document = render(replies)
+            distributions = document.xpath('.//div[@class="distribution-section"]')
+            self.assertEqual([node.get('data-item-id') for node in distributions], ['distro-0', 'distro-1'])
+            for index, node in enumerate(distributions):
+                heading = node.xpath('./div[@class="identifier-heading"]')[0]
+                self.assertIn('Distribution ' + str(index + 1), ''.join(heading.itertext()))
+                self.assertIn('Institutional repository' if index == 0 else 'National repository', ''.join(heading.itertext()))
+                policy = node.xpath('.//div[@class="identifier-arrangement dataset-policy"]')[0]
+                self.assertEqual(' '.join(''.join(policy.itertext()).split()), COMPOUND['en']['Yes' if index == 0 else 'No'])
+
     def test_short_naming_answers_keep_only_the_marked_paragraph_chain(self):
         from native_support import IMAGE, RUNNER
         body = ('<div class="answer-lead"><p>File naming conventions:</p></div>'

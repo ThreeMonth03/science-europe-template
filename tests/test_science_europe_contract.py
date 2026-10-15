@@ -89,6 +89,80 @@ def render_question(path: str, replies: dict[str, object], **context) -> str:
 
 
 class ScienceEuropeContractTests(unittest.TestCase):
+    def test_format_policies_preserve_question_scope_without_inventing_conversion(self):
+        from itertools import product
+        from bs4 import BeautifulSoup
+        from current_support import IDS, path, environment, PREFIX
+        formats = path('creatingCUuid', 'formatsQUuid')
+        owner = path(formats, 'format-a')
+        standard_path = path(owner, 'formatsIsStandardQUuid')
+        suitable_path = path(owner, 'formatsIsLTSuitableQUuid')
+        conversion_path = path(suitable_path, 'formatsIsLTSuitableNoAUuid', 'formatsConvertLTSuitableQUuid')
+        why_path = path(standard_path, 'formatsIsStandardNoAUuid', 'formatsWhyNonStandardQUuid')
+        reason = '<p>Keep Original.csv unchanged.</p><ul><li>Preserve <strong>original</strong> readings.</li></ul>'
+        base = {formats: ['format-a'], path(owner, 'formatsNameQUuid'):
+                {'value': {'value': {'type': 'PlainType', 'value': 'Original format'}}},
+                path(owner, 'formatsVolumeQUuid'): IDS['formatsVolumeSmallAUuid'],
+                why_path: IDS['formatsWhyNSAnotherReasonAUuid'],
+                path(why_path, 'formatsWhyNSAnotherReasonAUuid', 'formatsWhyNSAnotherReasonQUuid'): reason}
+        for escape in (False, True):
+            template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/02-what-data.html.j2' %}")
+            for standard, suitable, conversion, profile in product(
+                    (None, 'unknown', 'Yes', 'No'), (None, 'unknown', 'Yes', 'No'),
+                    (None, 'unknown', 'Yes', 'No'), ('review', 'submission')):
+                with self.subTest(escape=escape, standard=standard, suitable=suitable,
+                                  conversion=conversion, profile=profile):
+                    replies = dict(base)
+                    for question, prefix, value in ((standard_path, 'formatsIsStandard', standard),
+                            (suitable_path, 'formatsIsLTSuitable', suitable),
+                            (conversion_path, 'formatsConvertLTSuitable', conversion)):
+                        if value is not None: replies[question] = IDS.get(prefix + value + 'AUuid', value)
+                    output = template.render(repliesMap=replies, output_profile=profile)
+                    soup = BeautifulSoup(output, 'html.parser')
+                    text = soup.select_one('.format-summary').get_text(' ', strip=True)
+                    self.assertEqual(standard == 'Yes', 'It is a standard format widely used by researchers in this field' in text)
+                    self.assertEqual(standard == 'No', 'This format is not a standard widely used by researchers in this field.' in text)
+                    self.assertNotIn('We are not using a standardized format', text)
+                    self.assertEqual(suitable == 'Yes', 'is suitable for sharing and long-term archiving.' in text)
+                    self.assertEqual(suitable == 'No', 'not suitable for both sharing and long-term archiving' in text)
+                    self.assertEqual(suitable == 'No' and conversion == 'Yes', 'we plan to convert' in text)
+                    self.assertEqual(suitable == 'No' and conversion == 'No', 'we do not plan to convert' in text)
+                    if suitable == 'No' and conversion in ('Yes', 'No'):
+                        self.assertIn('to a format more suitable for archiving later.', text)
+                    self.assertNotIn('before the end of the project', output)
+                    self.assertEqual(int(standard == 'No'), output.count(reason))
+                    for fact, missing in (('format-standard', standard not in ('Yes', 'No')),
+                            ('format-archiving', suitable not in ('Yes', 'No')),
+                            ('format-conversion', suitable == 'No' and conversion not in ('Yes', 'No'))):
+                        gap = soup.select_one(f'[data-fact-id="{fact}"]')
+                        self.assertEqual(profile == 'review' and missing, gap is not None)
+                        if gap: self.assertEqual('missing', gap['data-status'])
+                    if profile == 'submission': self.assertFalse(soup.select('.data-gap'))
+            # A parent No denies the conjunction, not standardization alone.
+            # Only explicit reasons justify the narrower non-standard claim.
+            reason_path = path(why_path, 'formatsWhyNSAnotherReasonAUuid', 'formatsWhyNSAnotherReasonQUuid')
+            for (why, body), profile in product(
+                    ((None, ''), ('unknown', ''), ('ThereIsNoStandard', ''),
+                     ('ItIsOptimized', ''), ('AnotherReason', ''), ('AnotherReason', reason)),
+                    ('review', 'submission')):
+                with self.subTest(escape=escape, why=why, authored=bool(body), profile=profile):
+                    replies = {**base, standard_path: IDS['formatsIsStandardNoAUuid'], reason_path: body}
+                    if why is None: replies.pop(why_path)
+                    else: replies[why_path] = IDS.get('formatsWhyNS' + why + 'AUuid', why)
+                    output = template.render(repliesMap=replies, output_profile=profile)
+                    soup = BeautifulSoup(output, 'html.parser')
+                    text = soup.select_one('.format-summary').get_text(' ', strip=True)
+                    explicit = why in ('ThereIsNoStandard', 'ItIsOptimized')
+                    self.assertEqual(explicit, 'We are not using a standardized format' in text)
+                    self.assertEqual(not explicit, 'This format is not a standard widely used by researchers in this field.' in text)
+                    self.assertEqual(int(why == 'AnotherReason' and bool(body)), output.count(reason))
+                    if why == 'AnotherReason' and body:
+                        self.assertEqual('Reason for choosing this format:', soup.select_one(
+                            '[data-fact-id="nonstandard-reason"] .answer-lead').get_text())
+                    gap = soup.select_one('[data-fact-id="nonstandard-reason"][data-status="missing"]')
+                    self.assertEqual(profile == 'review' and not explicit and not body, gap is not None)
+                    if gap: self.assertEqual('reason for choosing this format', gap.get_text())
+
     def test_identifier_repository_labels_are_plain_below_dataset_boundaries(self):
         from bs4 import BeautifulSoup
         from current_support import identifier_replies
@@ -111,11 +185,15 @@ class ScienceEuropeContractTests(unittest.TestCase):
                         self.assertEqual(count, len(distributions))
                         for index, distribution in enumerate(distributions, 1):
                             labels = distribution.select('.identifier-heading > p.answer-lead')
-                            self.assertEqual(2 if count > 1 else 1, len(labels))
-                            self.assertEqual(label, labels[-1].get_text(' ', strip=True))
-                            self.assertFalse(labels[-1].select('strong,b,h1,h2,h3,h4,h5,h6'))
                             if count > 1:
+                                self.assertEqual(2, len(labels))
+                                self.assertEqual(label, labels[-1].get_text(' ', strip=True))
+                                self.assertFalse(labels[-1].select('strong,b,h1,h2,h3,h4,h5,h6'))
                                 self.assertEqual(f'Distribution {index}', labels[0].strong.get_text(strip=True))
+                            else:
+                                self.assertFalse(labels)
+                                sentence = distribution.select_one('.identifier-arrangement').get_text(' ', strip=True)
+                                self.assertEqual(f'The {label.lower()} will assign the persistent identifier and ensure that it resolves to a digital object.', sentence)
                             for fact in ('persistent-identifier', 'identifier-assigner', 'identifier-resolution'):
                                 self.assertEqual('complete', distribution.select_one(
                                     f'[data-fact-id="{fact}"]')['data-status'])
@@ -231,10 +309,11 @@ class ScienceEuropeContractTests(unittest.TestCase):
                             if named: values[path(owner, 'measuredDataNameQUuid')] = 'Dataset A'
                             output = template.render(repliesMap=values, output_profile=profile)
                             soup = BeautifulSoup(output, 'html.parser')
-                            item = soup.select_one(f'li[data-item-id="{owner}"]')
+                            item = soup.select_one(f'.dataset-section[data-item-id="{owner}"]')
                             single = item.select_one('.single-instrument')
                             self.assertEqual(bool(name or body), bool(single))
-                            self.assertEqual(2, len(soup.select('#q-how-data > .answer > ul > li')))
+                            self.assertEqual(2, len(soup.select('#q-how-data > .answer > .dataset-list > .dataset-section')))
+                            self.assertIsNone(item.find_parent('ul'))
                             self.assertEqual('Dataset A' if named else 'Instrument dataset 1' if profile == 'submission'
                                              else '(no name given)', item.h5.get_text(' ', strip=True))
                             if single:
@@ -251,7 +330,7 @@ class ScienceEuropeContractTests(unittest.TestCase):
                       path(instruments, 'partial', 'measuredDataInstrDescQUuid'): '<p>Original detail.</p>'}
             soup = BeautifulSoup(template.render(repliesMap=values, output_profile='submission'), 'html.parser')
             self.assertFalse(soup.select('.single-instrument'))
-            self.assertIn('Instrument 2', soup.select_one(f'li[data-item-id="{owner}"] > ul > li').get_text())
+            self.assertIn('Instrument 2', soup.select_one(f'.dataset-section[data-item-id="{owner}"] > ul > li').get_text())
             self.assertIn('Original detail.', soup.get_text())
 
     def test_shared_reference_rules_keep_individual_purposes_and_versions(self):

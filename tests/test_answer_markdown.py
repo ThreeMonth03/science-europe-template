@@ -121,6 +121,62 @@ class AnswerMarkdownTests(unittest.TestCase):
                     self.assertEqual(source.count('answerMarkdown.markdown(' + value + ')'), expected)
                     self.assertFalse(re.search(r'\b' + re.escape(value) + r'\s*\|\s*markdown\b', source))
 
+    def test_q1_dataset_groups_preserve_exact_authored_blocks_and_parent_gates(self):
+        from current_support import IDS, PREFIX, environment, path
+        from jinja2 import Undefined
+        envelope = lambda value, kind='StringReply': {'value': {'type': kind, 'value': value}}
+        source = 'Original opening.\n\n1. Parent\n    - Child\n2. Next\n\n| Field | Value |\n| --- | --- |\n| Original | 0 |\n\nLiteral `A<B&C>D`. [Procedure](https://example.org/procedure?a=1&b=2)'
+        rich = '<p>Original opening.</p><ol><li>Parent<ul><li>Child</li></ul></li><li>Next</li></ol><table><tr><th>Field</th><th>Value</th></tr><tr><td>Original</td><td>0</td></tr></table><p>Literal <code>A&lt;B&amp;C&gt;D</code>. <a href="https://example.org/procedure?a=1&amp;b=2">Procedure</a></p>'
+        for kind in ('measured', 'ref', 'nref'):
+            measured = kind == 'measured'
+            parent = path('creatingCUuid', 'measuredQUuid') if measured else path('reusingCUuid', 'preexistingQUuid')
+            yes, no = ('measuredYesAUuid', 'measuredNoAUuid') if measured else ('preexistingYesAUuid', 'preexistingNoAUuid')
+            listing = path(parent, yes, 'measuredDataQUuid' if measured else kind + 'DataQUuid')
+            first = path(listing, 'dataset-a')
+            values = {parent: envelope(IDS[yes], 'AnswerReply'),
+                      listing: envelope(['dataset-a', 'dataset-b'], 'ItemListReply'),
+                      path(first, 'measuredDataNameQUuid' if measured else kind + 'DataNameQUuid'): envelope('Dataset A')}
+            if measured:
+                instruments = path(first, 'measuredDataInstrQUuid')
+                values.update({instruments: envelope(['sensor'], 'ItemListReply'),
+                    path(instruments, 'sensor', 'measuredDataInstrNameQUuid'): envelope('Sensor A')})
+                detail = path(instruments, 'sensor', 'measuredDataInstrDescQUuid')
+            else:
+                use = path(first, kind + 'DataUseQUuid')
+                values[use] = envelope(IDS[kind + 'DataUseYesAUuid'], 'AnswerReply')
+                detail = path(use, kind + 'DataUseYesAUuid', kind + 'DataUsageQUuid')
+            values[detail] = envelope(source)
+            transport = ''.join(self.fragment(reply['value']['value'], rich if key == detail else '<p>' + html.escape(reply['value']['value']) + '</p>').replace('dsw-md-1', 'dsw-md-' + str(i))
+                for i, (key, reply) in enumerate(values.items(), 1) if reply['value']['type'] == 'StringReply')
+            for escape in (False, True):
+                env = environment(ROOT, escape=escape)
+                env.loader = FileSystemLoader(ROOT)  # Exercise the real exact-source guard.
+                env.filters['reply_str_value'] = lambda reply: '' if isinstance(reply, Undefined) else reply['value']['value'] if isinstance(reply, dict) else reply
+                env.filters['reply_items'] = lambda reply: reply['value']['value'] if isinstance(reply, dict) and reply['value']['type'] == 'ItemListReply' else []
+                render = env.from_string(PREFIX + "{% include 'src/questions/01-how-data.html.j2' %}").render
+                for profile in ('review', 'submission'):
+                    def output(data):
+                        return render(repliesMap=data, ctx={'project': {'replies': data}}, json=json,
+                            document=SimpleNamespace(content=transport.encode(), safe_encoding='utf-8'), output_profile=profile)
+                    rendered = output(values)
+                    doc = lhtml.fragment_fromstring(rendered, create_parent=True)
+                    owners = doc.xpath('.//div[@id="q-how-data"]//div[@class="dataset-list"]/div[@class="dataset-section"]')
+                    with self.subTest(kind=kind, escape=escape, profile=profile):
+                        self.assertEqual([node.get('data-item-id') for node in owners],
+                            [path(listing, item) if measured else item for item in ('dataset-a', 'dataset-b')])
+                        self.assertTrue(all(not node.xpath('ancestor::ul | ancestor::ol') for node in owners))
+                        self.assertIn(rich, rendered, 'Authored blocks must retain their exact transport bytes')
+                        self.assertEqual(len(owners[0].xpath('.//ol/li[1]/ul/li')), 1)
+                        self.assertEqual(owners[0].xpath('.//code/text()'), ['A<B&C>D'])
+                        self.assertEqual(owners[0].xpath('.//a/@href'), ['https://example.org/procedure?a=1&b=2'])
+                        self.assertEqual([[cell.text_content() for cell in row] for row in owners[0].xpath('.//tr')], [['Field', 'Value'], ['Original', '0']])
+                        self.assertNotIn('Original opening.', owners[1].text_content())
+                        self.assertFalse(doc.xpath('.//pre[@class="answer-markdown-fallback"] | .//p//div | .//p//table | .//p//ol'))
+                        inactive = lhtml.fragment_fromstring(output({**values, parent: envelope(IDS[no], 'AnswerReply')}), create_parent=True)
+                        self.assertFalse(inactive.xpath('.//div[@class="dataset-section"] | .//ol | .//table'))
+                        if profile == 'submission':
+                            self.assertFalse(doc.xpath('.//*[@class="data-gap"]'))
+
     def test_q8_ownership_and_q10_relation_retain_exact_owned_transport(self):
         from current_support import IDS, PREFIX, environment, path
         from jinja2 import Undefined

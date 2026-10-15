@@ -41,12 +41,17 @@
                             {%- set repositoryKindQUuid = [publishedDistrosItem, uuids.publishedDataRepositoryKindQUuid]|reply_path -%}
                             {%- set repositoryKindAUuid = repliesMap[repositoryKindQUuid]|reply_str_value -%}
                             {%- set repositoryKindKnown = repositoryKindAUuid in [uuids.publishedDataRepositoryDomainSpecificAUuid, uuids.publishedDataRepositoryGeneralPurposeAUuid, uuids.publishedDataRepositoryNationalAUuid, uuids.publishedDataRepositoryInstitutionalAUuid, uuids.publishedDataRepositorySpecialAUuid] -%}
+                            {%- set publishedDataIdentifierAssignsQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierAssignsQUuid]|reply_path -%}
+                            {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}
+                            {%- set publishedDataIdentifierResolvableQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierResolvableQUuid]|reply_path -%}
+                            {%- set publishedDataIdentifierResolvableAUuid = repliesMap[publishedDataIdentifierResolvableQUuid]|reply_str_value -%}
+                            {%- set integrateRepositoryKind = publishedDistrosItems|length == 1 and repositoryKindKnown and publishedDataIdentifierAUuid == uuids.publishedDataIdentifierYesAUuid and publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsRepositoryAUuid -%}
                             {% if output_profile|default('review') != 'submission' or publishedDataIdentifierAUuid in [uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierNoAUuid] %}
                             <div class="distribution-section" data-item-id="{{ j }}">
-                            {% if publishedDistrosItems|length > 1 or repositoryKindKnown %}
+                            {% if publishedDistrosItems|length > 1 or (repositoryKindKnown and not integrateRepositoryKind) %}
                             <div class="identifier-heading">
                             {% if publishedDistrosItems|length > 1 %}<p class="answer-lead">{{ pgettext("questions/13-persistent-identifier", "<strong>Distribution %(loop_index)s</strong>", loop_index=loop.index) }}</p>{% endif %}
-                            {% if repositoryKindKnown %}
+                            {% if repositoryKindKnown and not integrateRepositoryKind %}
                             <p class="answer-lead">
                             {%- if repositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid -%}
                                 {{ pgettext("questions/13-persistent-identifier", "Domain-specific repository") }}
@@ -70,18 +75,14 @@
                             <div class="identifier-followup-unit short-reading-unit">
                             <div class="identifier-arrangement dataset-policy">
                                 {# Who assigns #}
-                                {%- set publishedDataIdentifierAssignsQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierAssignsQUuid]|reply_path -%}
-                                {%- set publishedDataIdentifierAssignsAUuid = repliesMap[publishedDataIdentifierAssignsQUuid]|reply_str_value -%}
-                                {%- set publishedDataIdentifierResolvableQUuid = [publishedDataIdentifierQUuid, uuids.publishedDataIdentifierYesAUuid, uuids.publishedDataIdentifierResolvableQUuid]|reply_path -%}
-                                {%- set publishedDataIdentifierResolvableAUuid = repliesMap[publishedDataIdentifierResolvableQUuid]|reply_str_value -%}
                                 {%- set repositoryHandlesBoth = publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsRepositoryAUuid and publishedDataIdentifierResolvableAUuid in [uuids.publishedDataIdentifierResolvableYesAUuid, uuids.publishedDataIdentifierResolvableNoAUuid] -%}
 
                                 {# A known assigner sentence already states that identifiers will be
                                    assigned. Keep both facts, without repeating that assertion.
                                    Missing/unsupported assigners must retain the known parent answer. #}
-                                {%- if repositoryHandlesBoth -%}
-                                    {# One complete, translatable compound sentence carries both
-                                       facts. A negative guarantee is NOT a failed resolution. #}
+                                {%- if repositoryHandlesBoth or integrateRepositoryKind -%}
+                                    {# Name a single known owner; combine a known resolution
+                                       choice. A negative guarantee is NOT a failed resolution. #}
                                     <p data-fact-id="persistent-identifier" data-status="complete"><span data-requirement-id="SE-5d" data-fact-id="identifier-assigner" data-status="complete">{% include 'src/identifier-repository.html.j2' with context %}</span></p>
                                 {%- elif publishedDataIdentifierAssignsAUuid == uuids.publishedDataIdentifierAssignsProjectDataStewardAUuid -%}
                                     {{ pgettext("questions/13-persistent-identifier", "<p data-fact-id=\"persistent-identifier\" data-status=\"complete\"><span data-requirement-id=\"SE-5d\" data-fact-id=\"identifier-assigner\" data-status=\"complete\">A project data steward or principal investigator will assign the persistent identifier.</span></p>") }}

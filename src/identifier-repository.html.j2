@@ -1,6 +1,27 @@
-{# Called only for a confirmed repository assigner and a known resolution choice.
-   Preserve the separate fact/status marker inside the complete shared sentence. #}
-{% if publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid %}
+{# A single known location can name its repository in the policy itself.
+   Multiple locations retain their independent headings and generic policy. #}
+{% if integrateRepositoryKind %}
+  {%- set repositorySubject -%}
+    {%- if repositoryKindAUuid == uuids.publishedDataRepositoryDomainSpecificAUuid -%}
+      {{ pgettext("identifier-repository", "The domain-specific repository") }}
+    {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryGeneralPurposeAUuid -%}
+      {{ pgettext("identifier-repository", "The general-purpose repository") }}
+    {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryNationalAUuid -%}
+      {{ pgettext("identifier-repository", "The national repository") }}
+    {%- elif repositoryKindAUuid == uuids.publishedDataRepositoryInstitutionalAUuid -%}
+      {{ pgettext("identifier-repository", "The institutional repository") }}
+    {%- elif repositoryKindAUuid == uuids.publishedDataRepositorySpecialAUuid -%}
+      {{ pgettext("identifier-repository", "The special-purpose repository") }}
+    {%- endif -%}
+  {%- endset -%}
+  {% if publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid %}
+    <span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="complete">{{ pgettext("identifier-repository", "%(repository)s will assign the persistent identifier and ensure that it resolves to a digital object.", repository=repositorySubject) }}</span>
+  {% elif publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableNoAUuid %}
+    <span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="explicit-no">{{ pgettext("identifier-repository", "%(repository)s will assign the persistent identifier but will not guarantee that it resolves to a digital object.", repository=repositorySubject) }}</span>
+  {% else %}
+    {{ pgettext("identifier-repository", "%(repository)s will assign the persistent identifier.", repository=repositorySubject) }}
+  {% endif %}
+{% elif publishedDataIdentifierResolvableAUuid == uuids.publishedDataIdentifierResolvableYesAUuid %}
   <span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="complete">{{ pgettext("identifier-repository", "The repository will assign the persistent identifier and ensure that it resolves to a digital object.") }}</span>
 {% else %}
   <span data-requirement-id="SE-5d" data-fact-id="identifier-resolution" data-status="explicit-no">{{ pgettext("identifier-repository", "The repository will assign the persistent identifier but will not guarantee that it resolves to a digital object.") }}</span>
