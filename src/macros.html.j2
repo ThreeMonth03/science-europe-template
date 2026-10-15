@@ -176,8 +176,7 @@
 
 {# Original list indices remain stable when submission omits entirely empty rows. #}
 {%- macro instrumentEntry(index, name, description) -%}
-  <strong>{% if name|trim %}{{ name }}{% else %}{{ pgettext("macros", "Instrument %(index)s", index=index) }}{% endif %}</strong>
-  {% if description|trim -%}<span class="separator">&ndash;</span>{%- endif %}
-  {{ description }}
-  {% if not name|trim and not description|trim %}<span class="data-gap" data-fact-id="instrument-details" data-status="missing">{{ pgettext("macros", "Information not provided: instrument name and description.") }}</span>{% endif %}
+  <p{% if description|trim %} class="answer-lead"{% endif %}><strong>{% if name|trim %}{{ name|e }}{% else %}{{ pgettext("macros", "Instrument %(index)s", index=index) }}{% endif %}</strong>
+  {% if not name|trim and not description|trim %}<span class="data-gap" data-fact-id="instrument-details" data-status="missing">{{ pgettext("macros", "Information not provided: instrument name and description.") }}</span>{% endif %}</p>
+  {% if description|trim %}<div class="answer-detail">{{ answerMarkdown.markdown(description) }}</div>{% endif %}
 {%- endmacro -%}

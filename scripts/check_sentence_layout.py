@@ -263,7 +263,19 @@ def check(root, language):
             visible = bool(name.strip() or description.strip())
             assert len(rows) == (3 if profile == 'review' else 1 + int(visible))
             assert all(n.get_text(strip=True) and n.strong.get_text(strip=True) for n in rows)
-            assert len(soup.select('span.separator')) == int(bool(description.strip()))
+            assert not soup.select('span.separator')
+            details = []
+            for row in rows:
+                labels = row.find_all('p', recursive=False)
+                assert len(labels) == 1 and labels[0].strong
+                body = row.find_all('div', class_='answer-detail', recursive=False)
+                assert len(body) <= 1
+                assert ('answer-lead' in labels[0].get('class', [])) == bool(body)
+                assert all(node.get_text(strip=True) == description for node in body)
+                if body: assert labels[0].strong.get_text() == (name if name.strip() else 'Instrument 2' if language == 'en' else '儀器 2')
+                details.extend(body)
+            assert len(details) == int(bool(description.strip()))
+            assert not soup.select('#q-how-data p div, #q-how-data p p')
             assert ('Original detail.' in soup.get_text()) == bool(description.strip())
             if not name.strip() and (visible or profile == 'review'):
                 assert ('Instrument 2' if language == 'en' else '儀器 2') in rows[-2].strong.get_text()

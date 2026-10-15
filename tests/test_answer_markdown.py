@@ -177,6 +177,57 @@ class AnswerMarkdownTests(unittest.TestCase):
                         if profile == 'submission':
                             self.assertFalse(doc.xpath('.//*[@class="data-gap"]'))
 
+    def test_q1_single_multi_and_sparse_instruments_keep_each_exact_description(self):
+        from current_support import IDS, PREFIX, environment, path
+        from jinja2 import Undefined
+        envelope = lambda value, kind='StringReply': {'value': {'type': kind, 'value': value}}
+        bodies = {}
+        for key in ('A', 'B'):
+            source = f'{key} opening.\n\n{key} separate paragraph.\n\n- {key} original item\n\n| Field | Value |\n| --- | --- |\n| {key} | 0 |\n\n[{key} procedure](https://example.org/{key})'
+            rich = f'<p>{key} opening.</p><p>{key} separate paragraph.</p><ul><li>{key} original item</li></ul><table><tr><th>Field</th><th>Value</th></tr><tr><td>{key}</td><td>0</td></tr></table><p><a href="https://example.org/{key}">{key} procedure</a></p>'
+            bodies[source] = rich
+        first, second = bodies
+        cases = [[('Sensor A', first)], [('Sensor A', first), ('Sensor B', second)],
+                 [('', ''), ('', ''), ('', second)]]
+        parent = path('creatingCUuid', 'measuredQUuid')
+        listing = path(parent, 'measuredYesAUuid', 'measuredDataQUuid')
+        instruments = path(listing, 'dataset', 'measuredDataInstrQUuid')
+        for rows in cases:
+            values = {parent: envelope(IDS['measuredYesAUuid'], 'AnswerReply'),
+                      listing: envelope(['dataset'], 'ItemListReply'),
+                      instruments: envelope([str(i) for i in range(1, len(rows) + 1)], 'ItemListReply')}
+            for index, (name, description) in enumerate(rows, 1):
+                values[path(instruments, str(index), 'measuredDataInstrNameQUuid')] = envelope(name)
+                values[path(instruments, str(index), 'measuredDataInstrDescQUuid')] = envelope(description)
+            transport = ''.join(self.fragment(reply['value']['value'], bodies.get(reply['value']['value'], '<p>' + html.escape(reply['value']['value']) + '</p>')).replace('dsw-md-1', 'dsw-md-' + str(index))
+                for index, reply in enumerate(values.values(), 1) if reply['value']['type'] == 'StringReply')
+            for escape in (False, True):
+                env = environment(ROOT, escape=escape)
+                env.loader = FileSystemLoader(ROOT)
+                env.filters['reply_str_value'] = lambda reply: '' if isinstance(reply, Undefined) else reply['value']['value'] if isinstance(reply, dict) else reply
+                env.filters['reply_items'] = lambda reply: reply['value']['value'] if isinstance(reply, dict) and reply['value']['type'] == 'ItemListReply' else []
+                render = env.from_string(PREFIX + "{% include 'src/questions/01-how-data.html.j2' %}").render
+                for profile in ('review', 'submission'):
+                    with self.subTest(rows=len(rows), sparse=not rows[0][0], escape=escape, profile=profile):
+                        output = render(repliesMap=values, ctx={'project': {'replies': values}}, json=json,
+                            document=SimpleNamespace(content=transport.encode(), safe_encoding='utf-8'), output_profile=profile)
+                        doc = lhtml.fragment_fromstring(output, create_parent=True)
+                        owner = doc.xpath('.//div[@class="dataset-section"]')[0]
+                        details = owner.xpath('.//div[@class="answer-detail"]')
+                        expected = [(index, name, description) for index, (name, description) in enumerate(rows, 1)
+                                    if name or description or profile == 'review']
+                        labels = owner.xpath('./div[@class="single-instrument"]/p/strong | ./ul/li/p/strong')
+                        self.assertEqual([name or f'Instrument {index}' for index, name, _ in expected], [label.text_content() for label in labels])
+                        self.assertEqual(sum(bool(description) for _, description in rows), len(details))
+                        for detail, (_, _, description) in zip(details, (row for row in expected if row[2])):
+                            self.assertIn(bodies[description], output)
+                            self.assertEqual([node.tag for node in detail], ['p', 'p', 'ul', 'table', 'p'])
+                            self.assertEqual(detail.xpath('.//a/@href'), ['https://example.org/' + ('A' if description == first else 'B')])
+                        self.assertEqual(2 if len(rows) == 3 and profile == 'review' else 0,
+                            len(owner.xpath('.//*[@data-fact-id="instrument-details"]')))
+                        self.assertFalse(doc.xpath('.//pre[@class="answer-markdown-fallback"] | .//p//div | .//p//table | .//p//ul'))
+                        if profile == 'submission': self.assertFalse(doc.xpath('.//*[@class="data-gap"]'))
+
     def test_q8_ownership_and_q10_relation_retain_exact_owned_transport(self):
         from current_support import IDS, PREFIX, environment, path
         from jinja2 import Undefined

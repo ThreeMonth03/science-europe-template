@@ -30,6 +30,33 @@ def storage_matrix():
 
 
 class AnswerStateTests(unittest.TestCase):
+    def test_partial_archive_recovery_and_no_embargo_keep_complete_literal_scope(self):
+        from current_support import PREFIX, environment
+        archive = path('preservingCUuid', 'archivedDuringQUuid')
+        changes = path(archive, 'archivedDuringYesAUuid', 'archivedDuringReQUuid')
+        recovery = path(changes, 'archivedDuringReYesAUuid', 'archivedDuringRelyQUuid')
+        embargo = path('accessCUuid', 'limitedEmbargoQUuid')
+        for escape, profile in itertools.product((False, True), ('review', 'submission')):
+            env = environment(ROOT, escape)
+            q5 = env.from_string(PREFIX + "{% include 'src/questions/05-store-backup.html.j2' %}")
+            for answer in ('Yes', 'No'):
+                values = {archive: IDS['archivedDuringYesAUuid'], changes: IDS['archivedDuringReYesAUuid'],
+                          recovery: IDS['archivedDuringRely' + answer + 'AUuid']}
+                soup = BeautifulSoup(q5.render(repliesMap=values, output_profile=profile), 'html.parser')
+                sentence = soup.select_one('[data-fact-id="archive-human-error-recovery"]')
+                self.assertEqual('Backups of the archived data will ' + ('be used' if answer == 'Yes' else 'not be relied on') +
+                                 ' to recover from accidental changes or deletions.', sentence.get_text(strip=True))
+                self.assertEqual('complete' if answer == 'Yes' else 'explicit-no', sentence['data-status'])
+                self.assertFalse(soup.select('[data-fact-id="archive-frequent-backup-need"]'))
+                inactive = BeautifulSoup(q5.render(repliesMap={**values, archive: IDS['archivedDuringNoAUuid']},
+                                                   output_profile=profile), 'html.parser')
+                self.assertFalse(inactive.select('[data-fact-id="archive-human-error-recovery"]'))
+            q8 = env.from_string(PREFIX + "{% include 'src/questions/08-copyright-ipr.html.j2' %}")
+            phrase = 'All data will be made openly available immediately, without an embargo period.'
+            output = q8.render(repliesMap={embargo: IDS['limitedEmbargoOpenAUuid']}, output_profile=profile)
+            self.assertIn(phrase, BeautifulSoup(output, 'html.parser').get_text())
+            self.assertNotIn(phrase, q8.render(repliesMap={}, output_profile=profile))
+
     def test_consent_scope_replaces_only_the_generic_lead_and_preserves_authored_followups(self):
         from check_sentence_layout import partial_fixture
         from current_support import PREFIX, environment

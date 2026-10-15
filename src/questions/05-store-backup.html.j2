@@ -122,9 +122,9 @@
         {% endif %}
         {% set recovery = repliesMap[[changingPrefix, uuids.archivedDuringRelyQUuid]|reply_path]|reply_str_value %}
         {% if recovery == uuids.archivedDuringRelyYesAUuid %}
-          <p data-fact-id="archive-human-error-recovery" data-status="complete">{{ pgettext("questions/05-store-backup", "These backups will be used to recover from accidental changes or deletions.") }}</p>
+          <p data-fact-id="archive-human-error-recovery" data-status="complete">{{ pgettext("questions/05-store-backup", "Backups of the archived data will be used to recover from accidental changes or deletions.") }}</p>
         {% elif recovery == uuids.archivedDuringRelyNoAUuid %}
-          <p data-fact-id="archive-human-error-recovery" data-status="explicit-no">{{ pgettext("questions/05-store-backup", "These backups will not be relied on to recover from accidental changes or deletions.") }}</p>
+          <p data-fact-id="archive-human-error-recovery" data-status="explicit-no">{{ pgettext("questions/05-store-backup", "Backups of the archived data will not be relied on to recover from accidental changes or deletions.") }}</p>
         {% endif %}
         </div>
       {% endif %}

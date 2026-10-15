@@ -138,7 +138,7 @@
     {%- set embargoPath = [uuids.accessCUuid, uuids.limitedEmbargoQUuid]|reply_path -%}
     {%- set embargoAUuid = repliesMap[embargoPath]|reply_str_value -%}
     {%- if embargoAUuid == uuids.limitedEmbargoOpenAUuid -%}
-      <p>{{ pgettext("questions/08-copyright-ipr", "No embargo period is needed because all data will be made openly available.") }}</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "All data will be made openly available immediately, without an embargo period.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoIndefinitelyAUuid -%}
       <p>{{ pgettext("questions/08-copyright-ipr", "A fixed embargo period cannot be used because some restricted data must remain closed indefinitely.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoReleasedSoonAUuid -%}
