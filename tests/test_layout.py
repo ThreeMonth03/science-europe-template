@@ -18,6 +18,34 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_word_marked_iso_dates_bind_every_character_without_touching_other_text(self):
+        import base64
+        from native_support import IMAGE, WORD_RUNNER
+        date = '2027-12-31'
+        bound = '\u2060'.join(date.replace('-', '\u2011'))
+        cases = [
+            ('Before <span class="date-value">' + date + '</span> after.', 'Before ' + bound + ' after.'),
+            ('計畫將於<span class="date-value">' + date + '</span>結束。', '計畫將於' + bound + '結束。'),
+            ('Unmarked ' + date + '.', 'Unmarked ' + date + '.'),
+            ('<span class="other">' + date + '</span>', date),
+            ('Original prose: 2027-12-31 and station_20271231.csv.', 'Original prose: 2027-12-31 and station_20271231.csv.'),
+            ('<a href="https://example.org/' + date + '">https://example.org/' + date + '</a>', 'https://example.org/' + date),
+        ]
+        for malformed in ('2027-12', '2027-1-31', '2027-12-31-extra', '31/12/2027', '2027–12–31'):
+            cases.append(('<span class="date-value">' + malformed + '</span>', malformed))
+        result = json.loads(subprocess.check_output(
+            ['docker', 'run', '--rm', '--pull=never', '--network=none', '--log-driver=none', '-i',
+             '--entrypoint', 'python', IMAGE, '-c', WORD_RUNNER],
+            input=json.dumps(dict(lua=(ROOT / 'src/word/pilot.lua').read_text(),
+                html=''.join('<p>' + source + '</p>' for source, _ in cases),
+                reference=base64.b64encode((ROOT / 'src/word/reference.docx').read_bytes()).decode())).encode(),
+            timeout=180))
+        # Read the emitted DOCX paragraphs, not just the filtered Pandoc AST.
+        self.assertEqual([expected for _, expected in cases], [p['text'] for p in result['paragraphs']])
+        self.assertEqual(9, bound.count('\u2060'))
+        self.assertFalse(bound.startswith('\u2060') or bound.endswith('\u2060'))
+        self.assertFalse(any('\u2060' in p['text'] for p in result['paragraphs'][2:]))
+
     def test_q13_single_repository_subject_preserves_other_arrangements_and_authored_uses(self):
         import itertools
         import sys

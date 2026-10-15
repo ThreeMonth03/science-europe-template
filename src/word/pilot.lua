@@ -72,8 +72,8 @@ function Para(paragraph)
   end
 end
 
--- Only an explicitly marked ISO-shaped date gets non-breaking hyphens in Word.
--- Leave file names, URLs and authored prose unchanged.
+-- Bind every character of a marked ISO date: non-breaking hyphens alone still
+-- let CJK Word layout split the year. Leave names, URLs and prose unchanged.
 function Span(span)
   if span.classes:includes("repository-label") then
     -- Own label emphasis here: translation handles words, not decorative markup.
@@ -83,7 +83,11 @@ function Span(span)
   if span.classes:includes("date-value") then
     local value = pandoc.utils.stringify(span)
     if value:match("^%d%d%d%d%-%d%d%-%d%d$") then
-      span.content = {pandoc.Str(value:gsub("-", utf8.char(0x2011)))}
+      local characters = {}
+      for character in value:gmatch(".") do
+        characters[#characters + 1] = character == "-" and utf8.char(0x2011) or character
+      end
+      span.content = {pandoc.Str(table.concat(characters, utf8.char(0x2060)))}
       return span
     end
   end

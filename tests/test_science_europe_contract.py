@@ -89,6 +89,76 @@ def render_question(path: str, replies: dict[str, object], **context) -> str:
 
 
 class ScienceEuropeContractTests(unittest.TestCase):
+    def test_repository_destinations_are_complete_and_keep_integration_links(self):
+        from itertools import product
+        from bs4 import BeautifulSoup
+        from current_support import IDS, path, environment, PREFIX, support_replies
+        names = [None, {'type': 'PlainType', 'value': 'Coastal Archive'},
+                 {'type': 'IntegrationType', 'raw': {'name': 'Coastal Archive', 'doi': '10.1234/example'}},
+                 {'type': 'IntegrationType', 'raw': {'name': 'Coastal Archive', 'id': 'bsg-s000001'}}]
+        for escape in (False, True):
+            template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/10-share-restrictions.html.j2' %}")
+            for kind, name, profile, publication in product(
+                    ('DomainSpecific', 'GeneralPurpose'), names, ('review', 'submission'), ('Yes', 'No', None)):
+                with self.subTest(escape=escape, kind=kind, name=name, profile=profile, publication=publication):
+                    replies = support_replies(repository=kind, publication=publication)
+                    base = path('preservingCUuid', 'producedDataQUuid', 'dataset-a', 'isPublishedDataQUuid',
+                                'isPublishedDataYesAUuid', 'publishedDistrosQUuid', 'distro-0',
+                                'publishedDataRepositoryKindQUuid', 'publishedDataRepository' + kind + 'AUuid')
+                    field = 'domainSpecificRepoNameQUuid' if kind == 'DomainSpecific' else 'generalPurposeRepoNameQUuid'
+                    if name is not None: replies[path(base, field)] = {'value': {'value': name}}
+                    if kind == 'DomainSpecific':
+                        replies[path(base, 'domainSpecificRepoContactBeforeQUuid')] = IDS['domainSpecificRepoContactBeforeYesAlreadyAUuid']
+                    soup = BeautifulSoup(template.render(repliesMap=replies, output_profile=profile), 'html.parser')
+                    arrangement = soup.select_one('.repository-arrangement')
+                    if publication != 'Yes':
+                        self.assertIsNone(arrangement)
+                        self.assertNotIn('Coastal Archive', soup.get_text())
+                        self.assertNotIn('We have already contacted the repository.', soup.get_text())
+                        continue
+                    self.assertIn('joined-policy', arrangement['class'])
+                    sentence = arrangement.find('p', recursive=False)
+                    self.assertIsNotNone(sentence)
+                    category = 'domain-specific' if kind == 'DomainSpecific' else 'general-purpose'
+                    destination = (f'This distribution will be deposited in the {category} repository Coastal Archive.'
+                                   if name else f'This distribution will be deposited in a {category} repository.')
+                    self.assertTrue(sentence.get_text().startswith(destination), sentence)
+                    link = sentence.find('a')
+                    if name and name['type'] == 'IntegrationType':
+                        raw = name['raw']
+                        self.assertEqual('Coastal Archive', link.get_text())
+                        self.assertEqual('https://doi.org/' + raw['doi'] if 'doi' in raw else
+                                         'https://fairsharing.org/' + raw['id'], link['href'])
+                    else: self.assertIsNone(link)
+                    if kind == 'DomainSpecific': self.assertIn('We have already contacted the repository.', sentence.get_text())
+                    self.assertFalse(soup.select('p p, p div, p ul, p table'))
+                    if profile == 'submission': self.assertFalse(soup.select('.data-gap, .data-review'))
+
+    def test_dmp_creator_role_does_not_imply_implementation_or_revision(self):
+        from itertools import product
+        from bs4 import BeautifulSoup
+        from current_support import environment, PREFIX
+        from check_responsibility_reading import contributor_replies, ROLES, SENTENCES
+        role_sets = ([ROLES[-1]], [ROLES[3], ROLES[-1]], ROLES, [ROLES[3]])
+        for escape in (False, True):
+            template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
+            for roles, name, profile in product(role_sets, ('Alex Chen', None), ('review', 'submission')):
+                with self.subTest(escape=escape, roles=roles, name=name, profile=profile):
+                    people = [('unassigned', None, []), ('author', name, roles)]
+                    soup = BeautifulSoup(template.render(repliesMap=contributor_replies(people), output_profile=profile), 'html.parser')
+                    owner = soup.select_one('.person-responsibilities')
+                    self.assertEqual('author', owner['data-contributor-id'])
+                    self.assertEqual('2', owner['data-contributor-index'])
+                    actor = name or 'Contributor 2'
+                    expected = ' '.join(sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES['en']) if role in roles)
+                    text = owner.select_one('.responsibility-summary').get_text(strip=True)
+                    self.assertEqual(expected, text)
+                    self.assertEqual(ROLES[-1] in roles, f'{actor} is a creator of the data management plan.' in text)
+                    for invented in ('implementing the data management plan', 'reviewed and revised'):
+                        self.assertNotIn(invented, text)
+                    self.assertEqual(profile == 'review' and not name, bool(owner.select('.data-gap')))
+                    self.assertFalse(soup.select('p p, p div, p ul, p table'))
+
     def test_format_policies_preserve_question_scope_without_inventing_conversion(self):
         from itertools import product
         from bs4 import BeautifulSoup

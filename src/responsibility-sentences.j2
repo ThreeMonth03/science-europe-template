@@ -26,6 +26,6 @@
   {% do mappedRoles.append(uuids.contributorRoleDataProtectorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleCreatorOfDMPAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for implementing the data management plan and ensuring that it is reviewed and revised.", responsibility_actor=responsibilityActor)) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is a creator of the data management plan.", responsibility_actor=responsibilityActor)) -%}
   {% do mappedRoles.append(uuids.contributorRoleCreatorOfDMPAUuid) %}
 {% endif %}

@@ -23,7 +23,7 @@ SENTENCES = {
         '{actor} is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability.',
         '{actor} is responsible for producing and disseminating electronic or print copies of the resource.',
         '{actor} is responsible for addressing personal-data protection and data-protection policies.',
-        '{actor} is responsible for implementing the data management plan and ensuring that it is reviewed and revised.',
+        '{actor} is a creator of the data management plan.',
     ],
     'zh-Hant': [
         '{actor}負責審查、補充、清理或標準化提交至資料中心或儲存庫的後設資料及相關資料，以供儲存、使用與維護。',
@@ -32,7 +32,7 @@ SENTENCES = {
         '{actor}負責管理資料並支援其有效運用，涵蓋資料處理、資料政策、指引與可用性。',
         '{actor}負責以電子或紙本形式製作並發布資源副本。',
         '{actor}負責個人資料保護及資料保護政策相關工作。',
-        '{actor}負責執行資料管理方案，並確保該方案經過審查與修訂。',
+        '{actor}為資料管理方案撰寫者。',
     ],
 }
 LISTING = path('adminDetailsCUuid', 'contributorsQUuid')
