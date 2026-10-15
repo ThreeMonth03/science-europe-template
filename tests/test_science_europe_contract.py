@@ -133,11 +133,17 @@ class ScienceEuropeContractTests(unittest.TestCase):
                 used: IDS['refDataUseYesAUuid'], version: IDS['refDataVersionedYesAUuid'],
                 policy: IDS['refDataVersionedChangeStayAUuid']}
         # The body adapter supplies exact HTML, not proof of native conversion.
-        bodies = ['<p>2.1</p>', '<p>' + 'Original version note. ' * 80 + '</p>',
-                  '<p>Version opening.</p><table><tbody><tr><td>Original revision.</td>'
-                  '<td>Original evidence.</td></tr></tbody></table><p>Version ending.</p>']
+        bodies = [('<p>2.1</p>', True), ('<p>版本 &lt;2 &amp; v1.2</p>', True),
+                  ('<p>' + 'Original version note. ' * 80 + '</p>', False),
+                  ('<p><strong>2.1</strong> <code>v2</code></p>', False),
+                  ('<p><a href="https://example.org/?a=1&amp;b=2">2.1</a></p>', False),
+                  ('<ul><li>2.1</li><li>Original note.</li></ul>', False),
+                  ('<p class="original">2.1</p>', False), ('<p></p>', False), ('<p>   </p>', False),
+                  ('<p>2.1\nOriginal note.</p>', False),
+                  ('<p>Version opening.</p><table><tbody><tr><td>Original revision.</td>'
+                   '<td>Original evidence.</td></tr></tbody></table><p>Version ending.</p>', False)]
         for profile in ('submission', 'review'):
-            for body in bodies:
+            for body, compact in bodies:
                 with self.subTest(profile=profile, body=body[:30]):
                     output = render_question('src/questions/01-how-data.html.j2',
                                              {**base, value: body}, output_profile=profile)
@@ -147,13 +153,38 @@ class ScienceEuropeContractTests(unittest.TestCase):
                     self.assertEqual('complete', detail['data-status'])
                     self.assertIsNone(detail.find_parent('table'))
                     self.assertFalse(soup.select('table.dataset-version'))
-                    lead = detail.find('div', recursive=False)
-                    self.assertEqual(['answer-lead'], lead['class'])
-                    self.assertEqual('Version', lead.get_text())
-                    self.assertEqual(1, output.count(body))
+                    if compact:
+                        self.assertIsNone(detail.find('div', recursive=False))
+                        self.assertEqual(1, len(detail.find_all('p', recursive=False)))
+                        self.assertEqual('Version:', detail.p.strong.get_text())
+                        self.assertTrue(str(detail.p).endswith(body[3:]))
+                    else:
+                        lead = detail.find('div', recursive=False)
+                        self.assertEqual(['answer-lead'], lead['class'])
+                        self.assertEqual('Version', lead.get_text())
+                        # Scope the normalized DOM check, and check original bytes separately.
+                        self.assertEqual(1, detail.decode_contents().count(str(BeautifulSoup(body, 'html.parser'))))
+                        self.assertIn(body, output)
                     if '<table>' in body:
                         self.assertEqual(detail, detail.table.parent)
+                    self.assertIn('the current version will continue to be used.',
+                                  detail.find_next_sibling('p').get_text())
                     self.assertIn('the current version will continue to be used.', output)
+            # The decision follows rendered Markdown, not a short raw source.
+            from current_support import environment, PREFIX
+            from markupsafe import Markup
+            for escape in (False, True):
+                env = environment(ROOT, escape)
+                template = env.from_string(PREFIX + "{% include 'src/questions/01-how-data.html.j2' %}")
+                for body, compact in bodies:
+                    env.filters['markdown'] = lambda source: Markup(body)
+                    output = template.render(repliesMap={**base, value: 'v2'}, output_profile=profile)
+                    detail = BeautifulSoup(output, 'html.parser').select_one('.dataset-version')
+                    self.assertEqual(compact, detail.find('div', recursive=False) is None)
+                    if compact: self.assertTrue(str(detail.p).endswith(body[3:]))
+                    else:
+                        self.assertEqual(1, detail.decode_contents().count(str(BeautifulSoup(body, 'html.parser'))))
+                        self.assertIn(body, output)
             for missing in (None, '', ' \t\n\u3000'):
                 values = dict(base)
                 if missing is not None: values[value] = missing
@@ -164,13 +195,64 @@ class ScienceEuropeContractTests(unittest.TestCase):
                 self.assertEqual(profile == 'review', bool(soup.select('[data-fact-id="dataset-version"]')))
                 self.assertIn('the current version will continue to be used.', output)
             for stale in ('missing-version-selector', 'not-reused'):
-                values = {**base, value: bodies[2]}
+                values = {**base, value: bodies[-1][0]}
                 if stale == 'missing-version-selector': del values[version]
                 else: values[used] = IDS['refDataUseNoAUuid']
                 output = render_question('src/questions/01-how-data.html.j2', values,
                                          output_profile=profile)
                 self.assertNotIn('Original revision.', output)
                 self.assertFalse(BeautifulSoup(output, 'html.parser').select('.dataset-version'))
+
+    def test_single_instrument_keeps_owner_ordinals_and_authored_blocks(self):
+        from bs4 import BeautifulSoup
+        from current_support import IDS, path, environment, PREFIX
+        measured = path('creatingCUuid', 'measuredQUuid')
+        datasets = path(measured, 'measuredYesAUuid', 'measuredDataQUuid')
+        owner = path(datasets, 'first')
+        instruments = path(owner, 'measuredDataInstrQUuid')
+        base = {measured: IDS['measuredYesAUuid'], datasets: ['first', 'second'],
+                path(datasets, 'second', 'measuredDataNameQUuid'): 'Other dataset',
+                path(owner, 'measuredDataQualityQUuid'): IDS['measuredDataQualityYesAUuid'],
+                path(owner, 'measuredDataQualityQUuid', 'measuredDataQualityYesAUuid',
+                     'mdQualityCalibratingQUuid'): IDS['mdQualityCalibratingYesAUuid']}
+        bodies = ['', '<p>Keep Original.csv, exactly!</p>',
+                  '<p>Original opening.</p><ul><li>Keep <strong>A</strong>.</li></ul>',
+                  '<p><a href="https://example.org/?a=1&amp;b=2">Original link</a></p>',
+                  '<table><tbody><tr><td>Original value</td></tr></tbody></table>']
+        for escape in (False, True):
+            template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/01-how-data.html.j2' %}")
+            for profile in ('review', 'submission'):
+                for named in (False, True):
+                    for name in ('Sensor A', '', '<img src="not-a-picture">'):
+                        for body in bodies:
+                            values = {**base, instruments: ['instrument'],
+                                      path(instruments, 'instrument', 'measuredDataInstrNameQUuid'): name,
+                                      path(instruments, 'instrument', 'measuredDataInstrDescQUuid'): body}
+                            if named: values[path(owner, 'measuredDataNameQUuid')] = 'Dataset A'
+                            output = template.render(repliesMap=values, output_profile=profile)
+                            soup = BeautifulSoup(output, 'html.parser')
+                            item = soup.select_one(f'li[data-item-id="{owner}"]')
+                            single = item.select_one('.single-instrument')
+                            self.assertEqual(bool(name or body), bool(single))
+                            self.assertEqual(2, len(soup.select('#q-how-data > .answer > ul > li')))
+                            self.assertEqual('Dataset A' if named else 'Instrument dataset 1' if profile == 'submission'
+                                             else '(no name given)', item.h5.get_text(' ', strip=True))
+                            if single:
+                                self.assertIsNone(single.find('ul', recursive=False))
+                                self.assertFalse(single.select('img'))
+                                self.assertEqual(name or 'Instrument 1', single.p.strong.get_text())
+                                self.assertEqual(bool(body), bool(single.select('.answer-detail')))
+                                if body: self.assertEqual(body, single.select_one('.answer-detail').decode_contents())
+                            self.assertFalse(soup.select('p p,p div,p ul,p table'))
+                            self.assertEqual(1 if named else 0, item.get_text().count('Dataset A'))
+                            if profile == 'submission': self.assertFalse(soup.select('.data-gap'))
+            # One visible row from a longer source list retains its original list/ordinal.
+            values = {**base, instruments: ['empty', 'partial'],
+                      path(instruments, 'partial', 'measuredDataInstrDescQUuid'): '<p>Original detail.</p>'}
+            soup = BeautifulSoup(template.render(repliesMap=values, output_profile='submission'), 'html.parser')
+            self.assertFalse(soup.select('.single-instrument'))
+            self.assertIn('Instrument 2', soup.select_one(f'li[data-item-id="{owner}"] > ul > li').get_text())
+            self.assertIn('Original detail.', soup.get_text())
 
     def test_shared_reference_rules_keep_individual_purposes_and_versions(self):
         events = json.loads((ROOT / "fixtures/pilot/en/populated.events.json").read_text())

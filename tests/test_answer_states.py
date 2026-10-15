@@ -30,6 +30,72 @@ def storage_matrix():
 
 
 class AnswerStateTests(unittest.TestCase):
+    def test_consent_scope_replaces_only_the_generic_lead_and_preserves_authored_followups(self):
+        from check_sentence_layout import partial_fixture
+        from current_support import PREFIX, environment
+        template_path = 'src/questions/09-ethical-issues.html.j2'
+        chain = ('creatingCUuid collectPersonalQUuid collectPersonalYesAUuid cpersGdprQUuid '
+                 'cpersGdprExploreAUuid cpersGdprLegalBasisQUuid cpersGdprLegalBasisAskAUuid cpersConsentQUuid')
+        km, base, leaf = partial_fixture(chain)
+        ancestors = tuple(base)
+        scopes = {
+            'Use': "We will obtain consent for this project's specific use of the data.",
+            'Reuse': "We will obtain consent for this project's use and for subsequent reuse of the data.",
+            'UseAnon': "We will obtain consent for this project's use of the data and for anonymization. We will then anonymize the data for subsequent reuse.",
+            'Anon': 'We will obtain consent to anonymize the data. We will anonymize the data before any further processing.',
+        }
+        choices = {name: IDS['cpersConsent' + name + 'AUuid'] for name in scopes}
+        km['entities']['questions'][IDS['cpersConsentQUuid']].update(
+            questionType='OptionsQuestion', answerUuids=list(choices.values()))
+        km['entities']['answers'].update({choice: {'followUpUuids': []} for choice in choices.values()})
+        parent = leaf.rsplit('.', 1)[0]
+        authored = '<p>Keep Consent-v1.2.csv; A&amp;B.</p><p>Separate paragraph.</p><ul><li>Original item.</li></ul><table><tr><td>Original cell.</td></tr></table>'
+        for question in ('cpersExplainInformedQUuid', 'cpersDescribeProcedureQUuid'):
+            base[path(parent, question)] = authored
+        base[path('creatingCUuid', 'collectPersonalQUuid', 'collectPersonalYesAUuid',
+                  'cpersGdprQUuid', 'cpersGdprExploreAUuid', 'cpersGdprPurposeQUuid')] = authored
+        generic = 'We ask the data subjects for their consent.'
+        for escape in (False, True):
+            env = environment(ROOT, escape)
+            flat_value = env.filters['reply_str_value']
+            # Decode real typed envelopes; the template must reject wrong reply types.
+            env.filters['reply_str_value'] = lambda r: r['value'].get('value', '') if isinstance(r, dict) and isinstance(r.get('value'), dict) else flat_value(r)
+            template = env.from_string(PREFIX + "{% include '" + template_path + "' %}")
+            def render(values, profile, schema):
+                raw = template.render(repliesMap=values, output_profile=profile, **schema)
+                self.assertEqual(raw.count(authored), 3)
+                soup = BeautifulSoup(raw, 'html.parser')
+                self.assertFalse(soup.select('p p,p div,p ul,p table'))
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review'))
+                return ' '.join(soup.get_text(' ', strip=True).split())
+            for schema, profile, choice in itertools.product(({}, {'km': km}), ('review', 'submission'),
+                    (*scopes, None, '', 'unknown', 'typed', 'wrong-reply-type')):
+                values = dict(base)
+                if choice is not None: values[leaf] = choices.get(choice, choice)
+                if choice in ('typed', 'wrong-reply-type'):
+                    values[leaf] = {'value': {'type': 'AnswerReply' if choice == 'typed' else 'StringReply', 'value': choices['Use']}}
+                text = render(values, profile, schema)
+                expected = 'Use' if choice == 'typed' else choice if choice in scopes else None
+                self.assertEqual(text.count(generic), int(expected is None), (escape, profile, choice, bool(schema)))
+                for name, phrase in scopes.items(): self.assertEqual(phrase in text, name == expected)
+            for profile, mutation in itertools.product(('review', 'submission'),
+                    ('removed-question', 'removed-choice', 'dangling-answer', 'removed-followup', 'wrong-question-type')):
+                altered = deepcopy(km)
+                node = altered['entities']['questions'][IDS['cpersConsentQUuid']]
+                if mutation == 'removed-question': del altered['entities']['questions'][IDS['cpersConsentQUuid']]
+                elif mutation == 'removed-choice': node['answerUuids'].remove(choices['Use'])
+                elif mutation == 'dangling-answer': del altered['entities']['answers'][choices['Use']]
+                elif mutation == 'removed-followup': altered['entities']['answers'][IDS['cpersGdprLegalBasisAskAUuid']]['followUpUuids'].clear()
+                else: node['questionType'] = 'ValueQuestion'
+                text = render({**base, leaf: choices['Use']}, profile, {'km': altered})
+                self.assertEqual(text.count(generic), 1, mutation)
+                self.assertFalse(any(phrase in text for phrase in scopes.values()), mutation)
+            for ancestor in ancestors:
+                values = {**base, leaf: choices['Use']}; values.pop(ancestor)
+                raw = template.render(repliesMap=values, output_profile='submission', km=km)
+                self.assertNotIn(generic, raw)
+                self.assertFalse(any(phrase in raw for phrase in scopes.values()))
+
     def test_reused_negative_facts_and_openness_are_active_answers_not_missing_values(self):
         from check_sentence_layout import partial_fixture
         cases = [

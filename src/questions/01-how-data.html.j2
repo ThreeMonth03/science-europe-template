@@ -38,7 +38,17 @@
                 {%- do instrumentRows.append([loop.index, name, description]) -%}
               {%- endif -%}
             {%- endfor -%}
-            {%- if instrumentRows -%}
+            {%- if measuredDataInstrItems|length == 1 and instrumentRows|length == 1 and (instrumentRows[0][1]|trim or instrumentRows[0][2]|trim) -%}
+              {% with index=instrumentRows[0][0], measuredDataInstrName=instrumentRows[0][1], measuredDataInstrDesc=instrumentRows[0][2] %}
+              {# One instrument needs no nested list; authored Markdown keeps
+                 its own blocks, and the existing neutral ordinal stays stable. #}
+              <div class="single-instrument">
+                {% set instrumentName %}<strong>{% if measuredDataInstrName|trim %}{{ measuredDataInstrName|e }}{% else %}{{ pgettext("macros", "Instrument %(index)s", index=index) }}{% endif %}</strong>{% endset %}
+                <p{% if measuredDataInstrDesc|trim %} class="answer-lead"{% endif %}>{{ pgettext("questions/01-how-data", "Instrument: %(instrumentName)s", instrumentName=instrumentName|safe) }}</p>
+                {% if measuredDataInstrDesc|trim %}<div class="answer-detail">{{ answerMarkdown.markdown(measuredDataInstrDesc) }}</div>{% endif %}
+              </div>
+              {% endwith %}
+            {%- elif instrumentRows -%}
               <p>{{ pgettext("questions/01-how-data", "For this dataset, we are using the following instruments:") }}</p>
               <ul>
                 {%- for index, measuredDataInstrName, measuredDataInstrDesc in instrumentRows -%}
@@ -50,7 +60,7 @@
             {%- else -%}
               {% if output_profile|default('review') != 'submission' %}<p>{{ pgettext("questions/01-how-data", "No instruments for this dataset have been specified.") }}</p>{% endif %}
             {%- endif -%}
-            {% with qualityNameAlreadyRendered = true %}
+            {% with qualityNameAlreadyRendered = true, compactQualitySummary = true %}
               {% include "src/quality-control.html.j2" with context %}
             {% endwith %}
           </li>
@@ -158,9 +168,18 @@
                 {{ pgettext("questions/01-how-data", "<p data-fact-id=\"dataset-versioning\" data-status=\"complete\">This reference dataset is versioned.</p>") }}
               {% endif %}
               {% if refDataVersionedWhich|trim %}
+                {%- set versionContent = answerMarkdown.markdown(refDataVersionedWhich) -%}
+                {%- set versionCandidate = versionContent|trim -%}
+                {# Compact only one short, plain rendered paragraph. Rich authored
+                   content retains its original blocks and separate label. #}
+                {%- set compactVersion = versionCandidate.startswith('<p>') and versionCandidate.endswith('</p>') and versionCandidate.count('<') == 2 and 0 < versionCandidate|striptags|trim|length <= 80 and '\n' not in versionCandidate and '\r' not in versionCandidate -%}
                 <div class="dataset-version answer-detail" data-fact-id="dataset-version" data-status="complete">
+                  {% if compactVersion %}
+                  <p>{{ pgettext("questions/01-how-data", "<strong>Version:</strong> %(version)s", version=versionCandidate[3:-4]|safe) }}</p>
+                  {% else %}
                   <div class="answer-lead">{{ pgettext("questions/01-how-data", "<p><strong>Version</strong></p>") }}</div>
-                  {{ answerMarkdown.markdown(refDataVersionedWhich) }}
+                  {{ versionContent }}
+                  {% endif %}
                 </div>
               {% else %}
                 {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"dataset-version\" data-status=\"missing\"><strong>Information not provided:</strong> which version of this dataset will be used.</p>") }}{% endif %}

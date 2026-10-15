@@ -277,6 +277,7 @@ def check(root, language):
 
         quality = [env.from_string(prefix + "{% include 'src/questions/" + name + ".html.j2' %}")
                    for name in ['01-how-data', '04-quality-control']]
+        calibration = env.from_string("{{ pgettext('quality-control', 'measurement calibration') }}").render()
         measured = path('creatingCUuid', 'measuredQUuid')
         listing = path(measured, 'measuredYesAUuid', 'measuredDataQUuid')
         item = path(listing, 'dataset-1')
@@ -308,9 +309,17 @@ def check(root, language):
                         assert len(node.find_all(recursive=False)) == 1 and node.div is not None
                         assert node.div.decode_contents() == AUTHORED
                 assert ('Original.csv' in soup.get_text()) == has_detail
-                if fixed: assert soup.select_one('[data-fact-id="quality-methods"][data-status="complete"]')
+                if fixed:
+                    methods_node = soup.select_one('[data-fact-id="quality-methods"][data-status="complete"]')
+                    assert methods_node and calibration in methods_node.get_text()
+                    if methods_node.name == 'p':
+                        assert ('Dataset A' in methods_node.get_text()) == (question is quality[1])
                 if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
-                facts.append([str(n) for n in soup.select('[data-fact-id^="quality-"]')])
+                # Only the complete fixed-method summary deliberately omits Q1's
+                # already-visible dataset name. All other fact markup stays exact.
+                facts.append([tuple(sorted(n.attrs.items())) if n.name == 'p' and
+                    n.get('data-fact-id') == 'quality-methods' and n.get('data-status') == 'complete'
+                    else str(n) for n in soup.select('[data-fact-id^="quality-"]')])
                 if value and not value.strip():
                     empty = dict(replies); empty[detail] = ''
                     assert str(soup) == str(render(question, empty, profile))

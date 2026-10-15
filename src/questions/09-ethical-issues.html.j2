@@ -160,10 +160,10 @@
           {%- if legalBaseAUuid == uuids.cpersGdprLegalBasisPublicAUuid -%}
             {%- do sentences.append(pgettext("questions/09-ethical-issues", "The stated legal basis for collecting and processing personal data is a task carried out in the public interest.")) -%}
           {%- elif legalBaseAUuid == uuids.cpersGdprLegalBasisAskAUuid -%}
-            {%- do sentences.append(pgettext("questions/09-ethical-issues", "We ask the data subjects for their consent.")) -%}
-
-            {%- set cpersConsentPath = [legalBasePath, legalBaseAUuid, uuids.cpersConsentQUuid]|reply_path -%}
-            {%- set cpersConsentAUuid = repliesMap[cpersConsentPath]|reply_str_value -%}
+            {# A valid scope already states consent; retain the parent claim otherwise. #}
+            {%- set cpersConsentParts = [uuids.creatingCUuid, uuids.collectPersonalQUuid, uuids.collectPersonalYesAUuid, uuids.cpersGdprQUuid, uuids.cpersGdprExploreAUuid, uuids.cpersGdprLegalBasisQUuid, uuids.cpersGdprLegalBasisAskAUuid, uuids.cpersConsentQUuid] -%}
+            {%- set cpersConsentPath = ethicsPath(cpersConsentParts, 'OptionsQuestion', 'AnswerReply') -%}
+            {%- set cpersConsentAUuid = repliesMap[cpersConsentPath]|reply_str_value if cpersConsentPath else '' -%}
             {%- if cpersConsentAUuid == uuids.cpersConsentUseAUuid -%}
               {%- do sentences.append(pgettext("questions/09-ethical-issues", "We will obtain consent for this project's specific use of the data.")) -%}
             {%- elif cpersConsentAUuid == uuids.cpersConsentReuseAUuid -%}
@@ -172,6 +172,8 @@
               {%- do sentences.append(pgettext("questions/09-ethical-issues", "We will obtain consent for this project's use of the data and for anonymization. We will then anonymize the data for subsequent reuse.")) -%}
             {%- elif cpersConsentAUuid == uuids.cpersConsentAnonAUuid -%}
               {%- do sentences.append(pgettext("questions/09-ethical-issues", "We will obtain consent to anonymize the data. We will anonymize the data before any further processing.")) -%}
+            {%- else -%}
+              {%- do sentences.append(pgettext("questions/09-ethical-issues", "We ask the data subjects for their consent.")) -%}
             {%- endif -%}
 
             {%- set cpersExplainInformedPath = [legalBasePath, legalBaseAUuid, uuids.cpersExplainInformedQUuid]|reply_path -%}
