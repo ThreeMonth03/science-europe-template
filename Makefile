@@ -21,6 +21,7 @@ knowledge-models:
 
 test: knowledge-models
 	$(PYTHON) -m unittest discover -s tests -v
+	$(PYTHON) -m unittest discover -s experiments/legacy434 -v
 
 verify:
 	$(DSW_TDK) --no-config verify .

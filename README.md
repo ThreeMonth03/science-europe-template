@@ -1,499 +1,60 @@
-# Science Europe DMP
+# Science Europe DMP template
 
-The local PO work now has a generated **DSW 4.34 Traditional Chinese compatibility
-package**, so translation work does not wait for a server upgrade. Maintain the
-English Jinja and one PO; do not edit the generated Chinese ZIP. See the
-[compatibility build instructions](docs/testing.md#po-translation-and-dsw-434-compatibility).
-The 4.35 native-PO path stays separate. Neither path automatically deploys.
+This repository owns the shared English Jinja, answer mapping and PDF/Word layout
+for the customised Science Europe template. Traditional Chinese translations are
+maintained only in the companion
+[Chinese repository](https://github.com/ThreeMonth03/science-europe-template-zhtw),
+in `locales/zh-Hant.po`.
 
-The local candidate uses English `0.3.84` and generated Chinese compatibility
-`0.3.86`. PDF, Word and HTML never display the export timestamp in either profile;
-named DMP versions, their dates and real change history remain. The prior
-`0.3.80`/`0.3.82` polish comparison is preserved. Edit the PO only in the companion Chinese repository; this repository's
-old catalog is now a read-only historical fixture. The existing Chinese builder
-produces both runtime deliveries with one prepared reference. Native before/after
-verification and CI cutover are separate gates; older version notes below are history.
-The PDF review footer now avoids a break immediately before provenance; this is
-a soft boundary, not a whole-answer keep rule. The preceding short tail can move
-with metadata without reducing type size or dropping content. That prior repair
-left Word unchanged. This candidate also shortens Q5's review-only instructions
-without inventing storage locations or backup schedules; submission stays prompt-free.
-Q13's complete single-summary tail no longer attaches itself to the next section.
-Q15 reuses the existing short-content guards for PDF and a bounded Word list lead;
-long or unfamiliar authored content still flows. Neither Worker nor fonts change.
-Q3 now groups capacity, filesystem/versioning, object/document storage and database
-facts separately. Each group's authored Markdown and answer conditions are retained;
-the object-store lead stays with the naming answer's opening, not the whole answer.
-This is a scoped structure repair, not a global spacing or translation rewrite.
+## Current architecture
 
-For the current candidate repairs, see the [shared testing guide](docs/testing.md).
-It replaces eight per-round development notes; the release history below is unchanged.
+- `template.json` declares the English source template and output formats.
+- `src/` contains shared Jinja, language-aware CSS, Word assets and filters.
+- The Chinese repository pins an exact English commit and Tool commit in
+  `pipeline.yml`, then builds both runtime deliveries from the same source.
+- DSW 4.34 uses a generated Chinese compatibility ZIP with an embedded MO catalog.
+  DSW 4.35 uses the English ZIP with a separately attached Chinese PO locale.
+- Generated ZIPs, MO files and Chinese render trees are outputs, not editable sources.
 
-Candidate 0.3.54 carries the verified Word long-budget repair: short final
-full-width rows remain intact, and compact separators prevent adjacent generated
-resource tables from merging. Long or complex final rows remain splittable.
-It retains the 0.3.53 bounded Q8/Q10 list-lead protection and Q11 shared
-preservation policies. Q11 shares only three or
-more complete, identical active fixed-choice policies; authored context,
-repositories, contacts and incomplete policies remain per record. It keeps the
-shared English source and exact Chinese commit pairing; submission still retains the 15 original questions,
-neutral unnamed-record labels and authored answers without internal gap prompts.
-The source seal allows only this registered version change and preserves the
-frozen 0.3.51 metadata for historical gates. This is not a deployed release or
-Microsoft Word compatibility certification.
+Review and submission are formats of the same template, not separate branches.
+Submission retains the 15 Science Europe questions, meaningful partial answers
+and neutral unnamed-record labels without internal missing-information prompts.
+Review additionally exposes bounded missing-information notices. Neither profile
+displays the document export timestamp.
 
-> **Local experiment:** this repository is based on the official
-> `dsw:science-europe:1.30.1` template and is testing an explicit completeness
-> contract. It packages as
-> `threemonth03:science-europe-enhanced:<version>` (see `template.json`), so it cannot overwrite
-> the official template accidentally.
+## Development and verification
 
-Version 0.3.51 [integrates the reviewed shared Q3 policy joining rule](docs/q3-policy-prose.md).
-It keeps English and mixed runs byte-exact, preserves authored/missing-information barriers,
-and retains the [0.3.50 Word empty-section spacing and keep chains](docs/word-empty-sections.md).
-Only two shared Word helpers change; Chinese translation files, PDF inputs,
-review behavior and all original questions remain. Paired native and workflow
-evidence is tracked in the Chinese repo; this is not deployment.
+Install the declared dependencies in an isolated Python environment, then use:
 
-Version 0.3.49 [integrates the reviewed Q1 preparation prose](docs/reuse-preparation.md).
-Complete English branch sentences feed the existing Chinese translation pipeline;
-the nine reviewed wording changes preserve answer states, authored content and
-layout/Word assets. Paired native and CI checks are tracked in the Chinese repo.
-This is source integration, not deployment or full submission acceptance.
-
-Version 0.3.48 [integrates bounded empty-section print spacing](docs/empty-section-spacing.md)
-from the verified prototype. Only print margins change; all questions and answers,
-translations, review behavior and Word steps remain. Paired rebuilt-package native
-verification is recorded separately in the Chinese repo; this is not deployment.
-
-Version 0.3.47 [consolidates Q1 summaries and empty-question spacing](docs/submission-flow.md)
-into shared source. Submission keeps the 15 original questions without new missing
-prompts, review stays unchanged, and Chinese uses the pinned translation pipeline.
-Full source/metadata proofs precede exact historical regression views. Native
-paired-package acceptance is tracked separately; this is not a deployment.
-
-The [empty-question spacing prototype](experiments/empty-question-spacing/README.md)
-keeps all 15 questions and tightens only empty submission headings. Its 28 native
-bilingual A/B pairs retain content and review layout, add no PDF pages and shorten
-five Word previews by one page each. Worker autoescaping and a PDF empty-box
-regression were caught and fixed. Production remains 0.3.46; paired source
-integration, wider prose review and Microsoft Word acceptance are still separate.
-
-A separate [Q1 reuse-summary prototype](experiments/reuse-summary/README.md) groups
-four related reuse facts into one paragraph while preserving authored restrictions.
-Both actual language packages pass 1,844 branch checks and 28 offline native A/B
-pairs cover complete, missing and long answers. Production stays at 0.3.46; this
-prototype is not deployed and does not solve empty submission headings.
-
-The 0.3.46 [selected full-KM followups](docs/full-km-followups.md) integrates three
-previously verified answer mappings and the scoped identifier line-layout fix.
-Chinese still follows the pinned translation pipeline. Exact historical gates
-are retained separately from actual new-branch checks; this is not a release.
-
-The 0.3.45 [submission reading integration](docs/submission-reading.md) adds stable
-project/resource/software labels, bounded Q9/Q15 submission cleanup, and a shared
-Word short-table guard. Chinese still comes through the existing translator;
-review remains the default. Native paired-package validation is a separate gate.
-
-The 0.3.44 [shared-source submission preview](docs/submission-preview.md) integrates
-owned-notice suppression, overview/prose rules and stable numbered dataset labels.
-Review stays the default; Chinese is generated from this source. The complete
-submission switch and native integrated PDF/Word acceptance remain separate gates.
-
-The 0.3.43 [mixed/large budget grouping](docs/budget-grouping.md) integrates the
-tested PDF continuation headers and row-safe PDF/Word grouping into shared source.
-Existing row guards remain; exact projections retain every earlier source gate.
-This is not deployment, full Word pagination acceptance or global notice suppression.
-
-The 0.3.41 [owned Q15 prose pair](docs/resource-prose.md) joins two explicitly
-answered fixed sentences without changing their words or existing translations.
-Missing/unknown and authored answers retain their exact output. Native bilingual
-PDF/Word validation is tracked separately in the companion translation repo.
-
-The 0.3.40 [bounded Q15 PDF reading unit](docs/short-resources.md) keeps a short,
-simple resource overview and its small budget together. It changes only the PDF
-entry; questionnaire prose, translations, CSS and Word remain unchanged.
-
-The 0.3.39 [bounded Q11 Word reading unit](docs/preservation-reading.md) keeps
-short dataset names and fixed preservation summaries together. Long, missing
-or authored content retains its existing structure. PDF/Jinja and translations
-are unchanged; native bilingual and Microsoft Word acceptance are separate.
-
-The 0.3.38 [output profiles pilot](docs/output-profiles.md) adds separately named
-review/submission-preview HTML, PDF and Word formats from the same Jinja source.
-Only the explicitly listed notices are optional so far: this is **not** a clean,
-submission-ready template for arbitrary projects. Review remains the default.
-
-The 0.3.37 [concise missing metadata experiment](docs/metadata-gap-prose.md)
-joins only two simultaneously absent Q3 follow-ups into one paragraph, retaining
-independent fact markers. It retires the 0.3.36 special CSS panel; no Lua,
-font, reference document or translation-tool change is needed.
-
-The 0.3.35 [joined Q5 Word lead experiment](docs/q5-word-join.md) joins two
-bounded, template-owned paragraphs with a visible line break. HTML/PDF,
-translations and styles are unchanged. Exact AST/DOCX and unchanged-fallback
-checks are separate from native bilingual and Microsoft Word acceptance.
-
-The 0.3.34 [short Q5 pagination experiment](docs/storage-context-pagination.md)
-adds bounded grouping for fixed storage answers and operational limitations.
-Native comparisons improve four PDF/Word separations, but Chinese
-`metadata-partial` Word still separates its policy and limitations. This is a
-known failing visual gate, not a release. Prose, translations and shared style
-definitions are unchanged; long/complex/cold-archive fallbacks remain breakable.
-
-The 0.3.33 [metadata follow-up experiment](docs/metadata-followups.md) preserves
-dictionary Yes/No and makes missing metadata-policy follow-ups visible.
-Authored reasons, existing standards, capacity and shared styles are retained.
-Native bilingual output checks are a separate gate; this is not a release.
-
-The 0.3.32 [storage capacity experiment](docs/storage-capacity-gaps.md) makes a
-selected but blank Q3 capacity follow-up visible without hiding other answers.
-Zero, original quantities and authored paragraphs are retained. Shared styles
-are unchanged; native output checks remain a separate gate.
-
-The 0.3.31 [format reading experiment](docs/format-reading.md) combines complete
-Q2 facts into fewer sentences while retaining independent partial answers and
-all quantities. Styles and authored text are unchanged; native checks are separate.
-
-The 0.3.30 [archive gap panel experiment](docs/archive-gap-panels.md) groups
-three explicitly named pairs of adjacent missing Q11 details in print/PDF.
-All wording, Jinja, translations, screen HTML and Word are unchanged.
-
-The 0.3.29 [archival-extension criteria experiment](docs/archive-basis-reading.md)
-joins only the three fixed Q11 choice labels into a paragraph, preserving
-per-choice facts, missing prompts and unsupported-choice review. Authored text
-and all styles stay unchanged; native output acceptance remains separate.
-
-The 0.3.26 [short-budget Word experiment](docs/word-short-budget.md) reuses the
-shared eligibility check to widen missing-budget prompts in Word only. PDF and
-HTML retain their previous behavior; answers, font sizes and paragraph styles
-are unchanged. Native and Microsoft Word acceptance remain separate gates.
-
-The 0.3.25 [short-budget PDF experiment](docs/short-budget-reading.md) gives bounded
-incomplete budget tables more room for missing-value prompts. It preserves all
-original text; long/complex tables, HTML and Word retain their previous behavior.
-
-The 0.3.24 [empty-Q15 panel experiment](docs/empty-pdf-reading.md) groups exactly
-four fixed missing-information paragraphs visually, without changing their text,
-font size, Jinja, translations or Word. Partial answers retain their original layout.
-
-The 0.3.23 [Q9 Word label regression](docs/q9-word-labels.md) keeps bounded dataset
-names with their own ethics flags, with unchanged bilingual content and native PDF.
-The 0.3.22 [Q8 Word label regression](docs/q8-word-labels.md) keeps bounded dataset
-names with their permission text. Jinja, translations and native PDF styles stay
-unchanged; long/complex content is not forced into an unbreakable block.
-
-The 0.3.21 [personal-data follow-up regression](docs/personal-data-followups.md)
-distinguishes missing and negative Q7 replies, preserves free-text blocks, and
-removes unsupported Q9 assessment/privacy claims. PDF/Word styles are unchanged.
-
-The 0.3.20 [missing-information regression](docs/missing-info-reading.md) fixes
-the Q7 safeguards prompt and paragraph boundary, long-PDF missing metadata, and
-the bounded empty-Q15 group. It remains experimental, not a full-DMP acceptance.
-
-The 0.3.15 [identifier follow-up experiment](docs/identifier-followups.md) makes
-missing or unsupported assignment/resolution answers visible without inventing policy.
-
-The 0.3.14 [identifier reading experiment](docs/identifier-reading.md) groups
-Q13's existing labels and policy sentences without rewriting any answers.
-
-The 0.3.13 [paper reference experiment](docs/paper-reference.md) moves the full
-related-paper value into its own reference row after the preservation prose.
-
-The 0.3.12 [preservation context flow experiment](docs/preservation-context-flow.md)
-joins adjacent template-owned Q11 context and policy sentences. It preserves
-authored paragraphs and visible gaps; no questionnaire facts or wording change.
-
-The experiment keeps the upstream Jinja structure but changes how incomplete
-answers are rendered in the Q1/Q5/Q15 pilot. Covered unanswered branches display
-**Information not provided** instead of being omitted or treated as negative.
-This is not yet implemented or audited for every branch or all 15 questions.
-Stable `data-requirement-id`, `data-fact-id`, and
-`data-status` attributes also give the English and translated outputs a
-deterministic alignment key.
-
-The next experimental iteration improves whole-document readability. See
-[the owned changes and upgrade boundaries](docs/readability-pass.md). This is
-not a release or a claim that all fifteen questions have been fully audited.
-
-The 0.2.1 [answer-retention experiment](docs/answer-retention-experiment.md)
-fixes selected Q3/Q12 omissions and misleading negatives, preserves case-sensitive
-file names, and adds a broader synthetic scenario plus KM-binding diagnostics.
-All fifteen output questions are exercised, not all their branches or SE topics.
-
-The 0.2.2 [structure and binding experiment](docs/structure-and-bindings.md)
-repairs selected Q8/Q9/Q11/Q13 HTML blocks and answer-loss conditions. It is
-still experimental and does not claim complete SE coverage or runtime table support.
-
-The 0.3.0 [storage and sharing experiment](docs/storage-sharing.md) maps selected
-during-project archival facts, preserves partially specified publication
-arrangements, and replaces Q10–Q13 outer list scaffolding with reading blocks.
-
-The 0.3.1 [narrative and pagination experiment](docs/narrative-pagination.md)
-consolidates archival facts in Q5, preserves the independent Q6 security gap,
-and tests bounded reading units and long free answers in PDF and Word.
-
-The 0.3.5 [reading-polish experiment](docs/reading-polish.md) consolidates Q2
-missing-field prompts, keeps short quantities together, and joins only owned
-Q10 sentences. Navigation updates here do not change bilingual package content;
-the stable package description is maintained in `PACKAGE_README.md`.
-
-The 0.3.6 [sharing/preservation experiment](docs/sharing-preservation.md) joins
-bounded licence and preservation prose, retains custom process paragraphs and
-missing decisions, and prevents line breaks inside marked licence dates.
-
-The 0.3.7 [preservation-coverage experiment](docs/preservation-coverage.md)
-restores selected dataset descriptions, non-publication reasons and project-wide
-post-project archival answers. It does not equate publication with preservation
-or claim to establish a complete data-selection policy.
-
-The 0.3.8 [Word rhythm experiment](docs/word-rhythm.md) adjusts relative line
-spacing and the distinction between heading/list/body spacing without changing
-Jinja text or PDF CSS. The accompanying [selection-policy review](docs/selection-policy-review.md)
-records verified mapping limits and a proposed future KM design, not new answers.
-
-This is a customized derivative of the official DSW Science Europe template,
-not an officially endorsed Science Europe template. Its content contract refers
-to the [Science Europe Guidance Document](https://scienceeurope.org/media/4brkxxe5/se_rdm_practical_guide_extended_final.pdf).
-It uses questionnaire replies in [Data Stewardship Wizard](https://ds-wizard.org);
-no runtime LLM generates or invents the answers.
-
-
-## Usage
-
-This experimental custom template is not published in the DSW Registry.
-The official upstream template is available through the
-[DSW Registry](https://registry.ds-wizard.org/templates).
-
-Build reviewed bilingual candidates with
-[`ThreeMonth03/science-europe-template-zhtw`](https://github.com/ThreeMonth03/science-europe-template-zhtw).
-That build prepares embedded PDF fonts and language-specific Word reference
-styles before packaging; a raw `make package` is not the reviewed bilingual build.
-
-
-## Local experiment and development
-
-The first vertical slice covers Science Europe requirements **SE-1a**
-(collection/re-use), **SE-3a** (storage/backup), and **SE-6b** (resources).
-The machine-readable source of truth for all 15 Science Europe questions is
-[`requirements/science-europe-2021.json`](requirements/science-europe-2021.json).
-See [`docs/completeness-experiment.md`](docs/completeness-experiment.md) for
-the hypotheses and acceptance criteria.
-
-```bash
+```sh
 python -m pip install -r requirements-dev.txt
 make check
+make check-current
+make test-compat434
 ```
 
-The official repository is configured locally as the `upstream` Git remote.
-Before adopting a new release, follow
-[`docs/upstream-upgrades.md`](docs/upstream-upgrades.md) and run:
-
-```bash
-git fetch --no-tags upstream '+refs/heads/main:refs/remotes/upstream/main' 'refs/tags/*:refs/tags/upstream/*'
-python scripts/audit_upstream.py --target upstream/main
-```
-
-
-## Issues and Contributing
-
-This document template for DSW is available as open-source via GitHub Repository [ds-wizard/science-europe-template](https://github.com/ds-wizard/science-europe-template), you can [report issues](https://github.com/ds-wizard/science-europe-template/issues) there and fork it for customizations or contributions.
-
-
-### Contributors
-
-* **Marek Suchánek** <[marek.suchanek@ds-wizard.org](mailto:marek.suchanek@ds-wizard.org)>
-  * ORCID: [0000-0001-7525-9218](https://orcid.org/0000-0001-7525-9218)
-  * GitHub: [@MarekSuchanek](https://github.com/MarekSuchanek)
-* **Kryštof Komanec** <[krystof.komanec@ds-wizard.org](mailto:krystof.komanec@ds-wizard.org)>
-  * ORCID: [0000-0003-3856-1682](https://orcid.org/0000-0003-3856-1682)
-  * GitHub: [@krystofkomanec](https://github.com/krystofkomanec)
-* **Rob Hooft** <[rob.hooft@health-ri.nl](mailto:rob.hooft@health-ri.nl)>
-  * ORCID: [0000-0001-6825-9439](https://orcid.org/0000-0001-6825-9439)
-  * GitHub: [@rwwh](https://github.com/rwwh)
-* **Jana Martínková** <[jana.martinkova@ds-wizard.org](mailto:jana.martinkova@ds-wizard.org)>
-  * ORCID: [0000-0001-8575-6533](https://orcid.org/0000-0001-8575-6533/)
-  * GitHub: [@jmartinkova](https://github.com/jmartinkova)
-
-
-## Changelog
-
-### 1.30.1
-
-- Fixed text value type questions rendering with markdown
-
-### 1.30.0
-
-- Adjust to template metamodel version 18.0 (released in DSW 4.29.0)
-
-### 1.29.1
-
-- Adjust to template metamodel version 17.1 (released in DSW 4.26.0)
-- Fix affiliation on front page
-
-### 1.29.0
-
-- Fixed rendering risks
-- Improved qualified references part
-- Updated reused dataset name to use reply string value instead FAIRsharing integration
-- Updated dependency on KM to 2.7.0
-- Fixed the published dataset to reflect future-oriented statement
-
-### 1.28.0
-
-- Improved affiliation
-- Improved text
-
-### 1.27.0
-
-- Updated dependency on KM to 2.6.13
-- Fixed legacy integration type
-
-### 1.26.0
-
-- Updated integrations to metamodel version 17.0 (released in DSW 4.22.0)
-- Improved minor text flow
-
-### 1.25.0
-
-- Adjusted to template metamodel version 17.0 (released in DSW 4.22.0)
-- Fixed typos
-
-### 1.24.0
-
-- Added "General-purpose repository" option to repository type descriptions
-
-### 1.23.0
-
-- Added ORCID Integration
-- Added compatible knowledge models to README
-
-### 1.22.0
-
-- Improved Authors of DMP
-
-### 1.21.0
-
-- Adjusted to template metamodel version 16 (released in DSW 4.13.0)
-
-### 1.20.0
-
-- Adjusted to template metamodel version 15 (released in DSW 4.12.0)
-
-### 1.19.1
-
-- Fix issue with `createdBy`
-
-### 1.19.0
-
-- Adjusted to template metamodel version 14 (released in DSW 4.10.0)
-
-### 1.18.1
-
-- Fixed nested bullet points would display unwanted characters
-
-### 1.18.0
-
-- Updated according to the Science Europe DMP template, including the project number, access to private data, and project costs
-- Fixed the question regarding data versions to allow for multiple choices
-- Corrected the version table and front page
-
-### 1.17.0
-
-- Adjusted to template metamodel version 13 (released in DSW 4.3.0)
-
-### 1.16.1
-
-- Fixed broken images in Word
-
-### 1.16.0
-
-- Adjusted to template metamodel version 12 (released in DSW 4.1.0)
-
-### 1.15.2
-
-- Removed unused code
-- Improved wording of storage conventions
-
-### 1.15.1
-
-- Fixed extra `endif`
-
-### 1.15.0
-
-- Updated for `dsw:root:2.5.0`
-
-### 1.14.0
-
-- Switched from `wkhtmltopdf` to `weasyprint` for PDF
-- Improved styling for PDF and HTML
-- Fixed (non-)reference data in data summary
-- Aligned data openness with the KM
-
-### 1.13.0
-
-- Adjusted to template metamodel version 11 (released in DSW 3.20.0)
-- Added versions overview / change tracker table
-
-### 1.12.0
-
-- Adjusted to template metamodel version 10 (released in DSW 3.12.0)
-
-### 1.11.0
-
-- Adjusted to template metamodel version 9 (released in DSW 3.10.0)
-
-### 1.10.1
-
-- Fixed Jinja template nesting error
-
-### 1.10.0
-
-- Compatible with `dsw:root:2.4.0`
-
-### 1.9.0
-
-- Adjusted to template metamodel version 8 (released in DSW 3.8.0)
-
-### 1.8.0
-
-- Adjusted to template metamodel version 7 (released in DSW 3.7.0)
-
-### 1.7.0
-
-- Adjusted to template metamodel version 6 (released in DSW 3.6.0)
-
-### 1.6.0
-
-- Adjusted to template metamodel version 5 (released in DSW 3.5.0)
-
-### 1.5.0
-
-- Adjusted to template metamodel version 4 (released in DSW 3.2.0)
-
-### 1.4.1
-
-- Fixed displaying answers related to measured datasets
-
-### 1.4.0
-
-- Adjusted to template metamodel version 3 (released in DSW 2.12.0)
-
-### 1.3.0
-
-- Compatible with `dsw:root:2.3.0`
-
-### 1.2.0
-
-- Adjusted to template metamodel version 2
-
-### 1.1.0
-
-- Compatible with `dsw:root:2.2.0`
-- Updated projects and front page as there can be multiple projects specified for a single DMP
-- Questions 8, 9, and 10 updated according to DMP Common Standard with dataset - distribution - license hierarchy
-
-### 1.0.0
-
-- Compatible with `dsw:root:2.0.0` and up to `dsw:root:2.1.0`
-- Initial version of DMP template created during [ELIXIR BioHackathon Europe 2019](https://www.biohackathon-europe.org)
+See [testing and translation boundaries](docs/testing.md) for requirements and
+acceptance limits. CI validates the current tree; it does not deploy a template
+or replace page-by-page PDF/Word review.
+
+## Upstream and standard provenance
+
+This is a derivative of official `dsw:science-europe:1.30.1`, not an official
+Science Europe or DSW release. The original template commit and change-risk
+groups are recorded in [.upstream/base.json](.upstream/base.json).
+The standard topic map is in
+[requirements/science-europe-2021.json](requirements/science-europe-2021.json);
+its coverage notes are not a claim of complete standard compliance.
+
+Follow the [upstream upgrade policy](docs/upstream-upgrades.md). Source, translation
+and runtime upgrades are separate changes and require their own checks.
+
+## History
+
+Retired pre-PO conversion code, experiment snapshots and per-round reports are
+available in Git history. The last tree before the legacy cleanup is
+`69135b204414442376388430ab4867968a2574ed`. Use `git show COMMIT:path` to inspect
+a historical file; do not use an old guide as the current build procedure.
+
+The stable description embedded in distributable packages is
+`PACKAGE_README.md`; this navigation README is not packaged. See `LICENSE`.

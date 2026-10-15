@@ -6,7 +6,7 @@ import unittest
 from bs4 import BeautifulSoup
 from test_science_europe_contract import ROOT, render_question
 sys.path.insert(0, str(ROOT / 'scripts'))
-from generate_pilot_fixtures import IDS, path
+from current_support import IDS, path
 from current_support import support_replies
 
 Q5 = 'src/questions/05-store-backup.html.j2'

@@ -1,5 +1,4 @@
 """Transport guards and a batched parser regression in the pinned stock worker."""
-from copy import deepcopy
 import html
 import json
 import re
@@ -15,7 +14,8 @@ from markupsafe import Markup
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
-from current_repairs_contract import answer_markdown_steps, historical, project_source, source_tree
+from current_support import install_i18n
+from native_support import answer_markdown_steps
 
 
 def replies(values):
@@ -27,6 +27,7 @@ class AnswerMarkdownTests(unittest.TestCase):
     def environment(self, escape=True):
         env = Environment(loader=FileSystemLoader(ROOT), autoescape=escape)
         env.filters['markdown'] = lambda value: Markup(value)
+        install_i18n(env, ROOT)
         return env
 
     def render(self, source, transport, escape=True):
@@ -75,14 +76,11 @@ class AnswerMarkdownTests(unittest.TestCase):
                 self.assertEqual(doc.text_content(), source)
                 self.assertFalse(doc.xpath('.//literal'))
 
-    def test_all_eight_formats_retain_exact_original_entries_and_engines(self):
+    def test_all_eight_formats_share_the_owned_markdown_prefix(self):
         metadata = json.loads((ROOT / 'template.json').read_text())
-        prior = json.loads(historical('template.json'))
         self.assertEqual(len(metadata['formats']), 8)
-        for fmt, old in zip(metadata['formats'], prior['formats']):
+        for fmt in metadata['formats']:
             self.assertEqual(fmt['steps'][:2], answer_markdown_steps())
-            self.assertEqual({**fmt, 'steps': fmt['steps'][2:]}, old)
-        self.assertEqual(project_source()[1], prior)
 
     def test_confirmed_free_text_consumers_use_the_owned_parser(self):
         consumers = {
@@ -207,7 +205,7 @@ class AnswerMarkdownTests(unittest.TestCase):
 
     def test_q7_fixed_leads_use_the_existing_word_keep_next_block(self):
         from test_science_europe_contract import render_question
-        from test_personal_data_followups import replies, PATHS, QUESTION
+        from native_support import personal_replies as replies, PATHS, QUESTION
         from bs4 import BeautifulSoup
         body = '<p>Original explanation.</p><table><tr><td>Key exports</td><td>0</td></tr></table>'
         for profile in ['submission', 'review']:
@@ -385,18 +383,6 @@ class AnswerMarkdownTests(unittest.TestCase):
                             self.assertFalse(inactive.xpath('.//*[@data-fact-id="specialist-expertise-detail" and @data-status="complete"]'))
                             self.assertFalse(output({**data, parent: envelope(choice, 'AnswerReply')}, word=True).xpath('.//div[@class="q15-terminal-gap"]'))
 
-    def test_projection_rejects_prefix_order_options_and_original_entry_drift(self):
-        sources = source_tree()
-        metadata = json.loads((ROOT / 'template.json').read_text())
-        for index in range(len(metadata['formats'])):
-            for change in ['order', 'parser', 'entry']:
-                bad = deepcopy(metadata)
-                steps = bad['formats'][index]['steps']
-                if change == 'order': steps[:2] = steps[:2][::-1]
-                elif change == 'parser': steps[1]['options']['args'] += ' --shift-heading-level-by=1'
-                else: steps[2]['options']['template'] = 'src/answer-markdown-inputs.html.j2'
-                with self.subTest(format=index, change=change), self.assertRaises(AssertionError):
-                    project_source(sources, bad)
 
     def test_stock_435_parser_preserves_eof_tables_nested_lists_and_literal_sources(self):
         self.test_stock_parser_preserves_eof_tables_nested_lists_and_literal_sources(
@@ -496,7 +482,7 @@ print(json.dumps(result))
                     self.assertEqual(etree.tostring(new), etree.tostring(old), 'Only the bounded body-row keep may change')
 
     def test_stock_parser_preserves_eof_tables_nested_lists_and_literal_sources(self, image=None):
-        from probe_budget_word import IMAGE
+        from native_support import IMAGE
         sources = [
             '| Record | Validation |\n| --- | --- |\n| A | First |\n| B | Last |',
             '1. Parent\n   - Child\n2. Next',

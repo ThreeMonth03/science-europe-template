@@ -91,7 +91,7 @@ def render_question(path: str, replies: dict[str, object], **context) -> str:
 class ScienceEuropeContractTests(unittest.TestCase):
     def test_reference_version_flows_without_an_outer_information_table(self):
         from bs4 import BeautifulSoup
-        from test_answer_retention import IDS, path
+        from current_support import IDS, path
         reused = path('reusingCUuid', 'preexistingQUuid')
         listing = path(reused, 'preexistingYesAUuid', 'refDataQUuid')
         used = path(listing, 'record', 'refDataUseQUuid')
@@ -310,7 +310,7 @@ class ScienceEuropeContractTests(unittest.TestCase):
         }
         km, _ = project_fixture(None, 'Example project', 'project-1')
         from check_answer_mapping import question
-        from generate_pilot_fixtures import IDS
+        from current_support import IDS
         children = km['entities']['questions'][IDS['projectsQUuid']]['itemTemplateQuestionUuids']
         children = question(km, children, IDS['costQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
         for field in ('costTitleQUuid', 'costDescriptionQUuid', 'costAmountQUuid'):

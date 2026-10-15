@@ -22,7 +22,7 @@ class LayoutTests(unittest.TestCase):
         import copy
         import sys
         sys.path.insert(0, str(ROOT / 'scripts'))
-        from probe_budget_word import RUNNER
+        from native_support import RUNNER
         image = 'datastewardshipwizard/document-worker@sha256:726b2906b3eee3fa7301ffdd723901397518c61e112f054ff53fabe07538fad3'
         def budget(rows=2, purpose='Keep the original records.', tail='No extra equipment. Charges apply.'):
             row = ('<tr><td><p><strong>Resource 2</strong></p>'
@@ -152,7 +152,7 @@ class LayoutTests(unittest.TestCase):
     def test_review_diagnostic_and_restricted_permission_keep_only_their_leads(self):
         import sys
         sys.path.insert(0, str(ROOT / 'scripts'))
-        from probe_budget_word import IMAGE, RUNNER
+        from native_support import IMAGE, RUNNER
         diagnostic = '<div class="data-gap template-gap storage-detail-limits"><p>Details not mapped:</p><ul><li>Storage locations.</li><li>Backup schedule.</li></ul></div>'
         def q5(body=diagnostic, qid='q-store-backup'):
             return '<div id="'+qid+'"><div class="answer"><p>Earlier answer.</p>'+body+'</div></div>'
@@ -446,7 +446,7 @@ print(json.dumps({'passed':True,'cases':8,'boundary_spacer_mm':found}))
         import base64
         import sys
         sys.path.insert(0, str(ROOT / 'scripts'))
-        from probe_q8_word import IMAGE, RUNNER
+        from native_support import IMAGE, WORD_RUNNER as RUNNER
         questions = [
             ('q-what-data', '02-what-data',
              'The non-equipment datasets are:', '非儀器資料集如下：'),
@@ -464,7 +464,7 @@ print(json.dumps({'passed':True,'cases':8,'boundary_spacer_mm':found}))
         bodies = []
         for qid, filename, english, chinese in questions:
             source = (ROOT / ('src/questions/' + filename + '.html.j2')).read_text()
-            self.assertEqual(1, source.count('<div class="answer-lead"><p>' + english + '</p></div>'))
+            self.assertEqual(1, source.count('<div class="answer-lead"><p>{{ pgettext("questions/' + filename + '", "' + english + '") }}</p></div>'))
             for lead in (english, chinese):
                 for count in (1, 8):
                     # A long first item must stay free to paginate, not pull the
@@ -498,7 +498,7 @@ print(json.dumps({'passed':True,'cases':8,'boundary_spacer_mm':found}))
         import base64
         import sys
         sys.path.insert(0, str(ROOT / 'scripts'))
-        from probe_q8_word import IMAGE, RUNNER
+        from native_support import IMAGE, WORD_RUNNER as RUNNER
         cases = []
         for cls in ['answer', 'answer-detail', 'unowned']:
             for value, long in [('x' * 160, False), ('x' * 161, True),
@@ -551,7 +551,7 @@ print(json.dumps({'passed':True,'cases':8,'boundary_spacer_mm':found}))
         from lxml import etree as E
         sys.path.insert(0, str(ROOT / 'scripts'))
         from current_support import IDS, PREFIX, environment, path
-        from probe_budget_word import IMAGE
+        from native_support import IMAGE
         parent = path('accessCUuid', 'openImmediatelyQUuid')
         reason = path(parent, 'openImmediatelyNoAUuid', 'notOpenLegalReasonsQUuid')
         auth = path(reason, 'notOpenLegalReasonsYesAUuid', 'legalReasonsAuthenticatedQUuid')
@@ -609,9 +609,7 @@ print(json.dumps(results))
             self.assertEqual(E.tostring(before),E.tostring(after),'Authored content or other Word properties changed')
 
     def test_version_value_alignment_preserves_content_and_unowned_tables(self):
-        probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
-        worker = importlib.util.module_from_spec(probe_spec)
-        probe_spec.loader.exec_module(worker)
+        import native_support as worker
         def table(value='<p>2026.1</p>', label='Version'):
             return ('<table class="dataset-version" data-fact-id="dataset-version" data-status="complete">'
                     '<tbody><tr><th scope="row">'+label+'</th><td>'+value+'</td></tr></tbody></table>')
@@ -681,10 +679,10 @@ print(json.dumps(results))
                 self.assertEqual(only_first_style(results[0]['case-'+name],results[1]['case-'+name]),count)
 
     def test_word_history_keeps_only_bounded_rows_and_preserves_every_other_xml_byte(self):
-        probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
-        worker = importlib.util.module_from_spec(probe_spec)
-        probe_spec.loader.exec_module(worker)
+        import native_support as worker
         env = Environment(loader=FileSystemLoader(ROOT), autoescape=True)
+        from current_support import install_i18n
+        install_i18n(env, ROOT)
         env.filters['datetime_format'] = lambda value, fmt: '30 Sep 2026'
         template = env.get_template('src/word/versions.html.j2')
         def render(title='Review A', note='Short note.', count=1):
@@ -754,12 +752,12 @@ print(json.dumps(results))
                 worker.verify_row_xml(before, after, count)
 
     def test_history_and_provenance_wrap_without_changing_ordinary_layout(self):
-        probe_spec = importlib.util.spec_from_file_location('budget_worker', ROOT / 'scripts/probe_budget_word.py')
-        worker = importlib.util.module_from_spec(probe_spec)
-        probe_spec.loader.exec_module(worker)
+        import native_support as worker
         env = Environment(loader=FileSystemLoader(ROOT), autoescape=True)
+        from current_support import install_i18n
+        install_i18n(env, ROOT)
         env.filters['datetime_format'] = lambda value, fmt: '30 Sep 2026'
-        template = env.from_string("{% include 'src/versions.html.j2' %}{% include 'src/document-provenance.html.j2' %}")
+        template = env.from_string("{% import 'src/macros.html.j2' as macros with context %}{% include 'src/versions.html.j2' %}{% include 'src/document-provenance.html.j2' %}")
         css = (ROOT / 'src/style.css').read_text() + (ROOT / 'src/layout.css').read_text()
         rule = ('html body #dmp-versions td.version-name,\n'
                 'html body #dmp-versions td.version-changes,\n'
@@ -775,7 +773,7 @@ print(json.dumps(results))
                       document=dict(created_at=''),
                       pkg=dict(name=model, version='2.7.0', organization_id='dsw', km_id='root'),
                       config=dict(service_name='DMP service', service_url='https://example.org/'))
-            cases.append(dict(name=name, html=template.render(dc=dc, ctx=dict(phaseUuid=None),
+            cases.append(dict(name=name, html=template.render(dc=dc, km={}, ctx=dict(phaseUuid=None),
                 output_profile='review'), text=[title, description, model]))
         runner = '''import json,sys,re
 from weasyprint import HTML

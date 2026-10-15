@@ -6,7 +6,6 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
 from check_current import SUITES, run_suite
-from current_repairs_contract import project_source, source_tree
 from current_support import environment
 
 
@@ -166,7 +165,7 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
 
     def test_bounded_table_hint_preserves_question_grouping_and_rejections(self):
         from markupsafe import Markup
-        from probe_short_resources import cases
+        from short_resources_cases import cases
         for escape in [False, True]:
             helper = environment(ROOT, escape).get_template('src/pdf/short-resources.html.j2').module
             for name, original, _ in cases():
@@ -177,8 +176,8 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
     def test_owned_row_hint_keeps_only_the_existing_short_question_grammar(self):
         import re
         from markupsafe import Markup
-        from probe_short_resources import cases, fragment
-        from short_resources_contract import OPENING, HINT
+        from short_resources_cases import cases, fragment
+        from short_resources_cases import OPENING, HINT
         suffix = ' class="pdf-short-resource-row" style="break-inside: avoid"'
         marked = lambda value: re.sub(r'(<tr data-item-id="[^"]+")>', r'\1' + suffix + '>', value)
         rows = [(name, marked(original), selected) for name, original, selected in cases()]
@@ -226,37 +225,6 @@ class CurrentBehaviorTests(unittest.TestCase):
     pass
 
 
-class CurrentRepairContractTests(unittest.TestCase):
-    def test_registered_version_routes_without_accepting_unknown_versions(self):
-        from current_repairs_contract import CONTRACT, historical_version
-        self.assertEqual(CONTRACT['baseline_version'], historical_version(CONTRACT['candidate_version']))
-        self.assertEqual('999.0.0', historical_version('999.0.0'))
-
-    def test_exact_candidate_projects_and_any_source_drift_fails(self):
-        import json
-        current = source_tree()
-        metadata = json.loads((ROOT / 'template.json').read_text())
-        before, prior_metadata = project_source(current, metadata)
-        self.assertEqual('0.3.51', prior_metadata['version'])
-        self.assertNotIn('src/active-answer.j2', before)
-
-        changed = dict(current)
-        changed['src/questions/13-persistent-identifier.html.j2'] += b'\n'
-        with self.assertRaises(AssertionError):
-            project_source(changed, metadata)
-
-        added = dict(current)
-        added['src/unreviewed.j2'] = b''
-        with self.assertRaises(AssertionError):
-            project_source(added, metadata)
-
-        changed_metadata = dict(metadata, version='999.0.0')
-        with self.assertRaises(AssertionError):
-            project_source(current, changed_metadata)
-
-        changed_metadata = dict(metadata, name='Unreviewed template name')
-        with self.assertRaises(AssertionError):
-            project_source(current, changed_metadata)
 
 
 def test_suite(name):
