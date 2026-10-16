@@ -151,7 +151,7 @@ class ScienceEuropeContractTests(unittest.TestCase):
                     self.assertEqual('2', owner['data-contributor-index'])
                     actor = name or 'Contributor 2'
                     expected = ' '.join(sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES['en']) if role in roles)
-                    text = owner.select_one('.responsibility-summary').get_text(strip=True)
+                    text = owner.select_one('.responsibility-summary').get_text().strip()
                     self.assertEqual(expected, text)
                     self.assertEqual(ROLES[-1] in roles, f'{actor} is a creator of the data management plan.' in text)
                     for invented in ('implementing the data management plan', 'reviewed and revised'):

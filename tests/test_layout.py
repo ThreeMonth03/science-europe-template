@@ -873,7 +873,7 @@ print(json.dumps({'passed':True,'cases':8,'boundary_spacer_mm':found}))
                     body = '<div class="'+cls+'"><p>'+content+'</p><p>Original second paragraph.</p></div>'
                     cases.append((name, body, int(long and (bold or cls != 'unowned'))))
         lua = (ROOT / 'src/word/pilot.lua').read_text()
-        guard = 'return units <= 160'
+        guard = 'return display_width(block) <= 160'
         self.assertEqual(lua.count(guard), 1)
         html = ''.join('<div id="'+name+'">'+body+'</div>' for name, body, _ in cases)
         results = []
