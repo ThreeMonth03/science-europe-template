@@ -212,6 +212,20 @@ print(json.dumps(results))
         self.assertFalse(bound.startswith('\u2060') or bound.endswith('\u2060'))
         self.assertFalse(any('\u2060' in p['text'] for p in result['paragraphs'][2:]))
 
+    def test_word_binds_only_the_eight_owned_funding_status_labels(self):
+        from native_support import IMAGE, RUNNER
+        labels = ['(planned)', '(applied)', '(granted)', '(rejected)', '（規劃中）', '（已申請）', '（已核准）', '（未核准）']
+        body = ''.join('<p><span class="funding-status">'+label+'</span></p>' for label in labels)
+        body += '<p>（已核准）</p><p><span class="funding-status">Other answer</span></p>'
+        result = subprocess.check_output(
+            ['docker','run','--rm','--pull=never','--network=none','--log-driver=none','-i',
+             '--entrypoint','python',IMAGE,'-c',RUNNER],
+            input=json.dumps(dict(lua=(ROOT/'src/word/pilot.lua').read_text(), html=body)).encode(), timeout=180).decode()
+        document = json.loads(result)
+        for index, label in enumerate(labels):
+            self.assertIn(chr(0x2060).join(label), json.dumps(document['blocks'][index], ensure_ascii=False))
+        self.assertNotIn('\\u2060', json.dumps(document['blocks'][8:]))
+
     def test_q13_single_repository_subject_preserves_other_arrangements_and_authored_uses(self):
         import itertools
         import sys

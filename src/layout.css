@@ -87,6 +87,7 @@ html body #dmp-projects tr.project-funding { break-inside: auto; }
 html body #dmp-projects .project-funding { overflow-wrap: anywhere; word-break: break-word; }
 html body #dmp-projects .project-funding ul { margin: 0; padding-left: 1.2em; }
 html body #dmp-projects .project-funding li { margin: 0 0 .25em; }
+html body #dmp-projects .funding-status { white-space: nowrap; }
 html body .document-meta { font-size: 9pt; color: #526169; }
 html body .document-kind { font-size: 14pt; color: #526169; }
 html body .document-provenance { border-top: 1px solid #bcc6cc; margin-top: 2em; padding-top: .7em; font-size: 8.5pt; color: #526169; }

@@ -80,6 +80,18 @@ end
 -- Bind every character of a marked ISO date: non-breaking hyphens alone still
 -- let CJK Word layout split the year. Leave names, URLs and prose unchanged.
 function Span(span)
+  if span.identifier == "" and #span.classes == 1 and span.classes[1] == "funding-status" and
+     #span.attributes == 0 then
+    local value = pandoc.utils.stringify(span)
+    local fixed = {["(planned)"]=true, ["(applied)"]=true, ["(granted)"]=true, ["(rejected)"]=true,
+      ["（規劃中）"]=true, ["（已申請）"]=true, ["（已核准）"]=true, ["（未核准）"]=true}
+    if fixed[value] then
+      local characters = {}
+      for _, code in utf8.codes(value) do characters[#characters+1] = utf8.char(code) end
+      span.content = {pandoc.Str(table.concat(characters, utf8.char(0x2060)))}
+      return span
+    end
+  end
   if span.classes:includes("repository-label") then
     -- Own label emphasis here: translation handles words, not decorative markup.
     span.content = {pandoc.Strong(span.content)}
