@@ -1,4 +1,5 @@
 """Focused non-reuse prose and explicit list-label checks, for either language."""
+import copy
 import itertools
 import re
 
@@ -327,11 +328,20 @@ def check(root, language):
                     if methods_node.name == 'p':
                         assert ('Dataset A' in methods_node.get_text()) == (question is quality[1])
                 if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
-                # Only the complete fixed-method summary deliberately omits Q1's
-                # already-visible dataset name. All other fact markup stays exact.
+                # Q4 adds an owned presentation marker to the existing detail
+                # div; its entire authored body and every fact remain exact.
+                fact_nodes = []
+                for n in soup.select('[data-fact-id^="quality-"]'):
+                    n = copy.deepcopy(n)
+                    if question is quality[1] and has_detail and n.get('data-fact-id') == 'quality-other':
+                        assert n.div.attrs == {'class': ['reading-detail'], 'data-reading-detail': 'quality-other'}
+                        n.div.attrs = {}
+                    fact_nodes.append(n)
+                # Only the complete fixed-method summary deliberately omits
+                # Q1's already-visible dataset name.
                 facts.append([tuple(sorted(n.attrs.items())) if n.name == 'p' and
                     n.get('data-fact-id') == 'quality-methods' and n.get('data-status') == 'complete'
-                    else str(n) for n in soup.select('[data-fact-id^="quality-"]')])
+                    else str(n) for n in fact_nodes])
                 if value and not value.strip():
                     empty = dict(replies); empty[detail] = ''
                     assert str(soup) == str(render(question, empty, profile))

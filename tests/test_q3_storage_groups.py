@@ -70,6 +70,11 @@ class Q3StorageGroupTests(unittest.TestCase):
             for fact in ('metadata-access-explanation', 'file-naming', 'object-naming'):
                 detail, = document.xpath('.//div[@data-fact-id="' + fact + '"]')
                 payload = [n for n in detail if n.get('class') != 'answer-lead']
+                if fact in ('file-naming', 'object-naming'):
+                    self.assertEqual(len(payload), 1)
+                    self.assertEqual(payload[0].attrib,
+                                     {'class': 'reading-detail', 'data-reading-detail': fact})
+                    payload = list(payload[0])
                 self.assertEqual([html.tostring(n, with_tail=False) for n in payload], expected)
             policy = groups['object-store'][1]
             self.assertEqual(policy[0].attrib, {'class': 'answer-lead'})
