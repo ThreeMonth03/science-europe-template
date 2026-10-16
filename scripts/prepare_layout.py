@@ -169,12 +169,13 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     # One ownership indent inside dataset records, preserving existing keep
     # semantics. Headings remain flush left; no authored text is rewritten.
     for source, name in (("Body Text", "Detail"), ("Pilot Label", "Label"),
+                         ("Pilot Label", "Attribute"),
                          ("Pilot Lead", "Lead"), ("Pilot Provenance", "Provenance"),
                          ("Pilot Preservation Summary", "Summary")):
         item = document.styles.add_style("Pilot Dataset " + name, WD_STYLE_TYPE.PARAGRAPH)
         item.base_style = document.styles[source]
         item.paragraph_format.left_indent = Mm(4)
-        if name == "Label":
+        if name == "Attribute":
             item.font.size = Pt(9.5)
         if name == "Summary":
             item.paragraph_format.first_line_indent = Mm(-4)

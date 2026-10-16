@@ -96,6 +96,13 @@ local function layout_question(question)
           end})
           table.insert(paragraphs, {blocks=blocks, index=index, block=block, owned=not authored})
         elseif block.t == "Div" then
+          -- Only this fixed rights-holder label is secondary type. An author's
+          -- own bold paragraph keeps the ordinary body-size label style.
+          local label = block.content[1]
+          if block.classes:includes("answer-detail") and block.attributes["fact-id"] == "reuse-rightsholder" and
+             label and label.t == "Div" and label.attributes["custom-style"] == "Pilot Label" then
+            label.attributes["custom-style"] = "Pilot Dataset Attribute"
+          end
           local style = block.attributes["custom-style"]
           if styles[style] then block.attributes["custom-style"] = styles[style] end
           scan(block.content, 1, block.classes:includes("repository-destinations"),

@@ -116,6 +116,21 @@ print(json.dumps(results))
         self.assertEqual('', labeled.render(value='<p>Keep.</p>', label='x'*1000))
         self.assertEqual('', labeled.render(value='<p>'+'中'*295+'</p>', label='Long dataset name'))
 
+    def test_dataset_secondary_type_is_scoped_to_the_owned_attribute_label(self):
+        from native_support import IMAGE, RUNNER
+        body = ('<div id="q-how-data" class="question"><div class="answer"><div class="dataset-list">'
+                '<div class="dataset-section" data-item-id="dataset"><h5>Dataset</h5>'
+                '<div class="answer-detail" data-fact-id="reuse-rightsholder">'
+                '<div custom-style="Pilot Label"><p><strong>Owned attribute</strong></p></div>'
+                '<div custom-style="Pilot Label"><p><strong>Authored emphasis</strong></p></div>'
+                '</div></div></div></div></div>')
+        result = subprocess.check_output(
+            ['docker','run','--rm','--pull=never','--network=none','--log-driver=none','-i',
+             '--entrypoint','python',IMAGE,'-c',RUNNER],
+            input=json.dumps(dict(lua=(ROOT/'src/word/preservation-reading.lua').read_text(), html=body)).encode(), timeout=180).decode()
+        self.assertEqual(1, result.count('Pilot Dataset Attribute'))
+        self.assertEqual(1, result.count('Pilot Dataset Label'))
+
     def test_flowing_word_root_still_classifies_only_owned_empty_sections(self):
         from native_support import IMAGE
         sections = [
