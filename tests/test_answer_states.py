@@ -664,6 +664,36 @@ class AnswerStateTests(unittest.TestCase):
                                                     output_profile='submission', km=altered), 'html.parser')
                 self.assertFalse(soup.select('[data-fact-id="'+fact+'"]'), (chain, mutation))
 
+    def test_basic_security_topic_groups_omit_empty_paragraphs_and_keep_cjk_spacing(self):
+        from current_support import PREFIX, environment
+        risk = path('processingCUuid', 'risksQUuid')
+        prefix = path(risk, 'risksExploreAUuid')
+        groups = [('risksStoreLab', 'risksCarryHome'),
+                  ('risksCertifications', 'risksHttps', 'risksInstructed')]
+        for escape, profile, language in itertools.product(
+                (False, True), ('review', 'submission'), ('en', 'zh-Hant')):
+            env = environment(ROOT, escape)
+            env.globals['document_language'] = language
+            if language == 'zh-Hant':
+                # CJK sentinels check source whitespace, not translation quality.
+                env.globals['pgettext'] = lambda context, message, **kwargs: '安全敘述。'
+            template = env.from_string(PREFIX + "{% include 'src/questions/06-access-security.html.j2' %}")
+            for device, service in itertools.product(('Yes', 'No', None, 'unknown'), repeat=2):
+                replies = {risk: IDS['risksExploreAUuid']}
+                for keys, choice in zip(groups, (device, service)):
+                    if choice is not None:
+                        replies.update({path(prefix, key + 'QUuid'): IDS.get(key + choice + 'AUuid', choice)
+                                        for key in keys})
+                soup = BeautifulSoup(template.render(repliesMap=replies, output_profile=profile), 'html.parser')
+                paragraphs = soup.select('.answer > p:not(.data-gap)')
+                lengths = [len(keys) for keys, choice in zip(groups, (device, service)) if choice in ('Yes', 'No')]
+                with self.subTest(escape=escape, profile=profile, language=language, device=device, service=service):
+                    self.assertEqual(len(lengths), len(paragraphs))
+                    self.assertTrue(all(p.get_text(strip=True) for p in paragraphs))
+                    if language == 'zh-Hant':
+                        self.assertEqual(['安全敘述。' * length for length in lengths],
+                                         [p.get_text() for p in paragraphs])
+
     def test_negative_limitations_share_prose_without_losing_positive_siblings(self):
         risk = path('processingCUuid', 'risksQUuid')
         risk_prefix = path(risk, 'risksExploreAUuid')
@@ -673,11 +703,10 @@ class AnswerStateTests(unittest.TestCase):
                   path(carry, 'risksCarryHomeYesAUuid', 'risksCarryHomePassQUuid'): IDS['risksCarryHomePassYesAUuid'],
                   path(risk_prefix, 'risksCertificationsQUuid'): IDS['risksCertificationsNoAUuid'],
                   path(risk_prefix, 'risksHttpsQUuid'): IDS['risksHttpsYesAUuid']}
-        expected = ('Project members carry data with them (e.g. on laptops, USB sticks, or other external media). '
-                    'Not all data carriers are encrypted. '
-                    'Accounts on laptops are password-protected. '
+        expected = ['Project members carry data with them (e.g. on laptops, USB sticks, or other external media). '
+                    'Not all data carriers are encrypted. Accounts on laptops are password-protected.',
                     'Not all data centres that store project data hold appropriate certifications. '
-                    'All project web services are accessible through HTTPS.')
+                    'All project web services are accessible through HTTPS.']
         preexisting = path('reusingCUuid', 'preexistingQUuid')
         convert = path(preexisting, 'preexistingYesAUuid', 'dataCompReadQUuid')
         reuse = {preexisting: IDS['preexistingYesAUuid'], convert: IDS['dataCompReadYesAUuid'],
@@ -686,7 +715,8 @@ class AnswerStateTests(unittest.TestCase):
         for profile in ('review', 'submission'):
             soup = BeautifulSoup(render_question('src/questions/06-access-security.html.j2', values,
                 output_profile=profile), 'html.parser')
-            self.assertEqual(expected, ' '.join(soup.select_one('.answer > p').get_text(' ', strip=True).split()))
+            self.assertEqual(expected, [' '.join(p.get_text(' ', strip=True).split())
+                                        for p in soup.select('.answer > p')])
             soup = BeautifulSoup(render_question('src/questions/01-how-data.html.j2', reuse,
                 output_profile=profile), 'html.parser')
             sentence = soup.find('p', string=lambda text: text and 'We will not provide others' in text)

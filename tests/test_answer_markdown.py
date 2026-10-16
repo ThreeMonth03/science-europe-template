@@ -82,6 +82,48 @@ class AnswerMarkdownTests(unittest.TestCase):
         for fmt in metadata['formats']:
             self.assertEqual(fmt['steps'][:2], answer_markdown_steps())
 
+    def test_q11_description_label_keeps_short_values_and_rich_blocks_exact(self):
+        from current_support import PREFIX, environment, path
+        from jinja2 import Undefined
+        detail = path('dataset-a', 'producedDataDescriptionQUuid')
+        cases = [('無祀祠的點位', '<p>無祀祠的點位</p>', True),
+                 ('0', '<p>0</p>', True),
+                 ('A<B&C>D', '<p>A&lt;B&amp;C&gt;D</p>', True),
+                 ('Long ' * 30, '<p>' + 'Long ' * 30 + '</p>', False),
+                 ('Two\n\nparagraphs', '<p>Two</p><p>paragraphs</p>', False),
+                 ('[Link](https://example.org/)', '<p><a href="https://example.org/">Link</a></p>', False),
+                 ('- First\n- Next', '<ul><li>First</li><li>Next</li></ul>', False),
+                 ('| Field |\n| --- |\n| 0 |', '<table><tr><td>0</td></tr></table>', False),
+                 ('Literal', '<pre>Literal</pre>', False)]
+        for escape in (False, True):
+            env = environment(ROOT, escape=escape)
+            env.loader = FileSystemLoader(ROOT)  # Use the exact-source transport guard.
+            env.filters['reply_str_value'] = lambda reply: '' if isinstance(reply, Undefined) else reply['value']['value']
+            render = env.from_string(PREFIX + "{% include 'src/preservation-dataset.html.j2' %}").render
+            for profile in ('review', 'submission'):
+                for source, body, compact in cases:
+                    with self.subTest(escape=escape, profile=profile, source=source):
+                        data = {detail: {'value': {'type': 'StringReply', 'value': source}}}
+                        output = render(repliesMap=data, pathPrefix='dataset-a',
+                            ctx={'project': {'replies': data}}, json=json, output_profile=profile,
+                            document=SimpleNamespace(content=self.fragment(source, body).encode(), safe_encoding='utf-8'))
+                        doc = lhtml.fragment_fromstring(output, create_parent=True)
+                        owner, = doc.xpath('./div[@data-fact-id="preservation-dataset-description"]')
+                        if compact:
+                            self.assertEqual([n.tag for n in owner], ['p'])
+                            self.assertEqual(owner[0][0].tag, 'strong')
+                            self.assertEqual(owner[0][0].text, 'Dataset description:')
+                            self.assertEqual(owner[0][0].tail, ' ' + lhtml.fragment_fromstring(body).text_content())
+                        else:
+                            self.assertEqual(owner[0].get('class'), 'answer-lead')
+                            self.assertEqual(owner[0].text_content(), 'Dataset description')
+                            expected = [lhtml.tostring(n, with_tail=False) for n in lhtml.fragments_fromstring(body)]
+                            self.assertEqual([lhtml.tostring(n, with_tail=False) for n in list(owner)[1:]], expected)
+                        self.assertFalse(doc.xpath('.//p//p | .//p//div | .//p//table | .//p//ul'))
+                for source in ('', ' \n\t '):
+                    data = {detail: {'value': {'type': 'StringReply', 'value': source}}}
+                    self.assertEqual(render(repliesMap=data, pathPrefix='dataset-a', output_profile=profile).strip(), '')
+
     def test_confirmed_free_text_consumers_use_the_owned_parser(self):
         consumers = {
             'src/questions/01-how-data.html.j2': ['refDataUsageReply', 'refDataVersionedWhich', 'refDataConditionsOtherReply', 'nrefDataUsageReply'],

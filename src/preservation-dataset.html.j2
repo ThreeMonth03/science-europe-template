@@ -3,7 +3,19 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context %}
 {% set producedDescription = repliesMap[[pathPrefix, uuids.producedDataDescriptionQUuid]|reply_path]|reply_str_value %}
 {% if producedDescription|trim %}
-  <div class="answer-detail" data-fact-id="preservation-dataset-description" data-status="complete">{{ answerMarkdown.markdown(producedDescription) }}</div>
+  {% set descriptionContent = answerMarkdown.markdown(producedDescription) %}
+  {% set descriptionCandidate = descriptionContent|trim %}
+  {# Only one short, plain rendered paragraph can share the label's line.
+     Rich or long authored content retains every original block unchanged. #}
+  {% set compactDescription = descriptionCandidate.startswith('<p>') and descriptionCandidate.endswith('</p>') and descriptionCandidate.count('<') == 2 and 0 < descriptionCandidate|striptags|trim|length <= 80 and '\n' not in descriptionCandidate and '\r' not in descriptionCandidate %}
+  <div class="answer-detail" data-fact-id="preservation-dataset-description" data-status="complete">
+    {% if compactDescription %}
+    <p>{{ pgettext("preservation-dataset", "<strong>Dataset description:</strong> %(description)s", description=descriptionCandidate[3:-4]|safe) }}</p>
+    {% else %}
+    <div class="answer-lead">{{ pgettext("preservation-dataset", "<p><strong>Dataset description</strong></p>") }}</div>
+    {{ descriptionContent }}
+    {% endif %}
+  </div>
 {% endif %}
 {% set stagePath = [pathPrefix, uuids.producedDataStageQUuid]|reply_path %}
 {% set stage = repliesMap[stagePath]|reply_str_value %}

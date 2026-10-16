@@ -61,9 +61,11 @@
     {%- set homeNotPassword = risksCarryHomeAUuid == uuids.risksCarryHomeYesAUuid and risksCarryHomePassAUuid == uuids.risksCarryHomePassNoAUuid -%}
     {%- set storeLab = risksStoreLabAUuid == uuids.risksStoreLabNoAUuid -%}
 
-    {%- if risksStoreLabAUuid in [uuids.risksStoreLabNoAUuid, uuids.risksStoreLabYesAUuid] or (risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid]) or (risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid]) or (risksHttpsAUuid in [uuids.risksHttpsYesAUuid, uuids.risksHttpsNoAUuid]) or (risksInstructedAUuid in [uuids.risksInstructedYesAUuid, uuids.risksInstructedNoAUuid]) %}
+    {%- set hasDeviceStatements = risksStoreLabAUuid in [uuids.risksStoreLabNoAUuid, uuids.risksStoreLabYesAUuid] or risksCarryHomeAUuid in [uuids.risksCarryHomeNoAUuid, uuids.risksCarryHomeYesAUuid] -%}
+    {%- set hasServiceStatements = risksCertificationsAUuid in [uuids.risksCertificationsYesAUuid, uuids.risksCertificationsNoAUuid] or risksHttpsAUuid in [uuids.risksHttpsYesAUuid, uuids.risksHttpsNoAUuid] or risksInstructedAUuid in [uuids.risksInstructedYesAUuid, uuids.risksInstructedNoAUuid] -%}
+    {%- if hasDeviceStatements or hasServiceStatements %}
       {# Only template-owned fixed statements are captured; no authored answer enters this block.
-         Chinese joins complete clauses without source indentation; English keeps it unchanged. #}{% set basicRiskParagraph %}<p>
+         Chinese joins complete clauses without source indentation; English keeps it unchanged. #}{% set basicRiskParagraphs %}{% if hasDeviceStatements %}<p>
         {%- if storeLab %}
           {{ pgettext("questions/06-access-security", "Project members do not store data or software on computers in the lab or external hard drives connected to those computers.") }}{{ "" if document_language|default('en') == 'zh-Hant' else " " }}
         {%- elif risksStoreLabAUuid == uuids.risksStoreLabYesAUuid %}
@@ -84,6 +86,7 @@
         {%- elif homeNotPassword %}
           {{ pgettext("questions/06-access-security", "Not all laptop accounts are password-protected.") }}
         {%- endif -%}
+      </p>{% endif %}{% if hasServiceStatements %}<p>
         {%- if risksCertificationsAUuid == uuids.risksCertificationsYesAUuid %}
           {{ pgettext("questions/06-access-security", "All data centres that store project data hold appropriate certifications.") }}
         {%- elif risksCertificationsAUuid == uuids.risksCertificationsNoAUuid %}
@@ -99,7 +102,7 @@
         {%- elif risksInstructedAUuid == uuids.risksInstructedNoAUuid %}
           {{ pgettext("questions/06-access-security", "Project members have not received instruction covering both generic and project-specific risks.") }}
         {%- endif -%}
-      </p>{% endset %}{{ basicRiskParagraph.splitlines()|map('trim')|join('') if document_language|default('en') == 'zh-Hant' else basicRiskParagraph }}
+      </p>{% endif %}{% endset %}{{ basicRiskParagraphs.splitlines()|map('trim')|join('') if document_language|default('en') == 'zh-Hant' else basicRiskParagraphs }}
     {%- endif -%}
     {# Information loss, leak, and vandalism #}
     {%- set riskAnswers = {} -%}
