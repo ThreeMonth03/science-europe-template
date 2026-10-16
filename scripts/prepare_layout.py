@@ -184,6 +184,15 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     terminal.base_style = document.styles["Pilot Dataset Detail"]
     terminal.paragraph_format.keep_with_next = False
     terminal.paragraph_format.keep_together = True
+    # Subordinate prose shares one 4 mm level. Inline record identities keep
+    # their first line at the base margin; long paragraphs remain free to flow.
+    for mode in ("Detail", "Record"):
+        for source, suffix in (("Body Text", ""), ("Pilot Lead", " Lead"),
+                               ("Pilot Label", " Label")):
+            item = document.styles.add_style("Pilot Reading " + mode + suffix, WD_STYLE_TYPE.PARAGRAPH)
+            item.base_style = document.styles[source]
+            item.paragraph_format.left_indent = Mm(4)
+            item.paragraph_format.first_line_indent = Mm(-4 if mode == "Record" else 0)
     table_lead = document.styles.add_style("Pilot Table Lead", WD_STYLE_TYPE.PARAGRAPH)
     table_lead.base_style = document.styles["Compact"]
     table_lead.paragraph_format.keep_with_next = True

@@ -204,6 +204,24 @@ html body .dataset-section > h5 { font-size: 11pt; margin: .5em 0 .35em; }
 html body .dataset-section { padding-left: 4mm; }
 html body .dataset-section > h5,
 html body .dataset-section > strong.item-label { margin-left: -4mm; }
+/* Owned record sentences keep their inline identity on the base margin; only
+   continuation lines hang inward. Never indent the wrapper, which may also
+   contain authored lists, tables, headings or other independent blocks. */
+html body #q-what-data > .answer > div > .collection-dataset.reading-record[data-reading-record="collection"] > p.collection-summary,
+html body #q-what-data > .answer > .data-formats > .format-description.reading-record[data-reading-record="format"] > .format-summary,
+html body #q-quality-control > .answer > .quality-dataset.reading-record[data-reading-record="quality"] > p.quality-summary { margin-left: 4mm; text-indent: -4mm; }
+/* Marked lead-owned prose gets one shallow ownership indent. Style only its
+   direct paragraphs: authored lists, tables, preformatted text, blockquotes
+   and attributed wrappers retain their own layout. No blanket answer-detail
+   rule, because some containers mix project prose and several owned answers. */
+html body #q-what-data > .answer > div > .collection-dataset.reading-record[data-reading-record="collection"] > .answer-detail[data-fact-id="external-ownership"] > .reading-detail[data-reading-detail="collection-ownership"] > p,
+html body #q-what-data > .answer > .data-formats > .format-description.reading-record[data-reading-record="format"] > .answer-detail[data-fact-id="nonstandard-reason"] > .reading-detail[data-reading-detail="format-reason"] > p,
+html body #q-docs-metadata > .answer > .storage-conventions-policy > .q3-storage-group[data-storage-group="filesystem"] > .dataset-policy > .answer-detail[data-fact-id="file-naming"] > .reading-detail[data-reading-detail="file-naming"] > p,
+html body #q-docs-metadata > .answer > .storage-conventions-policy > .q3-storage-group[data-storage-group="object-store"] > .dataset-policy > .answer-detail[data-fact-id="object-naming"] > .reading-detail[data-reading-detail="object-naming"] > p,
+html body #q-quality-control > .answer > .quality-dataset.reading-record[data-reading-record="quality"] > .answer-detail[data-fact-id="quality-other"] > .reading-detail[data-reading-detail="quality-other"] > p,
+html body #q-personal-data > .answer > .answer-detail.reading-detail[data-reading-detail="personal-safeguards"][data-fact-id="personal-data-additional-safeguards"] > p,
+html body #q-personal-data > .answer > .answer-detail.reading-detail[data-reading-detail="personal-transfer"][data-fact-id="personal-data-transfer-measures"] > p,
+html body #q-ethical-issues > .answer > .answer-detail > .reading-detail[data-reading-detail="ethics-authored"] > p { margin-left: 4mm; }
 html body .dataset-section .answer-detail[data-fact-id="reuse-rightsholder"] > p:first-child { font-size: 9.5pt; }
 html body .dataset-section .answer-detail[data-fact-id="reuse-rightsholder"] > p:first-child strong { font-weight: normal; }
 html body #q-share-restrictions .short-dataset-record,

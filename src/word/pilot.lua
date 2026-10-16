@@ -1324,6 +1324,10 @@ function Div(div)
                (#block.classes == 0 or block.classes:includes("answer-lead")) and
                (block.attributes["custom-style"] == "Pilot Lead" or block.attributes["custom-style"] == "Pilot List Lead") then
           scan(block.content, listed, true)
+        elseif block.t == "Div" and block.identifier == "" and #block.classes == 1 and
+               block.classes:includes("reading-detail") and #block.attributes == 1 and
+               block.attributes["reading-detail"] == div.attributes["fact-id"] then
+          scan(block.content, listed, false)
         elseif block.t == "BulletList" or block.t == "OrderedList" then
           if #block.content > 3 then simple = false end
           for _, item in ipairs(block.content) do scan(item, true, false) end

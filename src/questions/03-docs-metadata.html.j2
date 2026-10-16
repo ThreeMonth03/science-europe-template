@@ -283,7 +283,7 @@
         {%- set scFSysAppointments = repliesMap[scFSysAppointmentsPath]|reply_str_value -%}
         {%- if scFSysAppointments|trim %}
           {%- set fileNamingHtml = answerMarkdown.markdown(scFSysAppointments) -%}
-          <div class="answer-detail{{ shortNamingClass(fileNamingHtml) }}" data-fact-id="file-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "File naming conventions:") }}</p></div>{{ fileNamingHtml }}</div>
+          <div class="answer-detail{{ shortNamingClass(fileNamingHtml) }}" data-fact-id="file-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "File naming conventions:") }}</p></div><div class="reading-detail" data-reading-detail="file-naming">{{ fileNamingHtml }}</div></div>
         {%- endif -%}
       {%- endif -%}
         </div>
@@ -304,7 +304,7 @@
         {% if scObjStoreNaming|trim %}</div>{% endif %}
         {%- if scObjStoreNaming|trim -%}
           {%- set objectNamingHtml = answerMarkdown.markdown(scObjStoreNaming) -%}
-          <div class="answer-detail{{ shortNamingClass(objectNamingHtml) }}" data-fact-id="object-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "Object naming conventions:") }}</p></div>{{ objectNamingHtml }}</div>
+          <div class="answer-detail{{ shortNamingClass(objectNamingHtml) }}" data-fact-id="object-naming"><div class="answer-lead"><p>{{ pgettext("questions/03-docs-metadata", "Object naming conventions:") }}</p></div><div class="reading-detail" data-reading-detail="object-naming">{{ objectNamingHtml }}</div></div>
         {%- endif -%}
       {%- endif -%}
         </div>

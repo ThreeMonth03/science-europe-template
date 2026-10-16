@@ -14,7 +14,7 @@
       <h4>{{ pgettext("questions/02-what-data", "Instrument datasets") }}</h4>
         {%- for datasetItem in measuredDataItems -%}
           {%- set pathPrefix = [measuredDataPath, datasetItem]|reply_path -%}
-          <div class="collection-dataset" data-item-id="{{ datasetItem }}">
+          <div class="collection-dataset reading-record" data-reading-record="collection" data-item-id="{{ datasetItem }}">
             {%- set measuredDataNamePath = [pathPrefix, uuids.measuredDataNameQUuid]|reply_path -%}
             {%- set measuredDataName = repliesMap[measuredDataNamePath]|reply_str_value -%}
             {%- set measuredDataWhoPath = [pathPrefix, uuids.measuredDataWhoQUuid]|reply_path -%}
@@ -67,7 +67,7 @@
             {% if ownershipOther|trim %}
               <div class="answer-detail" data-fact-id="external-ownership" data-status="complete">
                 <div class="answer-lead"><p>{{ pgettext("questions/02-what-data", "Data ownership arrangements:") }}</p></div>
-                {{ answerMarkdown.markdown(ownershipOther) }}
+                <div class="reading-detail" data-reading-detail="collection-ownership">{{ answerMarkdown.markdown(ownershipOther) }}</div>
               </div>
             {% elif ownershipMissing %}
               {%- if measuredDataWhoAUuid == uuids.measuredDataWhoExternalAUuid and mdExternalOwnershipAUuid == uuids.mdExternalOwnershipOtherAUuid -%}
@@ -258,7 +258,7 @@
         {%- set formatsVolumeFileGB = repliesMap[[formatsVolumePath, uuids.formatsVolumeFileSizeAUuid, uuids.formatsVolumeFileGBQUuid]|reply_path]|reply_str_value -%}
         {%- set formatTotalQuantity = macros.quantity(formatsVolumeTotalGB, "GB") -%}
         {%- set formatAverageQuantity = macros.quantity(formatsVolumeFileGB, "GB") -%}
-        <div class="format-description" data-item-id="{{ formatItem }}">
+        <div class="format-description reading-record" data-reading-record="format" data-item-id="{{ formatItem }}">
           <div class="dataset-policy format-summary">
             {% if formatName|striptags|trim %}
               <p>{% trans formatName=formatName %}Data format: <strong>{{ formatName }}</strong>.{% endtrans %}</p>
@@ -312,7 +312,7 @@
           {% if formatsIsStandardAUuid == uuids.formatsIsStandardNoAUuid and formatsWhyNonStandardAUuid == uuids.formatsWhyNSAnotherReasonAUuid and formatsWhyNSAnotherReason|trim %}
             <div class="answer-detail" data-fact-id="nonstandard-reason" data-status="complete">
               <p class="answer-lead">{% trans %}Reason for choosing this format:{% endtrans %}</p>
-              {{ answerMarkdown.markdown(formatsWhyNSAnotherReason) }}
+              <div class="reading-detail" data-reading-detail="format-reason">{{ answerMarkdown.markdown(formatsWhyNSAnotherReason) }}</div>
             </div>
           {% endif %}
           {% set formatGaps = [] %}

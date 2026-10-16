@@ -374,7 +374,7 @@ class AnswerMarkdownTests(unittest.TestCase):
                             second[detail.replace('.format-1.', '.format-2.')] = envelope('Second owner reason.')
                             multiple = {**data, **second, listing: envelope(['format-1', 'format-2'], 'ItemListReply')}
                             transport += self.fragment('Second owner reason.', '<p>Second owner reason.</p>').replace('dsw-md-1', 'dsw-md-7')
-                            records = lhtml.fragment_fromstring(output(multiple), create_parent=True).xpath('.//div[@class="format-description"]')
+                            records = lhtml.fragment_fromstring(output(multiple), create_parent=True).xpath('.//div[contains(concat(" ", normalize-space(@class), " "), " format-description ") and @data-reading-record="format"]')
                             self.assertEqual([node.get('data-item-id') for node in records], ['format-1', 'format-2'])
                             self.assertEqual(len(records[0].xpath('.//table')), 1)
                             self.assertFalse(records[1].xpath('.//table'))
@@ -429,7 +429,7 @@ class AnswerMarkdownTests(unittest.TestCase):
                         self.assertEqual(len(owned), 5 if value and value.strip() else 0)
                         self.assertFalse(doc.xpath('.//pre[@class="answer-markdown-fallback"]'))
                         if value in ['0', 'false']:
-                            self.assertTrue(all(node.xpath('./p[last()]')[0].text_content() == value for node in owned))
+                            self.assertTrue(all(node.xpath('./p[last()] | ./div[@data-reading-detail="file-naming" or @data-reading-detail="object-naming"]/p[last()]')[0].text_content() == value for node in owned))
                         if value == 'rich':
                             self.assertEqual([node.xpath('.//td')[0].text_content() for node in owned], [f'FIELD-{i}' for i in range(1, 6)])
                             self.assertTrue(all('Literal <analysis>.' in node.text_content() for node in owned))

@@ -157,4 +157,107 @@ local function layout_question(question)
   return question, false
 end
 
-return {{traverse="topdown", Div=Div}, {traverse="topdown", Div=layout_question}}
+-- Q2-Q9: explicit source-owned markers distinguish subordinate prose from
+-- ordinary answers. Style direct paragraphs only, not list/table contents or
+-- arbitrary authored divs; headings and fixed lead labels remain anchors.
+local function reading_question(question)
+  if question.classes:includes("answer") or question.classes:includes("answer-detail") or
+     question.classes:includes("abstract") then return question, false end
+  local id = question.identifier
+  if id ~= "q-what-data" and id ~= "q-docs-metadata" and id ~= "q-quality-control" and
+     id ~= "q-personal-data" and id ~= "q-ethical-issues" then return nil end
+  if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end
+  local function prose(blocks, mode)
+    for index, block in ipairs(blocks) do
+      if block.t == "Para" or block.t == "Plain" then
+        blocks[index] = pandoc.Div({pandoc.Para(block.content)},
+          pandoc.Attr("", {}, {["custom-style"]="Pilot Reading " .. mode}))
+      elseif block.t == "Div" and block.identifier == "" and #block.content == 1 and
+             (block.content[1].t == "Para" or block.content[1].t == "Plain") and
+             #block.attributes == 1 and (#block.classes == 0 or
+               (#block.classes == 1 and block.classes:includes("answer-lead"))) then
+        local suffix = ({["Pilot Lead"]=" Lead", ["Pilot Label"]=" Label"})[block.attributes["custom-style"]]
+        if suffix then
+          block.attributes["custom-style"] = "Pilot Reading " .. mode .. suffix
+          block.content[1] = pandoc.Para(block.content[1].content)
+        end
+      end
+    end
+  end
+  local function detail(block, role)
+    if known_div(block, {"reading-detail"}, {["reading-detail"]=true}) and
+       block.attributes["reading-detail"] == role then prose(block.content, "Detail") end
+  end
+  local function details(container, role)
+    for _, block in ipairs(container.content) do detail(block, role) end
+  end
+  local record_classes = {collection="collection-dataset", format="format-description", quality="quality-dataset"}
+  local function record(block, role)
+    if not known_div(block, {record_classes[role], "reading-record"},
+        {["item-id"]=true, ["reading-record"]=true}) or not block.attributes["item-id"] or
+       block.attributes["item-id"] == "" or block.attributes["reading-record"] ~= role then return end
+    if role ~= "format" then prose(block.content, "Record") end
+    for _, child in ipairs(block.content) do
+      if role == "format" and known_div(child, {"dataset-policy", "format-summary"}, {}) then
+        prose(child.content, "Record")
+      elseif child.t == "Div" and child.classes:includes("answer-detail") then
+        local fact = child.attributes["fact-id"]
+        if role == "collection" and fact == "external-ownership" then details(child, "collection-ownership")
+        elseif role == "format" and fact == "nonstandard-reason" then details(child, "format-reason")
+        elseif role == "quality" and fact == "quality-other" then details(child, "quality-other") end
+      end
+    end
+  end
+  local function naming(storage)
+    if not known_div(storage, {"storage-conventions-policy"}, {}) then return end
+    for _, group in ipairs(storage.content) do
+      if known_div(group, {"q3-storage-group"}, {["storage-group"]=true}) then
+        local kind = group.attributes["storage-group"]
+        local role = ({filesystem="file-naming", ["object-store"]="object-naming"})[kind]
+        if role then
+          for _, policy in ipairs(group.content) do
+            if known_div(policy, {"dataset-policy"}, {}) then
+              for _, body in ipairs(policy.content) do
+                if body.t == "Div" and body.identifier == "" and #body.attributes == 1 and
+                   body.attributes["fact-id"] == role and body.classes:includes("answer-detail") and
+                   (#body.classes == 1 or (#body.classes == 2 and body.classes:includes("short-naming-answer"))) then
+                  details(body, role)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  for _, answer in ipairs(question.content) do
+    if known_div(answer, {"answer"}, {}) then
+      for _, block in ipairs(answer.content) do
+        if id == "q-what-data" then
+          record(block, "collection")
+          if known_div(block, {"data-formats"}, {}) then
+            for _, item in ipairs(block.content) do record(item, "format") end
+          elseif known_div(block, {}, {}) and block.content[1] and
+                 block.content[1].t == "Header" and block.content[1].level == 4 then
+            for _, item in ipairs(block.content) do record(item, "collection") end
+          end
+        elseif id == "q-quality-control" then record(block, "quality")
+        elseif id == "q-docs-metadata" then naming(block)
+        elseif id == "q-personal-data" and
+               known_div(block, {"answer-detail", "reading-detail"},
+                 {["fact-id"]=true, status=true, ["reading-detail"]=true}) and
+               block.attributes.status == "complete" then
+          local fact = ({["personal-safeguards"]="personal-data-additional-safeguards",
+            ["personal-transfer"]="personal-data-transfer-measures"})[block.attributes["reading-detail"]]
+          if fact and block.attributes["fact-id"] == fact then prose(block.content, "Detail") end
+        elseif id == "q-ethical-issues" and known_div(block, {"answer-detail"}, {}) then
+          details(block, "ethics-authored")
+        end
+      end
+    end
+  end
+  return question, false
+end
+
+return {{traverse="topdown", Div=Div}, {traverse="topdown", Div=layout_question},
+        {traverse="topdown", Div=reading_question}}

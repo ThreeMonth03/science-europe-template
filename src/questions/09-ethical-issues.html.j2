@@ -322,7 +322,7 @@
               <div class="answer-lead"><p>{{ prose.parts|join(' ') }}</p></div>
               {%- do prose.parts.clear() -%}
             {%- elif loop.index0 - 1 in ethicsLead.indices -%}
-              <div>{{ sentence }}</div>
+              <div class="reading-detail" data-reading-detail="ethics-authored">{{ sentence }}</div>
             {%- else -%}
               {%- do prose.parts.append(sentence) -%}
             {%- endif -%}

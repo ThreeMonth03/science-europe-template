@@ -50,7 +50,7 @@
   {% if otherText|trim %}
     <div class="answer-lead"><p>{{ pgettext("quality-control", "Additional quality control details for <strong>%(qualityName)s</strong>:", qualityName=qualityName) }}</p></div>
     {# Let long authored paragraphs split; do not bind the first two paragraphs. #}
-    <div class="answer-detail" data-fact-id="quality-other" data-status="complete"><div>{{ answerMarkdown.markdown(otherText) }}</div></div>
+    <div class="answer-detail" data-fact-id="quality-other" data-status="complete"><div{% if qualityReadingDetails|default(false) %} class="reading-detail" data-reading-detail="quality-other"{% endif %}>{{ answerMarkdown.markdown(otherText) }}</div></div>
   {% elif otherAnswer == uuids.mdQualityOtherYesAUuid %}
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">{{ pgettext("quality-control", "Other quality control methods were selected for <strong>%(qualityName)s</strong>, but the details have not been provided.", qualityName=qualityName) }}</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{{ pgettext("quality-control", "Other quality control methods are planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>{% endif %}
   {% endif %}{% endif %}

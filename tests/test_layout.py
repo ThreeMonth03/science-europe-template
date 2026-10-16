@@ -18,6 +18,62 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_reading_indent_styles_only_owned_prose_not_lists_or_tables(self):
+        from native_support import IMAGE, RUNNER
+        def question(kind, body):
+            return '<div id="'+kind+'" class="question"><h3>Original question</h3><div class="answer">'+body+'</div></div>'
+        detail = '<div class="reading-detail" data-reading-detail="{}"><p>Keep <a href="#original">original text</a>.</p><ul><li>Keep list.</li></ul><table><tr><td>Keep table.</td></tr></table><div><p>Keep authored div.</p></div></div>'
+        collection = ('<div class="collection-dataset reading-record" data-reading-record="collection" data-item-id="one">'
+                      '<p>Original dataset: original description.</p><div class="answer-detail" data-fact-id="external-ownership">'+
+                      detail.format('collection-ownership')+'</div></div>')
+        formatting = ('<div class="data-formats"><div class="format-description reading-record" data-reading-record="format" data-item-id="one">'
+                      '<div class="dataset-policy format-summary"><p>Original format and policy.</p></div>'
+                      '<div class="answer-detail" data-fact-id="nonstandard-reason">'+detail.format('format-reason')+'</div></div></div>')
+        quality = ('<div class="quality-dataset reading-record" data-reading-record="quality" data-item-id="one">'
+                   '<p>Original dataset: quality checks.</p><div class="answer-detail" data-fact-id="quality-other">'+
+                   detail.format('quality-other')+'</div></div>')
+        naming = ('<div class="storage-conventions-policy"><div class="q3-storage-group" data-storage-group="filesystem">'
+                  '<div class="dataset-policy"><div class="answer-detail short-naming-answer" data-fact-id="file-naming">'
+                  '<div class="answer-lead" custom-style="Pilot Lead"><p>Original naming label:</p></div>'+
+                  detail.format('file-naming')+'</div></div></div></div>')
+        personal = detail.format('personal-safeguards').replace('class="reading-detail"',
+            'class="answer-detail reading-detail" data-fact-id="personal-data-additional-safeguards" data-status="complete"')
+        cases = [('collection', question('q-what-data', '<div><h4>Collections</h4>'+collection+'</div>'), 2),
+                 ('format', question('q-what-data', formatting), 2),
+                 ('quality', question('q-quality-control', quality), 2),
+                 ('naming', question('q-docs-metadata', naming), 1),
+                 ('personal', question('q-personal-data', personal), 1),
+                 ('ethics', question('q-ethical-issues', '<p>General prose.</p><div class="answer-detail">'+detail.format('ethics-authored')+'</div>'), 1),
+                 ('wrong-owner', question('q-other', collection+personal), 0),
+                 ('authored-lookalike', question('q-what-data', '<div class="answer-detail">'+collection+'</div>'), 0),
+                 ('unmarked', question('q-quality-control', quality.replace(' reading-record','')), 0),
+                 ('wrong-role', question('q-quality-control', quality.replace('data-reading-record="quality"','data-reading-record="format"')), 0)]
+        script = '''import contextlib,io,json,sys
+p=json.load(sys.stdin);results=[]
+for lua in ['',p['lua']]:
+ sys.stdin=io.StringIO(json.dumps(dict(lua=lua,html=p['html'])))
+ out=io.StringIO()
+ with contextlib.redirect_stdout(out): exec(p['runner'],{})
+ results.append(json.loads(out.getvalue()))
+print(json.dumps(results))
+'''
+        payload = dict(lua=(ROOT/'src/word/preservation-reading.lua').read_text(), runner=RUNNER,
+                       html=''.join('<div id="case-'+name+'">'+body+'</div>' for name,body,_ in cases))
+        before, after = json.loads(subprocess.check_output(
+            ['docker','run','--rm','--pull=never','--network=none','--log-driver=none','-i',
+             '--entrypoint','python',IMAGE,'-c',script], input=json.dumps(payload).encode(), timeout=180))
+        def nodes(value, kind):
+            if isinstance(value, dict):
+                return ([value] if value.get('t') == kind else []) + sum((nodes(v, kind) for v in value.values()), [])
+            return sum((nodes(v, kind) for v in value), []) if isinstance(value, list) else []
+        for (name, _, count), left, right in zip(cases, before['blocks'], after['blocks']):
+            with self.subTest(case=name):
+                for kind in ('Str', 'Link', 'BulletList', 'Table'):
+                    self.assertEqual(nodes(left, kind), nodes(right, kind))
+                styles = [v for n in nodes(right, 'Div') for k,v in n['c'][0][2]
+                          if k == 'custom-style' and v.startswith('Pilot Reading ')]
+                self.assertEqual(count, len(styles))
+
     def test_frontmatter_question_boundary_does_not_force_a_cover_page(self):
         css = (ROOT / 'src/layout.css').read_text()
         self.assertIn('html body #dmp-content { break-before: auto; page-break-before: auto; }', css)
@@ -287,7 +343,10 @@ print(json.dumps(results))
                 '<ul><li>Keep the original record.</li><li>Record each correction.</li></ul>')
         def naming(fact='file-naming', marked=True, value=body):
             return '<div class="answer-detail' + (' short-naming-answer' if marked else '') + '" data-fact-id="' + fact + '">' + value + '</div>'
+        wrapped = body.replace('<p>Keep station_', '<div class="reading-detail" data-reading-detail="file-naming"><p>Keep station_') + '</div>'
         cases = [('file', naming(), 2), ('object', naming('object-naming'), 2),
+                 ('owned-wrapper', naming(value=wrapped), 2),
+                 ('wrong-wrapper', naming(value=wrapped.replace('data-reading-detail="file-naming"', 'data-reading-detail="other"')), 0),
                  ('unmarked', naming(marked=False), 0), ('wrong-owner', naming('other'), 0),
                  ('long', naming(value=body.replace('Keep station_YYYYMMDD.csv.', '中' * 81)), 0)]
         lua = (ROOT / 'src/word/pilot.lua').read_text()
@@ -1370,6 +1429,13 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 self.assertIsNone(budget_label.paragraph_format.line_spacing)
                 self.assertEqual(4, document.styles["Pilot Label"].paragraph_format.space_before.pt)
                 self.assertTrue(document.styles["Pilot Lead"].paragraph_format.keep_with_next)
+                for mode in ('Detail', 'Record'):
+                    for suffix in ('', ' Lead', ' Label'):
+                        style = document.styles['Pilot Reading ' + mode + suffix]
+                        self.assertAlmostEqual(4, style.paragraph_format.left_indent.mm, places=2)
+                        self.assertAlmostEqual(-4 if mode == 'Record' else 0,
+                                               style.paragraph_format.first_line_indent.mm, places=2)
+                        self.assertIsNone(style.paragraph_format.keep_together)
                 self.assertTrue(document.styles["Pilot Responsibility Summary"].paragraph_format.keep_together)
                 self.assertFalse(document.styles["Pilot Responsibility Summary"].paragraph_format.keep_with_next)
                 self.assertEqual('Body Text', document.styles["Pilot Responsibility Summary"].base_style.name)

@@ -13,12 +13,12 @@
         {# Q1 already identifies the dataset. Q4 needs actual quality facts,
            not another name-only block when its quality answer is missing. #}
         {% set datasetQuality %}
-          {% with qualityNameAlreadyRendered = true %}
+          {% with qualityNameAlreadyRendered = true, qualityReadingDetails = true %}
           {% include "src/quality-control.html.j2" with context %}
           {% endwith %}
         {% endset %}
         {% if datasetQuality|striptags|trim %}
-          <div class="quality-dataset" data-item-id="{{ pathPrefix }}">{{ datasetQuality }}</div>
+          <div class="quality-dataset reading-record" data-reading-record="quality" data-item-id="{{ pathPrefix }}">{{ datasetQuality }}</div>
         {% endif %}
       {% endfor %}
     {% endif %}
