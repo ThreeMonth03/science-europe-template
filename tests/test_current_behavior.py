@@ -265,6 +265,45 @@ class CurrentResponsibilityAnchorTests(unittest.TestCase):
                                              int(profile == 'review' and not (name and name.strip())))
                         self.assertFalse(document.xpath('.//script | .//img'))
 
+    def test_contributor_keep_hint_accepts_only_bounded_scalar_records(self):
+        from lxml import html
+        from check_responsibility_reading import contributor_replies
+        from current_support import PREFIX, path
+
+        filename = 'src/contributors.html.j2'
+        source = (ROOT / filename).read_text()
+        self.assertEqual(1, source.count(' short-contributor'))
+        cases = [
+            ('plain', 'Original Institute.', True),
+            ('linked', '<a href="https://example.org/?a=1&amp;b=2">Original Institute.</a>', True),
+            ('inline', '<span><strong>Original Institute.</strong></span>', True),
+            ('three-breaks', 'Original<br>Institute<br>Division', True),
+            ('affiliation-list', '<ul>' + ''.join('<li>Original ' + str(i) + '</li>' for i in range(30)) + '</ul>', False),
+            ('ordered-list', '<ol><li>Original Institute.</li></ol>', False),
+            ('paragraph', '<div><p>Original paragraph.</p></div>', False),
+            ('pre', '<pre>Original\ncode.</pre>', False),
+            ('image', '<img src="unfetched.png" alt="Original diagram">', False),
+            ('long-latin', 'x' * 601, False),
+            ('long-cjk', '中' * 301, False),
+            ('four-breaks', 'Original<br>Institute<br>Division<br>Team', False),
+        ]
+        for escape in [False, True]:
+            templates = [environment(ROOT, escape, overrides).from_string(PREFIX + "{% include '" + filename + "' %}")
+                         for overrides in [None, {filename: source.replace(' short-contributor', '', 1)}]]
+            for name, affiliation, selected in cases:
+                with self.subTest(autoescape=escape, case=name):
+                    replies = contributor_replies([('person', 'Original person', [])])
+                    replies[path('adminDetailsCUuid', 'contributorsQUuid', 'person', 'contributorAffiliationQUuid')] = {
+                        'value': {'value': {'type': 'IntegrationType', 'value': affiliation, 'raw': None}}}
+                    context = dict(repliesMap=replies, output_profile='review',
+                                   dc={'project': {'created_by': None}, 'e': {'choices': {}}})
+                    actual, baseline = [template.render(**context) for template in templates]
+                    self.assertEqual(baseline, actual.replace(' short-contributor', ''))
+                    document = html.fragment_fromstring(actual, create_parent=True)
+                    record, = document.xpath('.//div[@id="dmp-contributors"]/ul/li')
+                    self.assertEqual(selected, 'short-contributor' in record.get('class').split())
+                    self.assertIn('Original person', ''.join(record.itertext()))
+
 
 class CurrentBehaviorTests(unittest.TestCase):
     pass

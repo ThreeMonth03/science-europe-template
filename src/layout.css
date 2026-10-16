@@ -103,9 +103,12 @@ html body .dataset-source { font-size: 9pt; }
 html body #q-how-data .dataset-list > .dataset-section > .dataset-source-context.short-dataset-source[data-source-kind="nonreuse"] > p.nonreuse-summary:first-child:has(+ p.dataset-source[data-fact-id="dataset-source"][data-status="complete"]),
 html body #q-how-data .dataset-list > .dataset-section > .dataset-source-context.short-dataset-source[data-source-kind="non-reference"] > p[data-fact-id="reuse-decision"][data-status="complete"]:first-child:has(+ p[data-fact-id="dataset-source"][data-status="complete"]) { break-after: avoid; }
 html body #q-how-data .dataset-source-context.short-dataset-source > p[data-fact-id="dataset-source"][data-status="complete"] { break-inside: avoid; }
+/* A reused reference may put contact details before its source. Attach only
+   this short source boundary, without keeping the entire authored contact. */
+html body #q-how-data .dataset-list > .dataset-section > div[data-fact-id="reuse-decision"][data-status="complete"] > .dataset-source-context.short-dataset-source[data-source-kind="reference"]:first-child { break-before: avoid; }
 /* Only the bounded direct Q6 tail attaches to its optional Q5 reference. */
 html body #q-access-security.question > .answer.short-security-reference-tail > p:has(+ .security-answer-reference.short-security-reference:last-child) { break-after: avoid; }
-html body #q-access-security.question > .answer > .security-answer-reference.short-security-reference { break-inside: avoid; }
+html body #q-access-security.question > .answer > .security-answer-reference.short-security-reference { break-before: avoid; break-inside: avoid; }
 html body .dataset-version { margin: .4em 0; overflow-wrap: anywhere; word-break: break-word; }
 html body .dataset-version th { width: 15%; font-weight: normal; }
 html body .dataset-version p { margin-bottom: .2em; }

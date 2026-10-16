@@ -1124,6 +1124,47 @@ local function keep_short_dataset_sources(div)
     end
     return links <= 1
   end
+  local function ordinary(items)
+    for _, inline in ipairs(items) do
+      if inline.t == "Link" and inline.identifier == "" and #inline.classes == 0 and
+         #inline.attributes == 0 and inline.title == "" and inline.target ~= "" then
+        if not plain(inline.content, false) then return false end
+      elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return false end
+    end
+    return true
+  end
+  local function reference_tail(holder, decision)
+    if not holder or holder.t ~= "Div" or holder.identifier ~= "" or #holder.classes ~= 1 or
+       holder.classes[1] ~= "answer-detail" or #holder.attributes ~= 2 or
+       holder.attributes["fact-id"] ~= "reuse-rightsholder" or holder.attributes["status"] ~= "complete" or
+       #holder.content == 0 or decision.t ~= "Div" or decision.identifier ~= "" or #decision.classes ~= 0 or
+       #decision.attributes ~= 2 or decision.attributes["fact-id"] ~= "reuse-decision" or
+       decision.attributes["status"] ~= "complete" then return end
+    local context = decision.content[1]
+    if not context or context.t ~= "Div" or context.identifier ~= "" or #context.classes ~= 2 or
+       not context.classes:includes("dataset-source-context") or not context.classes:includes("short-dataset-source") or
+       #context.attributes ~= 1 or context.attributes["source-kind"] ~= "reference" or #context.content ~= 1 or
+       not source(context.content[1]) then return end
+    local last, kept
+    for index, block in ipairs(holder.content) do
+      local style = block.t == "Div" and block.identifier == "" and #block.classes == 0 and
+        #block.attributes == 1 and #block.content == 1 and block.attributes["custom-style"] or nil
+      if index == 1 and style == "Pilot Label" and block.content[1].t == "Para" and
+         #block.content[1].content == 1 and block.content[1].content[1].t == "Strong" and
+         plain(block.content[1].content[1].content, false) then
+        last, kept = nil, nil
+      else
+        if style == "Pilot Lead" then block = block.content[1] end
+        if block.t ~= "Para" or not ordinary(block.content) or display_width(block) == 0 then return end
+        last, kept = block, style == "Pilot Lead"
+      end
+    end
+    if last and not kept and display_width(last) <= 240 and display_width({last, context.content[1]}) <= 400 then
+      -- Earlier rights-holder paragraphs remain untouched and free to flow.
+      holder.content[#holder.content] = pandoc.Div({last}, pandoc.Attr("", {}, {["custom-style"]="Pilot Lead"}))
+      changed = true
+    end
+  end
   local function dataset_list(list)
     if list.t ~= "Div" or list.identifier ~= "" or #list.classes ~= 1 or list.classes[1] ~= "dataset-list" or
        #list.attributes ~= 0 or #list.content > 64 then return end
@@ -1131,7 +1172,8 @@ local function keep_short_dataset_sources(div)
       if dataset.t == "Div" and dataset.identifier == "" and #dataset.classes == 1 and
          dataset.classes[1] == "dataset-section" and #dataset.attributes == 1 and
          dataset.attributes["item-id"] and dataset.attributes["item-id"] ~= "" then
-        for _, context in ipairs(dataset.content) do
+        for index, context in ipairs(dataset.content) do
+          reference_tail(dataset.content[index - 1], context)
           if context.t == "Div" and context.identifier == "" and #context.classes == 2 and
              context.classes:includes("dataset-source-context") and context.classes:includes("short-dataset-source") and
              #context.attributes == 1 and #context.content >= 2 and #context.content <= 3 then

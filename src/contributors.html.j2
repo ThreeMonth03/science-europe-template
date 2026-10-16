@@ -51,9 +51,14 @@
         <br>{{ pgettext("contributors", "Affiliation:") }} <span class="affiliation">{{ macros.integrationROR(contributor.affiliation) }}</span>
       {%- endif %}
     {% endset %}
-    {% set contributorBound = namespace(width=0) %}
+    {% set contributorBound = namespace(width=0, scalar=true, breaks=0) %}
     {% for character in (contributorContent|striptags).split()|join(' ') %}{% set contributorBound.width = contributorBound.width + (2 if character >= '⺀' else 1) %}{% endfor %}
-    <li class="contributor{% if 0 < contributorBound.width <= 600 and '<table' not in contributorContent and '<img' not in contributorContent %} short-contributor{% endif %}">{{ contributorContent }}</li>
+    {% for fragment in contributorContent.split('<')[1:] %}
+      {% set tag = fragment.split('>', 1)[0].split()|first|default('') %}
+      {% if tag in ['br', 'br/'] %}{% set contributorBound.breaks = contributorBound.breaks + 1 %}
+      {% elif tag not in ['span', '/span', 'strong', '/strong', 'a', '/a'] %}{% set contributorBound.scalar = false %}{% endif %}
+    {% endfor %}
+    <li class="contributor{% if 0 < contributorBound.width <= 600 and contributorBound.scalar and contributorBound.breaks <= 3 %} short-contributor{% endif %}">{{ contributorContent }}</li>
   {% endfor %}
   </ul>
   {%- elif dc.project.created_by -%}

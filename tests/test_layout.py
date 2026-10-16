@@ -455,6 +455,12 @@ with tempfile.TemporaryDirectory() as tmp:
                 '<div class="answer short-security-reference-tail"><p>Earlier fact.</p>' + tail + ref + '</div></div>')
         def people(body='<span class="name"><strong>範例人員</strong></span><br><a href="mailto:a@example.org">a@example.org</a><br>Roles: Researcher<br>Affiliation: Institute.'):
             return '<div id="dmp-contributors"><h2>People</h2><ul><li>' + body + '</li></ul></div>'
+        def reference_source(body='<p><strong>Data rights holder and contact information</strong></p><p>Contact <a href="https://example.org/contact?a=1&amp;b=2">Original owner</a>.</p>', location=source):
+            return ('<div id="q-how-data" class="question" data-requirement-id="SE-1a"><h3>1. Data?</h3>'
+                '<div class="answer"><div class="dataset-list"><div class="dataset-section" data-item-id="a"><h5>Dataset</h5>'
+                '<div class="answer-detail" data-fact-id="reuse-rightsholder" data-status="complete">' + body + '</div>'
+                '<div data-fact-id="reuse-decision" data-status="complete"><div class="dataset-source-context short-dataset-source" '
+                'data-source-kind="reference">' + location + '</div><p>Original later policy.</p></div></div></div></div></div>')
         cases = [(q1(), 1), (q1('固定決策。'), 1), (q1('x'*240, '<p>'+'y'*160+'</p>'), 1),
             (q1('中'*120, '<p>'+'文'*80+'</p>'), 1), (q1('x'*241), 0),
             (q1(location='<p>'+'中'*81+'</p>'), 0), (q1(marked=False), 0),
@@ -467,6 +473,26 @@ with tempfile.TemporaryDirectory() as tmp:
             (people('x'*601), 0), (people('中'*301), 0), (people('a<br>b<br>c<br>d<br>e'), 0),
             (people('<span>a<br>b<br>c<br>d<br>e</span>'), 0),
             (people('<em>Authored emphasis.</em>'), 0), (people().replace('dmp-contributors', 'other'), 0)]
+        reference_cases = [(reference_source(), 1), (reference_source('<p>聯絡<a href="mailto:a@example.org">原始權利人</a>。</p>'), 1),
+            (reference_source('<p>'+'x'*240+'</p>', '<p>'+'y'*160+'</p>'), 1),
+            (reference_source('<p>'+'中'*120+'</p>', '<p>'+'文'*80+'</p>'), 1),
+            (reference_source('<p>'+'Earlier authored prose. '*100+'</p><p>Original short final paragraph.</p>'), 1),
+            (reference_source('<div custom-style="Pilot Lead"><p>Already kept.</p></div>'), 0),
+            (reference_source('<p>'+'x'*241+'</p>'), 0), (reference_source('<p>'+'中'*121+'</p>'), 0),
+            (reference_source('<p><em>Original rich paragraph.</em></p>'), 0),
+            (reference_source('<p><a href="https://example.org"><em>Original rich link.</em></a></p>'), 0),
+            (reference_source('<div><p>Original nested paragraph.</p></div>'), 0),
+            (reference_source('<ul><li>Original list.</li></ul>'), 0),
+            (reference_source('<table><tr><td>Original table.</td></tr></table>'), 0),
+            (reference_source().replace('reuse-rightsholder', 'other-owner'), 0),
+            (reference_source().replace('data-fact-id="reuse-decision"', 'class="unknown" data-fact-id="reuse-decision"'), 0),
+            (reference_source().replace('data-fact-id="reuse-rightsholder"', 'data-extra="x" data-fact-id="reuse-rightsholder"'), 0),
+            (reference_source().replace('data-source-kind="reference"', 'data-source-kind="non-reference"'), 0),
+            (reference_source().replace('short-dataset-source', 'unmarked'), 0),
+            (reference_source(location='<p>'+'中'*81+'</p>'), 0),
+            (reference_source().replace('<div class="dataset-source-context', '<p>Intervening paragraph.</p><div class="dataset-source-context'), 0)]
+        reference_start = len(cases)
+        cases += reference_cases
         lua = (ROOT/'src/word/pilot.lua').read_text()
         calls = ['  if div.identifier == "q-how-data" then return keep_short_dataset_sources(div) end',
                  '  if div.identifier == "q-access-security" then return keep_short_security_reference(div) end',
@@ -498,6 +524,16 @@ print(json.dumps(result))'''
                     self.assertEqual(1, len(value['c'][1])); return normalize(value['c'][1][0])
                 return {k:('Para' if k=='t' and v=='Plain' else normalize(v)) for k,v in value.items()}
             return [normalize(v) for v in value] if isinstance(value, list) else value
+        def rights_holder(value):
+            if isinstance(value, dict):
+                if value.get('t') == 'Div' and ['fact-id', 'reuse-rightsholder'] in value['c'][0][2]: return value
+                for child in value.values():
+                    found = rights_holder(child)
+                    if found is not None: return found
+            elif isinstance(value, list):
+                for child in value:
+                    found = rights_holder(child)
+                    if found is not None: return found
         for mode, old, new in [('json',*results[:2]), ('docx',*results[2:])]:
             self.assertEqual(len(cases), len(new['blocks']))
             for i, ((_, expected), left, right) in enumerate(zip(cases,old['blocks'],new['blocks'])):
@@ -505,6 +541,11 @@ print(json.dumps(result))'''
                     self.assertEqual(expected, count(right)-count(left))
                     self.assertEqual(normalize(left), normalize(right))
                     if not expected: self.assertEqual(left,right)
+                    elif i >= reference_start:
+                        before_holder, after_holder = rights_holder(left), rights_holder(right)
+                        self.assertEqual(before_holder['c'][1][:-1], after_holder['c'][1][:-1])
+                        self.assertEqual(after_holder['c'][1][-1], {'t':'Div', 'c':[
+                            ['',[],[['custom-style','Pilot Lead']]], [before_holder['c'][1][-1]]]})
 
     def test_question_hierarchy_is_scoped_without_smaller_body_text(self):
         css = (ROOT/'src/layout.css').read_text()
