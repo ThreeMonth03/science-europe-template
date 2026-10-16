@@ -1351,10 +1351,6 @@ function Div(div)
     end
     return div
   end
-  if div.identifier == "dmp-content" and FORMAT == "docx" then
-    div.content:insert(1, pandoc.RawBlock("openxml", '<w:p><w:r><w:br w:type="page"/></w:r></w:p>'))
-    return div
-  end
   if div.classes:includes("dataset-policy") then
     local blocks, inlines = pandoc.List(), pandoc.List()
     local function flush()

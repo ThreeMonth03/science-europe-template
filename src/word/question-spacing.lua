@@ -88,23 +88,16 @@ local function empty_sections(div)
   if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end
   if div.classes:includes("answer") or div.classes:includes("answer-detail") or div.classes:includes("abstract") then return div, false end
   if div.identifier ~= "dmp-content" then return nil end
-  -- pilot.lua inserts exactly this page break before the six sections in DOCX.
-  -- JSON has no prefix; do not skip arbitrary raw blocks or authored paragraphs.
-  local offset = 0
-  if FORMAT == "docx" then
-    local first = div.content[1]
-    if not first or first.t ~= "RawBlock" or first.format ~= "openxml" or
-        first.text ~= '<w:p><w:r><w:br w:type="page"/></w:r></w:p>' then return div, false end
-    offset = 1
-  end
-  if #div.classes ~= 0 or #div.attributes ~= 0 or #div.content ~= #sections + offset then return div, false end
+  -- Both formats have exactly the six owned sections. Do not skip arbitrary
+  -- raw blocks or authored paragraphs at the frontmatter boundary.
+  if #div.classes ~= 0 or #div.attributes ~= 0 or #div.content ~= #sections then return div, false end
   -- Reject an unknown/reordered root before adding any markers.
   for i, expected in ipairs(sections) do
-    local section = div.content[i + offset]
+    local section = div.content[i]
     if section.t ~= "Div" or section.identifier ~= expected[1] then return div, false end
   end
   for i, expected in ipairs(sections) do
-    local section = div.content[i + offset]
+    local section = div.content[i]
     -- Pandoc preserves an HTML <section> as a Div with its synthetic section class.
     local eligible = #section.classes == 2 and section.classes[1] == "section" and section.classes[2] == "dmp-section" and
       #section.attributes == 0 and #section.content == #expected[2] + 1 and plain_heading(section.content[1], 2)

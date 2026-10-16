@@ -58,7 +58,9 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         for previous in list(props.findall(qn("w:lang"))):
             props.remove(previous)
         lang = OxmlElement("w:lang")
-        lang.set(qn("w:val"), "zh-TW" if language == "zh-Hant" else "en-GB")
+        # Western and East Asian runs have separate language attributes. Marking
+        # Latin as Chinese allows word-internal breaks in mixed-language DOCX.
+        lang.set(qn("w:val"), "en-GB")
         lang.set(qn("w:eastAsia"), "zh-TW")
         props.append(lang)
     # Links remain identifiable without colouring headings or ordinary lists.
@@ -69,12 +71,16 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         if name in document.styles:
             item = document.styles[name]
             item.font.size = Pt(10.5)
-            # CJK font metrics already include generous lead. Relative 0.9
-            # renders about 17.4 pt at 10.5 pt in the checked LibreOffice route;
-            # unlike exact height it still adapts to taller runs and equations.
+            # A relative CJK adjustment also compresses pure-Latin answers.
+            # Minimum leading keeps those readable while allowing taller CJK
+            # runs and equations to expand; never clip them with exact height.
             # Normal shares the body rule so Pandoc's first/table paragraphs
             # cannot silently use a different baseline from ordinary answers.
-            item.paragraph_format.line_spacing = 0.9 if language == "zh-Hant" else 1.2
+            if language == "zh-Hant":
+                item.paragraph_format.line_spacing = Pt(13.5)
+                item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
+            else:
+                item.paragraph_format.line_spacing = 1.2
             item.paragraph_format.space_before = Pt(0)
             item.paragraph_format.space_after = Pt(2 if name == "Compact" else 4)
             item.paragraph_format.widow_control = True

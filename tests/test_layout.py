@@ -18,6 +18,76 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_frontmatter_question_boundary_does_not_force_a_cover_page(self):
+        css = (ROOT / 'src/layout.css').read_text()
+        self.assertIn('html body #dmp-content { break-before: auto; page-break-before: auto; }', css)
+        self.assertNotIn('#dmp-content { break-before: page;', css)
+        # The XML helper must accept the flowing boundary and leave authored
+        # breaks intact, not turn the first section into a mandatory new page.
+        bookmark = '<w:bookmarkStart w:id="1" w:name="dmp-content" />\n    '
+        heading = '<w:p><w:pPr><w:pStyle w:val="Heading2" /></w:pPr><w:r><w:t>Original section</w:t></w:r></w:p>'
+        page_break = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>\n    '
+        for escape in (False, True):
+            template = Environment(loader=FileSystemLoader(ROOT), undefined=StrictUndefined,
+                autoescape=escape).get_template('src/word/short-tables.xml')
+            for explicit in ('', page_break):
+                with self.subTest(escape=escape, explicit_break=bool(explicit)):
+                    source = bookmark + explicit + heading
+                    self.assertEqual(source, template.render(content=source))
+
+    def test_flowing_word_root_still_classifies_only_owned_empty_sections(self):
+        from native_support import IMAGE
+        sections = [
+            ('sec-data-collection', ['q-how-data', 'q-what-data']),
+            ('sec-docs-metadata', ['q-docs-metadata', 'q-quality-control']),
+            ('sec-storage-backup', ['q-store-backup', 'q-access-security']),
+            ('sec-ethics-legal', ['q-personal-data', 'q-copyright-ipr', 'q-ethical-issues']),
+            ('sec-sharing-preservation', ['q-share-restrictions', 'q-data-preservation', 'q-access-data', 'q-persistent-identifier']),
+            ('sec-responsibilities-resources', ['q-dm-responsible', 'q-required-resources']),
+        ]
+        policy = '<div class="workspace-policy dataset-policy"><div class="reading-gap"></div><div class="reading-gap"></div></div>'
+        parts = ['<section id="' + sid + '" class="dmp-section"><h2>Original section</h2>' +
+            ''.join('<div id="' + qid + '" class="question compact-empty-question"><h3>Original question</h3>'
+                '<div class="answer">' + (policy if qid == 'q-store-backup' else '') + '</div></div>'
+                for qid in questions) + '</section>' for sid, questions in sections]
+        content = ''.join(parts)
+        cases = [
+            ('all-empty', content, 6, ''),
+            ('answered-first', content.replace('<div class="answer"></div>', '<div class="answer"><p>Original answer.</p></div>', 1), 5, ''),
+            ('authored-prefix', '<p>Original prefix.</p>' + content, 0, ''),
+            ('reordered', parts[1] + parts[0] + ''.join(parts[2:]), 0, ''),
+            ('unowned-root', content, 0, ' class="other"'),
+            ('authored-policy', content.replace(policy, policy.replace('<div class="reading-gap"></div>', '<div class="reading-gap"><p>Original policy.</p></div>', 1)), 5, ''),
+        ]
+        runner = '''import json,sys,tempfile,subprocess
+from pathlib import Path
+p=json.load(sys.stdin); results=[]
+with tempfile.TemporaryDirectory() as tmp:
+ for mode in ['json','docx']:
+  args=['pandoc','--from=html','--to=json']
+  for name in ['pilot','spacing']:
+   f=Path(tmp)/(name+'.lua');f.write_text('FORMAT="'+mode+'"\\n'+p[name]);args.append('--lua-filter='+str(f))
+  for name,content,count,attrs in p['cases']:
+   source='<div id="dmp-content"'+attrs+'>'+content+'</div>'
+   results.append([mode,name,count,json.loads(subprocess.check_output(args,input=source.encode()))])
+print(json.dumps(results))
+'''
+        payload = {'pilot': (ROOT / 'src/word/pilot.lua').read_text(),
+            'spacing': (ROOT / 'src/word/question-spacing.lua').read_text(), 'cases': cases}
+        result = json.loads(subprocess.check_output(
+            ['docker', 'run', '--rm', '--pull=never', '--network=none', '--log-driver=none', '-i',
+             '--entrypoint', 'python', IMAGE, '-c', runner], input=json.dumps(payload).encode(), timeout=180))
+        for mode, name, count, document in result:
+            with self.subTest(mode=mode, case=name):
+                serialized = json.dumps(document)
+                self.assertEqual(count, serialized.count('DSW:SE:empty-section:v1:begin'))
+                self.assertEqual(15, serialized.count('"Header", "c": [3,'))
+                self.assertEqual(15, serialized.count('"Str", "c": "question"'))
+                self.assertNotIn('w:type=\\"page\\"', serialized)
+                if name == 'answered-first': self.assertIn('answer.', serialized)
+                if name == 'authored-prefix': self.assertIn('prefix.', serialized)
+                if name == 'authored-policy': self.assertIn('policy.', serialized)
+
     def test_word_marked_iso_dates_bind_every_character_without_touching_other_text(self):
         import base64
         from native_support import IMAGE, WORD_RUNNER
@@ -1088,8 +1158,11 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 for style_name in ("Normal", "Body Text", "First Paragraph", "Compact"):
                     item = document.styles[style_name]
                     self.assertEqual(10.5, item.font.size.pt)
-                    self.assertEqual(0.9, item.paragraph_format.line_spacing)
-                    self.assertEqual(WD_LINE_SPACING.MULTIPLE, item.paragraph_format.line_spacing_rule)
+                    self.assertEqual(13.5, item.paragraph_format.line_spacing.pt)
+                    self.assertEqual(WD_LINE_SPACING.AT_LEAST, item.paragraph_format.line_spacing_rule)
+                    lang = item.element.rPr.find(qn('w:lang'))
+                    self.assertEqual('en-GB', lang.get(qn('w:val')))
+                    self.assertEqual('zh-TW', lang.get(qn('w:eastAsia')))
                     self.assertEqual(2 if style_name == "Compact" else 4, item.paragraph_format.space_after.pt)
                     self.assertTrue(item.paragraph_format.widow_control)
                 for level in range(1, 6):
@@ -1125,3 +1198,52 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 self.assertEqual(WD_LINE_SPACING.MULTIPLE, d.styles[name].paragraph_format.line_spacing_rule)
                 self.assertEqual(10.5, d.styles[name].font.size.pt)
             self.assertEqual('en-GB', d.styles['Normal'].element.rPr.find(qn('w:lang')).get(qn('w:val')))
+
+    def test_runtime_locale_styles_match_prepared_reference(self):
+        import base64
+        from xml.etree import ElementTree as E
+        from jinja2 import UndefinedError
+        from native_support import IMAGE
+        references = []
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            font = root / 'font.ttf'; font.write_bytes(b'fixture font asset')
+            for language in ('en', 'zh-Hant'):
+                folder = root / language
+                (folder / 'src/word').mkdir(parents=True)
+                for relative in ('src/layout.css', 'src/word/reference.docx'):
+                    shutil.copyfile(ROOT / relative, folder / relative)
+                module.prepare_layout(folder, font, language)
+                references.append(base64.b64encode((folder / 'src/word/reference.docx').read_bytes()).decode())
+        runner = '''import base64,json,sys,tempfile,subprocess,zipfile
+from pathlib import Path
+styles=[]
+with tempfile.TemporaryDirectory() as tmp:
+ ref=Path(tmp)/'reference.docx';out=Path(tmp)/'test.docx'
+ for value in json.load(sys.stdin):
+  ref.write_bytes(base64.b64decode(value))
+  subprocess.run(['pandoc','--from=html','--to=docx','--reference-doc='+str(ref),'-o',str(out)],input=b'<h1>Title</h1><p>Mixed English and Chinese.</p>',check=True)
+  with zipfile.ZipFile(out) as z: styles.append(z.read('word/styles.xml').decode())
+print(json.dumps(styles))
+'''
+        english, chinese = json.loads(subprocess.check_output(
+            ['docker', 'run', '--rm', '--pull=never', '--network=none', '--log-driver=none', '-i',
+             '--entrypoint', 'python', IMAGE, '-c', runner], input=json.dumps(references).encode(), timeout=180))
+        # A Pandoc/author-added style must survive, including its own language.
+        custom = '<w:style w:type="paragraph" w:styleId="CustomAuthor"><w:rPr><w:lang w:val="fr-FR" /></w:rPr></w:style>'
+        english = english.replace('</w:styles>', custom + '</w:styles>')
+        chinese = chinese.replace('</w:styles>', custom + '</w:styles>')
+        for escape in (False, True):
+            template = Environment(loader=FileSystemLoader(ROOT), undefined=StrictUndefined,
+                autoescape=escape).get_template('src/word/locale-styles.xml.j2')
+            for language in ('en', 'zh-Hant'):
+                rendered = template.render(content=english, ctx={'document': {'language': language}})
+                self.assertIn(custom, rendered)
+                if language == 'en':
+                    self.assertEqual(english, rendered)
+                else:
+                    self.assertEqual(E.canonicalize(chinese), E.canonicalize(rendered))
+            for broken in (english.replace('w:styleId="Normal"', 'w:styleId="RenamedNormal"'),
+                           english.replace('w:line="288"', 'w:line="287"')):
+                with self.assertRaises(UndefinedError):
+                    template.render(content=broken, ctx={'document': {'language': 'zh-Hant'}})

@@ -55,8 +55,8 @@
   {%- set section_parts = section_piece.split(section_end) -%}
   {{- require_section(section_parts|length == 2) -}}
   {%- set section_heading = section_parts[0] -%}
-  {# The shared Word helper gives only the first section a page break. Preserve
-     that property when also compacting an entirely unanswered section. #}
+  {# Preserve an explicit heading break if present; the template does not add
+     one at the frontmatter boundary. #}
   {%- if '<w:pageBreakBefore/>' in section_heading -%}
     {%- set section_property = section_property.replace('</w:pPr>', '<w:pageBreakBefore/></w:pPr>') -%}
     {%- set section_replacement = section_replacement.replace('<w:spacing', '<w:pageBreakBefore/><w:spacing'|safe) -%}
