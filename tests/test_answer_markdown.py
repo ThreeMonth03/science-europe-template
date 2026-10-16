@@ -86,7 +86,7 @@ class AnswerMarkdownTests(unittest.TestCase):
         from current_support import PREFIX, environment, path
         from jinja2 import Undefined
         detail = path('dataset-a', 'producedDataDescriptionQUuid')
-        cases = [('無祀祠的點位', '<p>無祀祠的點位</p>', True),
+        cases = [('觀測站的點位', '<p>觀測站的點位</p>', True),
                  ('0', '<p>0</p>', True),
                  ('A<B&C>D', '<p>A&lt;B&amp;C&gt;D</p>', True),
                  ('Long ' * 30, '<p>' + 'Long ' * 30 + '</p>', False),

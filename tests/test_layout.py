@@ -18,6 +18,79 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_q6_policy_keep_changes_only_bounded_metadata_not_authored_or_next_item(self):
+        import base64
+        from bs4 import BeautifulSoup
+        from native_support import IMAGE, WORD_RUNNER
+        from current_support import PREFIX, environment, path
+        listing = path('adminDetailsCUuid', 'policiesProceduresQUuid')
+        cases = [
+            ('short-en', 'Policy <A> & B', 'https://example.org/?a=1&b=2', '<p>Original short description.</p>', 1),
+            ('short-zh', 'CC BY-NC 4.0', 'https://creativecommons.org/licenses/by-nc-sa/4.0/', '<p>本資料可供非商業研究使用，引用時請註明來源。</p>', 1),
+            ('name-only', 'Policy', '', '<p>Original short description.</p>', 1),
+            ('url-only', '', 'https://example.org/', '<p>Original short description.</p>', 1),
+            ('boundary', 'Policy', '', '<p>' + '中' * 80 + '</p>', 1),
+            ('long', 'Policy', '', '<p>' + '中' * 81 + '</p>', 0),
+            ('long-metadata', '中' * 81, '', '<p>Original short description.</p>', 0),
+            ('rich', 'Policy', '', '<p>Keep <a href="https://example.org/">original link</a>.</p>', 0),
+            ('table-first', 'Policy', '', '<table><tr><td>Original table.</td></tr></table>', 0),
+            ('multiple', 'Policy', '', '<p>Original first.</p><p>Original second.</p>', 0),
+            ('description-only', '', '', '<p>Original short description.</p>', 0),
+            ('metadata-only', 'Policy', 'https://example.org/', '', 0),
+            ('authored-item', '', '', '<div class="policy-item short-policy-item" data-item-id="fake">Fake metadata<p>Keep original.</p></div>', 0),
+        ]
+        bodies, expected = [], 0
+        for escape in (False, True):
+            template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/06-access-security.html.j2' %}")
+            for profile in ('review', 'submission'):
+                for name, title, link, description, keeps in cases:
+                    replies = {listing: ['blank-policy', 'original-policy']}
+                    for field, value in [('Name', title), ('Link', link), ('Description', description)]:
+                        replies[path(listing, 'original-policy', 'policiesProcedures' + field + 'QUuid')] = value
+                    body = template.render(repliesMap=replies, output_profile=profile)
+                    if description: self.assertIn(description, body)
+                    soup = BeautifulSoup(body, 'html.parser')
+                    answer = soup.select_one('.answer')
+                    owners = soup.select('.answer > ul > li > .policy-item[data-item-id="original-policy"]')
+                    self.assertEqual(bool(keeps), bool(owners))
+                    self.assertEqual('1' if keeps else None, answer.get('data-short-policy-positions'))
+                    if name == 'table-first': self.assertTrue(soup.select('.answer > ul > li > strong:first-child:has(+ table)'))
+                    bodies.append(body); expected += keeps
+                    if name == 'short-en':
+                        bodies += [body.replace('id="q-access-security"', 'id="q-other"'),
+                                   '<div class="answer-detail">' + body + '</div>']
+                        replies[listing].append('other-policy')
+                        for field, value in [('Name', title), ('Link', link), ('Description', description)]:
+                            replies[path(listing, 'other-policy', 'policiesProcedures' + field + 'QUuid')] = value
+                        pair = template.render(repliesMap=replies, output_profile=profile)
+                        self.assertEqual(BeautifulSoup(pair, 'html.parser').select_one('.answer')['data-short-policy-positions'], '1 2')
+                        bodies.append(pair); expected += 2
+        reading = (ROOT / 'src/word/preservation-reading.lua').read_text()
+        call = 'elseif id == "q-access-security" then policy(block, answer.attributes["short-policy-positions"] or "")'
+        self.assertEqual(reading.count(call), 1)
+        common = 'common=["pandoc","--from=html","--lua-filter="+str(f)]'
+        runner = WORD_RUNNER.replace(common, 'g=Path(tmp)/"reading.lua";g.write_text(p["reading"])\n '+common[:-1]+',"--lua-filter="+str(g)]')
+        results = []
+        for source in (reading.replace(call, 'elseif id == "q-access-security" then -- baseline'), reading):
+            raw = subprocess.check_output(['docker', 'run', '--rm', '--pull=never', '--network=none',
+                '--log-driver=none', '-i', '--entrypoint', 'python', IMAGE, '-c', runner],
+                input=json.dumps(dict(lua=(ROOT / 'src/word/pilot.lua').read_text(), reading=source,
+                    html=''.join('<div>' + body + '</div>' for body in bodies),
+                    reference=base64.b64encode((ROOT / 'src/word/reference.docx').read_bytes()).decode())).encode(), timeout=180)
+            results.append(json.loads(raw)['paragraphs'])
+        self.assertEqual(len(results[0]), len(results[1]))
+        changed = 0
+        for before, after in zip(*results):
+            self.assertEqual(before['text'], after['text'])
+            self.assertEqual(before['other_xml'], after['other_xml'])
+            if before['style'] != after['style']:
+                self.assertEqual(after['style'], 'PilotListLead')
+                self.assertNotIn('Original short description.', after['text'])
+                changed += 1
+            elif 'Original short description.' == after['text']:
+                self.assertNotIn(after['style'], ['PilotLead', 'PilotListLead'])
+        self.assertEqual(changed, expected)
+
     def test_reading_indent_styles_only_owned_prose_not_lists_or_tables(self):
         from native_support import IMAGE, RUNNER
         def question(kind, body):

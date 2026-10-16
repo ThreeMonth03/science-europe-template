@@ -165,7 +165,7 @@ local function reading_question(question)
      question.classes:includes("abstract") then return question, false end
   local id = question.identifier
   if id ~= "q-what-data" and id ~= "q-docs-metadata" and id ~= "q-quality-control" and
-     id ~= "q-personal-data" and id ~= "q-ethical-issues" then return nil end
+     id ~= "q-access-security" and id ~= "q-personal-data" and id ~= "q-ethical-issues" then return nil end
   if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end
   local function prose(blocks, mode)
     for index, block in ipairs(blocks) do
@@ -230,8 +230,37 @@ local function reading_question(question)
       end
     end
   end
+  -- Only generated Q6 metadata leads its own short plain description. The
+  -- item wrapper prevents generic list keeps from chaining the next policy.
+  local function policy(list, positions)
+    if list.t ~= "BulletList" then return end
+    for index, item in ipairs(list.content) do
+      local owner = #item == 1 and item[1] or nil
+      if (" " .. positions .. " "):find(" " .. tostring(index) .. " ", 1, true) and
+         owner and known_div(owner, {"policy-item", "short-policy-item"}, {["item-id"]=true}) and
+         owner.attributes["item-id"] and owner.attributes["item-id"]:match("%S") and #owner.content == 2 then
+        local lead, description = owner.content[1], owner.content[2]
+        if (lead.t == "Plain" or lead.t == "Para") and description.t == "Para" and
+           plain(description.content) and width(lead) > 0 and width(lead) <= 160 and
+           width(description) > 0 and width(description) <= 160 then
+          local simple = true
+          for _, inline in ipairs(lead.content) do
+            if inline.t == "Str" or inline.t == "Space" or inline.t == "SoftBreak" then
+            elseif inline.t == "Strong" and plain(inline.content) then
+            elseif inline.t == "Span" and inline.identifier == "" and #inline.classes == 1 and
+                   inline.classes[1] == "separator" and #inline.attributes == 0 and plain(inline.content) then
+            else simple = false end
+          end
+          if simple then owner.content[1] = pandoc.Div({pandoc.Para(lead.content)},
+            pandoc.Attr("", {}, {["custom-style"]="Pilot List Lead"})) end
+        end
+      end
+    end
+  end
   for _, answer in ipairs(question.content) do
-    if known_div(answer, {"answer"}, {}) then
+    local policyAttributes = id == "q-access-security" and {["short-policy-positions"]=true} or {}
+    if known_div(answer, {"answer"}, policyAttributes) or
+       (id == "q-access-security" and known_div(answer, {"answer", "short-security-reference-tail"}, policyAttributes)) then
       for _, block in ipairs(answer.content) do
         if id == "q-what-data" then
           record(block, "collection")
@@ -243,6 +272,7 @@ local function reading_question(question)
           end
         elseif id == "q-quality-control" then record(block, "quality")
         elseif id == "q-docs-metadata" then naming(block)
+        elseif id == "q-access-security" then policy(block, answer.attributes["short-policy-positions"] or "")
         elseif id == "q-personal-data" and
                known_div(block, {"answer-detail", "reading-detail"},
                  {["fact-id"]=true, status=true, ["reading-detail"]=true}) and
