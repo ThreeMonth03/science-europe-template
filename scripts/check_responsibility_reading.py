@@ -79,7 +79,7 @@ def check(root, language):
                 paragraphs = node.select('.responsibility-summary')
                 assert len(paragraphs) == 1
                 assert paragraphs[0]['data-role-uuids'].split() == selected
-                assert paragraphs[0].get_text(strip=True) == separator.join(
+                assert paragraphs[0].get_text().strip() == separator.join(
                     sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES[language]) if role in roles).strip()
                 gaps = node.select('.data-gap')
                 assert len(gaps) == int(profile == 'review' and not (name and name.strip()))

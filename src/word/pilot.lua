@@ -56,14 +56,19 @@ function Table(tbl)
   return align_dataset_version(tbl)
 end
 
+-- Conservative display width shared by bounded short-paragraph guards.
+local function display_width(value)
+  local units = 0
+  for _, code in utf8.codes(pandoc.utils.stringify(value)) do
+    units = units + (code >= 0x2E80 and 2 or 1)
+  end
+  return units
+end
+
 -- Both automatic label paths need the same bound: bold authored paragraphs
 -- are still prose and must be free to paginate when they are long.
 local function short_automatic_lead(block)
-  local units = 0
-  for _, code in utf8.codes(pandoc.utils.stringify(block)) do
-    units = units + (code >= 0x2E80 and 2 or 1)
-  end
-  return units <= 160
+  return display_width(block) <= 160
 end
 
 function Para(paragraph)
@@ -1089,7 +1094,152 @@ local function separate_authored_resource_tables(div)
   return div
 end
 
+-- Q1 source contexts are marked outside gettext because HTML paragraph
+-- attributes do not survive Pandoc. Keep only a short fixed sentence with its
+-- own short source, never the source with another dataset or an authored tail.
+local function keep_short_dataset_sources(div)
+  if (FORMAT ~= "docx" and FORMAT ~= "json") or #div.classes ~= 1 or
+     div.classes[1] ~= "question" or #div.attributes ~= 1 or
+     div.attributes["requirement-id"] ~= "SE-1a" then return nil end
+  local changed = false
+  local function plain(items, reason)
+    for _, inline in ipairs(items) do
+      if reason and inline.t == "Span" and inline.identifier == "" and #inline.classes == 0 and
+         #inline.attributes == 2 and inline.attributes["fact-id"] == "nonreuse-reason" and
+         inline.attributes["status"] == "complete" then
+        if not plain(inline.content, false) then return false end
+      elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return false end
+    end
+    return true
+  end
+  local function source(block)
+    if block.t ~= "Para" or display_width(block) == 0 or display_width(block) > 160 then return false end
+    local links = 0
+    for _, inline in ipairs(block.content) do
+      if inline.t == "Link" and inline.identifier == "" and #inline.classes == 0 and #inline.attributes == 0 and
+         inline.title == "" and (inline.target:match("^https?://") or inline.target:match("^ftp://")) then
+        if not plain(inline.content, false) or pandoc.utils.stringify(inline) ~= inline.target then return false end
+        links = links + 1
+      elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return false end
+    end
+    return links <= 1
+  end
+  local function dataset_list(list)
+    if list.t ~= "Div" or list.identifier ~= "" or #list.classes ~= 1 or list.classes[1] ~= "dataset-list" or
+       #list.attributes ~= 0 or #list.content > 64 then return end
+    for _, dataset in ipairs(list.content) do
+      if dataset.t == "Div" and dataset.identifier == "" and #dataset.classes == 1 and
+         dataset.classes[1] == "dataset-section" and #dataset.attributes == 1 and
+         dataset.attributes["item-id"] and dataset.attributes["item-id"] ~= "" then
+        for _, context in ipairs(dataset.content) do
+          if context.t == "Div" and context.identifier == "" and #context.classes == 2 and
+             context.classes:includes("dataset-source-context") and context.classes:includes("short-dataset-source") and
+             #context.attributes == 1 and #context.content >= 2 and #context.content <= 3 then
+            local kind = context.attributes["source-kind"]
+            local lead, location = context.content[1], context.content[2]
+            if (kind == "nonreuse" or (kind == "non-reference" and #context.content == 2)) and
+               lead.t == "Para" and plain(lead.content, kind == "nonreuse") and display_width(lead) > 0 and
+               display_width(lead) <= 240 and source(location) and display_width({lead, location}) <= 400 then
+              context.content[1] = pandoc.Div({lead}, pandoc.Attr("", {}, {["custom-style"]="Pilot Lead"}))
+              changed = true
+            end
+          end
+        end
+      end
+    end
+  end
+  for _, answer in ipairs(div.content) do
+    if answer.t == "Div" and answer.identifier == "" and #answer.classes == 1 and
+       answer.classes[1] == "answer" and #answer.attributes == 0 then
+      for _, block in ipairs(answer.content) do
+        dataset_list(block)
+        -- The reference/non-reference lists share one template-owned neutral
+        -- container. Do not recurse into answer-detail or other authored Divs.
+        if block.t == "Div" and block.identifier == "" and #block.classes == 0 and #block.attributes == 0 and
+           block.content[1] and block.content[1].t == "Header" and block.content[1].level == 4 then
+          for _, child in ipairs(block.content) do dataset_list(child) end
+        end
+      end
+    end
+  end
+  if changed then return div end
+end
+
+-- Q6 may end in a short fixed paragraph and an optional Q5 reference. The HTML
+-- hint excludes authored tails; recheck the direct owned AST and both widths.
+-- Bind only that preceding paragraph, not the reference or the whole answer.
+local function keep_short_security_reference(div)
+  if (FORMAT ~= "docx" and FORMAT ~= "json") or #div.classes ~= 1 or div.classes[1] ~= "question" or
+     #div.attributes ~= 0 or #div.content ~= 2 or div.content[1].t ~= "Header" or
+     div.content[1].level ~= 3 then return nil end
+  local answer = div.content[2]
+  if answer.t ~= "Div" or answer.identifier ~= "" or #answer.classes ~= 2 or
+     not answer.classes:includes("answer") or not answer.classes:includes("short-security-reference-tail") or
+     #answer.attributes ~= 0 or #answer.content < 2 then return nil end
+  local reference = answer.content[#answer.content]
+  if reference.t ~= "Div" or reference.identifier ~= "" or #reference.classes ~= 2 or
+     not reference.classes:includes("security-answer-reference") or not reference.classes:includes("short-security-reference") or
+     #reference.attributes ~= 0 or #reference.content ~= 1 or reference.content[1].t ~= "Para" or
+     #reference.content[1].content ~= 1 then return nil end
+  local link = reference.content[1].content[1]
+  if link.t ~= "Link" or link.identifier ~= "" or #link.classes ~= 0 or #link.attributes ~= 0 or
+     link.target ~= "#q-store-backup" or link.title ~= "" then return nil end
+  local function plain(items)
+    for _, inline in ipairs(items) do
+      if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return false end
+    end
+    return true
+  end
+  local lead = answer.content[#answer.content - 1]
+  local already_kept = lead.t == "Div" and lead.identifier == "" and #lead.classes == 0 and
+    #lead.attributes == 1 and lead.attributes["custom-style"] == "Pilot Lead" and #lead.content == 1
+  if already_kept then lead = lead.content[1] end
+  if lead.t ~= "Para" or not plain(lead.content) or not plain(link.content) or display_width(lead) == 0 or
+     display_width(lead) > 160 or display_width(reference) == 0 or display_width(reference) > 160 or
+     display_width({lead, reference}) > 320 or already_kept then return nil end
+  answer.content[#answer.content - 1] = pandoc.Div({lead}, pandoc.Attr("", {}, {["custom-style"]="Pilot Lead"}))
+  return div
+end
+
+-- Frontmatter people are individual Compact paragraphs with explicit line
+-- breaks. Keep only bounded scalar records; do not bind the roster together.
+local function keep_short_contributors(div)
+  if (FORMAT ~= "docx" and FORMAT ~= "json") or #div.classes ~= 0 or #div.attributes ~= 0 or
+     #div.content ~= 2 or div.content[1].t ~= "Header" or div.content[1].level ~= 2 or
+     div.content[2].t ~= "BulletList" then return nil end
+  local function simple(inlines, nested)
+    for _, inline in ipairs(inlines) do
+      if inline.t == "Span" or inline.t == "Strong" or inline.t == "Link" then
+        if not simple(inline.content, true) then return false end
+      elseif inline.t == "LineBreak" and nested then return false
+      elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" and
+             inline.t ~= "LineBreak" then return false end
+    end
+    return true
+  end
+  local changed = false
+  for _, item in ipairs(div.content[2].content) do
+    if #item == 1 then
+      local paragraph = item[1]
+      if paragraph.t == "Div" and paragraph.identifier == "" and #paragraph.classes == 0 and
+         #paragraph.attributes == 1 and paragraph.attributes["custom-style"] == "Pilot List Lead" and
+         #paragraph.content == 1 then paragraph = paragraph.content[1] end
+      if (paragraph.t == "Plain" or paragraph.t == "Para") and simple(paragraph.content) and
+         display_width(paragraph) > 0 and display_width(paragraph) <= 600 then
+        local breaks = 0
+        for _, inline in ipairs(paragraph.content) do if inline.t == "LineBreak" then breaks = breaks + 1 end end
+        if breaks <= 3 then
+          item[1] = pandoc.Div({pandoc.Para(paragraph.content)}, pandoc.Attr("", {}, {["custom-style"]="Pilot Contributor Summary"}))
+          changed = true
+        end
+      end
+    end
+  end
+  if changed then return div end
+end
+
 function Div(div)
+  if div.identifier == "dmp-contributors" then return keep_short_contributors(div) end
   -- Q3's shared classifier marks only a few short plain paragraphs/list items.
   -- Chain those paragraphs, never the whole question or an unbounded answer.
   if #div.classes == 2 and div.classes:includes("answer-detail") and
@@ -1162,6 +1312,8 @@ function Div(div)
     end
   end
   if div.identifier == "q-store-backup" then return keep_q5_diagnostic_lead(keep_q5_context(div)) end
+  if div.identifier == "q-how-data" then return keep_short_dataset_sources(div) end
+  if div.identifier == "q-access-security" then return keep_short_security_reference(div) end
   if div.identifier == "q-ethical-issues" then return keep_q9_dataset_labels(div) end
   if div.identifier == "q-copyright-ipr" then return keep_q8_reference_labels(div) end
   if div.identifier == "q-required-resources" then div = widen_short_budget_columns(div) end
@@ -1301,8 +1453,13 @@ function Div(div)
        div.attributes["contributor-id"] ~= "" and index and index:match("^[1-9]%d*$") and
        utf8.len(pandoc.utils.stringify(div)) <= 500 and #div.content == 1 and div.content[1].t == "Para" then
       local simple = true
-      for _, inline in ipairs(div.content[1].content) do
-        if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then simple = false end
+      for position, inline in ipairs(div.content[1].content) do
+        if position == 1 and inline.t == "Strong" then
+          if #inline.content == 0 then simple = false end
+          for _, child in ipairs(inline.content) do
+            if child.t ~= "Str" and child.t ~= "Space" and child.t ~= "SoftBreak" then simple = false end
+          end
+        elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then simple = false end
       end
       if simple then
         div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Responsibility Summary"}))

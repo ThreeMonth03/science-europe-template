@@ -1,44 +1,4 @@
-{# Stock enrich-docx: keep English Pandoc styles byte-for-byte, and change only
-   the English/Chinese prepared-reference differences for the supported locale.
-   Do not replace styles.xml wholesale: Pandoc may add user/custom styles. #}
-{%- set document_language -%}{%- include 'src/locales/language.j2' -%}{%- endset -%}
-{%- if document_language == 'en' -%}
-  {{- content|safe -}}
-{%- else -%}
-  {%- macro require(ok) -%}
-    {%- if not ok -%}{{ locale_styles_xml_contract_mismatch.raise_error() }}{%- endif -%}
-  {%- endmacro -%}
-  {# Western runs remain en-GB; East Asian runs remain zh-TW in both locales.
-     Only these five reference-owned line-spacing rules differ. Unknown styles
-     and docDefaults are intentionally not rewritten. #}
-  {%- set spacing_styles = ['Normal', 'BodyText', 'FirstParagraph', 'Compact', 'Heading1'] -%}
-  {%- for identifier in spacing_styles -%}
-    {{- require(content.count('w:styleId="' ~ identifier ~ '"') == 1) -}}
-  {%- endfor -%}
-  {%- set pieces = content.split('<w:style ') -%}
-  {{- require(pieces|length > 1) -}}
-  {{- pieces[0]|safe -}}
-  {%- for piece in pieces[1:] -%}
-    {%- set parts = piece.split('</w:style>', 1) -%}
-    {{- require(parts|length == 2) -}}
-    {%- set style = parts[0] -%}
-    {%- set opening = style.split('>', 1)[0] -%}
-    {{- require(opening.count('w:styleId="') == 1) -}}
-    {%- set identifier = opening.split('w:styleId="', 1)[1].split('"', 1)[0] -%}
-    {%- if identifier in spacing_styles -%}
-      {%- if identifier in ['Normal', 'BodyText', 'FirstParagraph', 'Compact'] -%}
-        {%- set after = '40' if identifier == 'Compact' else '80' -%}
-        {%- set old_spacing = '<w:spacing w:after="' ~ after ~ '" w:before="0" w:line="288" w:lineRule="auto" />' -%}
-        {%- set new_spacing = '<w:spacing w:after="' ~ after ~ '" w:before="0" w:line="270" w:lineRule="atLeast" />' -%}
-        {{- require(style.count(old_spacing) == 1) -}}
-        {%- set style = style.replace(old_spacing, new_spacing, 1) -%}
-      {%- elif identifier == 'Heading1' -%}
-        {%- set old_spacing = '<w:spacing w:after="120" w:before="240" w:line="288" w:lineRule="auto" />' -%}
-        {%- set new_spacing = '<w:spacing w:after="120" w:before="240" w:line="525" w:lineRule="atLeast" />' -%}
-        {{- require(style.count(old_spacing) == 1) -}}
-        {%- set style = style.replace(old_spacing, new_spacing, 1) -%}
-      {%- endif -%}
-    {%- endif -%}
-    {{- ('<w:style ' ~ style ~ '</w:style>' ~ parts[1])|safe -}}
-  {%- endfor -%}
-{%- endif -%}
+{# Both prepared references now share mixed-script spacing and language rules.
+   Stock enrich-docx must preserve Pandoc/author styles byte-for-byte, rather
+   than rewriting serializer-dependent XML for a document's selected locale. #}
+{{- content|safe -}}

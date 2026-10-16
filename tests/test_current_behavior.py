@@ -221,6 +221,51 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
                     self.assertEqual(template.render(original=original, rows=rows, word=word), expected)
 
 
+class CurrentResponsibilityAnchorTests(unittest.TestCase):
+    def test_first_actor_only_is_owned_markup_and_every_sentence_is_unchanged(self):
+        from lxml import html
+        from check_responsibility_reading import ROLES, SENTENCES, contributor_replies
+        from current_support import PREFIX
+
+        cases = [
+            [('first-role-' + str(index), 'Owner', ROLES[index:])]
+            for index in range(len(ROLES))
+        ] + [
+            [('same-a', 'Same Name', ROLES), ('same-b', 'Same Name', ROLES[1:])],
+            [('prose', 'data', ROLES)],
+            [('markup', '<strong>Owner</strong> & "Team" <script>x</script>', ROLES)],
+            [('roles', 'Owner', list(reversed(ROLES)) + [ROLES[0]])],
+            [('blank', ' \n ', ROLES), ('missing', None, ROLES[2:])],
+        ]
+        for escape in [False, True]:
+            template = environment(ROOT, escape).from_string(
+                PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
+            for profile in ['review', 'submission']:
+                for people in cases:
+                    with self.subTest(autoescape=escape, profile=profile, people=people):
+                        document = html.fragment_fromstring(template.render(
+                            repliesMap=contributor_replies(people), output_profile=profile), create_parent=True)
+                        nodes = document.xpath('.//div[contains(concat(" ", @class, " "), " person-responsibilities ")]')
+                        self.assertEqual(len(nodes), len(people))
+                        for index, (node, (item, name, roles)) in enumerate(zip(nodes, people), 1):
+                            actor = name if name and name.strip() else 'Contributor ' + str(index)
+                            summary, = node.xpath('./p[@class="responsibility-summary"]')
+                            owner, = summary.xpath('./strong')
+                            self.assertEqual(list(summary), [owner])
+                            self.assertFalse(summary.text)
+                            self.assertEqual(''.join(owner.itertext()), actor)
+                            self.assertFalse(list(owner))
+                            self.assertEqual(''.join(summary.itertext()), ' '.join(
+                                sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES['en'])
+                                if role in roles))
+                            self.assertEqual(summary.get('data-role-uuids').split(),
+                                             [role for role in ROLES if role in roles])
+                            self.assertEqual(node.get('data-contributor-id'), item)
+                            self.assertEqual(len(node.xpath('./p[@class="data-gap"]')),
+                                             int(profile == 'review' and not (name and name.strip())))
+                        self.assertFalse(document.xpath('.//script | .//img'))
+
+
 class CurrentBehaviorTests(unittest.TestCase):
     pass
 

@@ -35,7 +35,7 @@
   {%- if contributors|length > 0 -%}
   <ul>
   {% for contributor in contributors %}
-    <li class="contributor">
+    {% set contributorContent %}
       <span class="name"><strong>{% if contributor.name|trim %}{{ contributor.name|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.contributorLabel(contributor.index) }}{% else %}{{ pgettext("contributors", "(name not given)") }}{% endif %}</strong></span>
       {%- if contributor.email and contributor.orcid %}
         <br>{{ macros.formatEmail(contributor.email) }}, {{ macros.formatOrcid(contributor.orcid) }}
@@ -50,7 +50,10 @@
       {%- if contributor.affiliation %}
         <br>{{ pgettext("contributors", "Affiliation:") }} <span class="affiliation">{{ macros.integrationROR(contributor.affiliation) }}</span>
       {%- endif %}
-    </li>
+    {% endset %}
+    {% set contributorBound = namespace(width=0) %}
+    {% for character in (contributorContent|striptags).split()|join(' ') %}{% set contributorBound.width = contributorBound.width + (2 if character >= '⺀' else 1) %}{% endfor %}
+    <li class="contributor{% if 0 < contributorBound.width <= 600 and '<table' not in contributorContent and '<img' not in contributorContent %} short-contributor{% endif %}">{{ contributorContent }}</li>
   {% endfor %}
   </ul>
   {%- elif dc.project.created_by -%}

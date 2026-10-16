@@ -7,7 +7,7 @@
 html body { font-size: 10.5pt; line-height: 1.5; color: #222; }
 /* Joined and ordinary Chinese prose share the same body-line rhythm. */
 html[lang="zh-Hant"] body { line-height: 1.45; }
-html body h1 { font-size: 21pt; line-height: 1.25; }
+html body h1 { font-size: 20pt; line-height: 1.25; }
 html body h2 { font-size: 15pt; line-height: 1.35; margin: 1.3em 0 .65em; }
 html body h3 { font-size: 11pt; font-weight: normal; line-height: 1.5; margin: .9em 0 .6em; color: #47565c; }
 /* Question prompts outrank dataset labels without enlarging ordinary answers. */
@@ -59,6 +59,8 @@ html body header div { position: static; }
 html body header .note { margin-top: .6em; }
 html body header .contact-orcid { white-space: normal; }
 html body #dmp-contributors, html body #dmp-projects { page-break-before: auto; }
+/* Keep only bounded person records, not long identities or the whole roster. */
+html body #dmp-contributors > ul > li.contributor.short-contributor { break-inside: avoid; }
 html body .abstract { page-break-after: auto; }
 html body .abstract p { text-align: left; }
 html body section { margin-bottom: 1.4em; }
@@ -96,6 +98,14 @@ html body .dataset-list > .dataset-section { margin: 0 0 1em; }
 html body #q-how-data .dataset-list > .dataset-section > strong.item-label { display: block; break-after: avoid; }
 html body .dataset-list h5 { font-size: 11pt; margin: .8em 0 .35em; }
 html body .dataset-source { font-size: 9pt; }
+/* Bind only a marked short source to its own fixed decision, never to the next
+   record or a long authored explanation. The source itself does not keep-next. */
+html body #q-how-data .dataset-list > .dataset-section > .dataset-source-context.short-dataset-source[data-source-kind="nonreuse"] > p.nonreuse-summary:first-child:has(+ p.dataset-source[data-fact-id="dataset-source"][data-status="complete"]),
+html body #q-how-data .dataset-list > .dataset-section > .dataset-source-context.short-dataset-source[data-source-kind="non-reference"] > p[data-fact-id="reuse-decision"][data-status="complete"]:first-child:has(+ p[data-fact-id="dataset-source"][data-status="complete"]) { break-after: avoid; }
+html body #q-how-data .dataset-source-context.short-dataset-source > p[data-fact-id="dataset-source"][data-status="complete"] { break-inside: avoid; }
+/* Only the bounded direct Q6 tail attaches to its optional Q5 reference. */
+html body #q-access-security.question > .answer.short-security-reference-tail > p:has(+ .security-answer-reference.short-security-reference:last-child) { break-after: avoid; }
+html body #q-access-security.question > .answer > .security-answer-reference.short-security-reference { break-inside: avoid; }
 html body .dataset-version { margin: .4em 0; overflow-wrap: anywhere; word-break: break-word; }
 html body .dataset-version th { width: 15%; font-weight: normal; }
 html body .dataset-version p { margin-bottom: .2em; }

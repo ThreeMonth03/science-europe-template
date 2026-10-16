@@ -1,4 +1,12 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
+{# Only a short scalar source can bind its immediately preceding fixed sentence.
+   The wrapper is outside gettext: all source words, links and authored blocks
+   remain unchanged, and long/rich locations retain ordinary pagination. #}
+{%- macro sourceContext(source, kind) -%}
+  {%- set selection = namespace(width=0) -%}
+  {%- for character in source -%}{%- set selection.width = selection.width + (2 if character >= '⺀' else 1) -%}{%- endfor -%}
+  <div class="dataset-source-context{% if source|trim and selection.width <= 152 and '<' not in source and '>' not in source and '\n' not in source and '\r' not in source %} short-dataset-source{% endif %}" data-source-kind="{{ kind }}">{{ caller() }}</div>
+{%- endmacro -%}
 <div id="q-how-data" class="question" data-requirement-id="SE-1a">
   <h3>{{ pgettext("questions/01-how-data", "1. How will new data be collected or produced and/or how will existing data be re-used?") }}</h3>
 
@@ -131,11 +139,13 @@
             {# identification #}
             <div data-fact-id="reuse-decision" data-status="complete">
             {% if refDataWhere|trim %}
+              {% call sourceContext(refDataWhere, 'reference') %}
               {% if refDataWhere.startswith("https://") or refDataWhere.startswith("http://") or refDataWhere.startswith("ftp://") %}
               {{ pgettext("questions/01-how-data", "<p class=\"dataset-source\" data-fact-id=\"dataset-source\" data-status=\"complete\">Source: <a href=\"%(refDataWhere)s\">%(refDataWhere)s</a></p>", refDataWhere=refDataWhere) }}
             {% else %}
               {{ pgettext("questions/01-how-data", "<p data-fact-id=\"dataset-source\" data-status=\"complete\">Source: %(refDataWhere)s</p>", refDataWhere=refDataWhere) }}
             {% endif %}
+              {% endcall %}
             {% else %}
               {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"dataset-source\" data-status=\"missing\"><strong>Information not provided:</strong> where this dataset can be obtained.</p>") }}{% endif %}
             {% endif %}
@@ -257,11 +267,11 @@
             {%- set refDataUseNoOtherReason = [refDataUsedNoPrefix, uuids.refDataUseNoReasonAUuid ,uuids.refDataUseNoReasonQUuid]|reply_path -%}
             {%- set refDataUseNoOtherReasonReply = repliesMap[refDataUseNoOtherReason]|reply_str_value %}
           
-            {{ nonreuse.render(refDataWhere, refDataUseNoReply, refDataUseNoOtherReasonReply,
+            {% call sourceContext(refDataWhere, 'nonreuse') %}{{ nonreuse.render(refDataWhere, refDataUseNoReply, refDataUseNoOtherReasonReply,
                 uuids.refDataUseNoDataAUuid, uuids.refDataUseNoAspectAUuid, uuids.refDataUseNoQualityAUuid,
-                uuids.refDataUseNoCondAUuid, uuids.refDataUseNoReasonAUuid) }}
+                uuids.refDataUseNoCondAUuid, uuids.refDataUseNoReasonAUuid) }}{% endcall %}
           {% else %}
-            {{ nonreuse.undecided(refDataWhere) }}
+            {% call sourceContext(refDataWhere, 'undecided') %}{{ nonreuse.undecided(refDataWhere) }}{% endcall %}
           {%- endif -%}
         </div>
       {%- endfor -%}
@@ -295,6 +305,7 @@
         {%- if nrefDataUseReply == uuids.nrefDataUseYesAUuid %}
           {{ reuseRightsholder.render(nrefDataUsedPrefix.split('.') + [uuids.nrefDataOwnerQUuid]) }}
           {# identification #}
+          {% call sourceContext(nrefDataWhere, 'non-reference') %}
           {{ pgettext("questions/01-how-data", "<p data-fact-id=\"reuse-decision\" data-status=\"complete\">This dataset will be re-used.</p>") }}
           {% if nrefDataWhere|trim %}
             {% if nrefDataWhere.startswith("https://") or nrefDataWhere.startswith("http://") or nrefDataWhere.startswith("ftp://") %}
@@ -305,6 +316,7 @@
           {% else %}
             {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/01-how-data", "<p class=\"data-gap\" data-fact-id=\"dataset-source\" data-status=\"missing\"><strong>Information not provided:</strong> where this dataset can be obtained.</p>") }}{% endif %}
           {% endif %}
+          {% endcall %}
           {%- set nrefDataUsageQ = [nrefDataUsedPrefix, uuids.nrefDataUsageQUuid]|reply_path -%}
           {%- set nrefDataUsageReply = repliesMap[nrefDataUsageQ]|reply_str_value -%}
           {% if nrefDataUsageReply|trim %}
@@ -381,11 +393,11 @@
           {%- set nrefDataUseNoOtherReason = [nrefDataUsedNoPrefix, uuids.nrefDataUseNoReasonAUuid ,uuids.nrefDataUseNoReasonQUuid]|reply_path -%}
           {%- set nrefDataUseNoOtherReasonReply = repliesMap[nrefDataUseNoOtherReason]|reply_str_value %}
           
-          {{ nonreuse.render(nrefDataWhere, nrefDataUseNoReply, nrefDataUseNoOtherReasonReply,
+          {% call sourceContext(nrefDataWhere, 'nonreuse') %}{{ nonreuse.render(nrefDataWhere, nrefDataUseNoReply, nrefDataUseNoOtherReasonReply,
               uuids.nrefDataUseNoDataAUuid, uuids.nrefDataUseNoAspectAUuid, uuids.nrefDataUseNoQualityAUuid,
-              uuids.nrefDataUseNoCondAUuid, uuids.nrefDataUseNoReasonAUuid) }}
+              uuids.nrefDataUseNoCondAUuid, uuids.nrefDataUseNoReasonAUuid) }}{% endcall %}
         {% else %}
-          {{ nonreuse.undecided(nrefDataWhere) }}
+          {% call sourceContext(nrefDataWhere, 'undecided') %}{{ nonreuse.undecided(nrefDataWhere) }}{% endcall %}
         {%- endif -%}
       </div>
       {%- endfor -%}

@@ -71,31 +71,27 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         if name in document.styles:
             item = document.styles[name]
             item.font.size = Pt(10.5)
-            # A relative CJK adjustment also compresses pure-Latin answers.
-            # Minimum leading keeps those readable while allowing taller CJK
-            # runs and equations to expand; never clip them with exact height.
+            # Use one minimum for both locales: an English document can contain
+            # Chinese answers, and a Chinese document can contain Latin answers.
+            # Taller CJK runs and equations may expand; never clip them with an
+            # exact line height or multiply their already-tall font metrics.
             # Normal shares the body rule so Pandoc's first/table paragraphs
             # cannot silently use a different baseline from ordinary answers.
-            if language == "zh-Hant":
-                item.paragraph_format.line_spacing = Pt(13.5)
-                item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
-            else:
-                item.paragraph_format.line_spacing = 1.2
+            item.paragraph_format.line_spacing = Pt(14.5)
+            item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
             item.paragraph_format.space_before = Pt(0)
             item.paragraph_format.space_after = Pt(2 if name == "Compact" else 4)
             item.paragraph_format.widow_control = True
-    for level, size in enumerate((21, 15, 11.5, 11, 10.5), 1):
+    heading_leading = (25, 18.75, 14.5, 14, 13.5)
+    for level, size in enumerate((20, 15, 11.5, 11, 10.5), 1):
         if f"Heading {level}" in document.styles:
             item = document.styles[f"Heading {level}"]
             item.font.size, item.font.bold = Pt(size), True
             item.font.italic = False
-            # Headings retain their own rhythm, independent of body spacing.
-            item.paragraph_format.line_spacing = 1.2
-            if language == "zh-Hant" and level == 1:
-                # A wrapped CJK cover title otherwise inherits relative font
-                # metrics from Normal, leaving excessive space between lines.
-                item.paragraph_format.line_spacing = Pt(26.25)
-                item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
+            # Minimum leading avoids the large automatic CJK reserve. A larger
+            # gap before than after attaches the heading to its following body.
+            item.paragraph_format.line_spacing = Pt(heading_leading[level - 1])
+            item.paragraph_format.line_spacing_rule = WD_LINE_SPACING.AT_LEAST
             if level == 3:
                 item.font.bold = True
                 item.font.color.rgb = RGBColor.from_string("000000")
@@ -103,8 +99,8 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
             item.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.LEFT
             item.paragraph_format.keep_together = True
             item.paragraph_format.page_break_before = False
-            item.paragraph_format.space_before = Pt(8 if level >= 4 else 12)
-            item.paragraph_format.space_after = Pt(3 if level >= 4 else 4 if level == 3 else 6)
+            item.paragraph_format.space_before = Pt(12 if level == 1 or level >= 4 else 14)
+            item.paragraph_format.space_after = Pt(2 if level >= 4 else 3 if level == 3 else 5 if level == 2 else 6)
     # Source metadata is secondary text, not another body paragraph. A short
     # owned pair is one block so its final source line cannot become a page.
     provenance = document.styles.add_style("Pilot Provenance", WD_STYLE_TYPE.PARAGRAPH)
@@ -144,6 +140,12 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     responsibility.base_style = document.styles["Body Text"]
     responsibility.paragraph_format.keep_with_next = False
     responsibility.paragraph_format.keep_together = True
+    # Each bounded frontmatter person is one Compact paragraph with line breaks.
+    # Keep that person's lines, never the following person or the whole list.
+    contributor = document.styles.add_style("Pilot Contributor Summary", WD_STYLE_TYPE.PARAGRAPH)
+    contributor.base_style = document.styles["Compact"]
+    contributor.paragraph_format.keep_with_next = False
+    contributor.paragraph_format.keep_together = True
     list_lead = document.styles.add_style("Pilot List Lead", WD_STYLE_TYPE.PARAGRAPH)
     list_lead.base_style = document.styles["Compact"]
     list_lead.paragraph_format.keep_with_next = True

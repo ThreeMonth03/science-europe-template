@@ -381,6 +381,10 @@ with tempfile.TemporaryDirectory() as tmp:
                     'data-contributor-index="2"'+attrs+'><p>'+text+'</p>'+ending+'</div>')
         cases += [('person-en', person(), 'Pilot Responsibility Summary'),
                   ('person-zh', person('範例團隊負責資料管理。範例團隊負責執行資料管理方案。'), 'Pilot Responsibility Summary'),
+                  ('person-first-actor', person('<strong>A. Example</strong> manages data. A. Example implements the plan.'), 'Pilot Responsibility Summary'),
+                  ('person-first-actor-zh', person('<strong>範例團隊</strong>負責資料管理。範例團隊負責執行資料管理方案。'), 'Pilot Responsibility Summary'),
+                  ('person-later-bold', person('A. Example manages <strong>data</strong>.'), None),
+                  ('person-rich-actor', person('<strong><a href="https://example.org">A. Example</a></strong> manages data.'), None),
                   ('person-boundary', person('x'*500), 'Pilot Responsibility Summary'),
                   ('person-long', person('x'*501), None),
                   ('person-missing-name-hint', person(ending='<p class="data-gap">Please provide the name.</p>'), None),
@@ -435,6 +439,72 @@ with tempfile.TemporaryDirectory() as tmp:
                         detail = right['c'][1][0]['c'][1][1]['c'][1][0]
                         self.assertEqual(detail['c'][0][2], [['fact-id', 'specialist-expertise-detail'], ['status', 'complete']])
                         self.assertEqual(detail['c'][1][1]['c'][-1][0]['c'][0], ['', [], [['custom-style', 'Pilot List Lead']]])
+
+    def test_short_sources_references_and_contributors_change_only_owned_styles(self):
+        from native_support import IMAGE
+        source = '<p>Source: <a href="https://example.org/a">https://example.org/a</a></p>'
+        def q1(lead='Fixed decision.', location=source, kind='nonreuse', marked=True):
+            return ('<div id="q-how-data" class="question" data-requirement-id="SE-1a"><h3>1. Data?</h3>'
+                '<div class="answer"><div class="dataset-list"><div class="dataset-section" data-item-id="a">'
+                '<h5>Dataset</h5><div class="dataset-source-context' + (' short-dataset-source' if marked else '') +
+                '" data-source-kind="' + kind + '"><p>' + lead + '</p>' + location + '</div></div></div></div></div>')
+        reference = ('<div class="security-answer-reference short-security-reference"><p>'
+            '<a href="#q-store-backup">See question 5.</a></p></div>')
+        def q6(tail='<p>Fixed security fact.</p>', ref=reference):
+            return ('<div id="q-access-security" class="question"><h3>6. Security?</h3>'
+                '<div class="answer short-security-reference-tail"><p>Earlier fact.</p>' + tail + ref + '</div></div>')
+        def people(body='<span class="name"><strong>範例人員</strong></span><br><a href="mailto:a@example.org">a@example.org</a><br>Roles: Researcher<br>Affiliation: Institute.'):
+            return '<div id="dmp-contributors"><h2>People</h2><ul><li>' + body + '</li></ul></div>'
+        cases = [(q1(), 1), (q1('固定決策。'), 1), (q1('x'*240, '<p>'+'y'*160+'</p>'), 1),
+            (q1('中'*120, '<p>'+'文'*80+'</p>'), 1), (q1('x'*241), 0),
+            (q1(location='<p>'+'中'*81+'</p>'), 0), (q1(marked=False), 0),
+            (q1('<em>Authored decision.</em>'), 0), (q1(kind='unknown'), 0),
+            (q1().replace('q-how-data', 'q-other'), 0),
+            (q6(), 1), (q6('<p>匿名蒐集資料。</p>'), 1), (q6('<p>'+'中'*80+'</p>'), 1),
+            (q6('<p>'+'中'*81+'</p>'), 0), (q6('<div class="answer-detail"><p>Authored.</p></div>'), 0),
+            (q6('<p><em>Authored.</em></p>'), 0), (q6(ref=reference.replace('#q-store-backup', '#other')), 0),
+            (people(), 1), (people('x'*600), 1), (people('中'*300), 1),
+            (people('x'*601), 0), (people('中'*301), 0), (people('a<br>b<br>c<br>d<br>e'), 0),
+            (people('<span>a<br>b<br>c<br>d<br>e</span>'), 0),
+            (people('<em>Authored emphasis.</em>'), 0), (people().replace('dmp-contributors', 'other'), 0)]
+        lua = (ROOT/'src/word/pilot.lua').read_text()
+        calls = ['  if div.identifier == "q-how-data" then return keep_short_dataset_sources(div) end',
+                 '  if div.identifier == "q-access-security" then return keep_short_security_reference(div) end',
+                 '  if div.identifier == "dmp-contributors" then return keep_short_contributors(div) end']
+        before = lua
+        for call in calls:
+            self.assertEqual(1, lua.count(call)); before = before.replace(call, '')
+        runner = '''import json,sys,tempfile,subprocess
+from pathlib import Path
+p=json.load(sys.stdin); result=[]
+with tempfile.TemporaryDirectory() as tmp:
+ f=Path(tmp)/'pilot.lua'
+ for mode in ['json','docx']:
+  for lua in p['variants']:
+   f.write_text('FORMAT="'+mode+'"\\n'+lua)
+   result.append(json.loads(subprocess.check_output(['pandoc','--from=html','--to=json','--lua-filter='+str(f)],input=p['html'].encode())))
+print(json.dumps(result))'''
+        results = json.loads(subprocess.check_output(['docker','run','--rm','--pull=never','--network=none',
+            '--log-driver=none','-i','--entrypoint','python',IMAGE,'-c',runner], input=json.dumps({
+                'variants':[before,lua], 'html':''.join('<div id="case-'+str(i)+'">'+html+'</div>' for i,(html,_) in enumerate(cases))}).encode(), timeout=180))
+        owned = {'Pilot Lead', 'Pilot Contributor Summary'}
+        def count(value):
+            if isinstance(value, dict):
+                return int(value.get('t') == 'Div' and any(['custom-style',s] in value['c'][0][2] for s in owned)) + sum(count(v) for v in value.values())
+            return sum(count(v) for v in value) if isinstance(value, list) else 0
+        def normalize(value):
+            if isinstance(value, dict):
+                if value.get('t') == 'Div' and any(value['c'][0] == ['',[],[['custom-style',s]]] for s in owned):
+                    self.assertEqual(1, len(value['c'][1])); return normalize(value['c'][1][0])
+                return {k:('Para' if k=='t' and v=='Plain' else normalize(v)) for k,v in value.items()}
+            return [normalize(v) for v in value] if isinstance(value, list) else value
+        for mode, old, new in [('json',*results[:2]), ('docx',*results[2:])]:
+            self.assertEqual(len(cases), len(new['blocks']))
+            for i, ((_, expected), left, right) in enumerate(zip(cases,old['blocks'],new['blocks'])):
+                with self.subTest(mode=mode, case=i):
+                    self.assertEqual(expected, count(right)-count(left))
+                    self.assertEqual(normalize(left), normalize(right))
+                    if not expected: self.assertEqual(left,right)
 
     def test_question_hierarchy_is_scoped_without_smaller_body_text(self):
         css = (ROOT/'src/layout.css').read_text()
@@ -1111,7 +1181,8 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 document = Document(folder / "src/word/reference.docx")
                 self.assertFalse(document.styles["Heading 2"].paragraph_format.page_break_before)
                 title = document.styles["Heading 1"].paragraph_format
-                self.assertEqual(26.25, title.line_spacing.pt)
+                self.assertEqual(20, document.styles["Heading 1"].font.size.pt)
+                self.assertEqual(25, title.line_spacing.pt)
                 self.assertEqual(WD_LINE_SPACING.AT_LEAST, title.line_spacing_rule)
                 provenance = document.styles["Pilot Provenance"]
                 self.assertEqual('Body Text', provenance.base_style.name)
@@ -1139,6 +1210,9 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 self.assertTrue(document.styles["Pilot Responsibility Summary"].paragraph_format.keep_together)
                 self.assertFalse(document.styles["Pilot Responsibility Summary"].paragraph_format.keep_with_next)
                 self.assertEqual('Body Text', document.styles["Pilot Responsibility Summary"].base_style.name)
+                self.assertEqual('Compact', document.styles["Pilot Contributor Summary"].base_style.name)
+                self.assertTrue(document.styles["Pilot Contributor Summary"].paragraph_format.keep_together)
+                self.assertFalse(document.styles["Pilot Contributor Summary"].paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot List Lead"].paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Table Lead"].paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Table Lead"].paragraph_format.keep_together)
@@ -1158,7 +1232,7 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 for style_name in ("Normal", "Body Text", "First Paragraph", "Compact"):
                     item = document.styles[style_name]
                     self.assertEqual(10.5, item.font.size.pt)
-                    self.assertEqual(13.5, item.paragraph_format.line_spacing.pt)
+                    self.assertEqual(14.5, item.paragraph_format.line_spacing.pt)
                     self.assertEqual(WD_LINE_SPACING.AT_LEAST, item.paragraph_format.line_spacing_rule)
                     lang = item.element.rPr.find(qn('w:lang'))
                     self.assertEqual('en-GB', lang.get(qn('w:val')))
@@ -1167,10 +1241,10 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                     self.assertTrue(item.paragraph_format.widow_control)
                 for level in range(1, 6):
                     item = document.styles[f"Heading {level}"].paragraph_format
-                    if level > 1:
-                        self.assertEqual(1.2, item.line_spacing)
-                    self.assertEqual(8 if level >= 4 else 12, item.space_before.pt)
-                    self.assertEqual(3 if level >= 4 else 4 if level == 3 else 6, item.space_after.pt)
+                    self.assertEqual((25, 18.75, 14.5, 14, 13.5)[level - 1], item.line_spacing.pt)
+                    self.assertEqual(WD_LINE_SPACING.AT_LEAST, item.line_spacing_rule)
+                    self.assertEqual(12 if level == 1 or level >= 4 else 14, item.space_before.pt)
+                    self.assertEqual(2 if level >= 4 else 3 if level == 3 else 5 if level == 2 else 6, item.space_after.pt)
                     self.assertTrue(item.keep_with_next)
                     self.assertTrue(item.keep_together)
                 for section in document.sections:
@@ -1194,15 +1268,14 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
             module.prepare_layout(root, font, 'en')
             d = Document(root / 'src/word/reference.docx')
             for name in ('Normal', 'Body Text', 'First Paragraph', 'Compact'):
-                self.assertEqual(1.2, d.styles[name].paragraph_format.line_spacing)
-                self.assertEqual(WD_LINE_SPACING.MULTIPLE, d.styles[name].paragraph_format.line_spacing_rule)
+                self.assertEqual(14.5, d.styles[name].paragraph_format.line_spacing.pt)
+                self.assertEqual(WD_LINE_SPACING.AT_LEAST, d.styles[name].paragraph_format.line_spacing_rule)
                 self.assertEqual(10.5, d.styles[name].font.size.pt)
             self.assertEqual('en-GB', d.styles['Normal'].element.rPr.find(qn('w:lang')).get(qn('w:val')))
 
     def test_runtime_locale_styles_match_prepared_reference(self):
         import base64
         from xml.etree import ElementTree as E
-        from jinja2 import UndefinedError
         from native_support import IMAGE
         references = []
         with tempfile.TemporaryDirectory() as temporary:
@@ -1239,11 +1312,12 @@ print(json.dumps(styles))
             for language in ('en', 'zh-Hant'):
                 rendered = template.render(content=english, ctx={'document': {'language': language}})
                 self.assertIn(custom, rendered)
-                if language == 'en':
-                    self.assertEqual(english, rendered)
-                else:
-                    self.assertEqual(E.canonicalize(chinese), E.canonicalize(rendered))
-            for broken in (english.replace('w:styleId="Normal"', 'w:styleId="RenamedNormal"'),
-                           english.replace('w:line="288"', 'w:line="287"')):
-                with self.assertRaises(UndefinedError):
-                    template.render(content=broken, ctx={'document': {'language': 'zh-Hant'}})
+                self.assertEqual(english, rendered)
+                self.assertEqual(E.canonicalize(chinese), E.canonicalize(rendered))
+            # With no locale rewrite, even renamed/author-modified styles must
+            # survive. There is no serializer-dependent spacing to validate.
+            for authored in (english.replace('w:styleId="Normal"', 'w:styleId="RenamedNormal"'),
+                             english.replace('w:line="290"', 'w:line="295"')):
+                for language in ('en', 'zh-Hant'):
+                    self.assertEqual(authored, template.render(content=authored,
+                        ctx={'document': {'language': language}}))

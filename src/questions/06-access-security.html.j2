@@ -2,7 +2,6 @@
 <div id="q-access-security" class="question">
   <h3>{{ pgettext("questions/06-access-security", "6. How will data security and protection of sensitive data be taken care of during the research?") }}</h3>
 
-  <div class="answer">
   {% set answerContent %}
     {%- import 'src/active-answer.j2' as activeAnswer with context -%}
     {%- set risksParts = [uuids.processingCUuid, uuids.risksQUuid] -%}
@@ -303,14 +302,31 @@
       {% endif %}
     {%- endif -%}
   {% endset %}
+  {% set securityAnswer %}
   {% if answerContent|striptags|trim or '<img' in answerContent or '<table' in answerContent %}
     {{ answerContent }}
   {% else %}
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-3b" data-status="missing-output">{{ pgettext("questions/06-access-security", "This document does not yet contain an answer about data security and protection of sensitive data.") }}</p>{% endif %}
   {% endif %}
+  {% endset %}
   {# A cross-reference is not an answer to Q6; do not let it hide the gap above. #}
-  {% if repliesMap[[uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path]|reply_str_value == uuids.archivedDuringYesAUuid %}
+  {% set hasSecurityReference = repliesMap[[uuids.preservingCUuid, uuids.archivedDuringQUuid]|reply_path]|reply_str_value == uuids.archivedDuringYesAUuid %}
+  {% set securityReference %}{% if hasSecurityReference %}
     {{ pgettext("questions/06-access-security", "<p class=\"answer-reference\"><a href=\"#q-store-backup\">See question 5 for archival and backup arrangements.</a></p>") }}
-  {% endif %}
+  {% endif %}{% endset %}
+  {# Only a terminal direct plain fixed paragraph may bind the optional short
+     reference. Authored detail/list/table containers end in their own closing
+     tags and cannot qualify; no answer text or translation markup is edited. #}
+  {% set tail = (securityAnswer|trim).split('<p')[-1] %}
+  {% set tailOpening = tail.split('>', 1)[0] %}
+  {% set tailText = tail.split('>', 1)[-1][:-4] if tail.endswith('</p>') else '' %}
+  {% set tailBound = namespace(width=0, referenceWidth=0) %}
+  {% for character in tailText.split()|join(' ') %}{% set tailBound.width = tailBound.width + (2 if character >= '⺀' else 1) %}{% endfor %}
+  {% for character in (securityReference|striptags).split()|join(' ') %}{% set tailBound.referenceWidth = tailBound.referenceWidth + (2 if character >= '⺀' else 1) %}{% endfor %}
+  {% set shortReference = hasSecurityReference and 0 < tailBound.referenceWidth <= 160 %}
+  {% set shortTail = shortReference and (securityAnswer|trim).endswith('</p>') and tailOpening in ['', ' class="data-gap" data-requirement-id="SE-3b" data-status="missing-output"'] and '<' not in tailText and '>' not in tailText and 0 < tailBound.width <= 160 %}
+  <div class="answer{% if shortTail %} short-security-reference-tail{% endif %}">
+  {{ securityAnswer }}
+  {% if hasSecurityReference %}<div class="security-answer-reference{% if shortReference %} short-security-reference{% endif %}">{{ securityReference }}</div>{% endif %}
   </div>
 </div>
