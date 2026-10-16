@@ -16,6 +16,16 @@
     {%- if km is defined and asOpenAsPossiblePath and (asOpenAsPossibleAUuid not in km.entities.questions[uuids.asOpenAsPossibleQUuid].answerUuids or asOpenAsPossibleAUuid not in km.entities.answers) -%}
       {%- set asOpenAsPossibleAUuid = '' -%}
     {%- endif -%}
+    {%- set openImmediatelyPath = [uuids.accessCUuid, uuids.openImmediatelyQUuid]|reply_path -%}
+    {%- set openImmediatelyAUuid = repliesMap[openImmediatelyPath]|reply_str_value -%}
+    {%- set embargoPath = [uuids.accessCUuid, uuids.limitedEmbargoQUuid]|reply_path -%}
+    {%- set embargoAUuid = repliesMap[embargoPath]|reply_str_value -%}
+    {# Only this fully answered, fixed-prose combination shares a paragraph.
+       Keep original sentences and all other branches; ownership stays separate. #}
+    {%- set simpleOpenness = asOpenAsPossibleAUuid == uuids.asOpenAsPossibleYesAUuid
+        and openImmediatelyAUuid == uuids.openImmediatelyYesAUuid
+        and embargoAUuid == uuids.limitedEmbargoOpenAUuid -%}
+    {% if simpleOpenness %}<div class="dataset-policy openness-policy">{% endif %}
     {%- if asOpenAsPossibleAUuid == uuids.asOpenAsPossibleYesAUuid -%}
       {{ pgettext("questions/08-copyright-ipr", "<p>We will follow the principle of making our data <em>as open as possible</em>.</p>") }}
     {%- elif asOpenAsPossibleAUuid == uuids.asOpenAsPossibleNoAUuid -%}
@@ -23,8 +33,6 @@
     {%- endif -%}
 
     {# Can open data #}
-    {%- set openImmediatelyPath = [uuids.accessCUuid, uuids.openImmediatelyQUuid]|reply_path -%}
-    {%- set openImmediatelyAUuid = repliesMap[openImmediatelyPath]|reply_str_value -%}
     {%- if openImmediatelyAUuid == uuids.openImmediatelyYesAUuid -%}
       <p>{{ pgettext("questions/08-copyright-ipr", "All project data can eventually be made openly available.") }}</p>
     {%- elif openImmediatelyAUuid == uuids.openImmediatelyNoAUuid -%}
@@ -135,8 +143,6 @@
     {%- endif -%}
 
     {# Embargo #}
-    {%- set embargoPath = [uuids.accessCUuid, uuids.limitedEmbargoQUuid]|reply_path -%}
-    {%- set embargoAUuid = repliesMap[embargoPath]|reply_str_value -%}
     {%- if embargoAUuid == uuids.limitedEmbargoOpenAUuid -%}
       <p>{{ pgettext("questions/08-copyright-ipr", "All data will be made openly available immediately, without an embargo period.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoIndefinitelyAUuid -%}
@@ -152,6 +158,7 @@
         <p>{{ pgettext("questions/08-copyright-ipr", "Data not subject to legal restrictions will be released unconditionally after a fixed period.") }}</p>
       {%- endif -%}
     {%- endif -%}
+    {% if simpleOpenness %}</div>{% endif %}
     
     {# Ownership #}
     {%- import 'src/active-answer.j2' as activeAnswer with context -%}

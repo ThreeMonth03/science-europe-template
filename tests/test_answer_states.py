@@ -30,6 +30,46 @@ def storage_matrix():
 
 
 class AnswerStateTests(unittest.TestCase):
+    def test_q8_only_complete_fixed_openness_shares_a_paragraph(self):
+        from current_support import PREFIX, environment
+        principle = path('accessCUuid', 'asOpenAsPossibleQUuid')
+        availability = path('accessCUuid', 'openImmediatelyQUuid')
+        embargo = path('accessCUuid', 'limitedEmbargoQUuid')
+        ownership = path('creatingCUuid', 'ownershipQUuid')
+        sentences = [
+            'We will follow the principle of making our data as open as possible.',
+            'All project data can eventually be made openly available.',
+            'All data will be made openly available immediately, without an embargo period.',
+        ]
+        owner_sentence = 'All data will be owned by the Principal Investigator.'
+        for escape, profile in itertools.product((False, True), ('review', 'submission')):
+            env = environment(ROOT, escape)
+            template = env.from_string(PREFIX + "{% include 'src/questions/08-copyright-ipr.html.j2' %}")
+            for philosophy, scope, timing in itertools.product(
+                    ('Yes', 'No', None, 'unknown'), ('Yes', 'No', None, 'unknown'),
+                    ('Open', 'Indefinitely', 'ReleasedSoon', 'Yes', None, 'unknown')):
+                values = {ownership: IDS['ownershipPIAUuid']}
+                for key, prefix, choice in ((principle, 'asOpenAsPossible', philosophy),
+                                           (availability, 'openImmediately', scope),
+                                           (embargo, 'limitedEmbargo', timing)):
+                    if choice is not None:
+                        values[key] = IDS.get(prefix + choice + 'AUuid', choice)
+                if timing == 'Yes':
+                    values[path(embargo, 'limitedEmbargoYesAUuid', 'limitedEmbargoPeriodQUuid')] = '18 months (v1.2)'
+                soup = BeautifulSoup(template.render(repliesMap=values, output_profile=profile), 'html.parser')
+                group = soup.select_one('#q-copyright-ipr > .answer > .openness-policy')
+                with self.subTest(escape=escape, profile=profile, philosophy=philosophy, scope=scope, timing=timing):
+                    self.assertEqual(bool(group), (philosophy, scope, timing) == ('Yes', 'Yes', 'Open'))
+                    self.assertFalse(soup.select('p p,p div,p ul,p table'))
+                    self.assertEqual(1, sum(p.get_text() == owner_sentence for p in soup.select('.answer > p')))
+                    if group:
+                        self.assertIn('dataset-policy', group['class'])
+                        self.assertEqual(sentences, [' '.join(p.get_text().split()) for p in group.find_all('p', recursive=False)])
+                        self.assertEqual('as open as possible', group.select_one('em').get_text())
+                        self.assertNotIn(owner_sentence, group.get_text())
+                    if timing == 'Yes':
+                        self.assertIn('18 months (v1.2)', soup.get_text())
+
     def test_partial_archive_recovery_and_no_embargo_keep_complete_literal_scope(self):
         from current_support import PREFIX, environment
         archive = path('preservingCUuid', 'archivedDuringQUuid')
