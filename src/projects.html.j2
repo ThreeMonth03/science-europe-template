@@ -34,19 +34,19 @@
         {% endif %}
       {% endfor %}
     {% endset %}
-      {% if projectAcronym|trim or projectNumber|trim or projectStart|trim or projectEnd|trim or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
+      {% if projectAcronym|trim or projectNumber|trim or projectStart|trim or projectEnd|trim or fundingItems|trim or output_profile|default('review') != 'submission' %}<table class="project-details"><tbody>
         {% if projectAcronym|trim %}<tr data-fact-id="project-acronym" data-status="complete"><th scope="row">{{ pgettext("projects", "Project acronym") }}</th><td>{{ projectAcronym|e }}</td></tr>{% endif %}
         {% if projectNumber|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-number"><th scope="row">{{ pgettext("projects", "Project Number") }}</th><td>{{ projectNumber|e if projectNumber|trim else pgettext("projects", "N/A") }}</td></tr>{% endif %}
         {% if projectStart|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-start"><th scope="row">{{ pgettext("projects", "Start date") }}</th><td>{{ projectStart|e if projectStart|trim else pgettext("projects", "N/A") }}</td></tr>{% endif %}
         {% if projectEnd|trim or output_profile|default('review') != 'submission' %}<tr data-fact-id="project-end"><th scope="row">{{ pgettext("projects", "End date") }}</th><td>{{ projectEnd|e if projectEnd|trim else pgettext("projects", "N/A") }}</td></tr>{% endif %}
-      </tbody></table>{% endif %}
-      {% if fundingItems|trim or output_profile|default('review') != 'submission' %}<div class="project-funding" data-fact-id="project-funding"><h4>{{ pgettext("projects", "Funding") }}</h4>
+        {% if fundingItems|trim or output_profile|default('review') != 'submission' %}<tr class="project-funding" data-fact-id="project-funding"><th scope="row">{{ pgettext("projects", "Funding sources") }}</th><td>
           {%- if fundingItems|trim %}
             <ul>{{ fundingItems }}</ul>
           {%- else -%}
             <p>{{ pgettext("projects", "Funding information has not been provided.") }}</p>
           {%- endif -%}
-      </div>{% endif %}
+        </td></tr>{% endif %}
+      </tbody></table>{% endif %}
 
     {%- set projectAbstractPath = active.path(projectParts + [uuids.projectAbstractQUuid], 'ValueQuestion') -%}
     {%- set projectAbstract = repliesMap[projectAbstractPath]|reply_str_value if projectAbstractPath else '' -%}

@@ -122,7 +122,7 @@
                 {%- set personalDataManagedAccessReply = repliesMap[personalDataManagedAccessQUuid]|reply_str_value if personalDataManagedAccessQUuid else '' -%}
                 
                 {%- if personalDataManagedAccessReply|trim -%}
-                    <h4>{{ pgettext("questions/07-personal-data", "Access procedure to personal data") }}</h4>
+                    <h4>{{ pgettext("questions/07-personal-data", "Procedure for accessing personal data") }}</h4>
                     <p>{{ pgettext("questions/07-personal-data", "There is a procedure for users to access private data as follows: %(personalDataManagedAccessReply)s", personalDataManagedAccessReply=personalDataManagedAccessReply) }}</p>
                 {%- endif -%}
             {%- endif -%}

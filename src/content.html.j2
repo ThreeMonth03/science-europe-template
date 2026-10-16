@@ -1,6 +1,6 @@
 {%- import 'src/question-spacing.html.j2' as questionSpacing with context -%}<div id="dmp-content">
   <section id="sec-data-collection" class="dmp-section">
-    <h2>{{ pgettext("content", "Section 1: Data description and collection or re-use of existing data") }}</h2>
+    <h2{% if contentHasFrontmatter|default(false) %} class="body-start"{% endif %}>{{ pgettext("content", "Section 1: Data description and collection or re-use of existing data") }}</h2>
     {% call questionSpacing.question("q-how-data") %}{% include "src/questions/01-how-data.html.j2" with context %}{% endcall %}
     {% call questionSpacing.question("q-what-data") %}{% include "src/questions/02-what-data.html.j2" with context %}{% endcall %}
   </section>

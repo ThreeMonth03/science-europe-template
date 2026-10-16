@@ -4,6 +4,16 @@
 {%- macro require(ok) -%}
   {%- if not ok -%}{{ short_table_xml_contract_mismatch.raise_error() }}{%- endif -%}
 {%- endmacro -%}
+{# The scoped first-section Lua guard marks only a real frontmatter boundary.
+   Add a paragraph property to Heading2; never insert a blank page-break paragraph. #}
+{%- set body_marker = '<!--DSW:SE:body-start:v1-->' -%}
+{%- if body_marker in content -%}
+  {{- require(content.count(body_marker) == 1) -}}
+  {%- set boundary = content.split(body_marker, 1) -%}
+  {%- set heading = boundary[1].split('</w:pPr>', 1) -%}
+  {{- require(heading|length == 2 and heading[0].count('<w:p>') == 1 and heading[0].count('<w:pPr>') == 1 and heading[0].rstrip().endswith('<w:pStyle w:val="Heading2" />') and '<w:pageBreakBefore' not in heading[0]) -}}
+  {%- set content = boundary[0] + heading[0] + '<w:pageBreakBefore/></w:pPr>' + heading[1] -%}
+{%- endif -%}
 {# Independent Q15 authored-row contract. Lua has bounded each ordinary cell;
    preserve its two paragraphs/cells exactly and keep only this one body row. #}
 {#- Q8 uses the same exact two-cell contract after its independent ownership guard. -#}

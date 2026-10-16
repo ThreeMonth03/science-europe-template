@@ -222,9 +222,9 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
 
 
 class CurrentResponsibilityAnchorTests(unittest.TestCase):
-    def test_first_actor_only_is_owned_markup_and_every_sentence_is_unchanged(self):
+    def test_one_owned_actor_anchor_keeps_every_selected_duty(self):
         from lxml import html
-        from check_responsibility_reading import ROLES, SENTENCES, contributor_replies
+        from check_responsibility_reading import ROLES, contributor_replies, responsibility_summary
         from current_support import PREFIX
 
         cases = [
@@ -250,14 +250,14 @@ class CurrentResponsibilityAnchorTests(unittest.TestCase):
                         for index, (node, (item, name, roles)) in enumerate(zip(nodes, people), 1):
                             actor = name if name and name.strip() else 'Contributor ' + str(index)
                             summary, = node.xpath('./p[@class="responsibility-summary"]')
-                            owner, = summary.xpath('./strong')
-                            self.assertEqual(list(summary), [owner])
-                            self.assertFalse(summary.text)
+                            actor_label, = node.xpath('./p[@class="responsible-person"]')
+                            owner, = actor_label.xpath('./strong')
+                            self.assertEqual(list(actor_label), [owner])
+                            self.assertFalse(actor_label.text)
                             self.assertEqual(''.join(owner.itertext()), actor)
                             self.assertFalse(list(owner))
-                            self.assertEqual(''.join(summary.itertext()), ' '.join(
-                                sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES['en'])
-                                if role in roles))
+                            self.assertFalse(list(summary))
+                            self.assertEqual(''.join(summary.itertext()), responsibility_summary(roles, 'en'))
                             self.assertEqual(summary.get('data-role-uuids').split(),
                                              [role for role in ROLES if role in roles])
                             self.assertEqual(node.get('data-contributor-id'), item)

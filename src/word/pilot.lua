@@ -1281,6 +1281,20 @@ local function keep_short_contributors(div)
 end
 
 function Div(div)
+  -- A conditional body boundary belongs only to the first owned section.
+  -- XML later adds pageBreakBefore to its heading, not an extra blank paragraph.
+  if (FORMAT == "docx" or FORMAT == "json") and div.identifier == "sec-data-collection" and
+     (#div.classes == 1 or (#div.classes == 2 and div.classes:includes("section"))) and
+     div.classes:includes("dmp-section") and #div.attributes == 0 and
+     #div.content == 3 and div.content[1].t == "Header" and div.content[1].level == 2 and
+     #div.content[1].classes == 1 and div.content[1].classes[1] == "body-start" and
+     #div.content[1].attributes == 0 and div.content[2].t == "Div" and
+     div.content[2].identifier == "q-how-data" and div.content[3].t == "Div" and
+     div.content[3].identifier == "q-what-data" then
+    div.content[1].classes = {}
+    div.content:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:body-start:v1-->"))
+    return div
+  end
   if div.identifier == "dmp-contributors" then return keep_short_contributors(div) end
   -- Q3's shared classifier marks only a few short plain paragraphs/list items.
   -- Chain those paragraphs, never the whole question or an unbounded answer.
@@ -1485,26 +1499,39 @@ function Div(div)
     end
     return div
   end
-  -- Q14 now names the actor in its complete summary, not a separate lead.
-  -- Keep one bounded paragraph's lines, never the next person or a missing-name
-  -- hint. Reject other shapes here rather than falling into the generic chain.
+  -- Q14 owns exactly one actor anchor and one duty paragraph. Bind the name to
+  -- its duties; keep only a bounded summary's lines, never the next person or a
+  -- missing-name hint. Reject other shapes instead of using the generic chain.
   if div.classes:includes("person-responsibilities") then
     local index = div.attributes["contributor-index"]
-    if div.identifier == "" and #div.classes == 2 and div.classes:includes("short-reading-unit") and
+    if div.identifier == "" and (#div.classes == 1 or (#div.classes == 2 and div.classes:includes("short-reading-unit"))) and
        #div.attributes == 2 and div.attributes["contributor-id"] ~= nil and
        div.attributes["contributor-id"] ~= "" and index and index:match("^[1-9]%d*$") and
-       utf8.len(pandoc.utils.stringify(div)) <= 500 and #div.content == 1 and div.content[1].t == "Para" then
-      local simple = true
-      for position, inline in ipairs(div.content[1].content) do
-        if position == 1 and inline.t == "Strong" then
-          if #inline.content == 0 then simple = false end
-          for _, child in ipairs(inline.content) do
-            if child.t ~= "Str" and child.t ~= "Space" and child.t ~= "SoftBreak" then simple = false end
-          end
-        elseif inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then simple = false end
+       #div.content == 2 and div.content[2].t == "Para" then
+      -- Para() may already have styled a short all-bold actor. Accept only that
+      -- exact owned label wrapper, never arbitrary nested or authored blocks.
+      local actor = div.content[1]
+      local labeled = actor.t == "Div" and actor.identifier == "" and #actor.classes == 0 and
+                      #actor.attributes == 1 and actor.attributes["custom-style"] == "Pilot Label" and
+                      #actor.content == 1 and actor.content[1].t == "Para"
+      if labeled then actor = actor.content[1] end
+      local anchor = actor.t == "Para" and actor.content or {}
+      local simple = #anchor == 1 and anchor[1].t == "Strong" and #anchor[1].content > 0 and #div.content[2].content > 0
+      if simple then
+        for _, inline in ipairs(anchor[1].content) do
+          if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then simple = false end
+        end
+      end
+      for _, inline in ipairs(div.content[2].content) do
+        if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then simple = false end
       end
       if simple then
-        div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Responsibility Summary"}))
+        if not labeled then
+          div.content[1] = pandoc.Div({div.content[1]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Label"}))
+        end
+        if div.classes:includes("short-reading-unit") and utf8.len(pandoc.utils.stringify(div)) <= 500 then
+          div.content[2] = pandoc.Div({div.content[2]}, pandoc.Attr("", {}, {["custom-style"] = "Pilot Responsibility Summary"}))
+        end
       end
     end
     return div

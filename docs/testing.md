@@ -66,6 +66,11 @@ unnamed and long/rich-text cases. Check:
 - submission has no internal gap prompts, while review keeps its notices;
 - headings, lists, tables, fonts and page transitions remain readable.
 
+Funding sources belong to the research overview. When visible overview or
+contributor content exists, Section 1 starts on a new page; a title alone does
+not create a cover page. Dataset attributes use one shallow indent. Only bounded
+short records or fixed terminal pairs stay together; long authored answers flow.
+
 Inspect rendered pages, not just extracted text or a test count. A LibreOffice
 DOCX preview is useful evidence but is not native Microsoft Word certification.
 A build or CI pass does not authorize deployment, overwrite a published version,

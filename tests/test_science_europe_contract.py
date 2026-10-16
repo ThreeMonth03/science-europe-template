@@ -138,7 +138,7 @@ class ScienceEuropeContractTests(unittest.TestCase):
         from itertools import product
         from bs4 import BeautifulSoup
         from current_support import environment, PREFIX
-        from check_responsibility_reading import contributor_replies, ROLES, SENTENCES
+        from check_responsibility_reading import contributor_replies, ROLES, responsibility_summary
         role_sets = ([ROLES[-1]], [ROLES[3], ROLES[-1]], ROLES, [ROLES[3]])
         for escape in (False, True):
             template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
@@ -150,10 +150,11 @@ class ScienceEuropeContractTests(unittest.TestCase):
                     self.assertEqual('author', owner['data-contributor-id'])
                     self.assertEqual('2', owner['data-contributor-index'])
                     actor = name or 'Contributor 2'
-                    expected = ' '.join(sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES['en']) if role in roles)
+                    expected = responsibility_summary(roles, 'en')
                     text = owner.select_one('.responsibility-summary').get_text().strip()
                     self.assertEqual(expected, text)
-                    self.assertEqual(ROLES[-1] in roles, f'{actor} is a creator of the data management plan.' in text)
+                    self.assertEqual(actor, owner.select_one('.responsible-person').get_text())
+                    self.assertEqual(ROLES[-1] in roles, 'authorship of the data management plan' in text)
                     for invented in ('implementing the data management plan', 'reviewed and revised'):
                         self.assertNotIn(invented, text)
                     self.assertEqual(profile == 'review' and not name, bool(owner.select('.data-gap')))

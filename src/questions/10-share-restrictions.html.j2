@@ -258,14 +258,15 @@
                     {%- endfor -%}
                 </ul>
             {%- elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesYesAUuid -%}
-                <p data-fact-id="qualified-references" data-status="complete">{{ pgettext("questions/10-share-restrictions", "This dataset has qualified references to other datasets.") }}</p>
+                <div class="qualified-reference-tail"><p data-fact-id="qualified-references" data-status="complete">{{ pgettext("questions/10-share-restrictions", "This dataset has qualified references to other datasets.") }}</p></div>
             {%- elif isPublishedDataAUuid == uuids.isPublishedDataYesAUuid and publishedQReferencesAUuid == uuids.publishedQReferencesNoAUuid -%}
-                <p data-fact-id="qualified-references" data-status="explicit-no">{{ pgettext("questions/10-share-restrictions", "This dataset has no qualified references to other datasets.") }}</p>
+                <div class="qualified-reference-tail"><p data-fact-id="qualified-references" data-status="explicit-no">{{ pgettext("questions/10-share-restrictions", "This dataset has no qualified references to other datasets.") }}</p></div>
             {%- endif -%}
             {% endset %}
             {% if output_profile|default('review') != 'submission' or publicationDatasetContent|striptags|trim or '<img' in publicationDatasetContent or '<table' in publicationDatasetContent %}
-            <div class="dataset-section" data-item-id="{{ i }}">
-            <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else pgettext("questions/10-share-restrictions", "(no name given)") }}{% endif %}</h5>
+            {% set datasetHeading %}{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else pgettext("questions/10-share-restrictions", "(no name given)") }}{% endif %}{% endset %}
+            <div class="dataset-section{{ ' short-dataset-record' if macros.shortDatasetRecord(publicationDatasetContent, datasetHeading) and '<ul' not in publicationDatasetContent|lower and 'answer-detail' not in publicationDatasetContent else '' }}" data-item-id="{{ i }}">
+            <h5>{{ datasetHeading }}</h5>
             {{ publicationDatasetContent }}
             </div>
             {% endif %}

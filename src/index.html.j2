@@ -20,8 +20,9 @@
     <article class="dmp">
       {% include "src/frontmatter.html.j2" with context %}
       {% if dc.project.versions|length > 0 %}{% include "src/versions.html.j2" with context %}{% endif %}
-      {% include "src/projects.html.j2" with context %}
-      {% include "src/contributors.html.j2" with context %}
+      {% set administrativeContent %}{% include "src/projects.html.j2" with context %}{% include "src/contributors.html.j2" with context %}{% endset %}
+      {{ administrativeContent }}
+      {% set contentHasFrontmatter = administrativeContent|striptags|trim or '<img' in administrativeContent|lower or '<table' in administrativeContent|lower %}
       {% include "src/content.html.j2" with context %}
       {% include "src/document-provenance.html.j2" with context %}
     </article>

@@ -211,14 +211,18 @@
         {% set group = preservationGroups[record.key] if record.key else none %}
         {% set recordContent = record.context ~ record.policy ~ record.tail %}
         {% if output_profile|default('review') != 'submission' or recordContent|striptags|trim or '<img' in recordContent or '<table' in recordContent %}
-        <div class="dataset-section" data-item-id="{{ record.id }}">
-          <h5>{% if sharedPolicies.count %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% if record.name|trim %}{{ pgettext("questions/11-data-preservation", ": ") }}{{ record.name|e }}{% elif output_profile|default('review') != 'submission' %}{{ pgettext("questions/11-data-preservation", ": (no name given)") }}{% endif %}{% elif output_profile|default('review') == 'submission' and not record.name|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% else %}{{ record.name|e if record.name|trim else pgettext("questions/11-data-preservation", "(no name given)") }}{% endif %}</h5>
+        {% set displayedPolicy %}{% if group and group.number %}
+          {% set policyReference %}<a href="#preservation-policy-{{ group.number }}">{{ pgettext("questions/11-data-preservation", "Shared preservation policy %(group_number)s", group_number=group.number) }}</a>{% endset %}
+          <p class="preservation-policy-reference">{{ pgettext("questions/11-data-preservation", "Preservation policy: see %(policyReference)s.", policyReference=policyReference) }}</p>
+        {% else %}{{ record.policy }}{% endif %}{% endset %}
+        {% set displayedRecord = record.context ~ displayedPolicy ~ record.tail %}
+        {% set datasetHeading %}{% if sharedPolicies.count %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% if record.name|trim %}{{ pgettext("questions/11-data-preservation", ": ") }}{{ record.name|e }}{% elif output_profile|default('review') != 'submission' %}{{ pgettext("questions/11-data-preservation", ": (no name given)") }}{% endif %}{% elif output_profile|default('review') == 'submission' and not record.name|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, record.index) }}{% else %}{{ record.name|e if record.name|trim else pgettext("questions/11-data-preservation", "(no name given)") }}{% endif %}{% endset %}
+        {% set shortRecord = macros.shortDatasetRecord(displayedRecord, datasetHeading) and '<ul' not in record.context|lower and displayedRecord.lower().count('<ul') <= 1 and ('<ul' not in record.tail|lower or 'short-repository-list' in record.tail) %}
+        <div class="dataset-section{{ ' short-dataset-record' if shortRecord else '' }}" data-item-id="{{ record.id }}">
+          <h5>{{ datasetHeading }}</h5>
           <div class="preservation-summary dataset-policy">
             {{ record.context }}
-            {% if group and group.number %}
-              {% set policyReference %}<a href="#preservation-policy-{{ group.number }}">{{ pgettext("questions/11-data-preservation", "Shared preservation policy %(group_number)s", group_number=group.number) }}</a>{% endset %}
-              <p class="preservation-policy-reference">{{ pgettext("questions/11-data-preservation", "Preservation policy: see %(policyReference)s.", policyReference=policyReference) }}</p>
-            {% else %}{{ record.policy }}{% endif %}
+            {{ displayedPolicy }}
           </div>
           {{ record.tail }}
         </div>
@@ -226,7 +230,7 @@
       {% endfor %}
       {% for group in preservationGroups.values() %}
         {% if group.number %}
-        {% set policyMemberIndices = group.members|map(attribute='index')|join(', ') %}
+        {% set policyMemberIndices = group.members|map(attribute='index')|join('、' if document_language|default('en') == 'zh-Hant' else ', ') %}
         <div class="preservation-shared-policy" id="preservation-policy-{{ group.number }}" data-member-ids="{{ group.members|map(attribute='id')|join(' ') }}">
           <h4>{{ pgettext("questions/11-data-preservation", "Shared preservation policy %(group_number)s", group_number=group.number) }}</h4>
           <div class="answer-lead"><p>{{ pgettext("questions/11-data-preservation", "This policy applies separately to produced datasets %(policyMemberIndices)s.", policyMemberIndices=policyMemberIndices) }}</p></div>

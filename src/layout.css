@@ -67,8 +67,9 @@ html body section { margin-bottom: 1.4em; }
 html body .dmp-section .question + .question { margin-top: 1.3em; }
 html body .data-gap { padding: .45em .65em; border-left: 3px solid #95651b; background: #fff8e8; }
 
-/* Frontmatter flows into the questions; section headings provide separation. */
+/* Only actual administrative content introduces a separate body page. */
 html body #dmp-content { break-before: auto; page-break-before: auto; }
+html body #sec-data-collection > h2.body-start { break-before: page; page-break-before: always; }
 html body #dmp-projects h3 { font-size: 14pt; font-weight: bold; color: #222; }
 /* A project title or identifier may contain a long unbroken token. */
 html body .document-heading h1,
@@ -81,8 +82,11 @@ html body #q-required-resources .project-resources > p:first-child > strong { ov
 html body #dmp-projects > .project > table.project-details { table-layout: fixed; }
 html body #dmp-projects > .project > table.project-details th { width: 24%; }
 html body #dmp-projects > .project > table.project-details td { overflow-wrap: anywhere; word-break: break-word; }
-/* Funding is a flowing list, not one unbreakable table row. */
+/* Funding belongs to the same overview. Multiple sources may span pages. */
+html body #dmp-projects tr.project-funding { break-inside: auto; }
 html body #dmp-projects .project-funding { overflow-wrap: anywhere; word-break: break-word; }
+html body #dmp-projects .project-funding ul { margin: 0; padding-left: 1.2em; }
+html body #dmp-projects .project-funding li { margin: 0 0 .25em; }
 html body .document-meta { font-size: 9pt; color: #526169; }
 html body .document-kind { font-size: 14pt; color: #526169; }
 html body .document-provenance { border-top: 1px solid #bcc6cc; margin-top: 2em; padding-top: .7em; font-size: 8.5pt; color: #526169; }
@@ -195,6 +199,16 @@ html body .template-gap { font-size: 9.5pt; color: #526169; border-left-color: #
 /* Owned publication reading blocks: structure, not hidden list markers. */
 html body .dataset-section { margin: .6em 0 1em; }
 html body .dataset-section > h5 { font-size: 11pt; margin: .5em 0 .35em; }
+/* One shallow ownership indent; no blanket first-line indent or extra wrappers. */
+html body .dataset-section { padding-left: 4mm; }
+html body .dataset-section > h5,
+html body .dataset-section > strong.item-label { margin-left: -4mm; }
+html body .dataset-section .answer-detail[data-fact-id="reuse-rightsholder"] > p:first-child { font-size: 9.5pt; }
+html body .dataset-section .answer-detail[data-fact-id="reuse-rightsholder"] > p:first-child strong { font-weight: normal; }
+html body #q-share-restrictions .short-dataset-record,
+html body #q-data-preservation .short-dataset-record { break-inside: avoid; }
+html body #q-share-restrictions .qualified-reference-tail { break-before: avoid; }
+html body .person-responsibilities > .responsibility-summary { margin-left: 4mm; }
 html body .distribution-section { margin: .25em 0 .45em; }
 html body .distribution-section + .distribution-section { border-top: 1px solid #cbd2d5; padding-top: .4em; }
 /* Keep an owned label with the first visible body, not the entire distribution.

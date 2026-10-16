@@ -15,27 +15,33 @@ ROLE_LABELS = {
     'zh-Hant': ['資料策展人', '資料蒐集者', '資料管理者', '資料託管員',
                 '發布者', '資料保護官', '資料管理方案創作者', '聯絡人'],
 }
-SENTENCES = {
+DUTIES = {
     'en': [
-        '{actor} is responsible for reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.',
-        '{actor} is responsible for finding, gathering and collecting data.',
-        '{actor} is responsible for maintaining the completed resource.',
-        '{actor} is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability.',
-        '{actor} is responsible for producing and disseminating electronic or print copies of the resource.',
-        '{actor} is responsible for addressing personal-data protection and data-protection policies.',
-        '{actor} is a creator of the data management plan.',
+        'reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance',
+        'finding, gathering and collecting data',
+        'maintaining the completed resource',
+        'managing data and supporting its effective use, including data processing, policies, guidelines and availability',
+        'producing and disseminating electronic or print copies of the resource',
+        'addressing personal-data protection and data-protection policies',
+        'authorship of the data management plan',
     ],
     'zh-Hant': [
-        '{actor}負責審查、補充、清理或標準化提交至資料中心或儲存庫的後設資料及相關資料，以供儲存、使用與維護。',
-        '{actor}負責尋找、彙整與蒐集資料。',
-        '{actor}負責維護已完成的資源。',
-        '{actor}負責管理資料並支援其有效運用，涵蓋資料處理、資料政策、指引與可用性。',
-        '{actor}負責以電子或紙本形式製作並發布資源副本。',
-        '{actor}負責個人資料保護及資料保護政策相關工作。',
-        '{actor}為資料管理方案撰寫者。',
+        '對提交至資料中心或儲存庫的後設資料及相關資料進行審查、補充、清理或標準化，以供儲存、使用與維護',
+        '尋找、彙整與蒐集資料',
+        '維護已完成的資源',
+        '管理資料並支援其有效運用，涵蓋資料處理、資料政策、指引與可用性',
+        '以電子或紙本形式製作並發布資源副本',
+        '個人資料保護及資料保護政策相關工作',
+        '資料管理方案的撰寫',
     ],
 }
 LISTING = path('adminDetailsCUuid', 'contributorsQUuid')
+
+
+def responsibility_summary(roles, language):
+    """Expected duty atoms retain every selected binding without actor repetition."""
+    separator, prefix, ending = ('; ', 'Responsibilities: ', '.') if language == 'en' else ('；', '職責：', '。')
+    return prefix + separator.join(duty for role, duty in zip(ROLES, DUTIES[language]) if role in roles) + ending
 
 
 def contributor_replies(people):
@@ -50,7 +56,6 @@ def contributor_replies(people):
 
 def check(root, language):
     counts = dict(role_subsets=0, identity_cases=0, missing_name_cases=0, full_documents=0)
-    separator = ' ' if language == 'en' else ''
     label = 'Contributor' if language == 'en' else '參與人員'
     name_gap = ('Please provide the name of the person or team assigned these responsibilities.'
                 if language == 'en' else '請補上負責上述職責的人員或團隊名稱。')
@@ -75,12 +80,14 @@ def check(root, language):
                 assert node['data-contributor-id'] == item
                 assert node['data-contributor-index'] == str(index)
                 actor = name if name and name.strip() else f'{label} {index}'
-                assert not node.select('.responsible-person')
+                actors = node.select('.responsible-person')
+                assert len(actors) == 1 and actors[0].get_text() == actor
+                assert len(actors[0].select('strong')) == 1
                 paragraphs = node.select('.responsibility-summary')
                 assert len(paragraphs) == 1
                 assert paragraphs[0]['data-role-uuids'].split() == selected
-                assert paragraphs[0].get_text().strip() == separator.join(
-                    sentence.format(actor=actor) for role, sentence in zip(ROLES, SENTENCES[language]) if role in roles).strip()
+                assert paragraphs[0].get_text().strip() == responsibility_summary(roles, language)
+                assert not paragraphs[0].select('strong, ul, ol')
                 gaps = node.select('.data-gap')
                 assert len(gaps) == int(profile == 'review' and not (name and name.strip()))
                 if gaps: assert gaps[0].get_text(strip=True) == name_gap

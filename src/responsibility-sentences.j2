@@ -1,36 +1,31 @@
-{# Sentences is an existing translation-pipeline convention: English uses a
-   space between complete sentences, while Traditional Chinese joins at 。.
+{# One actor anchor owns this list of duty phrases. Keep each role's complete
+   meaning, including the curator's alternatives, without repeating the name.
    Append to the caller's fresh lists; include assignments would be local. #}
-{# Own the first actor's emphasis here, before translation interpolation.
-   The caller has already escaped the actor; never find names in rendered prose. #}
-{% macro responsibilityActorLabel() -%}
-  {%- if not responsibilitySentences -%}<strong>{{ responsibilityActor }}</strong>{%- else -%}{{ responsibilityActor }}{%- endif -%}
-{%- endmacro %}
 {% if uuids.contributorRoleDataCuratorAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance.", responsibility_actor=responsibilityActorLabel())) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "reviewing, enhancing, cleaning or standardizing metadata and associated data submitted to a data centre or repository for storage, use and maintenance")) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataCuratorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataCollectorAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for finding, gathering and collecting data.", responsibility_actor=responsibilityActorLabel())) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "finding, gathering and collecting data")) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataCollectorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataManagerAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for maintaining the completed resource.", responsibility_actor=responsibilityActorLabel())) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "maintaining the completed resource")) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataManagerAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataStewardAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for managing data and supporting its effective use, including data processing, policies, guidelines and availability.", responsibility_actor=responsibilityActorLabel())) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "managing data and supporting its effective use, including data processing, policies, guidelines and availability")) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataStewardAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDistributorAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for producing and disseminating electronic or print copies of the resource.", responsibility_actor=responsibilityActorLabel())) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "producing and disseminating electronic or print copies of the resource")) -%}
   {% do mappedRoles.append(uuids.contributorRoleDistributorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleDataProtectorAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is responsible for addressing personal-data protection and data-protection policies.", responsibility_actor=responsibilityActorLabel())) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "addressing personal-data protection and data-protection policies")) -%}
   {% do mappedRoles.append(uuids.contributorRoleDataProtectorAUuid) %}
 {% endif %}
 {% if uuids.contributorRoleCreatorOfDMPAUuid in roles %}
-  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "%(responsibility_actor)s is a creator of the data management plan.", responsibility_actor=responsibilityActorLabel())) -%}
+  {%- do responsibilitySentences.append(pgettext("responsibility-sentences", "authorship of the data management plan")) -%}
   {% do mappedRoles.append(uuids.contributorRoleCreatorOfDMPAUuid) %}
 {% endif %}

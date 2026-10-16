@@ -9,7 +9,7 @@
     {%- if contributorsItems|length > 0 -%}
       {# Group by the actual list item, never by a possibly shared person name.
          These are the same seven role bindings as before; non-DM roles do not
-         imply an assignment. Only template-owned sentences are joined. #}
+         imply an assignment. Only template-owned duty phrases are joined. #}
       {%- for contributorItem in contributorsItems -%}
         {%- set contributorIndex = loop.index -%}
         {%- set personPath = [contributorsPath, contributorItem]|reply_path -%}
@@ -21,7 +21,8 @@
         {% include 'src/responsibility-sentences.j2' with context %}
         {%- if responsibilitySentences -%}
           {% set personContent %}
-            <p class="responsibility-summary" data-fact-id="data-management-responsibilities" data-role-uuids="{{ mappedRoles|join(' ') }}">{{ responsibilitySentences|join("" if document_language|default("en") == "zh-Hant" else " ") }}</p>
+            <p class="responsible-person"><strong>{{ responsibilityActor }}</strong></p>
+            <p class="responsibility-summary" data-fact-id="data-management-responsibilities" data-role-uuids="{{ mappedRoles|join(' ') }}">{{ pgettext("questions/14-dm-responsible", "Responsibilities: %(duties)s.", duties=responsibilitySentences|join(pgettext("responsibility-sentences", "; "))) }}</p>
             {% if not name|trim and output_profile|default('review') != 'submission' %}
               <p class="data-gap" data-fact-id="responsible-person-name" data-status="missing">{{ pgettext("questions/14-dm-responsible", "Please provide the name of the person or team assigned these responsibilities.") }}</p>
             {% endif %}

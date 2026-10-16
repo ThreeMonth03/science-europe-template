@@ -165,8 +165,9 @@ def check(root, language):
             rows = soup.select('[data-fact-id="project-funding"] li')
             funding = soup.select_one('[data-fact-id="project-funding"]')
             if funding:
-                assert funding.name == 'div' and funding.h4 is not None
-                assert funding.find_parent('table') is None, 'Funding must flow outside the metadata table'
+                assert funding.name == 'tr' and funding.th is not None
+                assert funding.find_parent('table').get('class') == ['project-details']
+                assert funding.th.get_text() == ('Funding sources' if language == 'en' else '經費來源')
             visible = profile == 'review' or bool(expected or (grant or '').strip() or status in FUNDING_STATUS[language])
             assert len(rows) == int(visible)
             if visible:
@@ -179,7 +180,7 @@ def check(root, language):
                 assert [a['href'] for a in rows[0].select('a')] == ([link] if link else [])
                 assert not rows[0].select('b, img, script'), 'Funding fields are text, not HTML'
             if profile == 'submission':
-                assert not soup.select('table.project-details')
+                assert bool(soup.select('table.project-details')) == visible
                 assert bool(soup.select('[data-fact-id="project-funding"]')) == visible
             assert not soup.select('ul:empty, li:empty')
             counts['funding_cases'] += 1
@@ -262,7 +263,7 @@ def check(root, language):
             km, replies = fixture(None)
             for field, filled in zip(METADATA, states): replies[path(LISTING,'project-a',field)] = '0' if filled else ' \n '
             soup = render(overview, km, replies, profile)
-            assert len(soup.select('.project-details tr')) == (sum(states) if profile=='submission' else 3)
+            assert len(soup.select('.project-details tr')) == (sum(states) if profile=='submission' else 4)
             assert bool(soup.select('.project-details')) == (any(states) or profile=='review')
             counts['project_subsets'] += 1
 

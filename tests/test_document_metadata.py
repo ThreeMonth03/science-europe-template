@@ -19,8 +19,9 @@ class DocumentMetadataTests(unittest.TestCase):
     PHASE = 'Before final project end'
 
     def render(self, entry, name=PROJECT, escape=False, phase='phase-end', profile=None,
-               versions=None, document_created_at='1999-12-31T23:59:00Z', trace_fields=None):
-        km, replies = fixture(None, name)
+               versions=None, document_created_at='1999-12-31T23:59:00Z', trace_fields=None,
+               administrative=None):
+        km, replies = administrative if administrative is not None else fixture(None, name)
         km['entities']['phases'] = {'phase-end': {'title': self.PHASE}}
         if versions is None:
             versions = [dict(uuid='selected', name=self.VERSION,
@@ -41,6 +42,28 @@ class DocumentMetadataTests(unittest.TestCase):
         if profile is not None:
             values['output_profile'] = profile
         return BeautifulSoup(env.get_template(entry).render(**values), 'html.parser')
+
+    def test_body_page_boundary_requires_visible_administrative_content(self):
+        from check_project_acronym import LISTING, funding_fixture, integration
+        from current_support import path
+        cases = []
+        for name in (None, 'Named title only'):
+            cases.append((fixture(None, name), False))
+        for field, value in (('projectStartQUuid', '2026-01-01'),
+                             ('projectAbstractQUuid', '<p>Keep this abstract.</p>'),
+                             ('projectAbstractQUuid', '<img src="figure.png" alt="">')):
+            km, replies = fixture(None, 'Named project')
+            replies[path(LISTING, 'project-a', field)] = value
+            cases.append(((km, replies), True))
+        km, replies, _ = funding_fixture(name=integration('Funding body'), grant='GRANT-1')
+        cases.append(((km, replies), True))
+        for entry in ('src/submission/pdf.html.j2', 'src/submission/word.html.j2'):
+            for administrative, expected in cases:
+                with self.subTest(entry=entry, expected=expected, fields=len(administrative[1])):
+                    soup = self.render(entry, versions=[], administrative=administrative)
+                    self.assertEqual(expected, bool(soup.select('#sec-data-collection > h2.body-start')))
+                    self.assertEqual(15, len(soup.select('.question > h3')))
+                    self.assertEqual(1 if expected else 0, len(soup.select('.body-start')))
 
     def test_submission_has_business_title_and_version_without_system_trace(self):
         for entry in ('src/submission/pdf.html.j2', 'src/submission/word.html.j2'):

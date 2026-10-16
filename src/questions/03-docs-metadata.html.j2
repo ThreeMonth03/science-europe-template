@@ -85,7 +85,7 @@
           {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will document the data using the %(first_standard)s, %(second_standard)s, and %(third_standard)s metadata standards.", first_standard=metadataStandards[0], second_standard=metadataStandards[1], third_standard=metadataStandards[2])) -%}
         {%- endif -%}
         {%- if metadataStandardsKeywordsAUuid == uuids.metadataStandardsKeywordsYesAUuid -%}
-          {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will include keywords or relevant ontology references to optimize the possibility for discovery and potential reuse.")) -%}
+          {%- do metadataSentences.append(pgettext("questions/03-docs-metadata", "We will include keywords or relevant ontology references to support discovery and potential reuse.")) -%}
         {%- endif -%}
       {%- endif -%}
 

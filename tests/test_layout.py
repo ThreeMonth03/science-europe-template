@@ -22,6 +22,7 @@ class LayoutTests(unittest.TestCase):
         css = (ROOT / 'src/layout.css').read_text()
         self.assertIn('html body #dmp-content { break-before: auto; page-break-before: auto; }', css)
         self.assertNotIn('#dmp-content { break-before: page;', css)
+        self.assertIn('#sec-data-collection > h2.body-start { break-before: page;', css)
         # The XML helper must accept the flowing boundary and leave authored
         # breaks intact, not turn the first section into a mandatory new page.
         bookmark = '<w:bookmarkStart w:id="1" w:name="dmp-content" />\n    '
@@ -34,6 +35,86 @@ class LayoutTests(unittest.TestCase):
                 with self.subTest(escape=escape, explicit_break=bool(explicit)):
                     source = bookmark + explicit + heading
                     self.assertEqual(source, template.render(content=source))
+            marked = '<!--DSW:SE:body-start:v1-->' + heading
+            self.assertEqual(heading.replace('</w:pPr>', '<w:pageBreakBefore/></w:pPr>'),
+                             template.render(content=marked))
+
+    def test_stock_pandoc_marks_only_the_owned_conditional_body_heading(self):
+        from native_support import IMAGE, RUNNER
+        section = ('<section id="sec-data-collection" class="dmp-section"><h2 class="body-start">Section 1</h2>'
+                   '<div id="q-how-data" class="question"><h3>1. One</h3></div>'
+                   '<div id="q-what-data" class="question"><h3>2. Two</h3></div></section>')
+        cases = [section, section.replace(' class="body-start"', ''),
+                 section.replace('sec-data-collection', 'other-section'), '<h2 class="body-start">Authored heading</h2>']
+        payload = dict(lua=(ROOT/'src/word/pilot.lua').read_text(),
+                       html=''.join('<div id="case-'+str(i)+'">'+value+'</div>' for i,value in enumerate(cases)))
+        result = json.loads(subprocess.check_output(
+            ['docker','run','--rm','--pull=never','--network=none','--log-driver=none','-i',
+             '--entrypoint','python',IMAGE,'-c',RUNNER], input=json.dumps(payload).encode(), timeout=180))
+        for index, block in enumerate(result['blocks']):
+            self.assertEqual(int(index == 0), json.dumps(block).count('DSW:SE:body-start:v1'))
+
+    def test_dataset_indent_and_bounded_keeps_preserve_text_and_links(self):
+        from native_support import IMAGE, RUNNER
+        def record(body, marked=True, q='q-data-preservation'):
+            return ('<div id="'+q+'" class="question"><h3>Original question</h3><div class="answer">'
+                    '<div class="dataset-section'+(' short-dataset-record' if marked else '')+'" data-item-id="dataset">'
+                    '<h5>Original dataset</h5>'+body+'</div></div></div>')
+        short = ('<div class="answer-detail"><p>Keep original description.</p></div>'
+                 '<div class="dataset-policy"><p>See <a href="#policy">policy</a>.</p></div>'
+                 '<div class="repository-destinations short-repository-list"><ul><li>Institutional repository.</li></ul></div>')
+        cases = [('short', record(short), True), ('unmarked', record(short, False), False),
+                 ('long', record(short.replace('Keep original description.', '中'*181)), False),
+                 ('table', record(short.replace('Keep original description.', '<table><tr><td>Keep table.</td></tr></table>')), False),
+                 ('authored-list', record(short.replace('<p>Keep original description.</p>', '<ul><li>Keep authored list.</li></ul>')), False),
+                 ('fixed-tail', record('<p>'+'Original opening. '*30+'</p><div class="distribution-section"><p>'+'Fixed policy. '*30+'</p></div><div class="qualified-reference-tail"><p>No qualified references.</p></div>', False, 'q-share-restrictions'), True),
+                 ('authored-tail', record('<div class="answer-detail"><p>Keep authored text.</p></div><div class="qualified-reference-tail"><p>No qualified references.</p></div>', False, 'q-share-restrictions'), False),
+                 ('wrong-owner', record(short, q='q-other'), False)]
+        script = '''import contextlib,io,json,sys
+p=json.load(sys.stdin);results=[]
+for lua in ['',p['lua']]:
+ sys.stdin=io.StringIO(json.dumps(dict(lua=lua,html=p['html'])))
+ out=io.StringIO()
+ with contextlib.redirect_stdout(out): exec(p['runner'],{})
+ results.append(json.loads(out.getvalue()))
+print(json.dumps(results))
+'''
+        payload = dict(lua=(ROOT/'src/word/preservation-reading.lua').read_text(), runner=RUNNER,
+                       html=''.join('<div id="case-'+name+'">'+html+'</div>' for name,html,_ in cases))
+        before, after = json.loads(subprocess.check_output(
+            ['docker','run','--rm','--pull=never','--network=none','--log-driver=none','-i',
+             '--entrypoint','python',IMAGE,'-c',script], input=json.dumps(payload).encode(), timeout=180))
+        def values(node, kind):
+            if isinstance(node, dict):
+                own = [node['c']] if node.get('t') == kind else []
+                return own + sum((values(value, kind) for value in node.values()), [])
+            return sum((values(value, kind) for value in node), []) if isinstance(node, list) else []
+        for (name, _, bounded), left, right in zip(cases, before['blocks'], after['blocks']):
+            with self.subTest(case=name):
+                self.assertEqual(values(left, 'Str'), values(right, 'Str'))
+                self.assertEqual(values(left, 'Link'), values(right, 'Link'))
+                self.assertEqual(int(bounded), json.dumps(right).count('Pilot Dataset Terminal'))
+                self.assertEqual(name != 'wrong-owner', 'Pilot Dataset Detail' in json.dumps(right))
+
+    def test_short_dataset_html_hint_rejects_unknown_or_tall_authored_markup(self):
+        import sys
+        sys.path.insert(0, str(ROOT/'scripts'))
+        from current_support import environment
+        template = environment(ROOT, False).from_string(
+            "{% import 'src/macros.html.j2' as m %}{{ m.shortDatasetRecord(value) }}")
+        for value, expected in [('<p>Keep <a href="#policy">policy</a>.</p>', '1'),
+                                ('<div><p>'+'中'*300+'</p></div>', '1'),
+                                ('<p>'+'a'*301+'</p>', ''), ('<IMG src="large.png">', ''),
+                                ('<svg></svg>', ''), ('<table><tr><td>Keep.</td></tr></table>', ''),
+                                ('<p\nstyle = "font-size:100pt">Keep.</p>', ''),
+                                ('<div><blockquote>Keep.</blockquote></div>', '')]:
+            with self.subTest(value=value[:40]):
+                self.assertEqual(expected, template.render(value=value))
+        self.assertEqual('', template.render(value='<p>x</p>'*20))
+        labeled = environment(ROOT, False).from_string(
+            "{% import 'src/macros.html.j2' as m %}{{ m.shortDatasetRecord(value, label) }}")
+        self.assertEqual('', labeled.render(value='<p>Keep.</p>', label='x'*1000))
+        self.assertEqual('', labeled.render(value='<p>'+'中'*295+'</p>', label='Long dataset name'))
 
     def test_flowing_word_root_still_classifies_only_owned_empty_sections(self):
         from native_support import IMAGE
@@ -376,25 +457,26 @@ with tempfile.TemporaryDirectory() as tmp:
             'two-projects': base.replace('</table></div>', '</table></div><div class="project-resources"><p>Other project.</p></div>'),
         }
         cases += [('budget-'+name, html, None) for name, html in rejected.items()]
-        def person(text='A. Example manages data. A. Example implements the plan.', ending='', attrs=''):
+        def person(text='Responsibilities: managing data; authorship of the data management plan.',
+                   actor='<strong>A. Example</strong>', ending='', attrs=''):
             return ('<div class="person-responsibilities short-reading-unit" data-contributor-id="person" '
-                    'data-contributor-index="2"'+attrs+'><p>'+text+'</p>'+ending+'</div>')
+                    'data-contributor-index="2"'+attrs+'><p>'+actor+'</p><p>'+text+'</p>'+ending+'</div>')
         cases += [('person-en', person(), 'Pilot Responsibility Summary'),
-                  ('person-zh', person('範例團隊負責資料管理。範例團隊負責執行資料管理方案。'), 'Pilot Responsibility Summary'),
-                  ('person-first-actor', person('<strong>A. Example</strong> manages data. A. Example implements the plan.'), 'Pilot Responsibility Summary'),
-                  ('person-first-actor-zh', person('<strong>範例團隊</strong>負責資料管理。範例團隊負責執行資料管理方案。'), 'Pilot Responsibility Summary'),
-                  ('person-later-bold', person('A. Example manages <strong>data</strong>.'), None),
-                  ('person-rich-actor', person('<strong><a href="https://example.org">A. Example</a></strong> manages data.'), None),
-                  ('person-boundary', person('x'*500), 'Pilot Responsibility Summary'),
+                  ('person-zh', person('職責：資料管理；資料管理方案的撰寫。', '<strong>範例團隊</strong>'), 'Pilot Responsibility Summary'),
+                  ('person-escaped-actor', person(actor='<strong>&lt;Owner&gt; &amp; Team</strong>'), 'Pilot Responsibility Summary'),
+                  ('person-later-bold', person('Responsibilities: managing <strong>data</strong>.'), None),
+                  ('person-rich-actor', person(actor='<strong><a href="https://example.org">A. Example</a></strong>'), None),
+                  ('person-boundary', person('x'*499, '<strong>A</strong>'), 'Pilot Responsibility Summary'),
                   ('person-long', person('x'*501), None),
                   ('person-missing-name-hint', person(ending='<p class="data-gap">Please provide the name.</p>'), None),
                   ('person-link', person('<a href="https://example.org">A. Example</a> manages data.'), None),
+                  ('person-no-anchor', person(actor='A. Example'), None),
                   ('person-extra-attribute', person(attrs=' data-extra="original"'), None),
                   ('person-unmarked', person().replace(' short-reading-unit', ''), None),
                   ('person-invalid-index', person().replace('contributor-index="2"', 'contributor-index="0"'), None)]
         lua = (ROOT/'src/word/pilot.lua').read_text()
         call = '  if div.identifier == "q-required-resources" then div = keep_short_budget_narrative(div) end'
-        guard = 'utf8.len(pandoc.utils.stringify(div)) <= 500 and #div.content == 1'
+        guard = '#div.content == 2 and div.content[2].t == "Para"'
         self.assertEqual(lua.count(call), 1); self.assertEqual(lua.count(guard), 1)
         before = lua.replace(call, '').replace(guard, 'false and '+guard)
         runner = 'import contextlib,io,json,sys\np=json.load(sys.stdin);results=[]\nfor source in p["sources"]:\n sys.stdin=io.StringIO(json.dumps(dict(lua=source,html=p["html"])))\n out=io.StringIO()\n with contextlib.redirect_stdout(out): exec('+repr(RUNNER)+',{})\n results.append(json.loads(out.getvalue()))\nprint(json.dumps(results))'
@@ -432,9 +514,20 @@ with tempfile.TemporaryDirectory() as tmp:
                 right = copy.deepcopy(right)
                 rows = 1 if name == 'budget-one' else 3 if name in ('budget-three', 'budget-training-three-rows') else 2
                 self.assertEqual(restore_row_markers(right), rows - 1 if name.startswith('budget-') and style else 0)
-                if style is None: self.assertEqual(left, right)
+                if style is None:
+                    self.assertEqual(left, right)
+                    if name in ('person-long', 'person-unmarked'):
+                        person_blocks = right['c'][1][0]['c'][1]
+                        self.assertEqual(person_blocks[0]['c'][0][2], [['custom-style', 'Pilot Label']])
+                        self.assertEqual(person_blocks[1]['t'], 'Para')
                 else:
                     self.assertEqual(only_wrapper(left,right,style,name in bridges), 2 if name in bridges else 1)
+                    if name.startswith('person-'):
+                        # Para() already owns the name's all-bold label in both
+                        # versions. Q14 adds only the bounded duty paragraph.
+                        person_blocks = right['c'][1][0]['c'][1]
+                        self.assertEqual(person_blocks[0]['c'][0][2], [['custom-style', 'Pilot Label']])
+                        self.assertEqual(person_blocks[1]['c'][0][2], [['custom-style', 'Pilot Responsibility Summary']])
                     if name in bridges:
                         detail = right['c'][1][0]['c'][1][1]['c'][1][0]
                         self.assertEqual(detail['c'][0][2], [['fact-id', 'specialist-expertise-detail'], ['status', 'complete']])

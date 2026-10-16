@@ -35,6 +35,10 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
         for container in (section.header, section.first_page_header, section.even_page_header):
             for paragraph in container.paragraphs:
                 paragraph.clear()
+                properties = paragraph._element.find(qn("w:pPr"))
+                if properties is not None:
+                    for border in list(properties.findall(qn("w:pBdr"))):
+                        properties.remove(border)
             for element in list(container._element.iter()):
                 if element.tag in {qn("w:drawing"), qn("w:pict")}:
                     element.getparent().remove(element)
@@ -140,6 +144,7 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     responsibility.base_style = document.styles["Body Text"]
     responsibility.paragraph_format.keep_with_next = False
     responsibility.paragraph_format.keep_together = True
+    responsibility.paragraph_format.left_indent = Mm(4)
     # Each bounded frontmatter person is one Compact paragraph with line breaks.
     # Keep that person's lines, never the following person or the whole list.
     contributor = document.styles.add_style("Pilot Contributor Summary", WD_STYLE_TYPE.PARAGRAPH)
@@ -161,6 +166,23 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     preservation.paragraph_format.keep_with_next = False
     preservation.paragraph_format.keep_together = True
     # END bounded preservation label style
+    # One ownership indent inside dataset records, preserving existing keep
+    # semantics. Headings remain flush left; no authored text is rewritten.
+    for source, name in (("Body Text", "Detail"), ("Pilot Label", "Label"),
+                         ("Pilot Lead", "Lead"), ("Pilot Provenance", "Provenance"),
+                         ("Pilot Preservation Summary", "Summary")):
+        item = document.styles.add_style("Pilot Dataset " + name, WD_STYLE_TYPE.PARAGRAPH)
+        item.base_style = document.styles[source]
+        item.paragraph_format.left_indent = Mm(4)
+        if name == "Label":
+            item.font.size = Pt(9.5)
+        if name == "Summary":
+            item.paragraph_format.first_line_indent = Mm(-4)
+    # The final paragraph of a bounded record must not pull the next dataset.
+    terminal = document.styles.add_style("Pilot Dataset Terminal", WD_STYLE_TYPE.PARAGRAPH)
+    terminal.base_style = document.styles["Pilot Dataset Detail"]
+    terminal.paragraph_format.keep_with_next = False
+    terminal.paragraph_format.keep_together = True
     table_lead = document.styles.add_style("Pilot Table Lead", WD_STYLE_TYPE.PARAGRAPH)
     table_lead.base_style = document.styles["Compact"]
     table_lead.paragraph_format.keep_with_next = True

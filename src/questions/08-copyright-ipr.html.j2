@@ -17,7 +17,7 @@
       {%- set asOpenAsPossibleAUuid = '' -%}
     {%- endif -%}
     {%- if asOpenAsPossibleAUuid == uuids.asOpenAsPossibleYesAUuid -%}
-      {{ pgettext("questions/08-copyright-ipr", "<p>We will manage our data according to the principle <em>as open as possible</em>.</p>") }}
+      {{ pgettext("questions/08-copyright-ipr", "<p>We will follow the principle of making our data <em>as open as possible</em>.</p>") }}
     {%- elif asOpenAsPossibleAUuid == uuids.asOpenAsPossibleNoAUuid -%}
       <p data-fact-id="openness-principle" data-status="explicit-no">{{ pgettext("questions/08-copyright-ipr", "We will not manage our data according to the principle of being as open as possible.") }}</p>
     {%- endif -%}
