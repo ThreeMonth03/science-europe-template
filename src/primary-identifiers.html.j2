@@ -1,0 +1,57 @@
+{# Primary identifiers are produced-dataset siblings, independent of publication.
+   A selected type is not proof that an identifier value has been assigned. #}
+{%- set primaryIdentifierParts = [uuids.preservingCUuid, uuids.producedDataQUuid, i, uuids.producedDataIdentifiersQUuid] -%}
+{%- set primaryIdentifierListPath = activeAnswer.path(primaryIdentifierParts, 'ListQuestion') if km is defined else primaryIdentifierParts|reply_path -%}
+{%- set primaryIdentifierItems = repliesMap[primaryIdentifierListPath]|reply_items if primaryIdentifierListPath else [] -%}
+{%- if (repliesMap[producedDataPath].value is defined and repliesMap[producedDataPath].value.type is defined and repliesMap[producedDataPath].value.type != 'ItemListReply') or (primaryIdentifierListPath in repliesMap and repliesMap[primaryIdentifierListPath].value is defined and repliesMap[primaryIdentifierListPath].value.type is defined and repliesMap[primaryIdentifierListPath].value.type != 'ItemListReply') -%}
+  {%- set primaryIdentifierItems = [] -%}
+{%- endif -%}
+{%- for identifierItem in primaryIdentifierItems -%}
+  {%- set primaryIdentifierItemParts = primaryIdentifierParts + [identifierItem] -%}
+  {%- set primaryIdentifierTypePath = activeAnswer.path(primaryIdentifierItemParts + [uuids.dataIdentifierTypeQUuid], 'OptionsQuestion') if km is defined else (primaryIdentifierItemParts + [uuids.dataIdentifierTypeQUuid])|reply_path -%}
+  {%- set primaryIdentifierType = repliesMap[primaryIdentifierTypePath]|reply_str_value if primaryIdentifierTypePath else '' -%}
+  {%- if (primaryIdentifierTypePath in repliesMap and repliesMap[primaryIdentifierTypePath].value is defined and repliesMap[primaryIdentifierTypePath].value.type is defined and repliesMap[primaryIdentifierTypePath].value.type != 'AnswerReply') or (km is defined and primaryIdentifierTypePath and (primaryIdentifierType not in km.entities.questions[uuids.dataIdentifierTypeQUuid].answerUuids or primaryIdentifierType not in km.entities.answers)) -%}
+    {%- set primaryIdentifierType = '' -%}
+  {%- endif -%}
+  {%- set primaryIdentifierLabel = '' -%}
+  {%- if primaryIdentifierType == uuids.dataIdentifierTypeHandleAUuid -%}
+    {%- set primaryIdentifierLabel = 'Handle' -%}
+  {%- elif primaryIdentifierType == uuids.dataIdentifierTypeDoiAUuid -%}
+    {%- set primaryIdentifierLabel = 'DOI' -%}
+  {%- elif primaryIdentifierType == uuids.dataIdentifierTypeArkAUuid -%}
+    {%- set primaryIdentifierLabel = 'ARK' -%}
+  {%- elif primaryIdentifierType == uuids.dataIdentifierTypeUrlAUuid -%}
+    {%- set primaryIdentifierLabel = 'URL' -%}
+  {%- elif primaryIdentifierType == uuids.dataIdentifierTypeOtherAUuid -%}
+    {%- set primaryIdentifierOtherParts = primaryIdentifierItemParts + [uuids.dataIdentifierTypeQUuid, uuids.dataIdentifierTypeOtherAUuid, uuids.dataIdentifierTypeOtherTypeQUuid] -%}
+    {%- set primaryIdentifierOtherPath = activeAnswer.path(primaryIdentifierOtherParts, 'ValueQuestion') if km is defined else primaryIdentifierOtherParts|reply_path -%}
+    {%- set primaryIdentifierLabel = repliesMap[primaryIdentifierOtherPath]|reply_str_value|trim if primaryIdentifierOtherPath else '' -%}
+    {%- if primaryIdentifierOtherPath in repliesMap and repliesMap[primaryIdentifierOtherPath].value is defined and repliesMap[primaryIdentifierOtherPath].value.type is defined and repliesMap[primaryIdentifierOtherPath].value.type != 'StringReply' -%}
+      {%- set primaryIdentifierLabel = '' -%}
+    {%- endif -%}
+    {%- if not primaryIdentifierLabel -%}{%- set primaryIdentifierLabel -%}{{ pgettext("questions/13-persistent-identifier", "Other identifier") }}{%- endset -%}{%- endif -%}
+  {%- endif -%}
+  {%- set primaryIdentifierValuePath = activeAnswer.path(primaryIdentifierItemParts + [uuids.dataIdentifierIdentifierQUuid], 'ValueQuestion') if km is defined else (primaryIdentifierItemParts + [uuids.dataIdentifierIdentifierQUuid])|reply_path -%}
+  {%- set primaryIdentifierValue = repliesMap[primaryIdentifierValuePath]|reply_str_value|trim if primaryIdentifierValuePath else '' -%}
+  {%- if primaryIdentifierValuePath in repliesMap and repliesMap[primaryIdentifierValuePath].value is defined and repliesMap[primaryIdentifierValuePath].value.type is defined and repliesMap[primaryIdentifierValuePath].value.type != 'StringReply' -%}
+    {%- set primaryIdentifierValue = '' -%}
+  {%- endif -%}
+  {%- if primaryIdentifierLabel or primaryIdentifierValue or primaryIdentifierType == uuids.dataIdentifierTypeNoPidAUuid -%}
+    <li data-item-id="{{ identifierItem }}">
+      {% if primaryIdentifierLabel and primaryIdentifierValue %}
+        <p data-fact-id="primary-identifier-record" data-status="complete">{{ pgettext("questions/13-persistent-identifier", "%(identifierType)s: <strong>%(identifierValue)s</strong>", identifierType=primaryIdentifierLabel|e, identifierValue=primaryIdentifierValue|e) }}</p>
+      {% else %}
+      {% if primaryIdentifierType == uuids.dataIdentifierTypeNoPidAUuid %}
+        <p data-fact-id="primary-identifier-policy" data-status="explicit-no">{{ pgettext("questions/13-persistent-identifier", "We do not assign persistent identifiers to this dataset.") }}</p>
+      {% elif primaryIdentifierLabel %}
+        <p data-fact-id="primary-identifier-type" data-status="complete">{{ pgettext("questions/13-persistent-identifier", "Identifier type: %(identifierType)s.", identifierType=primaryIdentifierLabel|e) }}</p>
+      {% endif %}
+      {% if primaryIdentifierValue %}
+        <p data-fact-id="primary-identifier-value" data-status="complete">{{ pgettext("questions/13-persistent-identifier", "Recorded identifier: <strong>%(identifierValue)s</strong>", identifierValue=primaryIdentifierValue|e) }}</p>
+      {% elif primaryIdentifierLabel and primaryIdentifierValuePath and output_profile|default('review') != 'submission' %}
+        <p class="data-gap" data-fact-id="primary-identifier-value" data-status="missing">{{ pgettext("questions/13-persistent-identifier", "The primary identifier value has not been provided.") }}</p>
+      {% endif %}
+      {% endif %}
+    </li>
+  {%- endif -%}
+{%- endfor -%}

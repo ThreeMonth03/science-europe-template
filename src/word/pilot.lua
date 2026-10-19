@@ -1258,9 +1258,11 @@ end
 -- Frontmatter people are individual Compact paragraphs with explicit line
 -- breaks. Keep only bounded scalar records; do not bind the roster together.
 local function keep_short_contributors(div)
-  if (FORMAT ~= "docx" and FORMAT ~= "json") or #div.classes ~= 0 or #div.attributes ~= 0 or
+  local separate = #div.classes == 1 and div.classes:includes("separate-roster")
+  if (FORMAT ~= "docx" and FORMAT ~= "json") or (#div.classes ~= 0 and not separate) or #div.attributes ~= 0 or
      #div.content ~= 2 or div.content[1].t ~= "Header" or div.content[1].level ~= 2 or
      div.content[2].t ~= "BulletList" then return nil end
+  if separate and #div.content[2].content < 4 then return nil end
   local function simple(inlines, nested)
     for _, inline in ipairs(inlines) do
       if inline.t == "Span" or inline.t == "Strong" or inline.t == "Link" then
@@ -1289,7 +1291,82 @@ local function keep_short_contributors(div)
       end
     end
   end
+  if separate then
+    div.content:insert(1, pandoc.RawBlock("openxml", "<!--DSW:SE:roster-start:v1-->"))
+    changed = true
+  end
   if changed then return div end
+end
+
+-- Q14's generated fixed-duty lists have one actor and at most seven plain
+-- bullets. Keep only a bounded person, not the next person or a whole answer.
+-- Enter through the owned question/answer containers so authored lookalikes
+-- elsewhere cannot acquire a list keep chain.
+local function keep_short_responsibility_lists(question)
+  if FORMAT ~= "docx" and FORMAT ~= "json" then return nil end
+  local function owned(block, classes, attributes)
+    if block.t ~= "Div" or block.identifier ~= "" or #block.classes ~= #classes then return false end
+    for _, class in ipairs(classes) do if not block.classes:includes(class) then return false end end
+    for key, _ in pairs(block.attributes) do if not attributes[key] then return false end end
+    return true
+  end
+  local function plain(inlines)
+    if #inlines == 0 then return false end
+    for _, inline in ipairs(inlines) do
+      if inline.t ~= "Str" and inline.t ~= "Space" and inline.t ~= "SoftBreak" then return false end
+    end
+    return true
+  end
+  if #question.classes ~= 1 or not question.classes:includes("question") or #question.attributes ~= 0 then return nil end
+  local changed = false
+  for _, answer in ipairs(question.content) do
+    if owned(answer, {"answer"}, {}) then
+      for _, block in ipairs(answer.content) do
+        if owned(block, {"responsibilities-block"}, {}) then
+          for _, person in ipairs(block.content) do
+            if owned(person, {"person-responsibilities", "short-responsibility-list"},
+                {["contributor-id"]=true, ["contributor-index"]=true}) and
+               #person.attributes == 2 and person.attributes["contributor-id"] and
+               person.attributes["contributor-id"]:match("%S") and person.attributes["contributor-index"] and
+               person.attributes["contributor-index"]:match("^[1-9]%d*$") and #person.content == 2 then
+              local actor, duties = person.content[1], person.content[2]
+              local labeled = owned(actor, {}, {["custom-style"]=true}) and #actor.attributes == 1 and
+                actor.attributes["custom-style"] == "Pilot Label" and #actor.content == 1 and actor.content[1].t == "Para"
+              if labeled then actor = actor.content[1] end
+              local anchor = actor.t == "Para" and actor.content or {}
+              local simple = #anchor == 1 and anchor[1].t == "Strong" and plain(anchor[1].content) and
+                display_width(actor) <= 120 and display_width(person) <= 900 and duties.t == "BulletList" and
+                #duties.content >= 3 and #duties.content <= 7
+              local paragraphs = {}
+              if simple then
+                for index, item in ipairs(duties.content) do
+                  local paragraph = #item == 1 and item[1] or nil
+                  -- The existing generic short-list pass runs first for three
+                  -- bullets. Accept only its exact nonterminal label wrapper.
+                  if paragraph and index < #duties.content and owned(paragraph, {}, {["custom-style"]=true}) and
+                     #paragraph.attributes == 1 and paragraph.attributes["custom-style"] == "Pilot List Lead" and
+                     #paragraph.content == 1 and paragraph.content[1].t == "Para" then paragraph = paragraph.content[1] end
+                  if not paragraph or (paragraph.t ~= "Plain" and paragraph.t ~= "Para") or
+                     not plain(paragraph.content) then simple = false end
+                  table.insert(paragraphs, paragraph)
+                end
+              end
+              if simple then
+                if not labeled then person.content[1] = pandoc.Div({actor},
+                  pandoc.Attr("", {}, {["custom-style"]="Pilot Label"})) end
+                for index, item in ipairs(duties.content) do
+                  item[1] = pandoc.Div({pandoc.Para(paragraphs[index].content)}, pandoc.Attr("", {},
+                    {["custom-style"]=index < #duties.content and "Pilot Responsibility Lead" or "Pilot Responsibility Item"}))
+                end
+                changed = true
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  if changed then return question end
 end
 
 function Div(div)
@@ -1308,6 +1385,7 @@ function Div(div)
     return div
   end
   if div.identifier == "dmp-contributors" then return keep_short_contributors(div) end
+  if div.identifier == "q-dm-responsible" then div = keep_short_responsibility_lists(div) or div end
   -- Q3's shared classifier marks only a few short plain paragraphs/list items.
   -- Chain those paragraphs, never the whole question or an unbounded answer.
   if #div.classes == 2 and div.classes:includes("answer-detail") and

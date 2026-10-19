@@ -14,6 +14,15 @@
   {{- require(heading|length == 2 and heading[0].count('<w:p>') == 1 and heading[0].count('<w:pPr>') == 1 and heading[0].rstrip().endswith('<w:pStyle w:val="Heading2" />') and '<w:pageBreakBefore' not in heading[0]) -}}
   {%- set content = boundary[0] + heading[0] + '<w:pageBreakBefore/></w:pPr>' + heading[1] -%}
 {%- endif -%}
+{# A generated large Chinese Word roster starts at its own unchanged Heading2. #}
+{%- set roster_marker = '<!--DSW:SE:roster-start:v1-->' -%}
+{%- if roster_marker in content -%}
+  {{- require(content.count(roster_marker) == 1) -}}
+  {%- set boundary = content.split(roster_marker, 1) -%}
+  {%- set heading = boundary[1].split('</w:pPr>', 1) -%}
+  {{- require(heading|length == 2 and heading[0].count('<w:p>') == 1 and heading[0].count('<w:pPr>') == 1 and heading[0].rstrip().endswith('<w:pStyle w:val="Heading2" />') and '<w:pageBreakBefore' not in heading[0]) -}}
+  {%- set content = boundary[0] + heading[0] + '<w:pageBreakBefore/></w:pPr>' + heading[1] -%}
+{%- endif -%}
 {# Independent Q15 authored-row contract. Lua has bounded each ordinary cell;
    preserve its two paragraphs/cells exactly and keep only this one body row. #}
 {#- Q8 uses the same exact two-cell contract after its independent ownership guard. -#}

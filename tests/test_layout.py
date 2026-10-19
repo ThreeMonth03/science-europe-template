@@ -18,7 +18,75 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
-    def test_q14_long_duty_list_keeps_actor_not_all_items_or_next_person(self):
+    def test_q13_supplied_scalar_identifiers_have_targeted_wrapping(self):
+        css = (ROOT / 'src/layout.css').read_text()
+        self.assertIn('#q-persistent-identifier .primary-identifiers { overflow-wrap: anywhere; word-break: break-word; }', css)
+
+    def test_q14_pdf_keeps_only_bounded_fixed_duty_groups(self):
+        from bs4 import BeautifulSoup
+        from check_responsibility_reading import DUTIES, ROLES, contributor_replies
+        from current_support import PREFIX, environment
+        people = [('bounded', 'Alex Chen', ROLES), ('long', 'Long actor name ' * 50, ROLES),
+                  ('short', 'Robin Lin', ROLES[:2])]
+        for escape in (False, True):
+            for profile in ('review', 'submission'):
+                template = environment(ROOT, escape).from_string(
+                    PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
+                soup = BeautifulSoup(template.render(repliesMap=contributor_replies(people),
+                    output_profile=profile), 'html.parser')
+                owners = soup.select('.person-responsibilities')
+                self.assertEqual([node['data-contributor-id'] for node in owners],
+                                 ['bounded', 'long', 'short'])
+                self.assertEqual([node['data-contributor-id'] for node in
+                    soup.select('.person-responsibilities.short-responsibility-list')], ['bounded'])
+                for owner, (_, name, _) in zip(owners, people):
+                    self.assertEqual(owner.select_one('.responsible-person').get_text(), name)
+                for owner in owners[:2]:
+                    self.assertEqual([node.get_text() for node in owner.select('ul > li')], DUTIES['en'])
+                self.assertFalse(soup.select('.responsibilities-block.short-responsibility-list'))
+        css = (ROOT / 'src/layout.css').read_text()
+        self.assertIn('#q-dm-responsible .person-responsibilities.short-responsibility-list { break-inside: avoid; }', css)
+        self.assertNotIn('.responsibilities-block { break-inside: avoid;', css)
+
+    def test_contributor_identity_line_retains_contacts_and_role_associations(self):
+        from bs4 import BeautifulSoup
+        from check_responsibility_reading import CONTACT, ROLES, contributor_replies
+        from current_support import PREFIX, environment, path
+        people = [('both', 'Alex Chen', ROLES), ('email', 'Robin Lin', [CONTACT]),
+                  ('orcid', 'Casey Wu', ROLES[:1]), ('bare', 'Morgan Huang', [])]
+        replies = contributor_replies(people)
+        listing = path('adminDetailsCUuid', 'contributorsQUuid')
+        for item in ('both', 'email'):
+            replies[path(listing, item, 'contributorEmailQUuid')] = item + '@example.org'
+        integration = {'value': {'value': {'type': 'PlainType', 'value': '0000-0001-2345-6789', 'raw': None}}}
+        for item in ('both', 'orcid'):
+            replies[path(listing, item, 'contributorOrcidQUuid')] = integration
+        dc = {'project': {'created_by': None}, 'e': {'choices': {
+            role: {'label': role} for role in [*ROLES, CONTACT]}}}
+        for escape in (False, True):
+            template = environment(ROOT, escape).from_string(PREFIX +
+                "{% include 'src/contributors.html.j2' %}")
+            soup = BeautifulSoup(template.render(repliesMap=replies, dc=dc,
+                output_profile='submission'), 'html.parser')
+            owners = soup.select('.contributor')
+            self.assertEqual([node.select_one('.name').get_text() for node in owners],
+                             [name for _, name, _ in people])
+            self.assertEqual([len(node.select('.contributor-contact')) for node in owners], [1, 1, 1, 0])
+            for owner, (item, _, roles) in zip(owners, people):
+                self.assertEqual([node.get_text() for node in owner.select('.role')], sorted(roles))
+                contact = owner.select_one('.contributor-contact')
+                if contact:
+                    self.assertEqual(contact.find_previous_sibling().get('class'), ['name'])
+                    self.assertNotIn('<br', str(contact))
+                    self.assertTrue(contact.get_text().startswith(', '))
+                    self.assertEqual(contact.previous_sibling.get('class'), ['name'])
+                if item in ('both', 'email'):
+                    self.assertEqual(owner.select_one('a[href^="mailto:"]')['href'],
+                                     'mailto:' + item + '@example.org')
+                if item in ('both', 'orcid'):
+                    self.assertIn('0000-0001-2345-6789', owner.get_text())
+
+    def test_q14_unmarked_duty_list_keeps_actor_not_all_items_or_next_person(self):
         from check_responsibility_reading import DUTIES, ROLES, contributor_replies
         from current_support import PREFIX, environment
         from native_support import IMAGE, RUNNER
@@ -26,6 +94,7 @@ class LayoutTests(unittest.TestCase):
             PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
         source = template.render(repliesMap=contributor_replies([('owner', 'Alex Chen', ROLES)]),
                                  output_profile='submission') + '<p>NEXT_PERSON_SENTINEL</p>'
+        source = source.replace(' short-responsibility-list', '')
         raw = subprocess.check_output(['docker', 'run', '--rm', '--pull=never', '--network=none',
             '--log-driver=none', '-i', '--entrypoint', 'python', IMAGE, '-c', RUNNER],
             input=json.dumps(dict(lua=(ROOT / 'src/word/pilot.lua').read_text(), html=source)).encode(), timeout=120)
@@ -49,6 +118,149 @@ class LayoutTests(unittest.TestCase):
             self.assertEqual(''.join(' ' if inline['t'] == 'Space' else inline['c']
                                     for inline in item[0]['c']), expected)
         self.assertEqual(ast['blocks'][-1], {'t': 'Para', 'c': [{'t': 'Str', 'c': 'NEXT_PERSON_SENTINEL'}]})
+
+    def test_q14_word_bounded_bullets_preserve_numbering_and_stop_at_each_person(self):
+        import base64
+        from native_support import IMAGE, WORD_RUNNER
+        def person(actor='Alex Chen', duties=None, marker='short-responsibility-list', extra='', ending=''):
+            duties = duties or ['Original first duty.', 'Original second duty.', 'Original final duty.']
+            return ('<div class="person-responsibilities '+marker+'" data-contributor-id="owner" '
+                    'data-contributor-index="1"'+extra+'><p><strong>'+actor+'</strong></p><ul>'+''.join(
+                        '<li>'+duty+'</li>' for duty in duties)+'</ul>'+ending+'</div>')
+        def question(body):
+            return ('<div id="q-dm-responsible" class="question"><h3>14. Original question</h3>'
+                    '<div class="question-guidance"><p>Original question guidance.</p></div>'
+                    '<div class="answer"><div class="responsibilities-block">'+body+'</div></div></div>')
+        base = question(person())
+        cases = [('three', base, 3),
+                 *[(str(count)+'-items', question(person(duties=['Duty '+str(i) for i in range(count)])), count)
+                   for count in range(4, 8)],
+                 ('cjk', question(person('範例人員', ['蒐集原始資料。', '管理資料。', '保留原始紀錄。'])), 3),
+                 ('actor-boundary', question(person('x'*120)), 3),
+                 ('cjk-actor-boundary', question(person('中'*60)), 3),
+                 ('actor-long', question(person('x'*121)), 0),
+                 ('cjk-actor-long', question(person('中'*61)), 0),
+                 ('total-long', question(person(duties=['x'*901, 'Second.', 'Third.'])), 0),
+                 ('two-items', question(person(duties=['First.', 'Last.'])), 0),
+                 ('eight-items', question(person(duties=['Duty']*8)), 0),
+                 ('rich-item', question(person(duties=['<em>Original duty.</em>', 'Second.', 'Third.'])), 0),
+                 ('terminal-kept-wrapper', question(person(duties=['First.', 'Second.',
+                    '<div custom-style="Pilot List Lead"><p>Original final duty.</p></div>'])), 0),
+                 ('nested-list', question(person(duties=['<ul><li>Original duty.</li></ul>', 'Second.', 'Third.'])), 0),
+                 ('rich-actor', question(person('<a href="https://example.org">Original owner</a>')), 0),
+                 ('extra-attribute', question(person(extra=' data-extra="original"')), 0),
+                 ('missing-hint', question(person(ending='<p class="data-gap">Original name hint.</p>')), 0),
+                 ('unmarked', question(person(marker='')), 0),
+                 ('wrong-question', base.replace('id="q-dm-responsible"', 'id="q-other"'), 0),
+                 ('unknown-question-class', base.replace('class="question"', 'class="question other"'), 0),
+                 ('unknown-answer', base.replace('class="answer"', 'class="answer" data-extra="original"'), 0),
+                 ('unknown-block', base.replace('class="responsibilities-block"', 'class="responsibilities-block" data-extra="original"'), 0),
+                 ('empty-item-id', base.replace('data-contributor-id="owner"', 'data-contributor-id=""'), 0),
+                 ('invalid-index', base.replace('data-contributor-index="1"', 'data-contributor-index="0"'), 0),
+                 ('authored-lookalike', question('<div class="answer-detail">'+person()+'</div>'), 0),
+                 ('two-people', question(person()+person('Robin Lin')), 6)]
+        lua = (ROOT / 'src/word/pilot.lua').read_text()
+        call = '  if div.identifier == "q-dm-responsible" then div = keep_short_responsibility_lists(div) or div end'
+        self.assertEqual(lua.count(call), 1)
+        source = ''.join('<div id="case-'+name+'">'+body+'<p>Original next record.</p></div>'
+                         for name, body, _ in cases)
+        payload = dict(html=source, reference=base64.b64encode((ROOT/'src/word/reference.docx').read_bytes()).decode())
+        results = []
+        for variant in [lua.replace(call, ''), lua]:
+            payload['lua'] = variant
+            results.append(json.loads(subprocess.check_output(['docker', 'run', '--rm', '--pull=never', '--network=none',
+                '--log-driver=none', '-i', '--entrypoint', 'python', IMAGE, '-c', WORD_RUNNER],
+                input=json.dumps(payload).encode(), timeout=180)))
+        def normalize(value):
+            if isinstance(value, dict):
+                if value.get('t') == 'Div' and value['c'][0] in [
+                    ['', [], [['custom-style', 'Pilot List Lead']]],
+                    ['', [], [['custom-style', 'Pilot Responsibility Lead']]],
+                    ['', [], [['custom-style', 'Pilot Responsibility Item']]]]:
+                    self.assertEqual(len(value['c'][1]), 1)
+                    value = value['c'][1][0]
+                    return {'t': 'Plain', 'c': normalize(value['c'])}
+                return {key: normalize(child) for key, child in value.items()}
+            return [normalize(child) for child in value] if isinstance(value, list) else value
+        self.assertEqual(normalize(results[0]['ast']), normalize(results[1]['ast']))
+        for (name, _, expected), block in zip(cases, results[1]['ast']['blocks']):
+            styles = json.dumps(block)
+            self.assertEqual(expected, styles.count('Pilot Responsibility Lead')+styles.count('Pilot Responsibility Item'), name)
+            self.assertEqual(2 if name == 'two-people' else int(bool(expected)), styles.count('Pilot Responsibility Item'), name)
+            self.assertEqual(int(name not in ['wrong-question', 'unknown-question-class']),
+                             styles.count('Pilot Question Guidance'), name)
+        changed = 0
+        self.assertEqual(len(results[0]['paragraphs']), len(results[1]['paragraphs']))
+        for before, after in zip(results[0]['paragraphs'], results[1]['paragraphs']):
+            self.assertEqual(before['text'], after['text'])
+            self.assertEqual(before['other_xml'], after['other_xml'])
+            if before['style'] != after['style']:
+                self.assertIn(after['style'], ['PilotResponsibilityLead', 'PilotResponsibilityItem'])
+                changed += 1
+        self.assertEqual(changed, sum(expected for _, _, expected in cases))
+
+    def test_word_separate_roster_marker_keeps_heading_and_all_records(self):
+        from native_support import IMAGE, RUNNER
+        def roster(count, attrs=' class="separate-roster"', identifier='dmp-contributors', item='Original owner'):
+            return ('<div id="'+identifier+'"'+attrs+'><h2>People</h2><ul>'+''.join(
+                '<li>'+item+' '+str(index)+'<br>Original roles.<br>Original affiliation.</li>'
+                for index in range(count))+'</ul></div>')
+        cases = [(roster(4), 1), (roster(5), 1), (roster(4, item='Long name '*100), 1),
+                 (roster(3), 0), (roster(0), 0), (roster(4, attrs=''), 0),
+                 (roster(4, identifier='other'), 0), (roster(4, attrs=' class="separate-roster other"'), 0),
+                 (roster(4, attrs=' class="separate-roster" data-extra="original"'), 0)]
+        marker = '<!--DSW:SE:roster-start:v1-->'
+        lua = (ROOT/'src/word/pilot.lua').read_text()
+        line = '    div.content:insert(1, pandoc.RawBlock("openxml", "'+marker+'"))'
+        self.assertEqual(lua.count(line), 1)
+        source = ''.join('<div id="case-'+str(index)+'">'+value+'</div>' for index, (value, _) in enumerate(cases))
+        results = []
+        for variant in (lua.replace(line, ''), lua):
+            results.append(json.loads(subprocess.check_output(['docker', 'run', '--rm', '--pull=never', '--network=none',
+                '--log-driver=none', '-i', '--entrypoint', 'python', IMAGE, '-c', RUNNER], input=json.dumps(
+                    dict(lua=variant, html=source)).encode(), timeout=180)))
+        for (_, expected), before, after in zip(cases, results[0]['blocks'], results[1]['blocks']):
+            self.assertEqual(expected, json.dumps(after).count(marker))
+            if expected:
+                content = after['c'][1][0]['c'][1]
+                self.assertEqual(content[0], {'t': 'RawBlock', 'c': ['openxml', marker]})
+                self.assertEqual(content[1]['t'], 'Header')
+                self.assertEqual(content[1]['c'][0], 2)
+                del content[0]
+            self.assertEqual(before, after)
+
+    def test_roster_xml_break_changes_only_the_marked_heading2(self):
+        from jinja2 import UndefinedError
+        marker = '<!--DSW:SE:roster-start:v1-->'
+        heading = '<w:p><w:pPr><w:pStyle w:val="Heading2" /></w:pPr><w:r><w:t>People</w:t></w:r></w:p>'
+        earlier = '<w:p><w:r><w:t>Original overview</w:t></w:r></w:p>'
+        later = '<w:p><w:r><w:t>Original person</w:t></w:r></w:p>'
+        for escape in (False, True):
+            template = Environment(loader=FileSystemLoader(ROOT), undefined=StrictUndefined,
+                autoescape=escape).get_template('src/word/short-tables.xml')
+            self.assertEqual(earlier+heading+later, template.render(content=earlier+heading+later))
+            self.assertEqual(earlier+heading.replace('</w:pPr>', '<w:pageBreakBefore/></w:pPr>')+later,
+                             template.render(content=earlier+marker+heading+later))
+            for invalid in (marker+heading+marker+heading, marker+heading.replace('Heading2', 'Heading3'),
+                            marker+earlier+heading):
+                with self.assertRaises(UndefinedError): template.render(content=invalid)
+
+    def test_generated_roster_marker_requires_large_visible_chinese_roster(self):
+        from bs4 import BeautifulSoup
+        from check_responsibility_reading import contributor_replies
+        from current_support import PREFIX, environment
+        for escape in (False, True):
+            template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/contributors.html.j2' %}")
+            for language in ('en', 'zh-Hant'):
+                for profile in ('review', 'submission'):
+                    for count in (0, 3, 4, 5):
+                        people = [(str(index), 'Original owner '+str(index), []) for index in range(count)]
+                        people.append(('blank', '', []))
+                        soup = BeautifulSoup(template.render(repliesMap=contributor_replies(people),
+                            dc={'project': {'created_by': None}}, output_profile=profile, document_language=language), 'html.parser')
+                        self.assertEqual(int(language == 'zh-Hant' and count >= 4),
+                                         len(soup.select('#dmp-contributors.separate-roster')))
+                        self.assertEqual(count, len(soup.select('.contributor')))
 
     def test_q6_policy_keep_changes_only_bounded_metadata_not_authored_or_next_item(self):
         import base64
@@ -1544,9 +1756,18 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 self.assertTrue(document.styles["Pilot Responsibility Summary"].paragraph_format.keep_together)
                 self.assertFalse(document.styles["Pilot Responsibility Summary"].paragraph_format.keep_with_next)
                 self.assertEqual('Body Text', document.styles["Pilot Responsibility Summary"].base_style.name)
+                for name, keep_next in [('Pilot Responsibility Lead', True), ('Pilot Responsibility Item', False)]:
+                    self.assertEqual('Compact', document.styles[name].base_style.name)
+                    self.assertEqual(keep_next, document.styles[name].paragraph_format.keep_with_next)
+                    self.assertTrue(document.styles[name].paragraph_format.keep_together)
+                    self.assertEqual(0, document.styles[name].paragraph_format.space_before.pt)
+                    self.assertEqual(0, document.styles[name].paragraph_format.space_after.pt)
+                    self.assertIsNone(document.styles[name].paragraph_format.line_spacing)
+                    self.assertIsNone(document.styles[name].font.size)
                 self.assertEqual('Compact', document.styles["Pilot Contributor Summary"].base_style.name)
                 self.assertTrue(document.styles["Pilot Contributor Summary"].paragraph_format.keep_together)
                 self.assertFalse(document.styles["Pilot Contributor Summary"].paragraph_format.keep_with_next)
+                self.assertNotIn('Pilot Contributor Compact', document.styles)
                 self.assertTrue(document.styles["Pilot List Lead"].paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Table Lead"].paragraph_format.keep_with_next)
                 self.assertTrue(document.styles["Pilot Table Lead"].paragraph_format.keep_together)
@@ -1606,6 +1827,7 @@ print(json.dumps({'passed':True,'cases':len(p['cases'])}))
                 self.assertEqual(WD_LINE_SPACING.AT_LEAST, d.styles[name].paragraph_format.line_spacing_rule)
                 self.assertEqual(10.5, d.styles[name].font.size.pt)
             self.assertEqual('en-GB', d.styles['Normal'].element.rPr.find(qn('w:lang')).get(qn('w:val')))
+            self.assertIsNone(d.styles['Pilot Contributor Summary'].paragraph_format.line_spacing)
 
     def test_runtime_locale_styles_match_prepared_reference(self):
         import base64

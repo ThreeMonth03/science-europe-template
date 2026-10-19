@@ -1,4 +1,5 @@
 {% import "src/answer-markdown.html.j2" as answerMarkdown with context -%}
+{% import 'src/active-answer.j2' as activeAnswer with context -%}
 <div id="q-persistent-identifier" class="question">
     <h3>{{ pgettext("questions/13-persistent-identifier", "13. How will you ensure that each dataset is assigned a unique and persistent identifier?") }}</h3>
     <div class="question-guidance"><p>{{ pgettext("questions/13-persistent-identifier", "A Digital Object Identifier, or DOI, is one example.") }}</p></div>
@@ -11,6 +12,7 @@
         {%- for i in producedDataItems -%}
             {%- set pathPrefix = [producedDataPath, i]|reply_path -%}
             {%- set producedDataName = repliesMap[[pathPrefix, uuids.producedDataNameQUuid]|reply_path]|reply_str_value -%}
+            {%- set primaryIdentifierEntries -%}{% include 'src/primary-identifiers.html.j2' %}{%- endset -%}
             {# If will be published #}
             {%- set isPublishedDataPath = [pathPrefix, uuids.isPublishedDataQUuid]|reply_path -%}
             {%- set isPublishedDataAUuid = repliesMap[isPublishedDataPath]|reply_str_value -%}
@@ -26,10 +28,16 @@
                     {%- endif -%}
                 {%- endfor -%}
             {%- endif -%}
-            {%- set showIdentifierDataset = output_profile|default('review') != 'submission' or isPublishedDataAUuid == uuids.isPublishedDataNoAUuid or identifierDistroItems|length > 0 -%}
+            {%- set showIdentifierDataset = output_profile|default('review') != 'submission' or primaryIdentifierEntries|trim or isPublishedDataAUuid == uuids.isPublishedDataNoAUuid or identifierDistroItems|length > 0 -%}
             {% if showIdentifierDataset %}
             <div class="dataset-section" data-item-id="{{ i }}">
                 <h5>{% if output_profile|default('review') == 'submission' and not producedDataName|trim %}{{ macros.datasetLabel(macros.DATASET_PRODUCED, producedDataItems.index(i) + 1) }}{% else %}{{ producedDataName|e if producedDataName|trim else pgettext("questions/13-persistent-identifier", "(no name given)") }}{% endif %}</h5>
+            {% if primaryIdentifierEntries|trim %}
+                <div class="primary-identifiers">
+                    <div class="answer-lead"><p>{{ pgettext("questions/13-persistent-identifier", "Primary identifier information") }}</p></div>
+                    <ul>{{ primaryIdentifierEntries }}</ul>
+                </div>
+            {% endif %}
             {% if isPublishedDataAUuid == uuids.isPublishedDataYesAUuid %}
                 {# Where the data will be distributed #}
                     {%- if publishedDistrosItems|length > 0  -%}
@@ -149,7 +157,6 @@
 
     {# Keep the optional re-use summary compact, with authored uses in their own
        blocks. The follow-up asks HOW others could use the data, not WHY. #}
-    {% import 'src/active-answer.j2' as activeAnswer with context %}
     {%- set reuseParts = [uuids.creatingCUuid, uuids.measuredQUuid, uuids.measuredYesAUuid, uuids.measuredDataQUuid] -%}
     {%- set dataMeasuredPath = activeAnswer.path(reuseParts, 'ListQuestion') -%}
     {%- set dataMeasuredItems = repliesMap[dataMeasuredPath]|reply_items if dataMeasuredPath else [] -%}

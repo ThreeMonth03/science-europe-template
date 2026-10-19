@@ -31,7 +31,12 @@
               <p class="data-gap" data-fact-id="responsible-person-name" data-status="missing">{{ pgettext("questions/14-dm-responsible", "Please provide the name of the person or team assigned these responsibilities.") }}</p>
             {% endif %}
           {% endset %}
-          <div class="person-responsibilities{{ ' short-reading-unit' if responsibilitySentences|length <= 2 and personContent|striptags|length <= 500 else '' }}" data-contributor-id="{{ contributorItem|e }}" data-contributor-index="{{ contributorIndex }}">{{ personContent }}</div>
+          {# The seven fixed role duties are a bounded PDF reading block, not an
+             authored answer. Oversized actor names must still flow naturally. #}
+          {% set personBound = namespace(width=0, actorWidth=0) %}
+          {% for character in (personContent|striptags).split()|join(' ') %}{% set personBound.width = personBound.width + (2 if character >= '⺀' else 1) %}{% endfor %}
+          {% for character in responsibilityActor|striptags %}{% set personBound.actorWidth = personBound.actorWidth + (2 if character >= '⺀' else 1) %}{% endfor %}
+          <div class="person-responsibilities{{ ' short-reading-unit' if responsibilitySentences|length <= 2 and personContent|striptags|length <= 500 else '' }}{{ ' short-responsibility-list' if 3 <= responsibilitySentences|length <= 7 and personBound.width <= 900 and personBound.actorWidth <= 120 else '' }}" data-contributor-id="{{ contributorItem|e }}" data-contributor-index="{{ contributorIndex }}">{{ personContent }}</div>
         {%- endif -%}
       {%- endfor -%}
     {%- endif -%}

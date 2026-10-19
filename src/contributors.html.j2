@@ -29,7 +29,7 @@
     {%- endif -%}
   {%- endfor -%}
 
-{% if contributors or dc.project.created_by or output_profile|default('review') != 'submission' %}<div id="dmp-contributors">
+{% if contributors or dc.project.created_by or output_profile|default('review') != 'submission' %}<div id="dmp-contributors"{% if document_language|default('en') == 'zh-Hant' and contributors|length >= 4 %} class="separate-roster"{% endif %}>
   <h2>{{ pgettext("contributors", "People and responsibilities") }}</h2>
 
   {%- if contributors|length > 0 -%}
@@ -37,12 +37,12 @@
   {% for contributor in contributors %}
     {% set contributorContent %}
       <span class="name"><strong>{% if contributor.name|trim %}{{ contributor.name|e }}{% elif output_profile|default('review') == 'submission' %}{{ macros.contributorLabel(contributor.index) }}{% else %}{{ pgettext("contributors", "(name not given)") }}{% endif %}</strong></span>
-      {%- if contributor.email and contributor.orcid %}
-        <br>{{ macros.formatEmail(contributor.email) }}, {{ macros.formatOrcid(contributor.orcid) }}
-      {%- elif contributor.email %}
-        <br>{{ macros.formatEmail(contributor.email) }}
-      {%- elif contributor.orcid %}
-        <br>{{ macros.formatOrcid(contributor.orcid) }}
+      {%- if contributor.email and contributor.orcid -%}
+        <span class="contributor-contact">, {{ macros.formatEmail(contributor.email) }}, {{ macros.formatOrcid(contributor.orcid) }}</span>
+      {%- elif contributor.email -%}
+        <span class="contributor-contact">, {{ macros.formatEmail(contributor.email) }}</span>
+      {%- elif contributor.orcid -%}
+        <span class="contributor-contact">, {{ macros.formatOrcid(contributor.orcid) }}</span>
       {%- endif -%}
       {%- if contributor.roles|length > 0 %}
         <br>{% if contributor.roles|length == 0 %}{{ pgettext("contributors", "Role") }}{% else %}{{ pgettext("contributors", "Roles") }}{% endif %}{{ pgettext("contributors", ": ") }}{% for role in contributor.roles %}<span class="role">{{ role }}</span>{% if not loop.last %}{{ pgettext("contributors", ", ") }}{% endif %}{% endfor %}
@@ -64,8 +64,7 @@
   {%- elif dc.project.created_by -%}
   <ul>
     <li class="contributor">
-      <span class="name">{{ dc.project.created_by.first_name }} {{ dc.project.created_by.last_name }}</span>
-      <br>{{ macros.formatEmail(dc.project.created_by.email) }}
+      <span class="name">{{ dc.project.created_by.first_name }} {{ dc.project.created_by.last_name }}</span><span class="contributor-contact">, {{ macros.formatEmail(dc.project.created_by.email) }}</span>
       {%- if dc.project.created_by.affiliation %}
       <br>{{ pgettext("contributors", "Affiliation: <span class=\"affiliation\">%(dc_project_created_by_affiliation)s</span>", dc_project_created_by_affiliation=dc.project.created_by.affiliation) }}
       {%- endif %}

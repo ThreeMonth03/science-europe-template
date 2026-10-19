@@ -231,6 +231,9 @@ html body .person-responsibilities > .responsibility-summary { margin-left: 4mm;
 /* Compact duty lists keep body-sized type without a paragraph gap per item. */
 html body .person-responsibilities > ul.responsibility-summary { margin: .2em 0 .4em; padding-left: 4mm; line-height: 1.4; }
 html body .person-responsibilities > ul.responsibility-summary > li { margin-bottom: 0; break-inside: avoid; }
+/* Only a bounded actor and the fixed role-duty list stay on the same PDF page.
+   The roster, next person and oversized actor records remain free to flow. */
+html body #q-dm-responsible .person-responsibilities.short-responsibility-list { break-inside: avoid; }
 html body .distribution-section { margin: .25em 0 .45em; }
 html body .distribution-section + .distribution-section { border-top: 1px solid #cbd2d5; padding-top: .4em; }
 /* Keep an owned label with the first visible body, not the entire distribution.
@@ -257,6 +260,8 @@ html body .repository-label { font-weight: bold; }
 html body .identifier-heading { margin: .25em 0 .35em; break-after: avoid; }
 html body .identifier-heading > p { display: inline; margin: 0; }
 html body .identifier-heading > p::after { content: ' '; }
+/* Supplied identifiers are scalar text, not necessarily linked URLs. */
+html body #q-persistent-identifier .primary-identifiers { overflow-wrap: anywhere; word-break: break-word; }
 /* A complete, single reuse summary ends Q13; do not attach it to Q14.
    Authored details and multiple datasets retain their ordinary flow. */
 html body article.dmp.pdf-flow-layout #q-persistent-identifier > .answer > .measured-data-reuse > ul > li:only-child > p.reuse-summary:only-child { break-after: auto; }

@@ -214,11 +214,11 @@
             <div class="dataset-policy">
             <p>
             {%- if refDataReproduceReply == uuids.refDataReproduceProviderAUuid -%}
-              {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "Each dataset will remain available from its provider in the long term.") }}{% else %}{{ pgettext("questions/01-how-data", "The provider will keep this dataset available in the long term.") }}{% endif %}
+              {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "The providers will keep old versions of these datasets available, including the versions used in this project.") }}{% else %}{{ pgettext("questions/01-how-data", "The provider will keep old versions of this dataset available, including the version used in this project.") }}{% endif %}
             {%- elif refDataReproduceReply == uuids.refDataReproduceCopyAUuid  -%}
               {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "We will retain a copy of each dataset and provide these copies alongside the research results.") }}{% else %}{{ pgettext("questions/01-how-data", "We will retain a copy of this dataset and provide it alongside the research results.") }}{% endif %}
             {%- elif refDataReproduceReply == uuids.refDataReproduceBothAUuid -%}
-              {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "Each dataset will remain available from its provider in the long term. We will also retain a copy of each dataset and provide these copies alongside the research results.") }}{% else %}{{ pgettext("questions/01-how-data", "The provider will keep this dataset available in the long term. We will also retain a copy and provide it alongside the research results.") }}{% endif %}
+              {% if sharedReferencePolicy %}{{ pgettext("questions/01-how-data", "The providers will keep old versions of these datasets available, including the versions used in this project. We will also retain a copy of each dataset and provide these copies alongside the research results.") }}{% else %}{{ pgettext("questions/01-how-data", "The provider will keep old versions of this dataset available, including the version used in this project. We will also retain a copy and provide it alongside the research results.") }}{% endif %}
             {%- endif -%}
             </p>
 

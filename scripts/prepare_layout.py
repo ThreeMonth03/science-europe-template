@@ -145,6 +145,15 @@ def prepare_layout(template: Path, font: Path, language: str) -> None:
     responsibility.paragraph_format.keep_with_next = False
     responsibility.paragraph_format.keep_together = True
     responsibility.paragraph_format.left_indent = Mm(4)
+    # Bounded fixed-duty bullets keep their original Compact list geometry.
+    # Only nonterminal items keep-next; the last must release the next person.
+    for name, keep_next in (("Pilot Responsibility Lead", True), ("Pilot Responsibility Item", False)):
+        item = document.styles.add_style(name, WD_STYLE_TYPE.PARAGRAPH)
+        item.base_style = document.styles["Compact"]
+        item.paragraph_format.keep_with_next = keep_next
+        item.paragraph_format.keep_together = True
+        item.paragraph_format.space_before = Pt(0)
+        item.paragraph_format.space_after = Pt(0)
     # Each bounded frontmatter person is one Compact paragraph with line breaks.
     # Keep that person's lines, never the following person or the whole list.
     contributor = document.styles.add_style("Pilot Contributor Summary", WD_STYLE_TYPE.PARAGRAPH)
