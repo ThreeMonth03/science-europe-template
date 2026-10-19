@@ -226,4 +226,36 @@ def check(root, language):
                 assert anchor and doc.select_one(anchor['href'])
                 assert doc.select_one('#q-data-preservation .answer-detail[data-fact-id="repository-contact-arrangements"]').decode_contents() == authored
                 counts['full_documents'] += 1
+                # Three complete identical policies are shared, two stay local.
+                # A blank intervening record must not renumber surviving members.
+                shared = dict(replies)
+                shared[DATASETS] = ['dataset-b', 'dataset-empty', 'dataset-a'] + (['dataset-c'] if not missing_middle else [])
+                shared.update({k: v for k, v in repository_replies('Institutional', item='dataset-c').items() if k != DATASETS})
+                members = [item for item in shared[DATASETS] if item != 'dataset-empty']
+                for item in members:
+                    shared[path(DATASETS, item, 'publishedDataHowLongQUuid')] = IDS['publishedDataHowLongTechnicalAUuid']
+                    shared[path(DATASETS, item, 'publishedDataMetadataPersistentQUuid')] = IDS['publishedDataMetadataPersistentYesAUuid']
+                    shared[path(DATASETS, item, 'isPublishedDataQUuid', 'isPublishedDataYesAUuid', 'publishedDataCatalogueQUuid')] = IDS['publishedDataCatalogueYesAUuid']
+                from check_answer_mapping import question
+                km = preservation_schema()
+                question(km, km['entities']['questions'][IDS['producedDataQUuid']]['itemTemplateQuestionUuids'],
+                         IDS['publishedDataHowLongQUuid'], 'OptionsQuestion', [IDS['publishedDataHowLongTechnicalAUuid']])
+                grouped = render(template, shared, profile, km)
+                records = grouped.select('.dataset-section')
+                assert [r['data-item-id'] for r in records] == (shared[DATASETS] if profile == 'review' else members)
+                assert grouped.select_one('.answer-detail[data-fact-id="repository-contact-arrangements"]').decode_contents() == authored
+                policies = grouped.select('.preservation-shared-policy')
+                references = grouped.select('.preservation-policy-reference a')
+                assert len(policies) == int(len(members) >= 3)
+                assert len(references) == (len(members) if policies else 0)
+                if policies:
+                    policy = policies[0]
+                    assert policy['id'] == 'preservation-policy-1' and policy['data-member-ids'].split() == members
+                    nodes = grouped.find_all(True)
+                    assert all(nodes.index(policy) < nodes.index(reference) for reference in references), 'Explain shared policies before their first reference'
+                    for record, ordinal in zip([r for r in records if r['data-item-id'] in members], ['1', '3', '4']):
+                        assert record.h5.select_one(f'.dataset-label[data-list-index="{ordinal}"]')
+                        assert record.select_one('.preservation-policy-reference a')['href'] == '#' + policy['id']
+                    assert PRESERVATION[language]['metadata']['Yes'] in policy.get_text()
+                    assert PRESERVATION[language]['catalogue']['Yes'] in policy.get_text()
     return counts

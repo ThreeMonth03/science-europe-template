@@ -228,6 +228,9 @@ html body #q-share-restrictions .short-dataset-record,
 html body #q-data-preservation .short-dataset-record { break-inside: avoid; }
 html body #q-share-restrictions .qualified-reference-tail { break-before: avoid; }
 html body .person-responsibilities > .responsibility-summary { margin-left: 4mm; }
+/* Compact duty lists keep body-sized type without a paragraph gap per item. */
+html body .person-responsibilities > ul.responsibility-summary { margin: .2em 0 .4em; padding-left: 4mm; line-height: 1.4; }
+html body .person-responsibilities > ul.responsibility-summary > li { margin-bottom: 0; break-inside: avoid; }
 html body .distribution-section { margin: .25em 0 .45em; }
 html body .distribution-section + .distribution-section { border-top: 1px solid #cbd2d5; padding-top: .4em; }
 /* Keep an owned label with the first visible body, not the entire distribution.

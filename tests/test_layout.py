@@ -18,6 +18,38 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_q14_long_duty_list_keeps_actor_not_all_items_or_next_person(self):
+        from check_responsibility_reading import DUTIES, ROLES, contributor_replies
+        from current_support import PREFIX, environment
+        from native_support import IMAGE, RUNNER
+        template = environment(ROOT, True).from_string(
+            PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
+        source = template.render(repliesMap=contributor_replies([('owner', 'Alex Chen', ROLES)]),
+                                 output_profile='submission') + '<p>NEXT_PERSON_SENTINEL</p>'
+        raw = subprocess.check_output(['docker', 'run', '--rm', '--pull=never', '--network=none',
+            '--log-driver=none', '-i', '--entrypoint', 'python', IMAGE, '-c', RUNNER],
+            input=json.dumps(dict(lua=(ROOT / 'src/word/pilot.lua').read_text(), html=source)).encode(), timeout=120)
+        ast = json.loads(raw)
+        def nodes(value):
+            if isinstance(value, dict):
+                yield value
+                for child in value.values(): yield from nodes(child)
+            elif isinstance(value, list):
+                for child in value: yield from nodes(child)
+        owner, = [node for node in nodes(ast) if node.get('t') == 'Div' and
+                  'person-responsibilities' in node['c'][0][1]]
+        self.assertNotIn('short-reading-unit', owner['c'][0][1])
+        actor, duties = owner['c'][1]
+        self.assertEqual(actor['c'][0], ['', [], [['custom-style', 'Pilot Label']]])
+        self.assertEqual(duties['t'], 'BulletList')
+        self.assertEqual(len(duties['c']), 7)
+        for item, expected in zip(duties['c'], DUTIES['en']):
+            self.assertEqual(len(item), 1)
+            self.assertEqual(item[0]['t'], 'Plain')
+            self.assertEqual(''.join(' ' if inline['t'] == 'Space' else inline['c']
+                                    for inline in item[0]['c']), expected)
+        self.assertEqual(ast['blocks'][-1], {'t': 'Para', 'c': [{'t': 'Str', 'c': 'NEXT_PERSON_SENTINEL'}]})
+
     def test_q6_policy_keep_changes_only_bounded_metadata_not_authored_or_next_item(self):
         import base64
         from bs4 import BeautifulSoup

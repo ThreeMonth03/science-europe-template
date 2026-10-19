@@ -83,11 +83,19 @@ def check(root, language):
                 actors = node.select('.responsible-person')
                 assert len(actors) == 1 and actors[0].get_text() == actor
                 assert len(actors[0].select('strong')) == 1
-                paragraphs = node.select('.responsibility-summary')
-                assert len(paragraphs) == 1
-                assert paragraphs[0]['data-role-uuids'].split() == selected
-                assert paragraphs[0].get_text().strip() == responsibility_summary(roles, language)
-                assert not paragraphs[0].select('strong, ul, ol')
+                summaries = node.select('.responsibility-summary')
+                assert len(summaries) == 1
+                summary = summaries[0]
+                assert summary['data-role-uuids'].split() == selected
+                if len(selected) >= 3:
+                    assert summary.name == 'ul'
+                    assert [item.get_text() for item in summary.find_all('li', recursive=False)] == [
+                        duty for role, duty in zip(ROLES, DUTIES[language]) if role in roles]
+                    assert 'short-reading-unit' not in node.get('class', [])
+                else:
+                    assert summary.name == 'p'
+                    assert summary.get_text().strip() == responsibility_summary(roles, language)
+                assert not summary.select('strong, ul, ol')
                 gaps = node.select('.data-gap')
                 assert len(gaps) == int(profile == 'review' and not (name and name.strip()))
                 if gaps: assert gaps[0].get_text(strip=True) == name_gap

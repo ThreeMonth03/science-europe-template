@@ -207,6 +207,17 @@
           {% do group.update({'number': sharedPolicies.count}) %}
         {% endif %}
       {% endfor %}
+      {# Explain common policies before individual records refer to them. #}
+      {% for group in preservationGroups.values() %}
+        {% if group.number %}
+        {% set policyMemberIndices = group.members|map(attribute='index')|join('、' if document_language|default('en') == 'zh-Hant' else ', ') %}
+        <div class="preservation-shared-policy" id="preservation-policy-{{ group.number }}" data-member-ids="{{ group.members|map(attribute='id')|join(' ') }}">
+          <h4>{{ pgettext("questions/11-data-preservation", "Shared preservation policy %(group_number)s", group_number=group.number) }}</h4>
+          <div class="answer-lead"><p>{{ pgettext("questions/11-data-preservation", "This policy applies separately to produced datasets %(policyMemberIndices)s.", policyMemberIndices=policyMemberIndices) }}</p></div>
+          <div class="dataset-policy">{{ group.policy }}</div>
+        </div>
+        {% endif %}
+      {% endfor %}
       {% for record in preservationRecords %}
         {% set group = preservationGroups[record.key] if record.key else none %}
         {% set recordContent = record.context ~ record.policy ~ record.tail %}
@@ -225,16 +236,6 @@
             {{ displayedPolicy }}
           </div>
           {{ record.tail }}
-        </div>
-        {% endif %}
-      {% endfor %}
-      {% for group in preservationGroups.values() %}
-        {% if group.number %}
-        {% set policyMemberIndices = group.members|map(attribute='index')|join('、' if document_language|default('en') == 'zh-Hant' else ', ') %}
-        <div class="preservation-shared-policy" id="preservation-policy-{{ group.number }}" data-member-ids="{{ group.members|map(attribute='id')|join(' ') }}">
-          <h4>{{ pgettext("questions/11-data-preservation", "Shared preservation policy %(group_number)s", group_number=group.number) }}</h4>
-          <div class="answer-lead"><p>{{ pgettext("questions/11-data-preservation", "This policy applies separately to produced datasets %(policyMemberIndices)s.", policyMemberIndices=policyMemberIndices) }}</p></div>
-          <div class="dataset-policy">{{ group.policy }}</div>
         </div>
         {% endif %}
       {% endfor %}

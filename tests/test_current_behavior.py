@@ -240,7 +240,7 @@ class CurrentBudgetLayoutTests(unittest.TestCase):
 class CurrentResponsibilityAnchorTests(unittest.TestCase):
     def test_one_owned_actor_anchor_keeps_every_selected_duty(self):
         from lxml import html
-        from check_responsibility_reading import ROLES, contributor_replies, responsibility_summary
+        from check_responsibility_reading import ROLES, DUTIES, contributor_replies, responsibility_summary
         from current_support import PREFIX
 
         cases = [
@@ -265,15 +265,23 @@ class CurrentResponsibilityAnchorTests(unittest.TestCase):
                         self.assertEqual(len(nodes), len(people))
                         for index, (node, (item, name, roles)) in enumerate(zip(nodes, people), 1):
                             actor = name if name and name.strip() else 'Contributor ' + str(index)
-                            summary, = node.xpath('./p[@class="responsibility-summary"]')
+                            summary, = node.xpath('./*[@class="responsibility-summary"]')
                             actor_label, = node.xpath('./p[@class="responsible-person"]')
                             owner, = actor_label.xpath('./strong')
                             self.assertEqual(list(actor_label), [owner])
                             self.assertFalse(actor_label.text)
                             self.assertEqual(''.join(owner.itertext()), actor)
                             self.assertFalse(list(owner))
-                            self.assertFalse(list(summary))
-                            self.assertEqual(''.join(summary.itertext()), responsibility_summary(roles, 'en'))
+                            selected = [role for role in ROLES if role in roles]
+                            if len(selected) >= 3:
+                                self.assertEqual(summary.tag, 'ul')
+                                self.assertEqual([item.tag for item in summary], ['li'] * len(selected))
+                                self.assertEqual([item.text_content() for item in summary],
+                                                 [duty for role, duty in zip(ROLES, DUTIES['en']) if role in roles])
+                            else:
+                                self.assertEqual(summary.tag, 'p')
+                                self.assertFalse(list(summary))
+                                self.assertEqual(''.join(summary.itertext()), responsibility_summary(roles, 'en'))
                             self.assertEqual(summary.get('data-role-uuids').split(),
                                              [role for role in ROLES if role in roles])
                             self.assertEqual(node.get('data-contributor-id'), item)

@@ -138,7 +138,7 @@ class ScienceEuropeContractTests(unittest.TestCase):
         from itertools import product
         from bs4 import BeautifulSoup
         from current_support import environment, PREFIX
-        from check_responsibility_reading import contributor_replies, ROLES, responsibility_summary
+        from check_responsibility_reading import contributor_replies, ROLES, DUTIES, responsibility_summary
         role_sets = ([ROLES[-1]], [ROLES[3], ROLES[-1]], ROLES, [ROLES[3]])
         for escape in (False, True):
             template = environment(ROOT, escape).from_string(PREFIX + "{% include 'src/questions/14-dm-responsible.html.j2' %}")
@@ -150,9 +150,14 @@ class ScienceEuropeContractTests(unittest.TestCase):
                     self.assertEqual('author', owner['data-contributor-id'])
                     self.assertEqual('2', owner['data-contributor-index'])
                     actor = name or 'Contributor 2'
-                    expected = responsibility_summary(roles, 'en')
-                    text = owner.select_one('.responsibility-summary').get_text().strip()
-                    self.assertEqual(expected, text)
+                    summary = owner.select_one('.responsibility-summary')
+                    selected = [duty for role, duty in zip(ROLES, DUTIES['en']) if role in roles]
+                    if len(selected) >= 3:
+                        self.assertEqual('ul', summary.name)
+                        self.assertEqual(selected, [item.get_text() for item in summary.find_all('li', recursive=False)])
+                    else:
+                        self.assertEqual(responsibility_summary(roles, 'en'), summary.get_text().strip())
+                    text = summary.get_text(' ', strip=True)
                     self.assertEqual(actor, owner.select_one('.responsible-person').get_text())
                     self.assertEqual(ROLES[-1] in roles, 'authorship of the data management plan' in text)
                     for invented in ('implementing the data management plan', 'reviewed and revised'):
