@@ -69,6 +69,131 @@ class AnswerStateTests(unittest.TestCase):
                         self.assertNotIn(owner_sentence, group.get_text())
                     if timing == 'Yes':
                         self.assertIn('18 months (v1.2)', soup.get_text())
+                    indefinite = ('Unrestricted data will be made openly available immediately; '
+                                  'restricted data will remain closed indefinitely.')
+                    self.assertEqual(timing == 'Indefinitely', indefinite in soup.get_text())
+                    if timing == 'Indefinitely':
+                        self.assertNotIn(sentences[2], soup.get_text())
+
+    def test_personal_legal_basis_requires_current_typed_choices_without_empty_leads(self):
+        from check_answer_mapping import question
+        from check_sentence_layout import partial_fixture
+        from current_support import PREFIX, environment
+        from dsw.templating.filters import reply_items, reply_str_value
+
+        chain = ('creatingCUuid collectPersonalQUuid collectPersonalYesAUuid cpersGdprQUuid '
+                 'cpersGdprExploreAUuid cpersGdprLegalBasisQUuid')
+        km, base, basis = partial_fixture(chain)
+        extra, skip = '93d6fcd2-d488-4ac3-a625-d8cb057da7cc', '13896eab-053a-4f65-967f-e720b1376443'
+        roots = {name: IDS['cpersGdprLegalBasis' + name + 'AUuid'] for name in ('Public', 'Ask', 'Other')}
+        others = {name: IDS['cpersGdprLegalBasisOtherWhich' + name + 'AUuid']
+                  for name in ('Contract', 'Legit', 'Vital', 'Legal')}
+        km['entities']['questions'][IDS['cpersGdprLegalBasisQUuid']].update(
+            questionType='OptionsQuestion', answerUuids=[*roots.values(), extra])
+        for answer in (*roots.values(), extra):
+            km['entities']['answers'][answer] = {'followUpUuids': []}
+        question(km, km['entities']['answers'][roots['Other']]['followUpUuids'],
+                 IDS['cpersGdprLegalBasisOtherWhichQUuid'], 'OptionsQuestion', [*others.values(), extra])
+        other = path(basis, 'cpersGdprLegalBasisOtherAUuid', 'cpersGdprLegalBasisOtherWhichQUuid')
+        collect = path('creatingCUuid', 'collectPersonalQUuid')
+        gdpr = path(collect, 'collectPersonalYesAUuid', 'cpersGdprQUuid')
+        for field, answer in (('collectPersonalQUuid', IDS['collectPersonalNoAUuid']), ('cpersGdprQUuid', skip)):
+            km['entities']['questions'][IDS[field]]['answerUuids'].append(answer)
+            km['entities']['answers'][answer] = {'followUpUuids': []}
+        phrases = {
+            'Public': ('because the processing is necessary to perform a task carried out in the public interest.',
+                       'The stated legal basis for collecting and processing personal data is a task carried out in the public interest.'),
+            'Ask': ('with the consent of the data subjects.', 'We ask the data subjects for their consent.'),
+            'Contract': ('because the processing is necessary to perform a contract.', 'performance of a contract.'),
+            'Legit': ('because the processing is necessary for legitimate interests.', 'legitimate interests.'),
+            'Vital': ('because the processing is necessary to protect vital interests.', 'protection of vital interests.'),
+            'Legal': ('because the processing is necessary to comply with a legal obligation.', 'compliance with a legal obligation.'),
+        }
+        cases = [('Public', others['Contract'], 'Public'), ('Ask', others['Contract'], 'Ask'),
+                 *[('Other', answer, name) for name, answer in others.items()],
+                 *[('Other', value, None) for value in (None, '', ' \t\n\u3000', extra)],
+                 (None, others['Contract'], None), (extra, others['Contract'], None)]
+        typed = lambda values: {key: {'value': {'type': 'AnswerReply', 'value': value}}
+                                for key, value in values.items()}
+        for escape in (False, True):
+            environments = [environment(ROOT, escape), environment(ROOT, escape)]
+            environments[1].filters.update(reply_str_value=reply_str_value, reply_items=reply_items)
+            templates = [[env.from_string(PREFIX + "{% include 'src/questions/" + file + "' %}")
+                          for file in ('07-personal-data.html.j2', '09-ethical-issues.html.j2')]
+                         for env in environments]
+
+            def render(values, profile, schema, encoding=1):
+                context = {} if schema is None else {'km': schema}
+                soups = [BeautifulSoup(template.render(repliesMap=typed(values) if encoding else values,
+                         output_profile=profile, **context), 'html.parser') for template in templates[encoding]]
+                for soup in soups:
+                    self.assertFalse(soup.select('p p,p div,p ul,p table'))
+                    if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+                return soups, [' '.join(soup.select_one('.answer').get_text(' ', strip=True).split()) for soup in soups]
+
+            for schema, encoding, profile, (main, detail, expected) in itertools.product(
+                    (None, km), (0, 1), ('review', 'submission'), cases):
+                values = dict(base)
+                if main is not None: values[basis] = roots.get(main, main)
+                if detail is not None: values[other] = detail
+                with self.subTest(escape=escape, schema=bool(schema), encoding=encoding,
+                                  profile=profile, main=main, detail=detail):
+                    soups, texts = render(values, profile, schema, encoding)
+                    for name, pair in phrases.items():
+                        for text, phrase in zip(texts, pair):
+                            self.assertEqual(name == expected, phrase in text)
+                    self.assertEqual(expected is not None, 'We are collecting and processing personal data' in texts[0])
+                    self.assertEqual(expected in others, 'Alternative legal basis for collecting personal data:' in texts[1])
+                    self.assertFalse(texts[1].endswith(':'))
+                    unsupported = main == extra or main == 'Other' and detail == extra
+                    self.assertEqual(unsupported and profile == 'review', bool(soups[0].select(
+                        '[data-fact-id="personal-data-legal-basis"][data-status="needs-review"]')))
+                    if main == 'Other' and expected is None:
+                        fallback = ('An alternative legal basis was selected.' if detail == extra or profile == 'submission' else
+                                    'An alternative legal basis was selected, but it has not been specified; see Question 7.')
+                        self.assertIn(fallback, texts[1])
+                        self.assertEqual(not unsupported and profile == 'review', bool(soups[0].select(
+                            '[data-fact-id="personal-data-other-legal-basis"]')))
+
+            active = {**base, basis: roots['Other'], other: others['Contract']}
+            # These are reachable option nodes with retained replies, then filtered
+            # or changed by the current KM; they must not resurrect the old basis.
+            for mutation, profile in itertools.product(
+                    ('basis-question', 'basis-followup', 'basis-type', 'basis-choice', 'basis-answer',
+                     'other-question', 'other-followup', 'other-type', 'other-choice', 'other-answer'),
+                    ('review', 'submission')):
+                altered = deepcopy(km)
+                field = IDS['cpersGdprLegalBasisOtherWhichQUuid' if mutation.startswith('other-') else 'cpersGdprLegalBasisQUuid']
+                selected = others['Contract'] if mutation.startswith('other-') else roots['Other']
+                if mutation.endswith('question'): del altered['entities']['questions'][field]
+                elif mutation.endswith('followup'):
+                    parent = roots['Other'] if mutation.startswith('other-') else IDS['cpersGdprExploreAUuid']
+                    altered['entities']['answers'][parent]['followUpUuids'].remove(field)
+                elif mutation.endswith('type'): altered['entities']['questions'][field]['questionType'] = 'ValueQuestion'
+                elif mutation.endswith('choice'): altered['entities']['questions'][field]['answerUuids'].remove(selected)
+                else: del altered['entities']['answers'][selected]
+                with self.subTest(escape=escape, profile=profile, mutation=mutation):
+                    _, texts = render(active, profile, altered)
+                    for text, phrase in zip(texts, phrases['Contract']): self.assertNotIn(phrase, text)
+
+            for schema, profile, target in itertools.product((None, km), ('review', 'submission'),
+                                                            (collect, gdpr, basis, other)):
+                for mutation in ('missing', 'wrong-reply-type', 'wrong-value-type'):
+                    values = deepcopy(active)
+                    if mutation == 'missing': del values[target]
+                    elif mutation == 'wrong-reply-type':
+                        values = typed(values); values[target]['value']['type'] = 'StringReply'
+                    else:
+                        values = typed(values); values[target]['value']['value'] = 0
+                    context = {} if schema is None else {'km': schema}
+                    replies = typed(values) if mutation == 'missing' else values
+                    for template, phrase in zip(templates[1], phrases['Contract']):
+                        output = template.render(repliesMap=replies, output_profile=profile, **context)
+                        self.assertNotIn(phrase, BeautifulSoup(output, 'html.parser').get_text())
+            for schema, profile, (target, choice) in itertools.product((None, km), ('review', 'submission'),
+                    ((collect, IDS['collectPersonalNoAUuid']), (gdpr, skip), (basis, roots['Public']))):
+                _, texts = render({**active, target: choice}, profile, schema)
+                for text, phrase in zip(texts, phrases['Contract']): self.assertNotIn(phrase, text)
 
     def test_partial_archive_recovery_and_no_embargo_keep_complete_literal_scope(self):
         from current_support import PREFIX, environment

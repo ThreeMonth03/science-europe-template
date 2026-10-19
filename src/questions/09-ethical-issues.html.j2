@@ -155,8 +155,10 @@
           {# Explore opens a questionnaire branch; it is not evidence of an assessment. #}
 
           {# Legal Base #}
-          {%- set legalBasePath = [cpersGdprPath, cpersGdprAUuid, uuids.cpersGdprLegalBasisQUuid]|reply_path -%}
-          {%- set legalBaseAUuid = repliesMap[legalBasePath]|reply_str_value -%}
+          {%- import 'src/personal-legal-basis.j2' as legalBasis with context -%}
+          {%- set legalBasisParts = [uuids.creatingCUuid, uuids.collectPersonalQUuid, uuids.collectPersonalYesAUuid, uuids.cpersGdprQUuid, uuids.cpersGdprExploreAUuid, uuids.cpersGdprLegalBasisQUuid] -%}
+          {%- set legalBasePath = legalBasisParts|reply_path -%}
+          {%- set legalBaseAUuid = legalBasis.choice(legalBasisParts) -%}
           {%- if legalBaseAUuid == uuids.cpersGdprLegalBasisPublicAUuid -%}
             {%- do sentences.append(pgettext("questions/09-ethical-issues", "The stated legal basis for collecting and processing personal data is a task carried out in the public interest.")) -%}
           {%- elif legalBaseAUuid == uuids.cpersGdprLegalBasisAskAUuid -%}
@@ -201,12 +203,11 @@
             {%- endif -%}
 
           {%- elif legalBaseAUuid == uuids.cpersGdprLegalBasisOtherAUuid -%}
-            {%- set cpersGdprLegalBasisOtherWhichPath = [legalBasePath, legalBaseAUuid, uuids.cpersGdprLegalBasisOtherWhichQUuid]|reply_path -%}
-            {%- set cpersGdprLegalBasisOtherWhichAUuid = repliesMap[cpersGdprLegalBasisOtherWhichPath]|reply_str_value -%}
-            {%- if cpersGdprLegalBasisOtherWhichAUuid -%}
+            {%- set cpersGdprLegalBasisOtherWhichAUuid = legalBasis.choice(legalBasisParts + [uuids.cpersGdprLegalBasisOtherAUuid, uuids.cpersGdprLegalBasisOtherWhichQUuid]) -%}
+            {%- if cpersGdprLegalBasisOtherWhichAUuid in [uuids.cpersGdprLegalBasisOtherWhichContractAUuid, uuids.cpersGdprLegalBasisOtherWhichLegitAUuid, uuids.cpersGdprLegalBasisOtherWhichVitalAUuid, uuids.cpersGdprLegalBasisOtherWhichLegalAUuid] -%}
               {%- do sentences.append(pgettext("questions/09-ethical-issues", "Alternative legal basis for collecting personal data:") ~ ' ') -%}
             {%- else -%}
-              {%- if output_profile|default('review') == 'submission' -%}{%- do sentences.append(pgettext("questions/09-ethical-issues", "An alternative legal basis was selected.")) -%}{%- else -%}{%- do sentences.append(pgettext("questions/09-ethical-issues", "An alternative legal basis was selected, but it has not been specified; see Question 7.")) -%}{%- endif -%}
+              {%- if cpersGdprLegalBasisOtherWhichAUuid or output_profile|default('review') == 'submission' -%}{%- do sentences.append(pgettext("questions/09-ethical-issues", "An alternative legal basis was selected.")) -%}{%- else -%}{%- do sentences.append(pgettext("questions/09-ethical-issues", "An alternative legal basis was selected, but it has not been specified; see Question 7.")) -%}{%- endif -%}
             {%- endif -%}
             {%- if cpersGdprLegalBasisOtherWhichAUuid == uuids.cpersGdprLegalBasisOtherWhichContractAUuid -%}
               {%- do sentences.append(pgettext("questions/09-ethical-issues", "performance of a contract.")) -%}

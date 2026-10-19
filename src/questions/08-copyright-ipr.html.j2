@@ -146,7 +146,7 @@
     {%- if embargoAUuid == uuids.limitedEmbargoOpenAUuid -%}
       <p>{{ pgettext("questions/08-copyright-ipr", "All data will be made openly available immediately, without an embargo period.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoIndefinitelyAUuid -%}
-      <p>{{ pgettext("questions/08-copyright-ipr", "A fixed embargo period cannot be used because some restricted data must remain closed indefinitely.") }}</p>
+      <p>{{ pgettext("questions/08-copyright-ipr", "Unrestricted data will be made openly available immediately; restricted data will remain closed indefinitely.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoReleasedSoonAUuid -%}
       <p>{{ pgettext("questions/08-copyright-ipr", "Data will be released as soon as the restrictions no longer apply.") }}</p>
     {%- elif embargoAUuid == uuids.limitedEmbargoYesAUuid -%}

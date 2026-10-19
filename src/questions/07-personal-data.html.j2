@@ -12,13 +12,18 @@
             
             {%- if personalDataGDPRPathReply == uuids.cpersGdprExploreAUuid -%}
                 {# Legal basis be4651c9-9a8c-4e10-a158-61b94ca0e139 #}
-                {%- set personalDataLegalBasisQUuid = [personalDataGDPRPath, uuids.cpersGdprExploreAUuid, uuids.cpersGdprLegalBasisQUuid]|reply_path  -%}
-                {%- set personalDataLegalBasisReply = repliesMap[personalDataLegalBasisQUuid]|reply_str_value -%}
-                {%- set personalDataLegalBasisOtherQUuid = [personalDataLegalBasisQUuid, uuids.cpersGdprLegalBasisOtherAUuid, uuids.cpersGdprLegalBasisOtherWhichQUuid]|reply_path -%}
-                {%- set personalDataLegalBasisOtherReply = repliesMap[personalDataLegalBasisOtherQUuid]|reply_str_value -%}
-                {%- if personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid and not personalDataLegalBasisOtherReply -%}
+                {%- import 'src/personal-legal-basis.j2' as legalBasis with context -%}
+                {%- set legalBasisParts = [uuids.creatingCUuid, uuids.collectPersonalQUuid, uuids.collectPersonalYesAUuid, uuids.cpersGdprQUuid, uuids.cpersGdprExploreAUuid, uuids.cpersGdprLegalBasisQUuid] -%}
+                {%- set personalDataLegalBasisReply = legalBasis.choice(legalBasisParts) -%}
+                {%- set personalDataLegalBasisOtherReply = legalBasis.choice(legalBasisParts + [uuids.cpersGdprLegalBasisOtherAUuid, uuids.cpersGdprLegalBasisOtherWhichQUuid]) -%}
+                {%- set knownBases = [uuids.cpersGdprLegalBasisPublicAUuid, uuids.cpersGdprLegalBasisAskAUuid, uuids.cpersGdprLegalBasisOtherAUuid] -%}
+                {%- set knownOtherBases = [uuids.cpersGdprLegalBasisOtherWhichContractAUuid, uuids.cpersGdprLegalBasisOtherWhichLegitAUuid, uuids.cpersGdprLegalBasisOtherWhichVitalAUuid, uuids.cpersGdprLegalBasisOtherWhichLegalAUuid] -%}
+                {%- set unsupportedBasis = (personalDataLegalBasisReply and personalDataLegalBasisReply not in knownBases) or (personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid and personalDataLegalBasisOtherReply and personalDataLegalBasisOtherReply not in knownOtherBases) -%}
+                {%- if unsupportedBasis -%}
+                    {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-4a" data-fact-id="personal-data-legal-basis" data-status="needs-review">{{ pgettext("questions/07-personal-data", "The selected legal basis cannot be described by this template. Please review the answer.") }}</p>{% endif %}
+                {%- elif personalDataLegalBasisReply == uuids.cpersGdprLegalBasisOtherAUuid and personalDataLegalBasisOtherReply not in knownOtherBases -%}
                     {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-other-legal-basis\" data-status=\"missing\"><strong>Information not provided:</strong> the alternative legal basis selected for collecting and processing personal data.</p>") }}{% endif %}
-                {%- elif not personalDataLegalBasisReply -%}
+                {%- elif personalDataLegalBasisReply not in knownBases -%}
                     {% if output_profile|default('review') != 'submission' %}{{ pgettext("questions/07-personal-data", "<p class=\"data-gap\" data-requirement-id=\"SE-4a\" data-fact-id=\"personal-data-legal-basis\" data-status=\"missing\"><strong>Information not provided:</strong> the legal basis for collecting and processing personal data.</p>") }}{% endif %}
                 {%- else -%}
                     <h4>{{ pgettext("questions/07-personal-data", "Legal basis for collecting and processing personal data") }}</h4>

@@ -1,0 +1,25 @@
+{# Q7/Q9 share the same options-only legal-basis branch. A retained answer is
+   usable only through current selected ancestors, the KM graph and typed replies.
+   Keep flat no-KM fixtures supported without interpreting unknown option labels. #}
+{%- import 'src/active-answer.j2' as activeAnswer with context -%}
+{%- macro choice(parts) -%}
+  {%- set resolved = activeAnswer.path(parts, 'OptionsQuestion') if km is defined else parts|reply_path -%}
+  {%- set state = namespace(valid=resolved|length > 0) -%}
+  {%- for end in range(2, parts|length + 1, 2) -%}
+    {%- set current = parts[:end]|reply_path -%}
+    {%- if current in repliesMap and repliesMap[current].value is defined and repliesMap[current].value.type is defined -%}
+      {%- if repliesMap[current].value.type != 'AnswerReply' or repliesMap[current].value.value is not string -%}
+        {%- set state.valid = false -%}
+      {%- endif -%}
+    {%- endif -%}
+    {%- if end < parts|length and repliesMap[current]|reply_str_value != parts[end] -%}
+      {%- set state.valid = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+  {%- set selected = repliesMap[resolved]|reply_str_value if resolved else '' -%}
+  {%- set selected = selected if selected|trim else '' -%}
+  {%- if state.valid and km is defined and (selected not in km.entities.questions[parts[-1]].answerUuids or selected not in km.entities.answers) -%}
+    {%- set state.valid = false -%}
+  {%- endif -%}
+  {%- if state.valid -%}{{- selected -}}{%- endif -%}
+{%- endmacro -%}
