@@ -64,14 +64,14 @@
           {%- if legalReasons %}
             {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of legal restrictions.") }}
           {%- elif businessReasonsPatents %}
-            {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of patent-related commercial considerations.") }}
+            {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because patent applications still need to be filed.") }}
           {%- elif businessReasonsOther %}
-            <div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of commercial considerations unrelated to patents:") if notOpenBusinessReasonsOther else pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of commercial considerations unrelated to patents.") }}</p></div>
+            <div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open for other commercial reasons:") if notOpenBusinessReasonsOther else pgettext("questions/08-copyright-ipr", "The data cannot be made fully open for other commercial reasons.") }}</p></div>
             {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}
           {%- elif otherReasonsPapers %}
             {{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because papers need to be submitted first.") }}
           {%- elif otherReasonsOther %}
-            <div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of reasons other than publishing a paper:") if notOpenOtherReasonsOther else pgettext("questions/08-copyright-ipr", "The data cannot be made fully open because of reasons other than publishing a paper.") }}</p></div>
+            <div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "The data cannot be made fully open for other reasons:") if notOpenOtherReasonsOther else pgettext("questions/08-copyright-ipr", "The data cannot be made fully open for other reasons.") }}</p></div>
             {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}
           {%- endif -%}
         {%- else %}
@@ -81,15 +81,15 @@
               <li>{{ pgettext("questions/08-copyright-ipr", "legal restrictions") }}</li>
             {%- endif -%}
             {%- if businessReasonsPatents %}
-              <li>{{ pgettext("questions/08-copyright-ipr", "patent-related commercial considerations") }}</li>
+              <li>{{ pgettext("questions/08-copyright-ipr", "patent applications still need to be filed") }}</li>
             {%- elif businessReasonsOther %}
-              <li><div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "commercial considerations unrelated to patents:") if notOpenBusinessReasonsOther else pgettext("questions/08-copyright-ipr", "commercial considerations unrelated to patents") }}</p></div>
+              <li><div{% if notOpenBusinessReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "other commercial reasons:") if notOpenBusinessReasonsOther else pgettext("questions/08-copyright-ipr", "other commercial reasons") }}</p></div>
                 {% if notOpenBusinessReasonsOther %}{{ answerMarkdown.markdown(notOpenBusinessReasonsOther) }}{% endif %}</li>
             {%- endif -%}
             {%- if otherReasonsPapers %}
               <li>{{ pgettext("questions/08-copyright-ipr", "papers need to be submitted first") }}</li>
             {%- elif otherReasonsOther -%}
-              <li><div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "reasons other than publishing a paper:") if notOpenOtherReasonsOther else pgettext("questions/08-copyright-ipr", "reasons other than publishing a paper") }}</p></div>
+              <li><div{% if notOpenOtherReasonsOther %} class="answer-lead"{% endif %}><p>{{ pgettext("questions/08-copyright-ipr", "other reasons:") if notOpenOtherReasonsOther else pgettext("questions/08-copyright-ipr", "other reasons") }}</p></div>
                 {% if notOpenOtherReasonsOther %}{{ answerMarkdown.markdown(notOpenOtherReasonsOther) }}{% endif %}</li>
             {%- endif -%}
           </ul>

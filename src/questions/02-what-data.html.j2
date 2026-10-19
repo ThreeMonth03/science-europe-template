@@ -301,11 +301,11 @@
             {%- elif formatsVolumeAUuid == uuids.formatsVolumeFileSizeAUuid -%}
               {# Keep each entered quantity independently; do not coerce/round it into an invented total. #}
               {%- if formatsVolumeFiles|trim and formatsVolumeFileGB|trim %}
-                <p>{% trans formatsVolumeFiles=formatsVolumeFiles|e, formatAverageQuantity=formatAverageQuantity %}We expect {{ formatsVolumeFiles }} files, with an estimated average size of {{ formatAverageQuantity }}.{% endtrans %}</p>
+                <p>{% trans formatsVolumeFiles=formatsVolumeFiles|e, formatAverageQuantity=formatAverageQuantity %}The estimated number of files or study subjects is {{ formatsVolumeFiles }}. The estimated average data volume per file or study subject is {{ formatAverageQuantity }}.{% endtrans %}</p>
               {%- elif formatsVolumeFiles|trim %}
-                <p>{% trans formatsVolumeFiles=formatsVolumeFiles|e %}We expect {{ formatsVolumeFiles }} files.{% endtrans %}</p>
+                <p>{% trans formatsVolumeFiles=formatsVolumeFiles|e %}The estimated number of files or study subjects is {{ formatsVolumeFiles }}.{% endtrans %}</p>
               {%- elif formatsVolumeFileGB|trim %}
-                <p>{% trans formatAverageQuantity=formatAverageQuantity %}The estimated average file size is {{ formatAverageQuantity }}.{% endtrans %}</p>
+                <p>{% trans formatAverageQuantity=formatAverageQuantity %}The estimated average data volume per file or study subject is {{ formatAverageQuantity }}.{% endtrans %}</p>
               {%- endif -%}
             {%- endif -%}
           </div>
@@ -332,8 +332,8 @@
             {% if formatsVolumeAUuid == uuids.formatsVolumeTotalAUuid %}
               {% if not formatsVolumeTotalGB|trim %}{% set fieldGap %}<span data-fact-id="format-total-volume" data-status="missing">{% trans %}estimated total volume (GB){% endtrans %}</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
             {% elif formatsVolumeAUuid == uuids.formatsVolumeFileSizeAUuid %}
-              {% if not formatsVolumeFiles|trim %}{% set fieldGap %}<span data-fact-id="format-file-count" data-status="missing">{% trans %}estimated number of files{% endtrans %}</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
-              {% if not formatsVolumeFileGB|trim %}{% set fieldGap %}<span data-fact-id="format-file-size" data-status="missing">{% trans %}estimated average file size (GB){% endtrans %}</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
+              {% if not formatsVolumeFiles|trim %}{% set fieldGap %}<span data-fact-id="format-file-count" data-status="missing">{% trans %}estimated number of files or study subjects{% endtrans %}</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
+              {% if not formatsVolumeFileGB|trim %}{% set fieldGap %}<span data-fact-id="format-file-size" data-status="missing">{% trans %}estimated average data volume per file or study subject (GB){% endtrans %}</span>{% endset %}{% do formatGaps.append(fieldGap) %}{% endif %}
             {% elif formatsVolumeAUuid != uuids.formatsVolumeSmallAUuid %}
               {% set fieldGap %}<span data-fact-id="format-volume" data-status="missing">{% trans %}estimated data volume{% endtrans %}</span>{% endset %}{% do formatGaps.append(fieldGap) %}
             {% endif %}

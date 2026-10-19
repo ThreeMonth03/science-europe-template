@@ -115,7 +115,7 @@
                     {#- Contact the repository #}
                     {%- set repositorySentenceSeparator = "" if document_language|default('en') == 'zh-Hant' else " " -%}
                     {%- if domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeNoAUuid -%}
-                      {{ repositorySentenceSeparator }}{{ pgettext("questions/11-data-preservation", "We do not need to contact the repository in advance because depositing data there is routine for us.") }}
+                      {{ repositorySentenceSeparator }}{{ pgettext("questions/11-data-preservation", "We do not need to contact the repository in advance because depositing data there is routine for both us and the repository.") }}
                     {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesAlreadyAUuid -%}
                       {{ repositorySentenceSeparator }}{{ pgettext("questions/11-data-preservation", "We have already contacted the repository.") }}
                     {%- elif domainSpecificRepoContactBeforeAUuid == uuids.domainSpecificRepoContactBeforeYesWillAUuid -%}

@@ -43,7 +43,7 @@
   {%- if scopeChoice == uuids.nrefDataCompleteUseAUuid -%}
     {{ pgettext("reuse-summary", "The project will reuse the complete dataset.") }}
   {%- elif scopeChoice == uuids.nrefDataCompleteDocumentAUuid -%}
-    {{ pgettext("reuse-summary", "The project will reuse a subset of the data and document the filtering or selection process.") }}
+    {{ pgettext("reuse-summary", "If we filter or select data, we will fully document the process.") }}
   {%- elif scopeChoice == uuids.nrefDataCompleteSubsetAUuid -%}
     {{ pgettext("reuse-summary", "The project will reuse a selected subset of the data and make it available with the research results.") }}
   {%- endif -%}

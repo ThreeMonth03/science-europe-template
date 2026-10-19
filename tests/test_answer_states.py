@@ -30,6 +30,215 @@ def storage_matrix():
 
 
 class AnswerStateTests(unittest.TestCase):
+    def test_reuse_scope_preserves_conditional_documentation_and_adjacent_choices(self):
+        from check_sentence_layout import partial_fixture
+        from current_support import PREFIX, environment
+        from dsw.templating.filters import filters
+        chain = ('reusingCUuid preexistingQUuid preexistingYesAUuid nrefDataQUuid ITEM '
+                 'nrefDataUseQUuid nrefDataUseYesAUuid nrefDataCompleteQUuid')
+        km, base, leaf = partial_fixture(chain)
+        choices = {name: IDS['nrefDataComplete' + name + 'AUuid'] for name in ('Use', 'Document', 'Subset')}
+        km['entities']['questions'][IDS['nrefDataCompleteQUuid']].update(
+            questionType='OptionsQuestion', answerUuids=list(choices.values()))
+        km['entities']['answers'].update({answer: {'followUpUuids': []} for answer in choices.values()})
+        sentences = {
+            'Use': 'The project will reuse the complete dataset.',
+            'Document': 'If we filter or select data, we will fully document the process.',
+            'Subset': 'The project will reuse a selected subset of the data and make it available with the research results.',
+        }
+        for escape in (False, True):
+            env = environment(ROOT, escape)
+            env.filters.update(filters)
+            template = env.from_string(PREFIX + "{% include 'src/questions/01-how-data.html.j2' %}")
+            for profile, choice in itertools.product(('review', 'submission'), (*choices, None, 'unknown')):
+                values = dict(base)
+                if choice is not None: values[leaf] = choices.get(choice, choice)
+                # The paths and choices are the actual KM 2.7.0 branch; decode
+                # real reply envelopes with production filters, not flat mocks.
+                typed = {key: {'value': {'type': 'ItemListReply' if isinstance(value, list) else 'AnswerReply',
+                                         'value': value}} for key, value in values.items()}
+                soup = BeautifulSoup(template.render(km=km, repliesMap=typed, output_profile=profile), 'html.parser')
+                text = ' '.join(soup.get_text(' ', strip=True).split())
+                for name, sentence in sentences.items(): self.assertEqual(choice == name, sentence in text)
+                self.assertNotIn('The project will reuse a subset of the data and document', text)
+                self.assertFalse(soup.select('p p,p div,p ul,p table'))
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+
+    def test_volume_retains_files_or_study_subjects_for_all_partial_quantities(self):
+        from check_answer_mapping import question
+        from check_sentence_layout import partial_fixture
+        from current_support import PREFIX, environment
+        from dsw.templating.filters import filters
+        km, base, leaf = partial_fixture('creatingCUuid formatsQUuid ITEM formatsVolumeQUuid')
+        choices = {name: IDS['formatsVolume' + name + 'AUuid'] for name in ('Small', 'Total', 'FileSize')}
+        km['entities']['questions'][IDS['formatsVolumeQUuid']].update(
+            questionType='OptionsQuestion', answerUuids=list(choices.values()))
+        km['entities']['answers'].update({answer: {'followUpUuids': []} for answer in choices.values()})
+        children = km['entities']['answers'][choices['FileSize']]['followUpUuids']
+        for name in ('formatsVolumeFilesQUuid', 'formatsVolumeFileGBQUuid'):
+            question(km, children, IDS[name], 'ValueQuestion')
+        question(km, km['entities']['answers'][choices['Total']]['followUpUuids'],
+                 IDS['formatsVolumeTotalGBQUuid'], 'ValueQuestion')
+        count_path = path(leaf, 'formatsVolumeFileSizeAUuid', 'formatsVolumeFilesQUuid')
+        size_path = path(leaf, 'formatsVolumeFileSizeAUuid', 'formatsVolumeFileGBQUuid')
+        expected = {
+            (True, True): 'The estimated number of files or study subjects is {count}. The estimated average data volume per file or study subject is 0.5 GB.',
+            (True, False): 'The estimated number of files or study subjects is {count}.',
+            (False, True): 'The estimated average data volume per file or study subject is 0.5 GB.',
+        }
+        for escape in (False, True):
+            env = environment(ROOT, escape)
+            env.filters.update(filters)
+            template = env.from_string(PREFIX + "{% include 'src/questions/02-what-data.html.j2' %}")
+            for profile, count, size, choice in itertools.product(
+                    ('review', 'submission'), (None, '', ' \t\n\u3000', '0', '1', '20'),
+                    (None, '', ' \t\n\u3000', '0.5'), choices):
+                values = {**base, leaf: choices[choice]}
+                typed = {key: {'value': {'type': 'ItemListReply' if isinstance(value, list) else 'AnswerReply',
+                                         'value': value}} for key, value in values.items()}
+                for key, value in ((count_path, count), (size_path, size),
+                                   (path(leaf, 'formatsVolumeTotalAUuid', 'formatsVolumeTotalGBQUuid'), '12')):
+                    if value is not None: typed[key] = {'value': {'type': 'StringReply', 'value': value}}
+                soup = BeautifulSoup(template.render(km=km, repliesMap=typed, output_profile=profile), 'html.parser')
+                text = ' '.join(soup.get_text().split())
+                paragraphs = [' '.join(p.get_text().split()) for p in soup.select('.format-summary > p')]
+                count_known, size_known = bool((count or '').strip()), bool((size or '').strip())
+                for states, sentence in expected.items():
+                    expected_text = sentence.format(count=(count or '').strip())
+                    # The two known quantities remain in the same paragraph;
+                    # counts 0 and 1 must not change or erase the unit basis.
+                    self.assertEqual(choice == 'FileSize' and states == (count_known, size_known), expected_text in paragraphs)
+                self.assertEqual(choice == 'Small', 'Only a small volume of data is expected.' in text)
+                self.assertEqual(choice == 'Total', 'The estimated data volume is 12 GB.' in text)
+                for fact, missing, label in [
+                    ('format-file-count', not count_known, 'estimated number of files or study subjects'),
+                    ('format-file-size', not size_known, 'estimated average data volume per file or study subject (GB)'),
+                ]:
+                    node = soup.select_one('[data-fact-id="' + fact + '"]')
+                    self.assertEqual(profile == 'review' and choice == 'FileSize' and missing, bool(node))
+                    if node: self.assertEqual(label, node.get_text())
+                self.assertNotIn('20 files,', text)
+                self.assertNotIn('average file size', text)
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+
+    def test_openness_reasons_preserve_filing_status_and_nonexclusive_other_details(self):
+        from check_answer_mapping import chapter, question, schema
+        from current_support import PREFIX, environment
+        from dsw.templating.filters import filters
+        km = schema()
+        question(km, chapter(km, IDS['accessCUuid']), IDS['openImmediatelyQUuid'], 'OptionsQuestion',
+                 [IDS['openImmediatelyNoAUuid'], IDS['openImmediatelyYesAUuid']])
+        children = km['entities']['answers'][IDS['openImmediatelyNoAUuid']]['followUpUuids']
+        question(km, children, IDS['notOpenLegalReasonsQUuid'], 'OptionsQuestion',
+                 [IDS['notOpenLegalReasonsYesAUuid'], IDS['notOpenLegalReasonsNoAUuid']])
+        question(km, children, IDS['notOpenBusinessReasonsQUuid'], 'OptionsQuestion',
+                 [IDS['notOpenBusinessReasonsPatentsAUuid'], IDS['notOpenBusinessReasonsOtherAUuid']])
+        question(km, children, IDS['notOpenOtherReasonsQUuid'], 'OptionsQuestion',
+                 [IDS['notOpenOtherReasonsPapersAUuid'], IDS['notOpenOtherReasonsOtherAUuid']])
+        for binding in ('notOpenBusinessReasons', 'notOpenOtherReasons'):
+            question(km, km['entities']['answers'][IDS[binding + 'OtherAUuid']]['followUpUuids'],
+                     IDS[binding + 'OtherQUuid'], 'ValueQuestion')
+        parent = path('accessCUuid', 'openImmediatelyQUuid')
+        prefix = path(parent, 'openImmediatelyNoAUuid')
+        authored = 'Patent filing and planned paper publication remain relevant.\n\nKeep Original-v1.2.'
+        for escape in (False, True):
+            env = environment(ROOT, escape)
+            env.filters.update(filters)
+            template = env.from_string(PREFIX + "{% include 'src/questions/08-copyright-ipr.html.j2' %}")
+            for profile, legal, business, other, detail in itertools.product(
+                    ('review', 'submission'), (False, True), (None, 'Patents', 'Other'),
+                    (None, 'Papers', 'Other'), (None, ' \t\n\u3000', authored)):
+                values = {parent: IDS['openImmediatelyNoAUuid'],
+                          path(prefix, 'notOpenLegalReasonsQUuid'): IDS['notOpenLegalReasons' + ('Yes' if legal else 'No') + 'AUuid']}
+                for binding, selected in (('notOpenBusinessReasons', business), ('notOpenOtherReasons', other)):
+                    if selected: values[path(prefix, binding + 'QUuid')] = IDS[binding + selected + 'AUuid']
+                typed = {key: {'value': {'type': 'AnswerReply', 'value': value}} for key, value in values.items()}
+                for binding in ('notOpenBusinessReasons', 'notOpenOtherReasons'):
+                    if detail is not None:
+                        key = path(prefix, binding + 'QUuid', binding + 'OtherAUuid', binding + 'OtherQUuid')
+                        typed[key] = {'value': {'type': 'StringReply', 'value': detail}}
+                soup = BeautifulSoup(template.render(km=km, repliesMap=typed, output_profile=profile), 'html.parser')
+                text = ' '.join(soup.get_text(' ', strip=True).split())
+                number = int(legal) + bool(business) + bool(other)
+                has_detail = bool((detail or '').strip())
+                phrases = {
+                    'patent': ('The data cannot be made fully open because patent applications still need to be filed.'
+                               if number == 1 else 'patent applications still need to be filed'),
+                    'business': ('The data cannot be made fully open for other commercial reasons' if number == 1 else 'other commercial reasons')
+                                + (':' if has_detail else '.' if number == 1 else ''),
+                    'other': ('The data cannot be made fully open for other reasons' if number == 1 else 'other reasons')
+                             + (':' if has_detail else '.' if number == 1 else ''),
+                }
+                for key, active in (('patent', business == 'Patents'), ('business', business == 'Other'), ('other', other == 'Other')):
+                    self.assertEqual(active, phrases[key] in text)
+                self.assertEqual(has_detail and (business == 'Other' or other == 'Other'), 'Keep Original-v1.2.' in text)
+                if other == 'Papers': self.assertIn('papers need to be submitted first', text)
+                if legal: self.assertIn('legal restrictions', text)
+                self.assertNotIn('unrelated to patents', text)
+                self.assertNotIn('reasons other than publishing a paper', text)
+                self.assertNotIn('patent-related commercial considerations', text)
+                self.assertFalse(soup.select('p p,p div,p ul,p table'))
+                if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+
+    def test_distribution_licence_scope_and_mutual_repository_routine_stay_local(self):
+        from check_answer_mapping import question
+        from check_sentence_layout import partial_fixture
+        from current_support import PREFIX, environment
+        from dsw.templating.filters import filters
+        chain = ('preservingCUuid producedDataQUuid ITEM isPublishedDataQUuid isPublishedDataYesAUuid '
+                 'publishedDistrosQUuid ITEM publishedDataRepositoryKindQUuid '
+                 'publishedDataRepositoryDomainSpecificAUuid domainSpecificRepoContactBeforeQUuid')
+        km, base, contact = partial_fixture(chain)
+        contacts = {name: IDS['domainSpecificRepoContactBefore' + name + 'AUuid']
+                    for name in ('No', 'YesAlready', 'YesWill', 'Other')}
+        km['entities']['questions'][IDS['domainSpecificRepoContactBeforeQUuid']].update(
+            questionType='OptionsQuestion', answerUuids=list(contacts.values()))
+        km['entities']['answers'].update({answer: {'followUpUuids': []} for answer in contacts.values()})
+        distribution = contact.rsplit('.', 3)[0]
+        kind = path(distribution, 'publishedDataRepositoryKindQUuid')
+        km['entities']['questions'][IDS['publishedDataRepositoryKindQUuid']]['answerUuids'].append(IDS['publishedDataRepositoryGeneralPurposeAUuid'])
+        km['entities']['answers'][IDS['publishedDataRepositoryGeneralPurposeAUuid']] = {'followUpUuids': []}
+        children = km['entities']['questions'][IDS['publishedDistrosQUuid']]['itemTemplateQuestionUuids']
+        access = {name: IDS['publishedDistroShare' + name + 'AUuid'] for name in ('Open', 'Shared', 'Closed')}
+        question(km, children, IDS['publishedDistroShareQUuid'], 'OptionsQuestion', list(access.values()))
+        license_children = question(km, children, IDS['publishedDataLicensesQUuid'], 'ListQuestion')['itemTemplateQuestionUuids']
+        licenses = {name: IDS['publishedDataLicense' + name + 'AUuid'] for name in ('CC0', 'CCBY', 'Restrict')}
+        question(km, license_children, IDS['publishedDataLicenseQUuid'], 'OptionsQuestion', list(licenses.values()))
+        open_sentence = 'Open access: this distribution will be shared with anyone who complies with the licence conditions.'
+        routine = 'We do not need to contact the repository in advance because depositing data there is routine for both us and the repository.'
+        for escape in (False, True):
+            env = environment(ROOT, escape)
+            env.filters.update(filters)
+            templates = [env.from_string(PREFIX + "{% include 'src/questions/" + name + "' %}")
+                         for name in ('10-share-restrictions.html.j2', '11-data-preservation.html.j2')]
+            for profile, sharing, repository, selected, licence in itertools.product(
+                    ('review', 'submission'), (*access, None), ('DomainSpecific', 'GeneralPurpose'),
+                    (*contacts, None), (*licenses, None)):
+                values = {**base, kind: IDS['publishedDataRepository' + repository + 'AUuid']}
+                if selected is not None: values[contact] = contacts[selected]
+                if sharing is not None: values[path(distribution, 'publishedDistroShareQUuid')] = access[sharing]
+                listing = path(distribution, 'publishedDataLicensesQUuid')
+                if licence is not None:
+                    values[listing] = ['license-a']
+                    values[path(listing, 'license-a', 'publishedDataLicenseQUuid')] = licenses[licence]
+                typed = {key: {'value': {'type': 'ItemListReply' if isinstance(value, list) else 'AnswerReply',
+                                         'value': value}} for key, value in values.items()}
+                soups = [BeautifulSoup(template.render(km=km, repliesMap=typed, output_profile=profile), 'html.parser')
+                         for template in templates]
+                for soup in soups:
+                    text = ' '.join(soup.get_text(' ', strip=True).split())
+                    self.assertEqual(repository == 'DomainSpecific' and selected == 'No', routine in text)
+                    self.assertEqual(repository == 'DomainSpecific' and selected == 'YesAlready', 'We have already contacted the repository.' in text)
+                    self.assertEqual(repository == 'DomainSpecific' and selected == 'YesWill', 'We are going to contact the repository.' in text)
+                    self.assertNotIn('depositing data there is routine for us.', text)
+                    self.assertFalse(soup.select('p p,p div,p ul,p table'))
+                    if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+                access_text = soups[0].get_text(' ', strip=True)
+                self.assertEqual(sharing == 'Open', open_sentence in access_text)
+                self.assertEqual(sharing == 'Shared', 'Access will be limited to a predefined group of people.' in access_text)
+                self.assertEqual(sharing == 'Closed', 'This distribution is not intended for sharing.' in access_text)
+                self.assertNotIn('shared with anyone.', access_text)
+
     def test_q8_only_complete_fixed_openness_shares_a_paragraph(self):
         from current_support import PREFIX, environment
         principle = path('accessCUuid', 'asOpenAsPossibleQUuid')
