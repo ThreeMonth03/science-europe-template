@@ -43,6 +43,8 @@ jobs:
             tests.test_current_behavior.CurrentI18nTests \
             tests.test_current_behavior.CurrentBudgetLayoutTests \
             tests.test_q3_storage_groups \
+            tests.test_reference_versions \
+            tests.test_primary_identifiers \
             tests.test_derived_submission_headings.DerivedSubmissionHeadingsTests \
             tests.test_document_metadata.DocumentMetadataTests \
             tests.test_answer_states.AnswerStateTests \
