@@ -55,6 +55,7 @@ def answer_markdown_steps():
     """Exact owned prefix; original entries and conversion engines stay intact."""
     return [
         {'name': 'jinja', 'options': {
+            'jinja-ext': 'i18n', 'policy.ext.i18n.trimmed': 'true',
             'template': 'src/answer-markdown-inputs.html.j2',
             'content-type': 'text/html', 'extension': 'html'}},
         {'name': 'pandoc', 'options': {

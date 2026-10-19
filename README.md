@@ -14,6 +14,9 @@ in `locales/zh-Hant.po`.
   `pipeline.yml`, then builds both runtime deliveries from the same source.
 - DSW 4.34 uses a generated Chinese compatibility ZIP with an embedded MO catalog.
   DSW 4.35 uses the English ZIP with a separately attached Chinese PO locale.
+- The same English ZIP also supports stock DSW 4.34: descriptor options activate
+  null English gettext on its Jinja-powered steps, without fixing a catalog or
+  changing the Worker. DSW 4.35 still selects its attached locale normally.
 - Generated ZIPs, MO files and Chinese render trees are outputs, not editable sources.
 
 Review and submission are formats of the same template, not separate branches.

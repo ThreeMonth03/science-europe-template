@@ -10,6 +10,22 @@ from current_support import environment
 
 
 class CurrentI18nTests(unittest.TestCase):
+    def test_descriptor_enables_stock434_null_english_for_every_jinja_step(self):
+        import json
+        descriptor = json.loads((ROOT / 'template.json').read_text())
+        steps = [(output['name'], step) for output in descriptor['formats']
+                 for step in output['steps'] if step['name'] in ('jinja', 'enrich-docx')]
+        self.assertTrue(steps)
+        for output, step in steps:
+            with self.subTest(output=output, step=step['name'], options=step['options']):
+                options = step['options']
+                self.assertIn('i18n', [value.strip() for value in
+                                      options.get('jinja-ext', '').split(',')])
+                self.assertEqual('true', options.get('policy.ext.i18n.trimmed'))
+                # No fixed catalog: stock 4.34 installs null English translations;
+                # native 4.35 selects its separately attached PO by document locale.
+                self.assertFalse({'i18n-dir', 'i18n-domain', 'i18n-lang'} & options.keys())
+
     def catalog_root(self, parent, language='zh-Hant'):
         import polib
         root = Path(parent)

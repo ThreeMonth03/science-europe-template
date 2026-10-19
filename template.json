@@ -1,7 +1,7 @@
 {
   "organizationId": "threemonth03",
   "templateId": "science-europe-enhanced",
-  "version": "0.3.96",
+  "version": "0.3.97",
   "name": "Science Europe DMP \u2014 Output Profiles Pilot",
   "language": "en",
   "description": "Experimental derivative of dsw:science-europe:1.30.1 with completeness handling and shared PDF/Word reading structure",
@@ -36,6 +36,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -52,6 +54,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/index.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -67,6 +71,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -83,6 +89,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/pdf/index.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -102,6 +110,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -118,6 +128,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/index.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -140,6 +152,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -156,6 +170,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "content-type": "text/html",
             "extension": "html",
             "template": "src/word/index.html.j2"
@@ -172,6 +188,8 @@
         {
           "name": "enrich-docx",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "rewrite:word/document.xml": "render:src/word/short-tables.xml",
             "rewrite:word/styles.xml": "render:src/word/locale-styles.xml.j2"
           }
@@ -186,6 +204,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -202,6 +222,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/submission/index.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -217,6 +239,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -233,6 +257,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/submission/pdf.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -252,6 +278,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -268,6 +296,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "content-type": "text/html",
             "extension": "html",
             "template": "src/submission/word.html.j2"
@@ -284,6 +314,8 @@
         {
           "name": "enrich-docx",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "rewrite:word/document.xml": "render:src/word/question-spacing.xml",
             "rewrite:word/styles.xml": "render:src/word/locale-styles.xml.j2"
           }
@@ -298,6 +330,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/answer-markdown-inputs.html.j2",
             "content-type": "text/html",
             "extension": "html"
@@ -314,6 +348,8 @@
         {
           "name": "jinja",
           "options": {
+            "jinja-ext": "i18n",
+            "policy.ext.i18n.trimmed": "true",
             "template": "src/index.html.j2",
             "content-type": "text/html",
             "extension": "html"
