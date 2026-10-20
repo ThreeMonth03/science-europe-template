@@ -121,6 +121,48 @@ class AnswerStateTests(unittest.TestCase):
                 self.assertNotIn('average file size', text)
                 if profile == 'submission': self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
 
+    def test_partial_quantities_remain_with_their_own_format(self):
+        from check_answer_mapping import chapter, question, schema
+        from current_support import PREFIX, environment
+        from dsw.templating.filters import filters
+        km = schema()
+        children = question(km, chapter(km, IDS['creatingCUuid']), IDS['formatsQUuid'],
+                            'ListQuestion')['itemTemplateQuestionUuids']
+        question(km, children, IDS['formatsNameQUuid'], 'IntegrationQuestion')
+        choice = IDS['formatsVolumeFileSizeAUuid']
+        question(km, children, IDS['formatsVolumeQUuid'], 'OptionsQuestion', [choice])
+        for binding in ('formatsVolumeFilesQUuid', 'formatsVolumeFileGBQUuid'):
+            question(km, km['entities']['answers'][choice]['followUpUuids'], IDS[binding], 'ValueQuestion')
+        records = [('count-only', 'NetCDF', 'formatsVolumeFilesQUuid', '0'),
+                   ('average-only', 'CSV', 'formatsVolumeFileGBQUuid', '0.5')]
+        sentences = {'count-only': 'The estimated number of files or study subjects is 0.',
+                     'average-only': 'The estimated average data volume per file or study subject is 0.5 GB.'}
+        listing = path('creatingCUuid', 'formatsQUuid')
+        for escape in (False, True):
+            env = environment(ROOT, escape)
+            env.filters.update(filters)
+            template = env.from_string(PREFIX + "{% include 'src/questions/02-what-data.html.j2' %}")
+            for profile, ordered in itertools.product(('review', 'submission'), (records, records[::-1])):
+                with self.subTest(escape=escape, profile=profile, order=[r[0] for r in ordered]):
+                    replies = {listing: {'value': {'type': 'ItemListReply', 'value': [r[0] for r in ordered]}}}
+                    for item, name, binding, value in ordered:
+                        volume = path(listing, item, 'formatsVolumeQUuid')
+                        replies[path(listing, item, 'formatsNameQUuid')] = {'value': {'type': 'IntegrationReply',
+                            'value': {'type': 'PlainType', 'value': name}}}
+                        replies[volume] = {'value': {'type': 'AnswerReply', 'value': choice}}
+                        replies[path(volume, 'formatsVolumeFileSizeAUuid', binding)] = {
+                            'value': {'type': 'StringReply', 'value': value}}
+                    soup = BeautifulSoup(template.render(km=km, repliesMap=replies, output_profile=profile), 'html.parser')
+                    rendered = soup.select('.format-description')
+                    self.assertEqual([r[0] for r in ordered], [node['data-item-id'] for node in rendered])
+                    for node, (item, name, _, _) in zip(rendered, ordered):
+                        paragraphs = [' '.join(p.get_text().split()) for p in node.select('.format-summary > p')]
+                        self.assertEqual([f'Data format: {name}.', sentences[item]], paragraphs)
+                        missing = 'format-file-size' if item == 'count-only' else 'format-file-count'
+                        self.assertEqual(profile == 'review', bool(node.select_one(f'[data-fact-id="{missing}"]')))
+                    if profile == 'submission':
+                        self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+
     def test_openness_reasons_preserve_filing_status_and_nonexclusive_other_details(self):
         from check_answer_mapping import chapter, question, schema
         from current_support import PREFIX, environment

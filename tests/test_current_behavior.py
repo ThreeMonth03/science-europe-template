@@ -87,6 +87,46 @@ class CurrentI18nTests(unittest.TestCase):
 
 
 class CurrentBudgetLayoutTests(unittest.TestCase):
+    def test_two_unnamed_partial_budgets_keep_values_in_their_own_cells(self):
+        import itertools
+        from bs4 import BeautifulSoup
+        from current_support import PREFIX, path
+        from test_public_dmp_resource_prose import fixture, QUESTION, MODES
+        rows = [{'purpose': '<p>Purpose A.</p>', 'amount': '0'},
+                {'purpose': '<p>Purpose B.</p>', 'currency': 'TWD'}]
+        for escape, mode, profile in itertools.product((False, True), MODES, ('review', 'submission')):
+            with self.subTest(escape=escape, mode=mode, profile=profile):
+                km, replies, listing = fixture(rows)
+                template = environment(ROOT, escape).from_string(PREFIX + "{% include '" + QUESTION + "' %}")
+                soup = BeautifulSoup(template.render(km=km, repliesMap=replies,
+                    output_profile=profile, **MODES[mode]), 'html.parser')
+                owner, = soup.select('.project-resources')
+                self.assertFalse(owner.select('.resource-prose'))
+                records = owner.select(':scope > table.resource-table > tbody > tr')
+                self.assertEqual([record['data-item-id'] for record in records],
+                                 [path(listing, 'cost-1'), path(listing, 'cost-2')])
+                for index, (record, source) in enumerate(zip(records, rows), 1):
+                    cells = record.find_all('td', recursive=False)
+                    self.assertEqual(len(cells), 3)
+                    expected_title = f'Resource {index}' if profile == 'submission' else '(no resource name given)'
+                    self.assertEqual(cells[0].select_one('p > strong').get_text(), expected_title)
+                    purpose, = cells[0].select('.answer-detail[data-fact-id="resource-justification"]')
+                    self.assertEqual(purpose.decode_contents(), source['purpose'])
+                    values = [node.get_text(' ', strip=True)
+                              for node in cells[1].select(':scope > p:not(.data-gap)')]
+                    self.assertEqual(values, ['0'] if index == 1 else ['Currency: TWD.'])
+                    gaps = cells[1].select('p.data-gap[data-fact-id="resource-amount"]')
+                    self.assertEqual(len(gaps), int(profile == 'review'))
+                    if gaps:
+                        expected_gap = 'currency.' if index == 1 else 'budgeted amount.'
+                        self.assertEqual(gaps[0].get_text(' ', strip=True),
+                                         'Information not provided: ' + expected_gap)
+                    if profile == 'submission':
+                        self.assertFalse(cells[1].select('.data-gap,.data-review'))
+                        self.assertEqual(cells[2].get_text(strip=True), '')
+                if profile == 'submission':
+                    self.assertFalse(soup.select('.data-gap,.data-review,.empty-value'))
+
     def test_funding_tables_are_full_width_owned_and_preserve_exact_fragments(self):
         from lxml import html
         from markupsafe import Markup
