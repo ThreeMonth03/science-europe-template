@@ -311,8 +311,10 @@ def check(root, language):
             for question in quality:
                 soup = render(question, replies, profile)
                 node = soup.select_one('[data-fact-id="quality-other"]')
-                has_detail = choice == 'Yes' and bool((value or '').strip())
-                assert bool(node) == (choice == 'Yes')
+                supplied_detail = choice == 'Yes' and bool((value or '').strip())
+                overview = profile == 'submission' and question is quality[0]
+                has_detail = supplied_detail and not overview
+                assert bool(node) == (choice == 'Yes' and not (overview and supplied_detail))
                 assert bool(soup.select('.answer-detail[data-fact-id="quality-other"]')) == has_detail
                 assert bool(soup.select('.answer-lead')) == has_detail
                 if node:
@@ -327,6 +329,9 @@ def check(root, language):
                     assert methods_node and calibration in methods_node.get_text()
                     if methods_node.name == 'p':
                         assert ('Dataset A' in methods_node.get_text()) == (question is quality[1])
+                elif overview and supplied_detail:
+                    assert soup.select_one('[data-fact-id="quality-methods"][data-status="partial"]')
+                    assert len(soup.select('.quality-summary')) == 1
                 if profile == 'submission': assert not soup.select('.data-gap,.data-review,.empty-value')
                 # Q4 adds an owned presentation marker to the existing detail
                 # div; its entire authored body and every fact remain exact.
@@ -345,7 +350,10 @@ def check(root, language):
                 if value and not value.strip():
                     empty = dict(replies); empty[detail] = ''
                     assert str(soup) == str(render(question, empty, profile))
-            assert facts[0] == facts[1]
+            # Only Q1's submission overview omits the authored detail; review
+            # and all unchanged partial/unknown choices retain their old facts.
+            if profile != 'submission' or not (choice == 'Yes' and bool((value or '').strip())):
+                assert facts[0] == facts[1]
             counts['quality_other_cases'] += 1
         for parent, profile in itertools.product([None, IDS['measuredDataQualityNoAUuid'], 'obsolete'], ['review', 'submission']):
             replies = dict(base, **{other: IDS['mdQualityOtherYesAUuid'], detail: AUTHORED})

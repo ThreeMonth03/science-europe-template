@@ -68,7 +68,7 @@
             {%- else -%}
               {% if output_profile|default('review') != 'submission' %}<p>{{ pgettext("questions/01-how-data", "No instruments for this dataset have been specified.") }}</p>{% endif %}
             {%- endif -%}
-            {% with qualityNameAlreadyRendered = true, compactQualitySummary = true %}
+            {% with qualityNameAlreadyRendered = true, compactQualitySummary = true, qualityOverview = output_profile|default('review') == 'submission' %}
               {% include "src/quality-control.html.j2" with context %}
             {% endwith %}
           </div>

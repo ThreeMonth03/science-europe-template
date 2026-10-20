@@ -40,18 +40,20 @@
   {% set otherText = repliesMap[[otherPath, uuids.mdQualityOtherYesAUuid, uuids.mdQualityOtherWhatQUuid]|reply_path]|reply_str_value if otherAnswer == uuids.mdQualityOtherYesAUuid else '' %}
 {% if output_profile|default('review') == 'submission' and otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText|trim %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{% if qualityMethods %}{{ pgettext("quality-control", "Quality control measures planned for <strong>%(qualityName)s</strong>: <span data-fact-id=\"quality-methods\" data-status=\"complete\">%(qualityMethods)s</span> and other quality control methods.", qualityName=qualityName, qualityMethods=qualityMethods|join(pgettext("quality-control", ", "))) }}{% else %}{{ pgettext("quality-control", "Other quality control methods are planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}{% endif %}</p>{% else %}  {% if qualityMethods %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="complete">{% if compactQualitySummary|default(false) %}{{ pgettext("quality-control", "Quality control measures: %(qualityMethods)s.", qualityMethods=qualityMethods|join(pgettext("quality-control", ", "))) }}{% else %}{{ pgettext("quality-control", "Quality control measures for <strong>%(qualityName)s</strong>: %(qualityMethods)s.", qualityName=qualityName, qualityMethods=qualityMethods|join(pgettext("quality-control", ", "))) }}{% endif %}</p>
-  {% elif not otherText|trim %}
+  {# Q1's submission overview uses only fixed facts; Q4 retains the full
+     authored detail. Other-only answers still need their known Yes summary. #}
+  {% elif not otherText|trim or qualityOverview|default(false) %}
     {% if output_profile|default('review') == 'submission' %}
     <p class="quality-summary" data-fact-id="quality-methods" data-status="partial">{{ pgettext("quality-control", "Quality control is planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>
     {% else %}
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-methods" data-status="missing">{{ pgettext("quality-control", "Quality control is planned for <strong>%(qualityName)s</strong>, but the methods have not been specified.", qualityName=qualityName) }}</p>{% endif %}
     {% endif %}
   {% endif %}
-  {% if otherText|trim %}
+  {% if otherText|trim and not qualityOverview|default(false) %}
     <div class="answer-lead"><p>{{ pgettext("quality-control", "Additional quality control details for <strong>%(qualityName)s</strong>:", qualityName=qualityName) }}</p></div>
     {# Let long authored paragraphs split; do not bind the first two paragraphs. #}
     <div class="answer-detail" data-fact-id="quality-other" data-status="complete"><div{% if qualityReadingDetails|default(false) %} class="reading-detail" data-reading-detail="quality-other"{% endif %}>{{ answerMarkdown.markdown(otherText) }}</div></div>
-  {% elif otherAnswer == uuids.mdQualityOtherYesAUuid %}
+  {% elif otherAnswer == uuids.mdQualityOtherYesAUuid and not otherText|trim %}
     {% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-fact-id="quality-other" data-status="missing">{{ pgettext("quality-control", "Other quality control methods were selected for <strong>%(qualityName)s</strong>, but the details have not been provided.", qualityName=qualityName) }}</p>{% else %}<p class="quality-summary" data-fact-id="quality-other" data-status="partial">{{ pgettext("quality-control", "Other quality control methods are planned for <strong>%(qualityName)s</strong>.", qualityName=qualityName) }}</p>{% endif %}
   {% endif %}{% endif %}
 {% else %}
