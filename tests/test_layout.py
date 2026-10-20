@@ -18,6 +18,41 @@ spec.loader.exec_module(module)
 
 
 class LayoutTests(unittest.TestCase):
+    def test_q9_pdf_releases_only_a_terminal_owned_ethics_summary(self):
+        from bs4 import BeautifulSoup
+        selector = ('html body article.dmp.pdf-flow-layout #q-ethical-issues > .answer > '
+                    'ul.ethical-datasets > li.ethical-dataset > p.ethical-data-summary:only-child')
+        css = (ROOT / 'src/layout.css').read_text()
+        self.assertEqual(1, css.count(selector + ' { break-after: auto; }'))
+        self.assertIn('html body li > p:first-child { break-after: avoid; }', css)
+        self.assertNotRegex(css, r'(?:^|\n)html body (?:p|li(?: > p(?::first-child)?)?)\s*\{[^}]*break-after:\s*auto')
+        summary = '<p class="ethical-data-summary"><span class="ethical-dataset-name"><strong>Dataset A</strong></span> — Neither personal nor sensitive data.</p>'
+        source = ('<html><body><article class="dmp pdf-flow-layout">'
+            '<div id="q-ethical-issues" class="question"><div class="answer">'
+            '<ul class="ethical-datasets"><li class="ethical-dataset">' + summary +
+            '</li></ul></div></div></article></body></html>')
+        self.assertEqual(1, len(BeautifulSoup(source, 'html.parser').select(selector)))
+        cases = [
+            ('word', source.replace('dmp pdf-flow-layout', 'dmp')),
+            ('unknown-pdf-role', source.replace('pdf-flow-layout', 'unknown-layout')),
+            ('other-question', source.replace('q-ethical-issues', 'q-access-security')),
+            ('other-list', source.replace('ethical-datasets', 'other-list')),
+            ('unknown-answer-class', source.replace('class="answer"', 'class="unknown-answer"')),
+            ('unknown-item-class', source.replace('class="ethical-dataset"', 'class="unknown-item"')),
+            ('unknown-summary-class', source.replace('ethical-data-summary', 'unknown-summary')),
+            ('follow-up-gap', source.replace(summary, summary + '<p class="data-gap">Original gap.</p>')),
+            ('second-paragraph', source.replace(summary, summary + '<p>Original follow-up.</p>')),
+            ('follow-up-block', source.replace(summary, summary + '<div>Original follow-up.</div>')),
+            ('authored-detail', source.replace('<ul class="ethical-datasets">',
+                '<div class="answer-detail"><ul class="ethical-datasets">').replace('</ul>', '</ul></div>')),
+        ]
+        for name, markup in cases:
+            with self.subTest(case=name):
+                self.assertFalse(BeautifulSoup(markup, 'html.parser').select(selector))
+        # Summary inline children are content, not sibling follow-ups. The
+        # original list-item lead keep still applies to every rejected shape.
+        self.assertTrue(BeautifulSoup(source, 'html.parser').select('li > p:first-child'))
+
     def test_q13_supplied_scalar_identifiers_have_targeted_wrapping(self):
         css = (ROOT / 'src/layout.css').read_text()
         self.assertIn('#q-persistent-identifier .primary-identifiers { overflow-wrap: anywhere; word-break: break-word; }', css)

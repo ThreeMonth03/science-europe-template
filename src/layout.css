@@ -137,6 +137,9 @@ html body .answer-detail ul:has(> li:last-child:nth-child(-n+3)) { break-inside:
    so retain direct ownership outside :has and use its supported descendant form. */
 html body #q-copyright-ipr > .answer > .answer-detail > ul:has(li > div.answer-lead, li > table, li > pre, li > ul, li > ol) { break-inside: auto; }
 html body li > p:first-child { break-after: avoid; }
+/* A complete Q9 summary ends its own record; it must not keep the next
+   dataset or section. Items with follow-up blocks retain their existing keep. */
+html body article.dmp.pdf-flow-layout #q-ethical-issues > .answer > ul.ethical-datasets > li.ethical-dataset > p.ethical-data-summary:only-child { break-after: auto; }
 html body .resource-table { font-size: 10pt; table-layout: fixed; }
 /* Manually entered amount/currency/funding text must stay in its own cell. */
 html body .resource-table td { overflow-wrap: anywhere; word-break: break-word; }
