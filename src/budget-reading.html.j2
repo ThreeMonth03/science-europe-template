@@ -1,5 +1,25 @@
 {# Presentation only. Capture original fragments once in Q15; never parse them
    into replacement prose or modify their text/attributes/paragraph boundaries. #}
+{%- macro submission_table(header, rows, metadataHeader, fundingLabel, pdf, word) -%}
+  {%- set original -%}<table class="resource-table"><colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup><thead>{{ header }}</thead><tbody>{% for row in rows %}{{ row.original }}{% endfor %}</tbody></table>{%- endset -%}
+  {%- if pdf -%}{{ render(original, header, rows, metadataHeader, fundingLabel) }}
+  {%- elif word -%}{{ word_table(original, header, rows, metadataHeader, fundingLabel) }}
+  {%- else -%}{{ original }}{%- endif -%}
+{%- endmacro -%}
+
+{%- macro submission_resources(header, rows, metadataHeader, fundingLabel, pdf=false, word=false) -%}
+  {# Preserve order and authored HTML. Only Q15's explicit empty-metadata
+     classification may remove columns; all other rows use the old renderer. #}
+  {%- set pending = [] -%}
+  {%- for row in rows -%}
+    {%- if row.proseOnly -%}
+      {%- if pending -%}{{ submission_table(header, pending, metadataHeader, fundingLabel, pdf, word) }}{%- do pending.clear() -%}{%- endif -%}
+      <div class="resource-prose" data-item-id="{{ row.id }}">{% if row.purpose|trim and row.title|striptags|trim|length <= 80 %}<div class="answer-lead">{{ row.title }}</div>{% else %}{{ row.title }}{% endif %}{{ row.purpose }}</div>
+    {%- else -%}{%- do pending.append(row) -%}{%- endif -%}
+  {%- endfor -%}
+  {%- if pending -%}{{ submission_table(header, pending, metadataHeader, fundingLabel, pdf, word) }}{%- endif -%}
+{%- endmacro -%}
+
 {%- macro classify(row, result) -%}
   {# Conservative height bounds, not a complete HTML parser or text validator.
      Unknown tags/attributes fall back to the original table, never lose data. #}

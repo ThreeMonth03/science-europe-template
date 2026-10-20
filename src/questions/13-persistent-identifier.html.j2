@@ -179,7 +179,7 @@
             {%- endset -%}
             {%- set reuseHowPath = activeAnswer.path(reuseParts + [k, uuids.measuredDataReuseQUuid, uuids.measuredDataReuseOtherFieldAUuid, uuids.measuredDataReuseOtherFieldHowQUuid], 'ValueQuestion') -%}
             {%- set reuseHow = repliesMap[reuseHowPath]|reply_str_value -%}
-            {% if output_profile|default('review') != 'submission' or measuredDataNameReply|trim or reuseSummary or reuseHow|trim %}
+            {% if output_profile|default('review') != 'submission' or reuseSummary or reuseHow|trim %}
               <li data-item-id="{{ k }}">
                 {# Keep a short summary with its use label, not an entire authored answer. #}
                 {% set keepReuseLead = reuseHow|trim and measuredDataNameReply|length <= 80 %}

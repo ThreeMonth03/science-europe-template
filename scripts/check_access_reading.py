@@ -298,7 +298,7 @@ def check(root, language):
             replies, listing = reuse_replies(option, name, detail)
             soup = render(identifier, replies, profile, reuse_schema())
             entries = soup.select('.measured-data-reuse > ul > li')
-            visible = profile == 'review' or bool((name or '').strip()) or option in REUSE[language]
+            visible = profile == 'review' or option in REUSE[language]
             assert len(entries) == int(visible)
             assert bool(soup.select('.measured-data-reuse h4')) == visible
             if visible:
@@ -345,7 +345,10 @@ def check(root, language):
             if change == 'parent-missing': replies.pop(path('creatingCUuid', 'measuredQUuid'))
             if change == 'item-deleted': replies[listing] = []
             soup = render(identifier, replies, profile, schema)
-            assert bool(soup.select('.measured-data-reuse')) == (change in ['name-filtered', 'choice-filtered', 'choice-removed', 'option-filtered', 'answer-removed', 'how-filtered'])
+            expected_reuse = ['name-filtered', 'how-filtered']
+            if profile == 'review':
+                expected_reuse += ['choice-filtered', 'choice-removed', 'option-filtered', 'answer-removed']
+            assert bool(soup.select('.measured-data-reuse')) == (change in expected_reuse)
             assert bool(soup.select('[data-fact-id="measured-data-reuse"]')) == (change in ['name-filtered', 'how-filtered'])
             assert bool(soup.select('[data-fact-id="measured-data-reuse-uses"]')) == (change == 'name-filtered')
             counts['inactive_reuse'] += 1
@@ -359,9 +362,9 @@ def check(root, language):
             soup = render(full, replies, profile, reuse_schema())
             assert len(soup.select('.question')) == 15 and len(soup.select('.dmp-section')) == 6
             rows = soup.select('.measured-data-reuse > ul > li')
-            expected = replies[listing] if profile == 'review' else ['name-only', 'measured-a', 'same-name']
+            expected = replies[listing] if profile == 'review' else ['measured-a', 'same-name']
             assert [r['data-item-id'] for r in rows] == expected
-            if profile == 'submission': assert rows[1].select_one('.dataset-label[data-list-index="3"]')
+            if profile == 'submission': assert rows[0].select_one('.dataset-label[data-list-index="3"]')
             assert soup.select_one('.measured-data-reuse .answer-detail').decode_contents() == authored
             replies[listing] = []
             assert not render(identifier, replies, profile, reuse_schema()).select('.measured-data-reuse, ul:empty')

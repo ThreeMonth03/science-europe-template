@@ -111,7 +111,7 @@
                 {%- set projectCostItems = repliesMap[projectCostPath]|reply_items -%}
 
                 {%- if projectCostItems|length > 0  -%}
-                    {%- set budgetLayout = namespace(header='', rows=[], metadataHeader='', fundingLabel='') -%}
+                    {%- set budgetLayout = namespace(header='', rows=[], metadataHeader='', fundingLabel='', proseOnly=false) -%}
                     {%- set originalBudgetTable -%}
                     <table class="resource-table">
                       <colgroup><col class="resource-purpose"><col class="resource-budget"><col class="resource-funding"></colgroup>
@@ -121,7 +121,7 @@
                         {%- set projectCostItem = [projectCostPath, j]|reply_path -%}
                         {%- set projectCostItemTitleQUuid = [projectCostItem, uuids.costTitleQUuid]|reply_path -%}
                         {%- set projectCostItemTitleReply = repliesMap[projectCostItemTitleQUuid]|reply_str_value -%}
-                        {%- set budgetRow = namespace(id=projectCostItem, title='', purpose='', budget='', funding='', original='') -%}
+                        {%- set budgetRow = namespace(id=projectCostItem, title='', purpose='', budget='', funding='', original='', proseOnly=false, hasAllocation=false) -%}
                         {%- set budgetRow.original -%}
                         <tr data-item-id="{{ projectCostItem }}"><td>
                         {% set budgetRow.title %}<p><strong>{% if output_profile|default('review') == 'submission' and not projectCostItemTitleReply|trim %}{{ macros.resourceLabel(projectCostItems.index(j) + 1) }}{% else %}{{ projectCostItemTitleReply if projectCostItemTitleReply|trim else pgettext("questions/15-required-resources", "(no resource name given)") }}{% endif %}</strong></p>{% endset %}{{ budgetRow.title }}
@@ -160,6 +160,7 @@
 
                         {%- set projectCostItemAllocationQUuid = [projectCostItem, uuids.costAllocationQUuid]|reply_path  -%}
                         {%- set projectCostItemAllocationItems = repliesMap[projectCostItemAllocationQUuid]|reply_items -%}
+                        {%- set budgetRow.hasAllocation = projectCostItemAllocationItems|length > 0 -%}
 
                         
                           {%- set projectCostItemAllocations = [] -%}
@@ -227,13 +228,24 @@
 
 
                         {% endset %}{{ budgetRow.funding }}</td></tr>
+                        {#- Do not reserve empty money/funding columns for a prose-only
+                           submission record. Any partial value or allocation keeps
+                           the existing budget path, including zero and Other. #}
+                        {%- set budgetRow.proseOnly = output_profile|default('review') == 'submission'
+                            and not budgetRow.budget|trim and not budgetRow.funding|trim
+                            and not budgetRow.hasAllocation
+                            and (projectCostItemTitleReply|trim or budgetRow.purpose|trim) -%}
+                        {%- set budgetLayout.proseOnly = budgetLayout.proseOnly or budgetRow.proseOnly -%}
                         {%- endset -%}{{ budgetRow.original }}
                         {%- do budgetLayout.rows.append(budgetRow) -%}
                     {%- endfor -%}
                       </tbody>
                     </table>
                     {%- endset -%}
-                    {%- if pdf_budget_reading|default(false) -%}
+                    {%- if budgetLayout.proseOnly -%}
+                      {%- import 'src/budget-reading.html.j2' as budgetReading -%}
+                      {{ budgetReading.submission_resources(budgetLayout.header, budgetLayout.rows, budgetLayout.metadataHeader, budgetLayout.fundingLabel, pdf_budget_reading|default(false), word_budget_reading|default(false)) }}
+                    {%- elif pdf_budget_reading|default(false) -%}
                       {%- import 'src/budget-reading.html.j2' as budgetReading -%}
                       {{ budgetReading.render(originalBudgetTable, budgetLayout.header, budgetLayout.rows, budgetLayout.metadataHeader, budgetLayout.fundingLabel) }}
                     {%- elif word_budget_reading|default(false) -%}

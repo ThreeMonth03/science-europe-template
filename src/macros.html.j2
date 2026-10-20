@@ -2,8 +2,8 @@
 {# Formatting macros #}
 {# A bounded presentation hint, not a rewrite. Unknown tags or inline styles
    may be tall despite little text and must retain ordinary pagination. #}
-{%- macro shortDatasetRecord(content, label='') -%}
-  {%- set small = namespace(ok=content|length <= 5000 and label|striptags|trim|length <= 80 and (content|striptags|trim|length + label|striptags|trim|length) <= 300 and content.lower().count('<p') <= 6 and content.lower().count('<li') <= 3 and content.lower().count('<div') <= 12) -%}
+{%- macro shortDatasetRecord(content, label='', limit=300) -%}
+  {%- set small = namespace(ok=content|length <= 5000 and label|striptags|trim|length <= 80 and (content|striptags|trim|length + label|striptags|trim|length) <= limit and content.lower().count('<p') <= 6 and content.lower().count('<li') <= 3 and content.lower().count('<div') <= 12) -%}
   {%- for fragment in content.split('<')[1:] -%}
     {%- set tag = fragment.split('>', 1)[0].split()[0]|lower if fragment.split('>', 1)[0].split() else '' -%}
     {%- if 'style' in fragment.split('>', 1)[0]|lower or tag not in ['p', '/p', 'div', '/div', 'a', '/a', 'span', '/span', 'strong', '/strong', 'em', '/em', 'ul', '/ul', 'li', '/li'] -%}{%- set small.ok = false -%}{%- endif -%}

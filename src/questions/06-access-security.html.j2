@@ -299,9 +299,13 @@
           {% if shortPolicyDescription %}{% do policyReading.short.append(policyReading.visible) %}{% endif %}
           <li>
           {% if shortPolicyDescription %}<div class="policy-item short-policy-item" data-item-id="{{ policiesProceduresItem|e }}">{% endif %}
+          {# Keep a bounded label with the start, not all of a long policy. #}
+          {% set policyLabelLead = not shortPolicyDescription and metadataWidth.value <= 160 and (policiesProceduresItemNameReply|trim or policiesProceduresItemLinkReply|trim) and descriptionCandidate.startswith('<p>') %}
+          {% if policyLabelLead %}<div class="answer-lead"><p>{% endif %}
             {% if policiesProceduresItemNameReply|trim %}<strong>{{ policiesProceduresItemNameReply|e }}</strong>{% endif %}
             {% if policiesProceduresItemNameReply|trim and policiesProceduresItemLinkReply|trim %}<span class="separator">&ndash;</span>{% endif %}
             {% if policiesProceduresItemLinkReply|trim %}{{ policiesProceduresItemLinkReply|e }}{% endif %}
+          {% if policyLabelLead %}</p></div>{% endif %}
             {{ policyDescription }}
           {% if shortPolicyDescription %}</div>{% endif %}
           </li>

@@ -237,6 +237,25 @@
   {%- if formatsItems|length > 0 -%}
     <h4>{% trans %}Data formats and types{% endtrans %}</h4>
     <div class="data-formats">
+      {# Compact only a wholly name-only submission inventory. A mixed or
+         partially answered inventory keeps its existing per-record details. #}
+      {%- set nameOnlyFormats = [] -%}
+      {%- if output_profile|default('review') == 'submission' and formatsItems|length > 1 -%}
+        {%- for formatItem in formatsItems -%}
+          {%- set formatPrefix = [formatsPath, formatItem]|reply_path -%}
+          {%- set formatName = macros.integrationFairSharing(repliesMap[[formatPrefix, uuids.formatsNameQUuid]|reply_path])|trim -%}
+          {%- set formatChoices = [] -%}
+          {%- for field in [uuids.formatsIsStandardQUuid, uuids.formatsIsLTSuitableQUuid, uuids.formatsVolumeQUuid] -%}
+            {%- do formatChoices.append(repliesMap[[formatPrefix, field]|reply_path]|reply_str_value|trim) -%}
+          {%- endfor -%}
+          {%- if formatName|striptags|trim and not formatChoices|any -%}
+            {%- do nameOnlyFormats.append({'id': formatItem, 'name': formatName}) -%}
+          {%- endif -%}
+        {%- endfor -%}
+      {%- endif -%}
+      {% if nameOnlyFormats|length == formatsItems|length %}
+        <p class="format-name-list">{% for format in nameOnlyFormats %}{% if not loop.first %}{{ gettext(", ") }}{% endif %}<strong data-item-id="{{ format.id }}">{{ format.name }}</strong>{% endfor %}</p>
+      {% else %}
       {%- for formatItem in formatsItems -%}
         {%- set formatPrefix = [formatsPath, formatItem]|reply_path -%}
         {%- set formatNameReply = repliesMap[[formatPrefix, uuids.formatsNameQUuid]|reply_path] -%}
@@ -340,6 +359,7 @@
           {% if formatGaps %}{% if output_profile|default('review') != 'submission' %}<p class="data-gap" data-requirement-id="SE-1b">{% trans formatGaps=formatGaps|join(gettext(", ")) %}Information still needed: {{ formatGaps }}.{% endtrans %}</p>{% endif %}{% endif %}
         </div>
       {%- endfor -%}
+      {% endif %}
     </div>
   {%- endif -%}
   </div>
