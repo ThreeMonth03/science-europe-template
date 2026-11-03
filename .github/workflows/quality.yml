@@ -38,8 +38,10 @@ jobs:
         shell: bash
         run: |
           mkdir -p outputs
+          make pot POT_OUTPUT=outputs/template.pot
           python scripts/check_current.py --output outputs/current-behavior.json
           PYTHONPATH=tests:scripts python -m unittest -v \
+            tests.test_catalog \
             tests.test_current_behavior.CurrentI18nTests \
             tests.test_current_behavior.CurrentBudgetLayoutTests \
             tests.test_q3_storage_groups \
@@ -72,6 +74,7 @@ jobs:
           path: |
             outputs/*.json
             outputs/*.log
+            outputs/*.pot
           retention-days: 14
       - name: State tested source and acceptance boundary
         if: always()

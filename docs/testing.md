@@ -24,11 +24,18 @@ pinned by the existing workflow. They cover bounded contracts, not every
 possible project. CI has current unit/native lanes and a required aggregate
 check; retired historical replay is no longer a selectable mode.
 
-Chinese package checks additionally verify the PO against official DSW 4.35
-extraction. Missing or extra active keys, untranslated/fuzzy entries and mismatched
-named parameters fail rather than silently approving a source/translation mismatch.
-This checks marked messages, not the semantics of every translation or every
-human-readable literal.
+`make pot POT_OUTPUT=outputs/template-NEW.pot` exports the marked messages using
+official DSW 4.35 extraction. A clean, identified English commit is required;
+failed parsing, empty sources and an existing output path are rejected. The
+English catalog tests cover extraction, provenance and the shared catalog
+validator without requiring a Chinese checkout.
+
+Chinese CI consumes this English-produced POT before building. It checks the
+template coordinate and exact source commit against `pipeline.yml`, then checks
+the authoritative PO for missing or extra active keys, untranslated/fuzzy
+entries and mismatched named parameters. The Chinese refresh script does not
+extract or parse Jinja. These checks concern marked messages, not the semantics
+of every translation or every human-readable literal.
 
 ## Building runtime deliveries
 

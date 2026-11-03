@@ -40,6 +40,37 @@ See [testing and translation boundaries](docs/testing.md) for requirements and
 acceptance limits. CI validates the current tree; it does not deploy a template
 or replace page-by-page PDF/Word review.
 
+## Translation workflow
+
+This repository owns the translation message contract as well as the English
+text: Jinja markers, contexts, placeholders and POT extraction. The Chinese
+repository owns PO merging, translation review and runtime deliveries. The
+Tool repository supplies pinned build dependencies and resources; it is not the
+entry point for this template's POT/PO workflow.
+
+From a clean, committed English checkout, generate a new POT with:
+
+```sh
+make pot POT_OUTPUT=outputs/template-NEW.pot
+```
+
+`scripts/export_pot.py` uses the official DSW extractor through
+`scripts/template_catalog.py`; it does not infer sentence boundaries or rewrite
+Jinja. The shared helper is also used by `scripts/check_catalog.py`. Extraction
+fails on unparseable files or an empty catalog, rather than publishing a partial
+POT. The output must not already exist.
+
+The POT records the template coordinate and full English commit. For Chinese
+work, use exactly the commit pinned in the Chinese `pipeline.yml`, then pass the
+POT to that repository's `scripts/refresh_po.py --pot ...`. A different or
+unidentified source is rejected. Commit a deliberate source change and update
+the pin before refreshing translations; never follow a floating branch silently.
+
+POT is generated source-language input, not an editable translation or a second
+source of truth. It may be saved outside this checkout. Only the Chinese
+repository's `locales/zh-Hant.po` is authoritative for Traditional Chinese; neither
+extraction nor a PO review draft automatically approves translations.
+
 ## Upstream and standard provenance
 
 This is a derivative of official `dsw:science-europe:1.30.1`, not an official
