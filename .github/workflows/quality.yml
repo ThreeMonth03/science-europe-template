@@ -22,14 +22,18 @@ jobs:
         group: [unit, native]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Reproducible packages use actual package-input history.
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
           cache: pip
-          cache-dependency-path: requirements-dev.txt
+          cache-dependency-path: |
+            requirements-dev.txt
+            requirements-po.txt
       - name: Install declared English dependencies
         run: python -m pip install -r requirements-dev.txt
-      - name: Prepare public Knowledge Model fixtures independently
+      - name: Verify repository-owned public Knowledge Model fixtures
         run: make knowledge-models
       - name: Check template validity
         run: make verify
@@ -38,8 +42,13 @@ jobs:
         shell: bash
         run: |
           mkdir -p outputs
+          make package PACKAGE_OUTPUT=outputs/english-build
+          make pot POT_OUTPUT=outputs/template.pot
           python scripts/check_current.py --output outputs/current-behavior.json
           PYTHONPATH=tests:scripts python -m unittest -v \
+            tests.test_catalog \
+            tests.test_build_package \
+            tests.test_knowledge_models \
             tests.test_current_behavior.CurrentI18nTests \
             tests.test_current_behavior.CurrentBudgetLayoutTests \
             tests.test_q3_storage_groups \
@@ -72,6 +81,8 @@ jobs:
           path: |
             outputs/*.json
             outputs/*.log
+            outputs/*.pot
+            outputs/english-build/english.zip
           retention-days: 14
       - name: State tested source and acceptance boundary
         if: always()

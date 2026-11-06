@@ -2,10 +2,12 @@
 
 ## Source ownership
 
-English owns shared Jinja, answer bindings, language-aware layout and the DSW
-4.34 compatibility exporter. The companion Chinese repository owns the only
-editable `locales/zh-Hant.po` and pins exact source and Tool commits in
-`pipeline.yml`. Do not edit generated Chinese packages, MO files or render trees.
+English owns shared Jinja, answer bindings, language-aware layout, fonts, public
+KM test snapshots, English packaging and the DSW 4.34 compatibility exporter.
+The companion Chinese repository owns the only editable `locales/zh-Hant.po`
+and pins the exact English source and official build dependencies in
+`pipeline.yml`. Neither build needs a Tool checkout or editable Tool install.
+Do not edit generated Chinese packages, MO files or render trees.
 
 The compatibility exporter is active functionality, even though its filename
 contains `legacy`: stock DSW 4.34 needs the embedded-catalog profile. It is not
@@ -19,21 +21,47 @@ eight current English answer/reading suites; the Chinese workflow runs the same
 suites against both prepared language packages. `make test-compat434` verifies
 the active compatibility exporter.
 
+`make knowledge-models` verifies the two repository-owned public snapshots,
+offline. Missing or changed snapshots fail without replacing the input. Package
+tests cover source immutability, single layout preparation, deterministic ZIPs,
+history-derived timestamps and refusal to overwrite earlier output.
+
 Native parser and pagination checks require Docker and the stock Worker images
 pinned by the existing workflow. They cover bounded contracts, not every
 possible project. CI has current unit/native lanes and a required aggregate
 check; retired historical replay is no longer a selectable mode.
 
-Chinese package checks additionally verify the PO against official DSW 4.35
-extraction. Missing or extra active keys, untranslated/fuzzy entries and mismatched
-named parameters fail rather than silently approving a source/translation mismatch.
-This checks marked messages, not the semantics of every translation or every
-human-readable literal.
+`make pot POT_OUTPUT=outputs/template-NEW.pot` exports the marked messages using
+official DSW 4.35 extraction. A clean, identified English commit is required;
+failed parsing, empty sources and an existing output path are rejected. The
+English catalog tests cover extraction, provenance and the shared catalog
+validator without requiring a Chinese checkout.
+
+Chinese CI consumes this English-produced POT before building. It checks the
+template coordinate and exact source commit against `pipeline.yml`, then checks
+the authoritative PO for missing or extra active keys, untranslated/fuzzy
+entries and mismatched named parameters. The Chinese refresh script does not
+extract or parse Jinja. These checks concern marked messages, not the semantics
+of every translation or every human-readable literal.
 
 ## Building runtime deliveries
 
-Use the Chinese repository's current build instructions. The English package must
-already have its fonts and Word reference prepared exactly once.
+Build English independently from a clean checkout with full Git history:
+
+```sh
+make package PACKAGE_OUTPUT=outputs/english-NEW
+```
+
+`scripts/build_package.py` owns source copying, font/Word reference preparation,
+official TDK verification/packaging and canonical ZIP bytes. It uses only this
+repository's fonts and prepares the package exactly once. A new output directory
+is required; local dirty-source rehearsals must explicitly use the CLI's
+`--preview` option and are not release candidates.
+
+For paired English/Chinese deliveries, follow the Chinese repository's build
+instructions. Its orchestrator calls this same English builder, then reviews
+and exports the Chinese compatibility package; it does not prepare a second
+Word reference or implement a second English packager.
 
 For an explicit compatibility export from that prepared package:
 

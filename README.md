@@ -10,8 +10,10 @@ in `locales/zh-Hant.po`.
 
 - `template.json` declares the English source template and output formats.
 - `src/` contains shared Jinja, language-aware CSS, Word assets and filters.
-- The Chinese repository pins an exact English commit and Tool commit in
-  `pipeline.yml`, then builds both runtime deliveries from the same source.
+- This repository owns English preparation and packaging, including fonts,
+  Word reference preparation and public KM test fixtures.
+- The Chinese repository pins an exact English commit in `pipeline.yml`, then
+  builds both runtime deliveries from the same source and its reviewed PO.
 - DSW 4.34 uses a generated Chinese compatibility ZIP with an embedded MO catalog.
   DSW 4.35 uses the English ZIP with a separately attached Chinese PO locale.
 - The same English ZIP also supports stock DSW 4.34: descriptor options activate
@@ -36,9 +38,51 @@ make check-current
 make test-compat434
 ```
 
+Build the prepared English ZIP without a Chinese or Tool checkout:
+
+```sh
+make package PACKAGE_OUTPUT=outputs/english-NEW
+```
+
+The output directory must be new. The standalone builder requires clean,
+committed source and full Git history; `--preview` on `scripts/build_package.py`
+is only for unaccepted local development. It never edits the source assets.
+
 See [testing and translation boundaries](docs/testing.md) for requirements and
 acceptance limits. CI validates the current tree; it does not deploy a template
 or replace page-by-page PDF/Word review.
+
+## Translation workflow
+
+This repository owns the translation message contract as well as the English
+text: Jinja markers, contexts, placeholders and POT extraction. The Chinese
+repository owns PO merging, translation review, version pairing and bilingual
+runtime deliveries. Neither repository requires `dsw-document-template-tool` to
+build or test this customised template. The Tool's separate legacy workflow is
+not changed by this ownership boundary.
+
+From a clean, committed English checkout, generate a new POT with:
+
+```sh
+make pot POT_OUTPUT=outputs/template-NEW.pot
+```
+
+`scripts/export_pot.py` uses the official DSW extractor through
+`scripts/template_catalog.py`; it does not infer sentence boundaries or rewrite
+Jinja. The shared helper is also used by `scripts/check_catalog.py`. Extraction
+fails on unparseable files or an empty catalog, rather than publishing a partial
+POT. The output must not already exist.
+
+The POT records the template coordinate and full English commit. For Chinese
+work, use exactly the commit pinned in the Chinese `pipeline.yml`, then pass the
+POT to that repository's `scripts/refresh_po.py --pot ...`. A different or
+unidentified source is rejected. Commit a deliberate source change and update
+the pin before refreshing translations; never follow a floating branch silently.
+
+POT is generated source-language input, not an editable translation or a second
+source of truth. It may be saved outside this checkout. Only the Chinese
+repository's `locales/zh-Hant.po` is authoritative for Traditional Chinese; neither
+extraction nor a PO review draft automatically approves translations.
 
 ## Upstream and standard provenance
 

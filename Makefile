@@ -1,4 +1,4 @@
-.PHONY: test verify check check-current package audit-upstream knowledge-models export-compat434 test-compat434
+.PHONY: test verify check check-current package audit-upstream knowledge-models export-compat434 test-compat434 pot
 .DEFAULT_GOAL := test
 
 PYTHON ?= python3
@@ -8,6 +8,12 @@ ENGLISH_ZIP ?=
 COMPAT_VERSION ?=
 COMPAT_OUTPUT ?= outputs/compat434/template.zip
 SOURCE_COMMIT ?=
+POT_OUTPUT ?= outputs/template.pot
+PACKAGE_OUTPUT ?= outputs/package
+PACKAGE_PREVIEW ?=
+
+pot:
+	$(PYTHON) scripts/export_pot.py --output "$(POT_OUTPUT)"
 
 export-compat434:
 	$(if $(strip $(PO)),,$(error Set PO to the authoritative Chinese repository catalog))
@@ -32,7 +38,7 @@ check-current:
 	$(PYTHON) scripts/check_current.py
 
 package:
-	$(DSW_TDK) --no-config package .
+	$(PYTHON) scripts/build_package.py --output "$(PACKAGE_OUTPUT)" --tdk "$(DSW_TDK)" $(if $(filter 1 true,$(PACKAGE_PREVIEW)),--preview)
 
 audit-upstream:
 	$(PYTHON) scripts/audit_upstream.py --target upstream/main
