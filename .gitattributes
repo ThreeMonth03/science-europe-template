@@ -1,1 +1,3 @@
 *.docx binary
+# Frozen upstream bundles are checksum-verified inputs, not hand-edited source.
+fixtures/knowledge-models/*.km binary linguist-vendored

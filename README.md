@@ -10,8 +10,10 @@ in `locales/zh-Hant.po`.
 
 - `template.json` declares the English source template and output formats.
 - `src/` contains shared Jinja, language-aware CSS, Word assets and filters.
-- The Chinese repository pins an exact English commit and Tool commit in
-  `pipeline.yml`, then builds both runtime deliveries from the same source.
+- This repository owns English preparation and packaging, including fonts,
+  Word reference preparation and public KM test fixtures.
+- The Chinese repository pins an exact English commit in `pipeline.yml`, then
+  builds both runtime deliveries from the same source and its reviewed PO.
 - DSW 4.34 uses a generated Chinese compatibility ZIP with an embedded MO catalog.
   DSW 4.35 uses the English ZIP with a separately attached Chinese PO locale.
 - The same English ZIP also supports stock DSW 4.34: descriptor options activate
@@ -36,6 +38,16 @@ make check-current
 make test-compat434
 ```
 
+Build the prepared English ZIP without a Chinese or Tool checkout:
+
+```sh
+make package PACKAGE_OUTPUT=outputs/english-NEW
+```
+
+The output directory must be new. The standalone builder requires clean,
+committed source and full Git history; `--preview` on `scripts/build_package.py`
+is only for unaccepted local development. It never edits the source assets.
+
 See [testing and translation boundaries](docs/testing.md) for requirements and
 acceptance limits. CI validates the current tree; it does not deploy a template
 or replace page-by-page PDF/Word review.
@@ -44,9 +56,10 @@ or replace page-by-page PDF/Word review.
 
 This repository owns the translation message contract as well as the English
 text: Jinja markers, contexts, placeholders and POT extraction. The Chinese
-repository owns PO merging, translation review and runtime deliveries. The
-Tool repository supplies pinned build dependencies and resources; it is not the
-entry point for this template's POT/PO workflow.
+repository owns PO merging, translation review, version pairing and bilingual
+runtime deliveries. Neither repository requires `dsw-document-template-tool` to
+build or test this customised template. The Tool's separate legacy workflow is
+not changed by this ownership boundary.
 
 From a clean, committed English checkout, generate a new POT with:
 
